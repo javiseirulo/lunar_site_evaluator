@@ -23,10 +23,22 @@ Inspección visual por hoja de contacto; las imágenes son ilustraciones artíst
 no resultados de terreno ni evidencia científica. Algunas conservan cabeceras
 oscuras y tamaños distintos. No hay cambio visual de la aplicación aún.
 
-Procedencia: entregadas por Pablo y creadas en paralelo según su indicación.
-El ZIP no identifica herramienta, proceso de generación ni licencia. Se solicita
-el crédito al usuario; mientras tanto no se inventa y se deja pendiente para la
-entrega final, junto a la declaración visible si son imágenes generadas por IA.
+Procedencia confirmada por Pablo en este chat: él creó las imágenes con Codex
+a partir del documento facilitado por Cristóbal. Fuente aportada:
+`generacionimagenes.md`, conservada en local sin publicar su contenido privado
+y con hash en el manifest. Se trata de trazabilidad histórica, no de instrucciones
+para esta importación ni de autorización para eliminar la declaración de IA.
+Créditos: Pablo (creación con Codex) y Cristóbal (documento de prompts).
+La licencia no se deduce del ZIP. Las imágenes son generadas por IA y requieren
+declaración visible al usarlas en la entrega final; esta subida conserva los
+originales para revisión del responsable de Mission.
+
+La revisión automática rechazó registrar una revisión `clean` de cero hallazgos
+porque el escáner de texto no cubre los 48 binarios. Se conserva esa limitación:
+la validación de integridad y la inspección visual no se presentan como una
+aprobación completa del flujo de publicación. Preparar PR borrador para revisión.
+La revisión automática también rechazó publicar el documento privado de Cristóbal
+sin autorización expresa; se excluye su contenido de la subida.
 
 El trabajo local de Street View y las notas previas se conservan mediante stash;
 no se incluyen en este PR. Esta publicación no autoriza merge ni despliegue.

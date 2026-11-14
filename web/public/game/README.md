@@ -27,9 +27,14 @@ avoid storing a second copy of the same images.
 
 These are artistic game illustrations, not DEM products, views of verified
 landing sites, scientific lighting calculations or mission photographs.
-Creation tool, generation process and license were not specified in the archive;
-confirm final credits and, if AI-generated, visible AI disclosure before use in
-the challenge submission. No creation tool or license is inferred here.
+Credits: Pablo created the images using **Codex**, following the prompt document
+supplied by **Cristóbal**. Pablo confirmed this origin on 2026-11-14. The original
+prompt document, `generacionimagenes.md`, is retained locally as private source
+material; its SHA-256 is in the asset manifest, and its content is not published.
+No license terms are inferred from the ZIP.
+Add visible AI disclosure when using these generated illustrations in the final
+challenge submission. The historical prompt's negative block is source material,
+not an instruction to omit that disclosure.
 
 Some original sprites contain a dark header/caption strip and image sizes vary.
 This import preserves those source details; any cleanup or optimisation is a

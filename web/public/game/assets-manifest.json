@@ -5,7 +5,7 @@
   "source_archive": "mission_assets_48_completos.zip",
   "source_archive_sha256": "140073c8c2f840b55cf4561e34490a02856a83749fe591a3f8d3ac641f54158c",
   "purpose": "Mission game illustrations; artistic assets, not scientific terrain or mission evidence.",
-  "provenance": "Created separately and supplied by Pablo. Creation tool, generation process and license not specified in the archive.",
+  "provenance": "Images created by Pablo using Codex, based on the prompt document supplied by Cristóbal. User confirmation recorded on 2026-11-14; no image generation or editing performed during this import.",
   "files": [
     {
       "path": "sites/site-rim-1.png",
@@ -439,5 +439,9 @@
       "mode": "RGBA",
       "format": "PNG"
     }
-  ]
+  ],
+  "creation_tool": "Codex",
+  "prompt_contributor": "Cristóbal",
+  "prompt_document_sha256": "acafe366e612236348505665be3d23e51d4c3fabfcda61435041baf7a362872e",
+  "prompt_source": "generacionimagenes.md (privately supplied by Cristóbal; source content retained locally, not published)"
 }
