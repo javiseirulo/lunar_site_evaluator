@@ -12,11 +12,8 @@ export function LandingPage() {
   return (
     <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)]">
       <section className="box p-5">
-        <h1 className="text-heading text-[34px] leading-[1.1] font-black tracking-[-0.01em]">
-          Where should the next lander{' '}
-          <span className="bg-gradient-to-r from-[#ff6fb5] to-[#ff8a3d] bg-clip-text text-transparent">
-            touch down?
-          </span>
+        <h1 className="text-heading text-[34px] leading-[1.1] font-bold tracking-[-0.015em]">
+          Where should the next lander <span className="text-pink">touch down?</span>
         </h1>
         <p className="text-ink mt-3 max-w-[46ch] text-[15px]">
           Find a safe, sunny place to land near the Moon&apos;s south pole, then compare sites to
@@ -34,16 +31,16 @@ function FeaturedSite({ site }: { site: Site }) {
   const selectSite = useAppStore((s) => s.selectSite);
   const navigate = useNavigate();
   return (
-    <div className="border-edge mt-6 flex flex-col gap-5 rounded-[8px] border bg-[#0e0820] p-4 sm:flex-row sm:items-center">
+    <div className="border-edge mt-6 flex flex-col gap-5 bg-panel-2 rounded-[4px] border p-4 sm:flex-row sm:items-center">
       <div
-        className="space pointer-events-none aspect-square w-full shrink-0 rounded-[6px] p-2 sm:w-[170px]"
+        className="space pointer-events-none aspect-square w-full shrink-0 rounded-[3px] p-2 sm:w-[170px]"
         aria-hidden
       >
         <PolarMap className="size-full" />
       </div>
       <div className="min-w-0">
         <p className="text-ink-muted text-[14px]">Site of the Day</p>
-        <h2 className="text-heading mt-0.5 text-[24px] font-black">{site.name}</h2>
+        <h2 className="text-heading mt-0.5 text-[24px] font-bold">{site.name}</h2>
         <div className="mt-4 flex items-center gap-4">
           <ScoreBox score={site.score} />
           <button
@@ -71,15 +68,15 @@ function TopicTiles() {
     navigate('/explore');
   };
   const tiles: { label: string; Icon: LucideIcon; color: string; go: () => void }[] = [
-    { label: 'Sunlight', Icon: Sun, color: '#ffb84d', go: () => openLayer('illumination') },
+    { label: 'Sunlight', Icon: Sun, color: '#f2a900', go: () => openLayer('illumination') },
     {
       label: 'Earth View',
       Icon: SatelliteDish,
-      color: '#5cc8ff',
+      color: '#4f9fe8',
       go: () => navigate('/learn#earth'),
     },
-    { label: 'Terrain', Icon: Mountain, color: '#b394ff', go: () => openLayer('slope') },
-    { label: 'Icy Craters', Icon: Snowflake, color: '#ff6fb5', go: () => openLayer('psr') },
+    { label: 'Terrain', Icon: Mountain, color: '#e6eaf0', go: () => openLayer('slope') },
+    { label: 'Icy Craters', Icon: Snowflake, color: '#9fb4d9', go: () => openLayer('psr') },
   ];
   return (
     <section className="grid grid-cols-2 gap-4" aria-label="Topics">
@@ -92,7 +89,7 @@ function TopicTiles() {
         >
           <Icon
             className="size-16 transition-transform duration-200 group-hover:scale-110"
-            style={{ color, filter: `drop-shadow(0 0 10px ${color})` }}
+            style={{ color }}
             strokeWidth={1.6}
             aria-hidden
           />

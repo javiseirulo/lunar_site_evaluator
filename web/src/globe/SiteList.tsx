@@ -34,9 +34,9 @@ export function SiteList({ className }: { className?: string }) {
                 onClick={() => selectSite(s.id)}
                 aria-pressed={selected}
                 className={cn(
-                  'grid w-full grid-cols-[36px_1fr_44px] items-center rounded-[6px] border px-2 py-1.5 text-left text-[14px] transition-colors duration-150',
+                  'grid w-full grid-cols-[36px_1fr_44px] items-center rounded-[3px] border px-2 py-1.5 text-left text-[14px] transition-colors duration-150',
                   selected
-                    ? 'border-pink/80 bg-[#2a1240] shadow-[0_0_12px_-4px_#ff3fa4]'
+                    ? 'border-[#6d9be6] bg-[#0b3d91]/45'
                     : 'hover:bg-panel-2 border-transparent',
                   !s.valid && !selected && 'opacity-55',
                 )}
@@ -71,7 +71,7 @@ export function SiteDetail({ className }: { className?: string }) {
             ['Compare', 'Put two or three spots side by side.'],
           ].map(([title, text], i) => (
             <li key={title} className="flex gap-3">
-              <span className="bg-pink flex size-7 shrink-0 items-center justify-center rounded-full text-[14px] font-black text-white shadow-[0_0_12px_-2px_#ff3fa4]">
+              <span className="bg-pink flex size-7 shrink-0 items-center justify-center rounded-full text-[14px] font-bold text-white ">
                 {i + 1}
               </span>
               <span>
@@ -91,7 +91,7 @@ export function SiteDetail({ className }: { className?: string }) {
       key={site.id}
       aria-label={`${site.name} details`}
     >
-      <h2 className="text-heading text-center text-[20px] font-black">{site.name}</h2>
+      <h2 className="text-heading text-center text-[20px] font-bold">{site.name}</h2>
       {proMode && (
         <p className="text-ink-faint num mt-0.5 text-center text-[12px]">
           {formatLatLon(site.lat, site.lon)} · {site.elev_m.toLocaleString('en')} m
@@ -106,12 +106,7 @@ export function SiteDetail({ className }: { className?: string }) {
           const good = m.goodness(site.metrics);
           return (
             <li key={m.key} className="flex items-center gap-3" title={m.help}>
-              <m.Icon
-                className={cn('size-7 shrink-0', m.tone)}
-                style={{ filter: 'drop-shadow(0 0 6px currentColor)' }}
-                strokeWidth={1.7}
-                aria-hidden
-              />
+              <m.Icon className={cn('size-7 shrink-0', m.tone)} strokeWidth={1.7} aria-hidden />
               <div className="min-w-0 flex-1">
                 <div className="flex items-baseline justify-between gap-2 text-[14px]">
                   <span className="text-heading">{proMode ? m.proLabel : m.label}</span>
@@ -125,7 +120,6 @@ export function SiteDetail({ className }: { className?: string }) {
                       style={{
                         width: `${Math.round(good * 100)}%`,
                         background: m.bar,
-                        boxShadow: `0 0 8px ${m.bar}`,
                       }}
                     />
                   </div>

@@ -24,7 +24,7 @@ export default function ExplorePage() {
         <div className="box overflow-hidden">
           <div className="space relative p-3">
             <div
-              className="absolute top-3 right-3 z-10 flex overflow-hidden rounded-[6px] border border-[#7b4dff80]"
+              className="absolute top-3 right-3 z-10 flex overflow-hidden border-edge-hi rounded-[3px] border"
               role="group"
               aria-label="Map view"
             >
@@ -35,7 +35,7 @@ export default function ExplorePage() {
                   onClick={() => setView(v)}
                   className={cn(
                     'px-2.5 py-1 text-[12px] font-bold transition-colors',
-                    view === v ? 'bg-pink text-white' : 'text-ink-muted hover:text-white',
+                    view === v ? 'bg-violet text-white' : 'text-ink-muted hover:text-white',
                   )}
                   aria-pressed={view === v}
                 >

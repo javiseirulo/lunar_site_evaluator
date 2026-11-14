@@ -15,7 +15,7 @@ import { Logo } from './Logo';
 export function Masthead() {
   const { pathname } = useLocation();
   return (
-    <header className="portal border-violet/60 overflow-hidden rounded-[8px] border bg-[#07040f] shadow-[var(--shadow-card)]">
+    <header className="portal border-edge overflow-hidden rounded-[4px] border bg-black shadow-[var(--shadow-card)]">
       <Banner />
       <TabBar />
       {pathname !== '/' && <InfoStrip />}
@@ -23,57 +23,17 @@ export function Masthead() {
   );
 }
 
-/** Striped retro sun with a few sparkles (original synthwave motif). */
-function RetroSun() {
-  const sparkle = (cx: number, cy: number, r: number) => (
-    <g stroke="#ffe3f3" strokeWidth={r / 5} strokeLinecap="round">
-      <line x1={cx - r} y1={cy} x2={cx + r} y2={cy} />
-      <line x1={cx} y1={cy - r} x2={cx} y2={cy + r} />
-    </g>
-  );
-  return (
-    <svg
-      className="pointer-events-none absolute bottom-0 left-[56%] hidden h-[88%] -translate-x-1/2 md:block"
-      viewBox="0 0 200 84"
-      aria-hidden
-    >
-      <defs>
-        <linearGradient id="retro-sun" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#ffd36b" />
-          <stop offset="0.5" stopColor="#ff8a3d" />
-          <stop offset="1" stopColor="#ff3fa4" />
-        </linearGradient>
-        <clipPath id="sun-stripes">
-          <rect x="0" y="0" width="200" height="50" />
-          <rect x="0" y="54" width="200" height="7" />
-          <rect x="0" y="65" width="200" height="6" />
-          <rect x="0" y="75" width="200" height="5" />
-        </clipPath>
-        <filter id="sun-glow" x="-30%" y="-30%" width="160%" height="160%">
-          <feGaussianBlur stdDeviation="4" />
-        </filter>
-      </defs>
-      <circle cx="100" cy="84" r="62" fill="#ff3fa4" opacity="0.35" filter="url(#sun-glow)" />
-      <circle cx="100" cy="84" r="60" fill="url(#retro-sun)" clipPath="url(#sun-stripes)" />
-      {sparkle(24, 22, 5)}
-      {sparkle(182, 12, 4)}
-      <circle cx="50" cy="8" r="1.4" fill="#ffe3f3" />
-    </svg>
-  );
-}
-
 function Banner() {
   return (
-    <div className="space border-pink/70 relative flex flex-wrap items-center gap-x-6 gap-y-3 border-b px-5 py-4">
-      <RetroSun />
+    <div className="space relative flex flex-wrap items-center gap-x-6 gap-y-3 border-b-[3px] border-[#fc3d21] px-5 py-4">
       <Link
         to="/"
         className="relative flex items-center gap-3"
         aria-label="Lunar Site Evaluator home"
       >
-        <Logo className="size-16 shrink-0 drop-shadow-[0_0_10px_#ff3fa4aa]" />
+        <Logo className="size-14 shrink-0" />
         <span className="leading-tight">
-          <span className="block bg-gradient-to-r from-[#ff6fb5] to-[#ff8a3d] bg-clip-text text-[28px] font-black tracking-[-0.01em] text-transparent italic drop-shadow-[0_0_10px_#ff3fa460]">
+          <span className="block text-[27px] font-bold tracking-[-0.01em] text-white">
             Lunar Site Evaluator
           </span>
           <span className="text-ink block text-[13.5px]">
@@ -97,7 +57,7 @@ function SiteFinder() {
 
   return (
     <form
-      className="border-edge-hi relative ml-auto flex flex-col gap-1 rounded-[8px] border bg-[#120a22]/90 px-3 py-2 shadow-[0_0_16px_-6px_#9b5cffaa]"
+      className="border-edge bg-panel relative ml-auto flex flex-col gap-1 rounded-[4px] border px-3 py-2"
       onSubmit={(e) => {
         e.preventDefault();
         if (!value) return;
@@ -173,7 +133,7 @@ function InfoStrip() {
   const day = range ? dayOfWindow(currentTimeUTC, range.start_utc, range.end_utc) : null;
 
   return (
-    <div className="border-edge text-ink-muted flex flex-wrap items-center gap-x-3.5 gap-y-1 border-t bg-[#0e0820] px-4 py-1.5 text-[11.5px]">
+    <div className="border-edge text-ink-muted bg-panel flex flex-wrap items-center gap-x-3.5 gap-y-1 border-t px-4 py-1.5 text-[11.5px]">
       <span className="hidden lg:inline">
         For:{' '}
         {AUDIENCES.map((a, i) => (
@@ -186,7 +146,7 @@ function InfoStrip() {
         ))}
       </span>
       <span className="flex items-center gap-1.5 lg:ml-auto">
-        <span className="text-pink font-bold">Coming up</span>
+        <span className="text-heading font-bold">Coming up</span>
         {!selected && ranked.length > 1 && (
           <>
             <button

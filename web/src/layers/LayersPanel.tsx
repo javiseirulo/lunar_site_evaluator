@@ -10,11 +10,11 @@ import { LegendBar } from './Legend';
 
 /** Friendly names and switch colours for known layer ids; unknown ids fall back to layers.json. */
 const LAYER_UI: Record<string, { label: string; color: string }> = {
-  illumination: { label: 'Sunlight', color: '#ffb84d' },
-  slope: { label: 'Slope', color: '#ff6fb5' },
-  psr: { label: 'Ice (shadowed craters)', color: '#b894ff' },
-  elevation: { label: 'Height', color: '#c9c3d9' },
-  score: { label: 'Score', color: '#4fdc8a' },
+  illumination: { label: 'Sunlight', color: '#f2a900' },
+  slope: { label: 'Slope', color: '#fc3d21' },
+  psr: { label: 'Ice (shadowed craters)', color: '#9fb4d9' },
+  elevation: { label: 'Height', color: '#e6eaf0' },
+  score: { label: 'Score', color: '#4cb963' },
 };
 const ORDER = ['illumination', 'slope', 'psr', 'elevation', 'score'];
 
@@ -62,7 +62,7 @@ function LayerRow({
   const setLayerOpacity = useAppStore((s) => s.setLayerOpacity);
   const opacity = useAppStore((s) => s.layerOpacity[layer.id] ?? layer.default_opacity);
   const active = index >= 0;
-  const ui = LAYER_UI[layer.id] ?? { label: layer.label, color: '#b394ff' };
+  const ui = LAYER_UI[layer.id] ?? { label: layer.label, color: '#6d9be6' };
 
   return (
     <li title={layer.description}>
@@ -79,9 +79,9 @@ function LayerRow({
         <span
           className="relative inline-flex h-[22px] w-[40px] shrink-0 rounded-full border transition-colors duration-200"
           style={{
-            borderColor: active ? ui.color : '#4a3a6e',
-            background: active ? `${ui.color}40` : '#120a22',
-            boxShadow: active ? `0 0 10px -2px ${ui.color}` : 'none',
+            borderColor: active ? ui.color : '#4b5870',
+            background: active ? `${ui.color}33` : '#05070b',
+            boxShadow: 'none',
           }}
           aria-hidden
         >
@@ -89,7 +89,7 @@ function LayerRow({
             className="absolute top-[2px] size-[16px] rounded-full transition-transform duration-200 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
             style={{
               left: 2,
-              background: active ? ui.color : '#6b5c8f',
+              background: active ? ui.color : '#6e7889',
               transform: active ? 'translateX(18px)' : 'none',
             }}
           />

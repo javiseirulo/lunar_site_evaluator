@@ -1,7 +1,6 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { RouterProvider } from 'react-router';
-import '@fontsource-variable/nunito';
 import './index.css';
 import { router } from './core/router';
 
