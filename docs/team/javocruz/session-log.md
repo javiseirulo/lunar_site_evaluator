@@ -1,7 +1,7 @@
 # Notas de sesión — javocruz (rol Javi2: web, estética, layers)
 
 ## 2026-11-14 — Sesión 1: esqueleto web v0
-- Rama `javocruz/36-web-shell`. Sigue el plan técnico por persona (`plan-tecnico-por-persona.md`), no el reparto A–E de los issues (ver decisión en `docs/decisions/log.md`).
+- Rama `javocruz/36-web-shell`. Sigue el plan técnico por persona (ahora en `docs/10-plan-tecnico.md`), no el reparto A–E de los issues (ver decisión en `docs/decisions/log.md`).
 - gstack no estaba instalado en esta máquina; se trabajó sin él (pendiente instalar).
 - Hecho:
   - Monorepo pnpm (`web/`, `contracts/`), Node 22 fijado por `.npmrc`.
@@ -13,3 +13,8 @@
   - Tests (vitest): store, helpers de timeseries y validación de `public/data` contra el contrato. CI en `.github/workflows/web.yml`.
 - Verificado: lint, typecheck, 12 tests, build, y en navegador (escritorio y móvil 375 px): seleccionar sitio → ficha → "Street View" navega a `/streetview/<id>`, play avanza el tiempo, capas se apilan, deep links funcionan.
 - Siguiente (v1): design system con shadcn/ui, onboarding, deploy público (Vercel con raíz `web/`), y acordar con el equipo qué plan manda.
+
+## 2026-11-14 — Sesión 1 (cont.): rama dev y documentación para el equipo
+- PR #53 mergeado en `main` (squash). Creada la rama `dev` como integración; PR #54 cambia CLAUDE.md, protocolo, README, plantilla de PR, `sync-docs.sh` y CI para trabajar contra `dev`.
+- El plan técnico pasa de mi carpeta a `docs/10-plan-tecnico.md`, con una sección 0 de estado real y las diferencias entre el código y el plan, para que las IAs de los demás lo lean al empezar.
+- Corrección: el CI sí corre en los PR antes de mergear (en el #53 pasó).

@@ -13,12 +13,13 @@ Este repo es la memoria compartida del equipo. Cada persona usa su propia IA (Cl
 
 1. **gstack por defecto.** Ejecuta `bash scripts/check-gstack.sh`. Si dice `MISSING`, dile al usuario que instale
    gstack antes de trabajar ([cómo](docs/06-gstack-workflow.md)).
-2. **Al empezar cada tarea:** `bash scripts/sync-docs.sh` (git fetch + hooks) y lee todo `docs/` de `origin/main`,
+2. **Al empezar cada tarea:** `bash scripts/sync-docs.sh` (git fetch + hooks) y lee todo `docs/` de `origin/dev`,
    incluidas las notas de los compañeros en `docs/team/*` y los PRs abiertos.
 3. **Todo lo que se piense, decida o investigue se escribe en `docs/` como Markdown, en el momento.**
    Tus notas: `docs/team/<tu-handle>/`. Compartidos (`decisions/log.md`, `04-resources-data.md`): solo añadir al final.
-4. **Nunca trabajes en `main`.** Issue → rama `<handle>/<n>-<slug>` → Pull Request (`Closes #n`) → verificación →
-   merge a `main`. El push directo a `main` está bloqueado por hook. PRs pequeños y frecuentes (también de docs).
+4. **Se trabaja contra `dev`; nunca en `main`.** Issue → rama `<handle>/<n>-<slug>` desde `dev` → Pull Request a `dev`
+   (`gh pr create --base dev`, `Closes #n`) → verificación → merge a `dev`. `main` solo recibe `dev` en cada integración.
+   El push directo a `main` está bloqueado por hook. PRs pequeños y frecuentes (también de docs).
 5. **Reglas del concurso:** la *idea* la ponen los humanos (la IA no puede idear la solución); registra todo uso de IA en
    [`docs/si-usage-log.md`](docs/si-usage-log.md); lista todo recurso externo; sin branding NASA en contenido generado.
 
@@ -27,7 +28,7 @@ Este repo es la memoria compartida del equipo. Cada persona usa su propia IA (Cl
 ## 📚 Índice de conocimiento
 
 Empieza por [`docs/README.md`](docs/README.md):
-reglas ([01](docs/01-hackathon-rules.md)) · cómo ganar ([02](docs/02-judging-playbook.md)) ·
+**plan técnico y estado actual ([10](docs/10-plan-tecnico.md))** · reglas ([01](docs/01-hackathon-rules.md)) · cómo ganar ([02](docs/02-judging-playbook.md)) ·
 el reto ([03](docs/03-challenge-brief.md)) · datos y recursos ([04](docs/04-resources-data.md)) ·
 prior art ([05](docs/05-prior-art.md)) · flujo gstack ([06](docs/06-gstack-workflow.md)) ·
 ideas ([`docs/ideas/`](docs/ideas/)) · decisiones ([`docs/decisions/log.md`](docs/decisions/log.md)).

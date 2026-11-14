@@ -1,5 +1,8 @@
 # 07 — Plan de MVP (borrador, 2026-11-14)
 
+> **Nota (2026-11-14, @javocruz):** la implementación sigue `docs/10-plan-tecnico.md` (reparto por persona, contratos en `contracts/`).
+> Este documento sigue valiendo para prioridades de producto, métricas del reto y el esquema de diapositivas.
+
 > Borrador de implementación a partir de `docs/ideas/javiseirulo-explore-mission.md`. Los valores marcados ⚠️ son
 > propuestas por validar (no decisiones). Entrega: **dom 15 nov 23:59 hora local**.
 
