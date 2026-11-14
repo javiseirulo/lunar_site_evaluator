@@ -189,7 +189,29 @@ Estos cuatro campos son la única interfaz entre los módulos web (más `layerOp
 - **Dependencia con Pablo:** el DEM y la máscara de horizonte. Acordad pronto un formato tipo `horizon/<id>.npy` con 360 elevaciones.
 
 > **Ampliación (@javiseirulo, 2026-11-14).** Detalle del plan de efemérides y scoring acordado en la sesión de Javi. No sustituye lo de arriba ni los bloques de los demás.
-> Lo marcado ⚠️ afecta a otros (contrato o UI) y se propondrá por PR a `contracts/` avisando al equipo; hasta entonces mandan el contrato v1 y los mocks.
+> **J0 recoge lo ya decidido con el equipo** y manda sobre lo que digan J1–J11. Lo que siga marcado ⚠️ está pendiente.
+> Los cambios de esquema van por PR a `contracts/`; hasta que se mergeen mandan el contrato v1 y los mocks.
+
+#### J0. ✅ Decisiones cerradas con el equipo (2026-11-14)
+| # | Tema | Decisión | Afecta a |
+|---|---|---|---|
+| 1 | Dónde vive el score | **`web/src/scoring/`** (dueño Javi), funciones puras + vitest. Marta y Cristóbal lo **importan** (`@/scoring`); no hay un `score.ts` paralelo en `globe/` | Marta, Cristóbal |
+| 2 | `mission_config` en la web | **Quinto campo del store: `missionConfig`** (+ `setMissionConfig`), igual que se hizo con `layerOpacity`. Tipo `MissionConfig` en `contracts/types.ts` | Javi2, Marta, Cristóbal |
+| 3 | Métricas nuevas | `sun_el_mean_deg`, `max_blackout_hours` y `sun_earth_pct`, **opcionales** en v1.1. Slider simple: solo `sun_el_mean_deg`; las otras dos en Advanced | Javi2 (mocks), Marta (sliders) |
+| 4 | Perfil de horizonte | **Observador a 5 m** sobre el terreno. **Paso de 0,1°** (3600 valores, ~20 KB por sitio) en los sitios curados; **1°** en las celdas de 5 km del mapa de calor. El alcance del relieve lejano lo fija y documenta Pablo. La cobertura (qué sitios) es una decisión de producto (catálogo #48), no de Pablo; Pablo solo dice cuántos puede procesar | Pablo |
+| 5 | Rango temporal | **30 años, 2026-01-01 → 2055-12-31, cada hora** (cubre el ciclo nodal lunar de 18,6 años). Se sirve como **vectores Sol/Tierra en `MOON_ME` por año** + horizonte por sitio, y la web genera la `Timeseries` de cualquier ventana (ver J10). Los `timeseries/<id>.json` estáticos se mantienen para una ventana por defecto, por compatibilidad | Javi2 (TimeBar), Marta, Cristóbal |
+| 6 | `sun_frac` | Solo se usa en `illum_pct`. Sunset/Earthset siguen saliendo de `lit` / `earth_visible`: no cambia ningún helper | Javi2 |
+| 7 | Mission | **Usa `mission_config` y el modelo de llegada (J8)** para sus escenarios. Formato y archivo detallados en el bloque de Cristóbal | Cristóbal |
+| 8 | Modo de tiempo en Explore | **Implementado en el MVP:** selector "Design" (fecha de aterrizaje) / "Mission" (fecha de lanzamiento → llegada calculada), en `web/src/scoring/` y montado en Explore | Marta, Javi2 |
+| 9 | Coordenadas arbitrarias | **Vectores en marco lunar + transformación topocéntrica con paralaje exacta de la Tierra** (`@/ephem`), que es lo que pide §9. Pablo lo usa para la cámara en cualquier punto. Detalle en su bloque | Pablo |
+
+**Por qué importa el alcance del relieve lejano (decisión 4).** En el polo sur el Sol está como mucho a ~1,5° sobre el horizonte, así que montañas lejanas lo tapan:
+- Un relieve 2 km más alto que el observador a **50 km** subtiende `atan((2000 − 50000²/(2·1737400))/50000)` ≈ **1,5°**: tapa el Sol por completo.
+- El mismo relieve a **100 km** ya queda oculto por la curvatura.
+
+Si se recorta a 20 km, la iluminación sale **sobreestimada**. Por eso el alcance debe cubrir al menos ~100–150 km. Lo fija Pablo según el DEM y el coste, y lo documenta en `source`.
+
+**Por qué 0,1° y no más fino (decisión 4).** En el navegador el coste es nulo (una consulta por muestra). El límite real es el DEM: un píxel de 20–80 m subtiende ~0,1° a 20–50 km, así que bajar de 0,1° no aporta información. El disco solar mide 0,53°.
 
 #### J1. Alcance y resolución
 - **Se puede seleccionar toda la Luna, con énfasis en el polo sur.** Fuera de los polos la física es sencilla: hay ciclo día/noche regular (~14,8 días de luz y ~14,8 de noche) y la Tierra es siempre visible en la cara visible y nunca en la oculta (solo oscila en el limbo). Ahí basta con **horizonte plano**. En el polo sur el Sol roza el horizonte (±1,5°), así que el **horizonte real del DEM es imprescindible**.
@@ -204,7 +226,7 @@ Estos cuatro campos son la única interfaz entre los módulos web (más `layerOp
 - **Horizons se usa para validar** (la diferencia debe ser < 0,01°) y como "dato oficial" en los sitios del juego (`astroquery.jplhorizons` con `location={"lon","lat","elevation","body":301}`, `quantities="4"` = az/el).
 - **La efeméride se calcula una sola vez** (vectores Sol y Tierra respecto al centro lunar, cada hora) y después se rota al sistema local de cada sitio. La Tierra se corrige con paralaje exacta: `r_tierra − r_sitio`. **Lo costoso es el horizonte, no la efeméride.**
   - Es coherente con lo que dice Marta en su bloque: la dirección del Sol es la misma en todo el parche.
-- ⚠️ Opción V2: publicar esos vectores (~1,3 MB para 6 años) para que la web calcule az/el de **cualquier** punto sin backend. Es la "ampliación futura para coordenadas arbitrarias" de §9.
+- ✅ (J0 #5 y #9) Esos vectores **se publican** (por año, ver J10) y la web calcula az/el de **cualquier** punto y ventana sin backend (`@/ephem`). Es la "ampliación futura para coordenadas arbitrarias" de §9, adelantada al MVP porque es lo que permite servir 30 años.
 
 #### J3. Fuentes de datos
 - **DEM numérico y perfiles de horizonte:** los produce Pablo (`python/terrain/`, PGDA 81 y Barker et al. 2021). Yo los consumo.
@@ -286,7 +308,7 @@ El tiempo hasta Sunset/Earthset (lo pide el reto) ya lo calcula la web a partir 
   - **Descenso:** ~1 h.
   - No se modelan: Δv, ventanas de lanzamiento, NRHO ni perturbaciones (hay que declararlo).
 
-#### J9. ⚠️ `mission_config`: parámetros compartidos (propuesta para los sliders de Marta y, si le sirve, para los escenarios de Cristóbal)
+#### J9. ✅ `mission_config`: parámetros compartidos (sliders de Marta, escenarios de Cristóbal; vive en el store como `missionConfig`)
 Valores por defecto = valores iniciales de los sliders al abrir Explore y base que modifica cada escenario.
 
 | Parámetro | Defecto |
@@ -315,23 +337,28 @@ Los umbrales son propuestas razonables, a ajustar con referencias.
   "goal": { "type": "reach_valid_site", "deadline_days": 3 } }
 ```
 
-#### J10. ⚠️ Propuesta de contrato v1.1 (aditiva, sin renombrar nada de v1)
+#### J10. Contrato v1.1 (aditivo, sin renombrar nada de v1; contenido decidido en J0, falta el PR de esquemas)
 - `SiteMetrics` + `sun_el_mean_deg`, `max_blackout_hours`, `sun_earth_pct`.
 - `Timeseries` + `sun_frac?` (fracción de disco 0–1). `earth_visible` pasa a ser obligatorio en los datos reales.
-- Perfil de horizonte publicado para la web (`horizon/<id>.json`: `{ site_id, az_step_deg, elev_deg[360], observer_height_m, source }`). Lo usan la vista de Pablo y las coordenadas propias. Formato a cerrar con Pablo (§9).
+- Perfil de horizonte `web/public/data/horizon/<id>.json`: `{ version, site_id, lat, lon, observer_height_m: 5, az_step_deg: 0.1, elev_deg[3600], max_range_km, source }`. Azimut desde el norte local en sentido horario; elevación en grados **con curvatura incluida**. Lo produce Pablo y lo usan Javi (`lit`/`earth_visible`), la vista de Pablo y las coordenadas propias.
 - Nuevo `mission_config.schema.json` (J9).
 - Normalización del score (J7) escrita en el contrato.
-- `manifest.time_range` real: 2027 completo, cada hora (8760 muestras, ~0,5 MB por sitio, cargado bajo demanda). Sustituye a los 30 días del mock y cubre las ventanas que simula Mission.
+- **Efemérides largas:** `web/public/data/ephem/index.json` (rango 2026–2055, `step_s: 3600`, marco `MOON_ME`, kernels y versiones) + `ephem/<YYYY>.bin`, uno por año.
+  - Cada `.bin` es `Float32` little-endian, 6 valores por hora: `sun_unit_xyz`, `earth_km_xyz` (Luna → Tierra, en km, para la paralaje exacta).
+  - ~210 KB/año, ~6,3 MB los 30 años; se carga el año que haga falta.
+  - `@/ephem` expone `skyAt(lat, lon, t)` y `buildTimeseries(site, horizon, start, end)`, que devuelve el **mismo tipo `Timeseries`** de v1, así que nadie cambia sus consumidores.
+- `manifest.time_range` = la ventana por defecto de los `timeseries/<id>.json` estáticos (2027). La TimeBar puede ampliarse a 30 años usando `@/ephem` (cambio en `core`, de Javi2).
 
 #### J11. MVP frente a V2 (la entrega es el 15-nov a las 23:59)
 - **MVP:**
   - Efemérides SPICE de 2027 + validación con Horizons en 5 sitios (#39, #41).
   - `timeseries` y `sites.json` reales (#40): primero con horizonte plano y luego con los perfiles de Pablo para la lista curada.
   - Score con threshold/objective + `mission_config`.
-  - Coordenadas propias con horizonte plano, etiquetadas "sin terreno".
-  - Llegada Hohmann simple.
+  - Coordenadas propias con horizonte plano, etiquetadas "sin terreno" (`@/ephem`).
+  - Vectores de 30 años por año + generación de `Timeseries` en cliente (J0 #5).
+  - Llegada con modelo orbital simple + selector Design/Mission en Explore (J0 #8, ya implementado).
 - **Si da tiempo:** `grid_metrics.bin` a 5 km para el mapa de calor de Marta, y robustez temporal.
-- **V2:** cálculo global en el navegador, horizontes por celda a 240 m, robustez espacial, link budget, espera por traza orbital.
+- **V2:** horizontes por celda a 240 m, robustez espacial, link budget.
 - **Entregas previstas:**
   - **14-nov por la noche:** PR del contrato v1.1 + Sol y Tierra reales con horizonte plano para los sitios curados.
   - **15-nov por la mañana:** horizontes de Pablo → `lit`/`earth_visible` y `sites.json` reales.
@@ -482,6 +509,20 @@ y a la contingencia local; no obliga a construir la geometría visual global pro
 [PGDA 81](https://pgda.gsfc.nasa.gov/products/81), contratos y helpers en `dev`.
 Reconciliación solicitada por Pablo; seguimiento en **#59**.
 
+> **➕ Para Pablo: decidido con Javi el 2026-11-14 (§5 Javi, J0 #4 y #9).** Añadido por @javiseirulo; no cambia nada de lo anterior.
+> - **Perfil de horizonte**, que produces tú:
+>   - Ruta: `web/public/data/horizon/<id>.json` = `{ version, site_id, lat, lon, observer_height_m: 5, az_step_deg, elev_deg[], max_range_km, source }`.
+>   - **Observador a 5 m** sobre el terreno.
+>   - **`az_step_deg` = 0,1** (3600 valores) en los sitios curados, y **1°** en las celdas de 5 km del mapa de calor.
+>   - Azimut desde el norte local, en sentido horario. Elevación en grados **con la curvatura `d²/2R` incluida**.
+>   - El alcance (`max_range_km`) lo fijas tú. Tiene que llegar al relieve que puede tapar un Sol a ≤1,5°: ~100–150 km.
+>   - `source` = producto DEM + versión.
+> - **Cobertura:** la lista de sitios la marca el catálogo curado (#48). Tú dices cuántos perfiles da tiempo a procesar.
+> - **Cámara en cualquier punto:** no reutilizar las series de otro sitio (como ya dices arriba).
+>   - Usa `skyAt(lat, lon, t)` de `@/ephem`: vectores Sol/Tierra en `MOON_ME` sacados de SPICE, con transformación topocéntrica y **paralaje exacta de la Tierra**. Da el az/el de ese punto en 2026–2055.
+>   - Si el punto no tiene perfil de horizonte, muestra solo el horizonte geométrico y etiquétalo ("no terrain").
+> - **Validación cruzada:** la que ya tienes prevista (2 sitios y fechas: render frente a `lit`/`earth_visible`) se anota en el PR (#41).
+
 ### Marta: visor 3D de la Luna y modo exploración
 > Revisado 2026-11-14 contra el código de `dev` (`contracts/types.ts`, `web/src/core`, `web/src/layers`, mocks de `public/data`).
 > Marta trabaja en `web/src/globe/`; todo lo que sea de otra carpeta o de `contracts/` va por PR con su dueño.
@@ -519,6 +560,10 @@ Reconciliación solicitada por Pablo; seguimiento en **#59**.
     - Score en cliente: `score = Σ wᵢ·nᵢ / Σ wᵢ`, con `nᵢ` la métrica normalizada a 0–1 **en la dirección "más es mejor"**
       (pendiente, noche más larga y distancia a PSR se invierten o acotan). El mock usa `1 − slope/20` y `1 − dark_h/500`.
       ⚠️ La normalización real la define **Javi**; hay que acordarla y escribirla en el contrato (PR a `contracts/`), para que `score.ts` reproduzca `site.score` con los pesos por defecto.
+      ➕ ✅ Decidido el 2026-11-14 (§5 Javi, J0 #1–#3):
+      - El score vive en `web/src/scoring/` (Javi) y se **importa** de `@/scoring`, con la normalización threshold/objective de J7.
+      - Los sliders leen y escriben `missionConfig` del store.
+      - Slider simple: `sun_el_mean_deg`. `max_blackout_hours` y `sun_earth_pct` van en Advanced.
       Un test lo comprueba.
     - Los filtros duros (`valid`) no cambian con los pesos: un sitio no válido nunca sube al top.
     - **Rango de fechas**: `illum_pct`, `earth_vis_pct` y `max_dark_hours` se recalculan para ese rango a partir de las timeseries
@@ -595,6 +640,35 @@ Reconciliación solicitada por Pablo; seguimiento en **#59**.
   - v2: datos reales e integración con el globo y la ficha de sitio.
   - v3: modo estudiante y pulido.
 - **Pendiente de cerrar:** reglas de victoria y derrota · duración de la simulación (9 o 14 días) · qué diferencia el modo profesional del modo estudiante.
+
+> **➕ Para Cristóbal: formato de escenarios, decidido con Javi el 2026-11-14 (§5 Javi, J0 #7).** Añadido por @javiseirulo; no cambia lo anterior.
+> - **Archivo:** un JSON por escenario en `web/src/game/scenarios/<id>.json` (tu carpeta).
+>   - Forma: `MissionScenario` = `MissionConfig` de `contracts/types.ts` + campos de juego.
+>   - El esquema JSON (`contracts/mission_config.schema.json`) llega con el PR de contrato v1.1. Hasta entonces manda el tipo TypeScript.
+> - **Ejemplo:**
+>   ```json
+>   { "id": "rescate_shackleton",
+>     "title": "Landing site lost",
+>     "briefing": "The planned site is no longer safe. Pick a new one before the lander runs out of time.",
+>     "site_ids": ["shackleton_rim_02", "connecting_ridge", "de_gerlache_rim_01", "malapert_massif"],
+>     "time_mode": "mission", "launch_utc": "2027-03-02T00:00:00Z",
+>     "trajectory": "hohmann", "llo_alt_km": 100,
+>     "start_in_orbit": true, "orbit_plane_lon_deg": 40,
+>     "surface_days": 9,
+>     "requirements": { "max_dark_hours": { "threshold": 48 }, "earth_vis_pct": { "threshold": 0.6 } },
+>     "goal": { "type": "reach_valid_site", "deadline_days": 3 },
+>     "variant": "professional" }
+>   ```
+> - **Campos:**
+>   - `site_ids`: los 4–5 sitios de `sites.json` que se muestran sin pista.
+>   - `surface_days`: la duración de la simulación (9 o 14, según decidas).
+>   - `requirements`: umbrales con la forma threshold/objective de J9.
+>   - `start_in_orbit` + `orbit_plane_lon_deg`: la nave ya está en órbita polar y hay que esperar a que la traza pase por el sitio.
+>   - `variant`: `professional` / `student`.
+> - **Tiempo de llegada:** `computeArrival(config, site)` de `@/scoring`.
+>   - Devuelve las fases (lanzamiento → llegada a la Luna → espera en órbita → aterrizaje) y `landing_utc`.
+>   - La ventana que se simula es `[landing_utc, landing_utc + surface_days]`. Con `@/ephem` está disponible en 2026–2055.
+> - **Veredicto:** usa la función de validez de `@/scoring` (llega con el PR de score). Devuelve `valid` y `reasons` con margen ("noche máxima 142 h > 48 h"), así Mission y Explore dan el mismo resultado.
 
 ## 6. Cronograma (hackathon de ~48 h; escalar si tenéis más tiempo)
 
