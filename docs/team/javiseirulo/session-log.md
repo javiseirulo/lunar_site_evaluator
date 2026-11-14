@@ -18,3 +18,9 @@
 - `missionConfig` en el store (quinto campo) y tipo `MissionConfig` en `contracts/types.ts`.
 - Verificado: lint, typecheck, 24 tests, build y navegador (escritorio y 375 px; sin errores de consola).
 - Matiz físico: con plano orbital fijo (`start_in_orbit`), solo los sitios a ≲1° del polo se alcanzan en cada órbita; a 85°S la espera también puede ser de días.
+
+## 2026-11-14 (tarde): alcance toda la Luna + plan de implementación (#67)
+- Decisión: **toda la Luna, con énfasis en el polo sur** (ya estaba en J1, pero el código solo cubría ≤ −80°). Escrita en `docs/10-plan-tecnico.md` §10, con qué cambia para Javi2, Marta, Pablo y Cristóbal.
+- Terreno: esperar a Pablo. Horizonte plano "no terrain"; `slope_deg`/`psr_dist_km` como `pending_metrics`.
+- Catálogo #48: 20 ids actuales re-fuenteados + candidatos del polo sur + aterrizajes reales del resto de la Luna, todos con fuente.
+- Plan de implementación (4 PRs: contrato v1.1 → `python/` efemérides → `@/ephem` + `@/scoring` → datos reales) en `docs/team/javiseirulo/plan-implementacion.md`. Se trabaja en paralelo con subagentes en worktrees.

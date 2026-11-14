@@ -1,0 +1,2 @@
+# Generated payload hashes refer to exact bytes, including JSON/CSV line endings.
+/web/public/data/terrain/** -text

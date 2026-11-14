@@ -1,0 +1,77 @@
+{
+  "version": 1,
+  "mock": false,
+  "projection": "+proj=stere +lat_0=-90 +lon_0=0 +k=1 +x_0=0 +y_0=0 +R=1737400 +units=m +no_defs",
+  "radius_m": 1737400,
+  "bounds_m": [
+    -304006,
+    -304006,
+    304006,
+    304006
+  ],
+  "lat_limit": -80,
+  "width_px": 512,
+  "height_px": 512,
+  "layers": [
+    {
+      "id": "elevation",
+      "label": "Elevation",
+      "kind": "continuous",
+      "units": "m",
+      "value_range": [
+        -6659.0087890625,
+        6974.10986328125
+      ],
+      "palette": [
+        [
+          0,
+          "#14151d"
+        ],
+        [
+          0.45,
+          "#5d6170"
+        ],
+        [
+          1,
+          "#f1efe9"
+        ]
+      ],
+      "default_visible": true,
+      "default_opacity": 1,
+      "description": "Real LOLA elevation; area-mean display layer from the 80 m product. Not a landing-safety metric.",
+      "file": "terrain/elevation.png",
+      "encoding": "gray8",
+      "source": "NASA PGDA 90 / LDEM_80S_80MPP_ADJ.TIF / Barker et al. (2023)"
+    },
+    {
+      "id": "slope",
+      "label": "Slope",
+      "kind": "continuous",
+      "units": "\u00b0",
+      "value_range": [
+        0.6200125217437744,
+        33.68992233276367
+      ],
+      "palette": [
+        [
+          0,
+          "#0d0887"
+        ],
+        [
+          0.5,
+          "#cc4778"
+        ],
+        [
+          1,
+          "#f0f921"
+        ]
+      ],
+      "default_visible": false,
+      "default_opacity": 0.7,
+      "description": "Real LOLA slope; area-mean display layer from the 80 m product. Not a landing-safety metric.",
+      "file": "terrain/slope.png",
+      "encoding": "gray8",
+      "source": "NASA PGDA 90 / LDSM_80S_80MPP_ADJ.TIF / Barker et al. (2023)"
+    }
+  ]
+}

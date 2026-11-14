@@ -19,3 +19,15 @@ Rules:
 4. Site metrics are measured over the manifest's time window, the same window as the timeseries files, so the detail card, the time bar and the game always agree.
 
 Mock data is invented (synthetic terrain, approximate feature coordinates, toy Sun/Earth geometry) and must not be presented as results.
+
+## Additive terrain handoff proposal (#37)
+
+`PolarHeightmap` / `heightmap.schema.json` describe `terrain/heightmap.json` and
+the Float32 little-endian mesh plus byte mask produced by Pablo. This proposal
+does not change the existing loaders. Mesh endpoints match `layers.json.bounds_m`;
+row zero is max Y. The 1025 samples span 1024 intervals. Raster layer pixels,
+in contrast, are sampled at pixel centres within the same outer bounds.
+
+See [Pablo's handoff guide](../docs/team/pabloizgui/terrain-handoff.md) for decoding,
+NoData, source/frame, regeneration and the separate real elevation/slope layers.
+Marta/Javi2 must review this addition before integration in `dev`.

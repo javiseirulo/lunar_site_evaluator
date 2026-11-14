@@ -16,6 +16,12 @@
     "format:check": "prettier --check .",
     "mocks": "node contracts/scripts/gen-mocks.mjs"
   },
+  "pnpm": {
+    "overrides": {
+      "@cesium/engine": "26.3.0",
+      "@cesium/widgets": "16.2.0"
+    }
+  },
   "devDependencies": {
     "prettier": "^3.10.1"
   }
