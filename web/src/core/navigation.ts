@@ -33,12 +33,21 @@ export function pathForMode(mode: AppMode, siteId?: string | null): string {
 export const TABS: { label: string; path: string; mode?: AppMode; end?: boolean }[] = [
   { label: 'Home', path: '/', end: true },
   { label: 'Explore', path: '/explore', mode: 'explore' },
-  { label: 'Sites', path: '/sites' },
   { label: 'Compare', path: '/compare' },
-  { label: 'Street View', path: '/streetview', mode: 'streetview' },
   { label: 'Mission', path: '/game', mode: 'game' },
   { label: 'Learn', path: '/learn' },
-  { label: 'Data & Method', path: '/about' },
+];
+
+/** Every page, for the footer (tabs plus pages reached from buttons: sites, street view, about). */
+export const ALL_PAGES: { label: string; path: string }[] = [
+  { label: 'Home', path: '/' },
+  { label: 'Explore', path: '/explore' },
+  { label: 'All sites', path: '/sites' },
+  { label: 'Compare', path: '/compare' },
+  { label: 'Street View', path: '/streetview' },
+  { label: 'Mission', path: '/game' },
+  { label: 'Learn', path: '/learn' },
+  { label: 'Data & method', path: '/about' },
 ];
 
 /** Audience shortcuts shown under the tabs. */

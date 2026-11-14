@@ -1,35 +1,31 @@
 import { Link } from 'react-router';
 import { useData } from '../data';
-import { TABS } from '../navigation';
+import { ALL_PAGES } from '../navigation';
 
-const LINKS = TABS.map((t) => ({ to: t.path, label: t.label }));
+const LINKS = ALL_PAGES.map((t) => ({ to: t.path, label: t.label }));
 
 export function Footer() {
   const manifest = useData((s) => s.manifest);
   return (
-    <footer className="portal text-ink-faint mt-3 mb-6 px-1 text-center text-[11px]">
-      <p className="mb-2">
-        {LINKS.map((l, i) => (
-          <span key={l.to}>
-            {i > 0 && ' | '}[
-            <Link to={l.to} className="lnk">
-              {l.label}
-            </Link>
-            ]
-          </span>
+    <footer className="portal mt-10 mb-8 px-1 text-center text-[12px] text-[#8d877c]">
+      <nav aria-label="All pages" className="mb-4 flex flex-wrap justify-center gap-2">
+        {LINKS.map((l) => (
+          <Link key={l.to} to={l.to} className="nav-btn">
+            {l.label}
+          </Link>
         ))}
-      </p>
-      <div className="border-edge border-t pt-2 leading-relaxed">
+      </nav>
+      <div className="border-t border-[#2c2a26] pt-2 leading-relaxed">
         <p>
-          Built for the NASA Space Apps Challenge 2026 · Madrid local event · Independent project,
-          not affiliated with or endorsed by NASA.
+          Built for the NASA Space Apps Challenge 2026 at the Madrid local event. An independent
+          project, not affiliated with or endorsed by NASA.
         </p>
         <p>
-          Data: LOLA (LRO) topography · NAIF SPICE ephemerides · JPL Horizons checks
+          Data from LOLA (LRO) topography and NAIF SPICE ephemerides, checked against JPL Horizons.
           {manifest && (
             <>
               {' '}
-              · Data files generated{' '}
+              Data files generated{' '}
               <span className="num">{manifest.generated_utc.slice(0, 10)}</span>
               {manifest.mock && <span className="text-warn"> (mock)</span>}
             </>

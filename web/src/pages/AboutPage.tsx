@@ -56,7 +56,7 @@ export default function AboutPage() {
       <article className="box">
         <div className="box-head">Data &amp; Method</div>
         <div className="box-body max-w-[72ch] space-y-4 text-[12px]">
-          <h1 className="text-[18px] font-bold text-white">Data, method and credits</h1>
+          <h1 className="text-[18px] font-bold text-heading">Data, method and credits</h1>
 
           {isMock && (
             <p className="border-warn/60 bg-warn/10 text-warn border px-2 py-1.5 text-[11px]">
@@ -66,7 +66,7 @@ export default function AboutPage() {
           )}
 
           <section id="how">
-            <h2 className="border-edge mb-1 border-b text-[13px] font-bold text-white">
+            <h2 className="border-edge mb-1 border-b text-[13px] font-bold text-heading">
               How it works
             </h2>
             <p className="text-ink-muted">
@@ -79,7 +79,7 @@ export default function AboutPage() {
           </section>
 
           <section id="sources">
-            <h2 className="border-edge mb-1 border-b text-[13px] font-bold text-white">
+            <h2 className="border-edge mb-1 border-b text-[13px] font-bold text-heading">
               Data sources
             </h2>
             <ul className="text-ink-muted list-[square] space-y-1 pl-5">
@@ -94,14 +94,14 @@ export default function AboutPage() {
             </ul>
             {manifest && (
               <p className="text-ink-faint mt-1.5 text-[10px]">
-                Loaded data: {manifest.sources.join(' · ')} (generated{' '}
+                Loaded data: {manifest.sources.join('; ')} (generated{' '}
                 <span className="num">{manifest.generated_utc}</span>)
               </p>
             )}
           </section>
 
           <section id="ai">
-            <h2 className="border-edge mb-1 border-b text-[13px] font-bold text-white">
+            <h2 className="border-edge mb-1 border-b text-[13px] font-bold text-heading">
               Use of AI
             </h2>
             <p className="text-ink-muted">
@@ -112,7 +112,9 @@ export default function AboutPage() {
           </section>
 
           <section id="credits">
-            <h2 className="border-edge mb-1 border-b text-[13px] font-bold text-white">Credits</h2>
+            <h2 className="border-edge mb-1 border-b text-[13px] font-bold text-heading">
+              Credits
+            </h2>
             <p className="text-ink-muted">
               Built for the NASA Space Apps Challenge 2026 (Lunar Landing Site Navigator) by a team
               at the Madrid local event. Independent project, not affiliated with or endorsed by

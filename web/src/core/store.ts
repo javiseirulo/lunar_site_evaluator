@@ -19,6 +19,8 @@ export interface AppState extends AppEvents {
   layerOpacity: Record<string, number>;
   /** True once layer defaults from layers.json have been applied. */
   layersInitialised: boolean;
+  /** Pro mode: technical names, UTC times, coordinates and fine layer controls. Off = student view. */
+  proMode: boolean;
 
   selectSite: (id: string | null) => void;
   setTime: (isoUtc: string) => void;
@@ -29,6 +31,16 @@ export interface AppState extends AppEvents {
   moveLayer: (id: string, direction: 1 | -1) => void;
   setLayerOpacity: (id: string, opacity: number) => void;
   initLayers: (manifest: LayersManifest) => void;
+  setProMode: (on: boolean) => void;
+}
+
+const PRO_KEY = 'lse.proMode';
+function readPro(): boolean {
+  try {
+    return globalThis.localStorage?.getItem(PRO_KEY) === '1';
+  } catch {
+    return false;
+  }
 }
 
 export const useAppStore = create<AppState>()((set, get) => ({
@@ -38,6 +50,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
   mode: 'explore',
   layerOpacity: {},
   layersInitialised: false,
+  proMode: readPro(),
 
   selectSite: (id) => set({ selectedSiteId: id }),
   setTime: (isoUtc) => set({ currentTimeUTC: isoUtc }),
@@ -68,6 +81,15 @@ export const useAppStore = create<AppState>()((set, get) => ({
     set((s) => ({
       layerOpacity: { ...s.layerOpacity, [id]: Math.min(1, Math.max(0, opacity)) },
     })),
+
+  setProMode: (on) => {
+    try {
+      globalThis.localStorage?.setItem(PRO_KEY, on ? '1' : '0');
+    } catch {
+      /* private mode: keep it in memory only */
+    }
+    set({ proMode: on });
+  },
 
   initLayers: (manifest) =>
     set((s) => {

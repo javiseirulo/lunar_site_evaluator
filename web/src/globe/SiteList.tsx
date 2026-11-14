@@ -1,19 +1,10 @@
 /**
- * STARTER — owner: Marta (src/globe). A minimal ranked list + detail card so the other modes
- * can be tested end to end. Marta replaces/extends it with filters and weight sliders.
- * Styling follows the portal design system in src/index.css (.box, .box-head, .btn, .lnk).
+ * STARTER — owner: Marta (src/globe). A ranked list + site sheet so the other modes can be tested
+ * end to end. Marta replaces/extends it with filters and weight sliders.
+ * Wording/metrics come from METRICS in @/core (short names by default, technical in Pro mode).
  */
-import type { Site } from '@lunar/contracts';
 import { cn } from '@/lib/utils';
-import {
-  formatLatLon,
-  pct,
-  reasonIsGood,
-  reasonText,
-  useAppStore,
-  useData,
-  useSelectedSite,
-} from '@/core';
+import { METRICS, formatLatLon, useAppStore, useData, useSelectedSite } from '@/core';
 import { scoreColor } from '@/layers';
 
 export function SiteList({ className }: { className?: string }) {
@@ -25,65 +16,39 @@ export function SiteList({ className }: { className?: string }) {
 
   return (
     <section className={cn('box flex min-h-0 flex-col', className)} aria-labelledby="sites-heading">
-      <div className="box-head">
-        <h2 id="sites-heading">Candidate Sites</h2>
-        <span className="ml-auto font-sans font-normal tracking-normal normal-case">
-          {sites.filter((s) => s.valid).length} of {sites.length} pass
-        </span>
+      <div className="flex items-baseline justify-between px-5 pt-4 pb-2">
+        <h2 id="sites-heading" className="text-[18px]">
+          Sites
+        </h2>
+        <span className="text-ink-faint text-[12px]">score out of 100</span>
       </div>
-      <div className="min-h-0 flex-1 overflow-y-auto">
-        <table className="w-full border-collapse text-[11px]">
-          <thead className="bg-navy-800 sticky top-0">
-            <tr className="text-ink-faint text-left">
-              <th className="label w-7 px-2 py-1.5 text-right">#</th>
-              <th className="label px-2 py-1.5">Site</th>
-              <th className="label px-2 py-1.5 text-right">Score</th>
-            </tr>
-          </thead>
-          <tbody>
-            {ranked.map((s, i) => {
-              const selected = s.id === selectedSiteId;
-              return (
-                <tr
-                  key={s.id}
-                  className={cn(
-                    'border-edge cursor-pointer border-t border-dotted',
-                    selected ? 'bg-navy-600 text-white' : i % 2 ? 'bg-navy-850' : '',
-                    !s.valid && !selected && 'text-ink-faint',
-                  )}
-                  onClick={() => selectSite(s.id)}
+      <ol className="min-h-0 flex-1 overflow-y-auto px-2 pb-3">
+        {ranked.map((s, i) => {
+          const selected = s.id === selectedSiteId;
+          return (
+            <li key={s.id}>
+              <button
+                type="button"
+                onClick={() => selectSite(s.id)}
+                aria-pressed={selected}
+                className={cn(
+                  'grid w-full grid-cols-[22px_1fr_auto] items-baseline rounded-[4px] px-3 py-[7px] text-left text-[14px] transition-colors duration-100',
+                  selected ? 'bg-violet text-white' : 'hover:bg-panel-2',
+                  !s.valid && !selected && 'text-ink-faint',
+                )}
+              >
+                <span
+                  className={cn('num text-[12px]', selected ? 'text-white/70' : 'text-ink-faint')}
                 >
-                  <td className="num px-2 py-[5px] text-right">{i + 1}</td>
-                  <td className="px-2 py-[5px]">
-                    <button
-                      type="button"
-                      className={cn(
-                        'text-left',
-                        selected ? 'font-bold' : 'lnk no-underline hover:underline',
-                      )}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        selectSite(s.id);
-                      }}
-                    >
-                      {s.name}
-                    </button>
-                  </td>
-                  <td className="px-2 py-[5px] text-right">
-                    <span className="num inline-flex items-center gap-1">
-                      <span
-                        className="inline-block size-[7px] rotate-45 border border-black"
-                        style={{ background: scoreColor(s.score) }}
-                      />
-                      {Math.round(s.score * 100)}
-                    </span>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
+                  {i + 1}
+                </span>
+                <span className="truncate">{s.name}</span>
+                <span className="num font-medium">{Math.round(s.score * 100)}</span>
+              </button>
+            </li>
+          );
+        })}
+      </ol>
     </section>
   );
 }
@@ -91,77 +56,70 @@ export function SiteList({ className }: { className?: string }) {
 export function SiteDetail({ className }: { className?: string }) {
   const site = useSelectedSite();
   const setMode = useAppStore((s) => s.setMode);
+  const proMode = useAppStore((s) => s.proMode);
+
   if (!site) {
     return (
-      <section className={cn('box', className)}>
-        <div className="box-head">Site Data</div>
-        <p className="box-body text-ink-muted">
-          Select a site on the map, in the list, or with <b>Find a site</b> at the top of the page.
-        </p>
+      <section className={cn('box p-5', className)}>
+        <h2 className="text-[18px]">No site selected</h2>
+        <ol className="text-ink mt-3 list-decimal space-y-2 pl-5 text-[14px]">
+          <li>Click a diamond on the map, or a name in the list.</li>
+          <li>Press Play and watch when the site gets sunlight and sees Earth.</li>
+          <li>Open Compare to put two or three sites side by side.</li>
+        </ol>
       </section>
     );
   }
-  return (
-    <section className={cn('box', className)} aria-label={`${site.name} details`}>
-      <div className="box-head">Site Data</div>
-      <div className="box-body">
-        <div className="flex items-start gap-2">
-          <div className="min-w-0 flex-1">
-            <h2 className="text-[15px] leading-tight font-bold text-white">{site.name}</h2>
-            <p className="text-ink-faint num mt-0.5 text-[10px]">
-              {formatLatLon(site.lat, site.lon)} · {site.elev_m.toLocaleString('en')} m
-            </p>
-          </div>
-          <div
-            className="num border border-black px-1.5 py-0.5 text-center text-black"
-            style={{ background: scoreColor(site.score) }}
-            title="Score with the default weights (0–100)"
-          >
-            <div className="text-[9px] font-bold uppercase">Score</div>
-            <div className="text-[16px] leading-none font-bold">{Math.round(site.score * 100)}</div>
-          </div>
-        </div>
-        <Metrics site={site} />
-        <ul className="mt-2 space-y-0.5 text-[11px]">
-          {site.reasons.map((r) => (
-            <li key={r} className={reasonIsGood(r) ? 'text-good' : 'text-bad'}>
-              {reasonIsGood(r) ? '✔' : '✖'} {reasonText(r)}
-            </li>
-          ))}
-        </ul>
-        <button
-          type="button"
-          onClick={() => setMode('streetview')}
-          className="btn btn-go mt-2.5 w-full"
-        >
-          Stand here in Street View ›
-        </button>
-      </div>
-    </section>
-  );
-}
 
-function Metrics({ site }: { site: Site }) {
-  const m = site.metrics;
-  const rows = [
-    { label: 'Sunlight', value: pct(m.illum_pct), tone: 'text-sun' },
-    { label: 'Earth in view', value: pct(m.earth_vis_pct), tone: 'text-earth' },
-    { label: 'Slope', value: `${m.slope_deg.toFixed(1)}°`, tone: '' },
-    { label: 'Longest night', value: `${m.max_dark_hours} h`, tone: '' },
-    { label: 'To shadowed crater', value: `${m.psr_dist_km} km`, tone: 'text-psr' },
-  ];
   return (
-    <table className="border-edge mt-2 w-full border text-[11px]">
-      <tbody>
-        {rows.map((r, i) => (
-          <tr key={r.label} className={i % 2 ? 'bg-navy-850' : 'bg-navy-950'}>
-            <th className="text-ink-muted px-2 py-[5px] text-left font-normal">{r.label}</th>
-            <td className={cn('num px-2 py-[5px] text-right font-bold', r.tone || 'text-ink')}>
-              {r.value}
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
+    <section className={cn('box p-5', className)} aria-label={`${site.name} details`}>
+      <h2 className="text-[24px] leading-tight">{site.name}</h2>
+      {proMode && (
+        <p className="text-ink-faint num mt-1 text-[12px]">
+          {formatLatLon(site.lat, site.lon)}, {site.elev_m.toLocaleString('en')} m
+        </p>
+      )}
+      <p className="num mt-3 leading-none">
+        <span
+          className="mr-2 inline-block size-3 align-middle"
+          style={{ background: scoreColor(site.score) }}
+          aria-hidden
+        />
+        <span className="text-heading text-[48px] font-medium">{Math.round(site.score * 100)}</span>
+        <span className="text-ink-faint text-[14px]"> / 100</span>
+      </p>
+      {!site.valid && (
+        <p className="text-bad mt-2 text-[13px]">
+          Fails a safety rule:{' '}
+          {site.metrics.slope_deg > 15 ? 'too steep to land.' : 'too little sunlight.'}
+        </p>
+      )}
+
+      <ul className="rows border-edge mt-4 border-t">
+        {METRICS.map((m) => {
+          const good = m.goodness(site.metrics);
+          return (
+            <li key={m.key} className="py-2.5" title={m.help}>
+              <div className="flex items-center gap-2 text-[14px]">
+                <m.Icon className="text-ink-faint size-4 shrink-0" strokeWidth={1.8} aria-hidden />
+                <span className="text-ink">{proMode ? m.proLabel : m.label}</span>
+                <span className="num text-heading ml-auto font-medium">
+                  {m.format(site.metrics, proMode)}
+                </span>
+              </div>
+              {good !== null && (
+                <div className="meter mt-2 ml-6">
+                  <span style={{ width: `${Math.round(good * 100)}%`, background: m.bar }} />
+                </div>
+              )}
+            </li>
+          );
+        })}
+      </ul>
+
+      <button type="button" onClick={() => setMode('streetview')} className="btn mt-5 w-full">
+        Stand here in Street View
+      </button>
+    </section>
   );
 }
