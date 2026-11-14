@@ -1,7 +1,9 @@
 /** Title screen: pick a mode (South Pole now, Historical later) and the difficulty. */
 import { Lock, Play } from 'lucide-react';
 import { clsx } from 'clsx';
+import { useData } from '@/core';
 import { difficultyHint, type Difficulty } from '../engine/bars';
+import { southPoleSites } from '../engine/deal';
 import { useGame } from '../state/gameStore';
 import { MENU_BG, MODE_HISTORICAL, MODE_SOUTH_POLE } from './assets';
 import { GameImage } from './GameImage';
@@ -15,6 +17,8 @@ export function MenuScreen() {
   const difficulty = useGame((s) => s.difficulty);
   const setDifficulty = useGame((s) => s.setDifficulty);
   const start = useGame((s) => s.start);
+  // The hint lists the bars a real card shows (pending metrics are omitted from the cards).
+  const sample = useData((s) => (s.sites ? southPoleSites(s.sites)[0] : undefined));
 
   return (
     <div className="relative flex flex-1 flex-col items-center justify-center gap-6 overflow-hidden p-6">
@@ -111,7 +115,7 @@ export function MenuScreen() {
             </button>
           ))}
         </div>
-        <p className="text-ink-muted font-mono text-[11px]">{difficultyHint(difficulty)}</p>
+        <p className="text-ink-muted font-mono text-[11px]">{difficultyHint(difficulty, sample)}</p>
       </div>
     </div>
   );

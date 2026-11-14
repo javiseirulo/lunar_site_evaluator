@@ -11,6 +11,7 @@ import {
   scientistImage,
   siteImage,
   siteTerrain,
+  TERRAINS,
   verdictImage,
 } from './assets';
 import { CAUSE_HEADLINE, emergencyById, lessonFor } from './content';
@@ -54,21 +55,41 @@ describe('assets', () => {
     expect(scientistImage('alarm')).toMatch(/game\/characters\/dr-regolith-alarm\.png$/);
   });
 
-  it('explicitly maps every real site to a terrain and unknown ids to plateau', () => {
+  it('keeps the explicit terrain map and resolves every south-pole site to a terrain', () => {
     const data = join(__dirname, '..', '..', '..', 'public', 'data', 'sites.json');
     const sites = (JSON.parse(readFileSync(data, 'utf8')) as SitesFile).sites;
     expect(siteTerrain('shackleton_rim_01')).toBe('rim');
     expect(siteTerrain('nobile_rim_02')).toBe('cliff');
     expect(siteTerrain('cabeus_b')).toBe('crater');
     expect(siteTerrain('mons_mouton')).toBe('mons');
-    expect(siteTerrain('nowhere')).toBe('plateau');
+    expect(siteTerrain('leibnitz_beta')).toBe('plateau');
     expect(knownTerrain('nowhere')).toBeUndefined();
     expect(knownTerrain('toString')).toBeUndefined();
-    expect(sites.length).toBeGreaterThan(0);
-    for (const s of sites) {
-      expect(knownTerrain(s.id), `${s.id} has no explicit terrain`).toBeDefined();
-      expect(siteImage(s.id, 1)).toBe(gameAsset(`sites/site-${knownTerrain(s.id)}-1.png`));
+    const southPole = sites.filter((s) => s.region === 'south_pole');
+    expect(southPole.length).toBeGreaterThan(0);
+    for (const s of southPole) {
+      const terrain = siteTerrain(s.id);
+      expect(TERRAINS, `${s.id} -> ${terrain}`).toContain(terrain);
+      expect(siteImage(s.id, 1)).toBe(gameAsset(`sites/site-${terrain}-1.png`));
+      const known = knownTerrain(s.id);
+      if (known) expect(terrain).toBe(known);
     }
+  });
+
+  it('falls back to id keywords, then to a stable hash spread over the terrains', () => {
+    expect(siteTerrain('connecting_ridge_cr05')).toBe('ridge');
+    expect(siteTerrain('peak_near_shackleton_pns02')).toBe('peak');
+    expect(siteTerrain('cabeus_b_south')).toBe('crater');
+    expect(siteTerrain('malapert_mp2')).toBe('massif');
+    expect(siteTerrain('new_mons_site')).toBe('mons');
+    expect(siteTerrain('some_rim')).toBe('rim');
+    expect(siteTerrain('ibn_bajja_plains')).toBe('plateau');
+    const unknown = Array.from({ length: 40 }, (_, i) => `site_${i}`);
+    for (const id of unknown) {
+      expect(TERRAINS).toContain(siteTerrain(id));
+      expect(siteTerrain(id)).toBe(siteTerrain(id));
+    }
+    expect(new Set(unknown.map(siteTerrain)).size).toBeGreaterThanOrEqual(4);
   });
 
   it('gives cards of the same terrain different variants within a hand', () => {

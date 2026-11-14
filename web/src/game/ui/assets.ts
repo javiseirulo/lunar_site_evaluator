@@ -43,9 +43,47 @@ export function knownTerrain(siteId: string): Terrain | undefined {
   return Object.hasOwn(TERRAIN_BY_SITE, siteId) ? TERRAIN_BY_SITE[siteId] : undefined;
 }
 
-/** Terrain illustration family for a site; unknown ids fall back to `plateau`. */
+export const TERRAINS: readonly Terrain[] = [
+  'rim',
+  'cliff',
+  'ridge',
+  'peak',
+  'massif',
+  'mons',
+  'plateau',
+  'crater',
+];
+
+/** Keywords in a site id that pick a terrain, checked in this order. */
+const TERRAIN_KEYWORDS: [Terrain, readonly string[]][] = [
+  ['mons', ['mons', 'mouton']],
+  ['massif', ['massif', 'malapert']],
+  ['peak', ['peak']],
+  ['ridge', ['ridge']],
+  ['crater', ['crater', 'cabeus']],
+  ['rim', ['rim']],
+  ['plateau', ['plateau', 'plain']],
+];
+
+/** FNV-1a 32-bit hash: stable across sessions and platforms. */
+function hash(text: string): number {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < text.length; i++) h = Math.imul(h ^ text.charCodeAt(i), 0x01000193);
+  return h >>> 0;
+}
+
+/**
+ * Terrain illustration family for a site: the explicit map, else a keyword in the id, else a
+ * stable hash over the 8 terrains (so unknown sites do not all share one picture).
+ */
 export function siteTerrain(siteId: string): Terrain {
-  return knownTerrain(siteId) ?? 'plateau';
+  const known = knownTerrain(siteId);
+  if (known) return known;
+  const id = siteId.toLowerCase();
+  for (const [terrain, words] of TERRAIN_KEYWORDS) {
+    if (words.some((w) => id.includes(w))) return terrain;
+  }
+  return TERRAINS[hash(id) % TERRAINS.length]!;
 }
 
 export function siteImage(siteId: string, variant: 1 | 2): string {
