@@ -130,7 +130,21 @@ Javi cerró con el equipo cómo deben funcionar los escenarios de Mission. **Man
 | `metrics.ts` y Pro mode | Javi2 | PR #63 abierto y en conflicto | barras propias simples, se cambian al mergear |
 | Freeze del equipo | — | 15-nov ~18:00 | — |
 
-### Para debatir con el equipo
+### ✅ Cerrado por Manuel (2026-11-14, 5ª ronda) — manda sobre todo lo anterior
+- **Varios ganadores:** sí. La victoria da **1-3 estrellas según el score** (estilo Clash of Clans). Sin empates.
+- **Cartas:** sitios y posiciones barajados en cada partida; el nombre real se revela en el veredicto.
+- **Dificultad Normal/Expert desacoplada del Pro mode:** no es lo mismo la vista de estudiante de la web que querer jugar en
+  difícil. Mission tiene su propio selector; reutiliza los textos de `metrics.ts` cuando se mergee #63.
+- **Pendiente máxima = 10°** (acordado con Javi). Fuente: requisito de pendiente de aterrizaje < 10° (escala 100 m) en
+  [Artemis overview, NTRS 20250009323](https://ntrs.nasa.gov/api/citations/20250009323/downloads/ArtemisOverview2025IntSPAPPSChallenge.pdf)
+  y [HLS update 2024, NTRS 20240009596](https://ntrs.nasa.gov/api/citations/20240009596/downloads/ArtemisHLSUpdate_2024.pdf).
+  Sustituye al 8° de J9 y al 15° del texto de ayuda de #63.
+- **Nombres de estilos/dificultad** (`variant` de Javi vs. `style` + `difficulty` de Mission): se dejan como están; consenso antes de la entrega.
+- **Estética:** al final, cuando el equipo la cierre.
+- **Resto de umbrales:** los de Javi (J9): noche 100 h, blackout 72 h con margen de antena 2°, comunicaciones 50 %.
+  Duración provisional = `surface_days` 7 (valor de Javi) hasta que Manuel la cierre.
+
+### Para debatir con el equipo (histórico)
 - **Pendiente máxima:** hay tres valores en el repo: 8° (Javi, J9), 15° (texto de ayuda de `metrics.ts` en PR #63) y 10° (mi §4,
   requisito de aterrizaje de Artemis/HLS). Debe haber uno solo.
 - **Nombres `variant`:** acordar con Javi cómo se llaman los dos estilos y las dos dificultades en el formato de escenario.
