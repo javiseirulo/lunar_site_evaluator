@@ -7,3 +7,8 @@
 - Hallazgo: existe `Softsasi/LunaMission` (posible equipo del mismo reto) → diferenciarse (ver `docs/05-prior-art.md`).
 - Datos más útiles: Horizons API/SPICE (Sol/Tierra), LOLA 5 m del polo sur (Barker et al.), Moon Trek WMTS.
 - Siguiente: javi escribe su idea en `docs/ideas/`; cada compañero la suya; luego `/office-hours`.
+
+## 2026-11-14 — Sesión 2: plan de efemérides y scoring
+- Plan detallado añadido a `docs/10-plan-tecnico.md` §5 Javi (J1–J11), sin tocar los bloques de los demás.
+- Hallazgo: Moon Trek WMTS sirve imágenes renderizadas (no valores) → para mostrar/validar; el DEM numérico y los perfiles de horizonte los produce Pablo (PGDA/PDS).
+- Pendiente: PR de contrato v1.1 (aditivo) y empezar #39 (efemérides SPICE + validación Horizons) en rama desde `dev`.
