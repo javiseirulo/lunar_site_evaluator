@@ -1,0 +1,211 @@
+{
+  "version": 1,
+  "terrain_mock": false,
+  "input_sites_mock": true,
+  "frame": "MOON_ME_DE421",
+  "source_pixel_spacing_m": 80,
+  "sampling": "nearest native source pixel, not mesh or texture",
+  "warning": "Real terrain at fixture coordinates; not validated landing-site metrics. No score, validity or ephemeris changes.",
+  "sites": [
+    {
+      "id": "shackleton_rim_01",
+      "lat": -89.9,
+      "lon": 0,
+      "x_m": 0.0,
+      "y_m": 3032.3358121667407,
+      "elevation_m": 648.1246948242188,
+      "slope_deg": 20.86695671081543,
+      "terrain_valid": true
+    },
+    {
+      "id": "shackleton_rim_02",
+      "lat": -89.45,
+      "lon": 141,
+      "x_m": 10495.787106973505,
+      "y_m": -12961.217653998836,
+      "elevation_m": -791.2806396484375,
+      "slope_deg": 32.32425308227539,
+      "terrain_valid": true
+    },
+    {
+      "id": "connecting_ridge",
+      "lat": -89.45,
+      "lon": -137,
+      "x_m": -11374.348736070397,
+      "y_m": -12197.49568147069,
+      "elevation_m": 1952.5439453125,
+      "slope_deg": 2.0820791721343994,
+      "terrain_valid": true
+    },
+    {
+      "id": "de_gerlache_rim_01",
+      "lat": -88.7,
+      "lon": -68,
+      "x_m": -36551.48529118464,
+      "y_m": 14767.758650866574,
+      "elevation_m": 1767.3116455078125,
+      "slope_deg": 5.514342784881592,
+      "terrain_valid": true
+    },
+    {
+      "id": "de_gerlache_rim_02",
+      "lat": -88.25,
+      "lon": -95,
+      "x_m": -52868.04168486095,
+      "y_m": -4625.354310241328,
+      "elevation_m": -2279.4833984375,
+      "slope_deg": 1.0843393802642822,
+      "terrain_valid": true
+    },
+    {
+      "id": "peak_near_shackleton",
+      "lat": -88.8,
+      "lon": 124,
+      "x_m": 30168.138969787968,
+      "y_m": -20348.66667240789,
+      "elevation_m": 1630.1983642578125,
+      "slope_deg": 5.516663551330566,
+      "terrain_valid": true
+    },
+    {
+      "id": "malapert_massif",
+      "lat": -85.99,
+      "lon": -0.1,
+      "x_m": -212.31272759671626,
+      "y_m": 121646.10876346253,
+      "elevation_m": 4814.8388671875,
+      "slope_deg": 5.349443435668945,
+      "terrain_valid": true
+    },
+    {
+      "id": "leibnitz_beta",
+      "lat": -85.4,
+      "lon": 31.7,
+      "x_m": 73336.07678483281,
+      "y_m": 118741.22747209792,
+      "elevation_m": 6457.8076171875,
+      "slope_deg": 3.5923478603363037,
+      "terrain_valid": true
+    },
+    {
+      "id": "haworth_rim",
+      "lat": -86.6,
+      "lon": -15,
+      "x_m": -26691.91919679173,
+      "y_m": 99615.5985939498,
+      "elevation_m": 907.8994750976562,
+      "slope_deg": 5.125125885009766,
+      "terrain_valid": true
+    },
+    {
+      "id": "nobile_rim_01",
+      "lat": -84.4,
+      "lon": 63,
+      "x_m": 151423.05922898528,
+      "y_m": 77153.90231747025,
+      "elevation_m": 531.8203125,
+      "slope_deg": 16.935163497924805,
+      "terrain_valid": true
+    },
+    {
+      "id": "nobile_rim_02",
+      "lat": -85.7,
+      "lon": 41,
+      "x_m": 85583.97755767147,
+      "y_m": 98453.10394665717,
+      "elevation_m": 2803.34521484375,
+      "slope_deg": 26.275510787963867,
+      "terrain_valid": true
+    },
+    {
+      "id": "faustini_rim",
+      "lat": -86.4,
+      "lon": 82,
+      "x_m": 108137.2624586591,
+      "y_m": 15197.70112837153,
+      "elevation_m": 953.8990478515625,
+      "slope_deg": 8.113492965698242,
+      "terrain_valid": true
+    },
+    {
+      "id": "amundsen_rim",
+      "lat": -83.6,
+      "lon": 80,
+      "x_m": 191320.060285241,
+      "y_m": 33734.88857905806,
+      "elevation_m": -2275.03759765625,
+      "slope_deg": 7.711721420288086,
+      "terrain_valid": true
+    },
+    {
+      "id": "cabeus_b",
+      "lat": -82.2,
+      "lon": -55,
+      "x_m": -194047.37038956225,
+      "y_m": 135873.43151654312,
+      "elevation_m": -3865.256103515625,
+      "slope_deg": 2.8287386894226074,
+      "terrain_valid": true
+    },
+    {
+      "id": "shoemaker_rim",
+      "lat": -87,
+      "lon": 46,
+      "x_m": 65453.332871468556,
+      "y_m": 63207.54882768805,
+      "elevation_m": 101.04561614990234,
+      "slope_deg": 10.56947135925293,
+      "terrain_valid": true
+    },
+    {
+      "id": "sverdrup_rim",
+      "lat": -87.6,
+      "lon": -150,
+      "x_m": -36393.34196664335,
+      "y_m": -63035.11734345494,
+      "elevation_m": -1326.8555908203125,
+      "slope_deg": 1.0556719303131104,
+      "terrain_valid": true
+    },
+    {
+      "id": "slater_plain",
+      "lat": -87.6,
+      "lon": -112,
+      "x_m": -67486.63817039922,
+      "y_m": -27266.371714289235,
+      "elevation_m": -1564.0953369140625,
+      "slope_deg": 7.007071495056152,
+      "terrain_valid": true
+    },
+    {
+      "id": "de_gerlache_kocher",
+      "lat": -84.9,
+      "lon": -95,
+      "x_m": -154162.40113867825,
+      "y_m": -13487.462441570355,
+      "elevation_m": -1982.7633056640625,
+      "slope_deg": 4.08620023727417,
+      "terrain_valid": true
+    },
+    {
+      "id": "mons_mouton",
+      "lat": -84.3,
+      "lon": 31,
+      "x_m": 89094.26892554815,
+      "y_m": 148277.76376780914,
+      "elevation_m": 5384.23974609375,
+      "slope_deg": 3.054274320602417,
+      "terrain_valid": true
+    },
+    {
+      "id": "plain_81s",
+      "lat": -81.5,
+      "lon": 120,
+      "x_m": 223627.0240859672,
+      "y_m": -129111.12255410802,
+      "elevation_m": -1919.119384765625,
+      "slope_deg": 6.347818374633789,
+      "terrain_valid": true
+    }
+  ]
+}

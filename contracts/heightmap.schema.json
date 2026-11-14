@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "heightmap.schema.json",
+  "title": "terrain/heightmap.json — PolarHeightmap, additive proposal for Marta",
+  "type": "object",
+  "required": [
+    "version",
+    "mock",
+    "projection",
+    "radius_m",
+    "bounds_m",
+    "lat_limit",
+    "frame",
+    "width_px",
+    "height_px",
+    "registration",
+    "sample_0_0_m",
+    "sample_step_col_m",
+    "sample_step_row_m",
+    "row_order",
+    "resampling",
+    "source_pixel_spacing_m",
+    "height_unit",
+    "height_reference_radius_m",
+    "height_reference_note",
+    "heights",
+    "mask",
+    "height_range_m",
+    "valid_samples",
+    "total_samples",
+    "source",
+    "provenance_file",
+    "sha256"
+  ],
+  "$defs": {
+    "pair": { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2 }
+  },
+  "properties": {
+    "version": { "const": 1 },
+    "mock": { "type": "boolean" },
+    "projection": { "type": "string", "minLength": 1 },
+    "radius_m": { "type": "number", "exclusiveMinimum": 0 },
+    "bounds_m": { "type": "array", "items": { "type": "number" }, "minItems": 4, "maxItems": 4 },
+    "lat_limit": { "type": "number", "minimum": -90, "maximum": 0 },
+    "frame": { "const": "MOON_ME_DE421" },
+    "width_px": { "type": "integer", "minimum": 2 },
+    "height_px": { "type": "integer", "minimum": 2 },
+    "registration": { "const": "vertices" },
+    "sample_0_0_m": { "$ref": "#/$defs/pair" },
+    "sample_step_col_m": { "$ref": "#/$defs/pair" },
+    "sample_step_row_m": { "$ref": "#/$defs/pair" },
+    "row_order": { "const": "max_y_to_min_y" },
+    "resampling": { "const": "bilinear" },
+    "source_pixel_spacing_m": { "type": "number", "exclusiveMinimum": 0 },
+    "height_unit": { "const": "m" },
+    "height_reference_radius_m": { "type": "number", "exclusiveMinimum": 0 },
+    "height_reference_note": { "type": "string" },
+    "heights": {
+      "type": "object",
+      "required": ["file", "encoding", "order", "scale", "offset", "nodata"],
+      "properties": {
+        "file": { "type": "string" },
+        "encoding": { "const": "float32-le" },
+        "order": { "const": "row-major" },
+        "scale": { "const": 1 },
+        "offset": { "const": 0 },
+        "nodata": { "const": "NaN" }
+      }
+    },
+    "mask": {
+      "type": "object",
+      "required": ["file", "encoding", "valid", "nodata"],
+      "properties": {
+        "file": { "type": "string" },
+        "encoding": { "const": "uint8" },
+        "valid": { "const": 1 },
+        "nodata": { "const": 0 }
+      }
+    },
+    "height_range_m": { "$ref": "#/$defs/pair" },
+    "valid_samples": { "type": "integer", "minimum": 1 },
+    "total_samples": { "type": "integer", "minimum": 4 },
+    "source": { "type": "string" },
+    "provenance_file": { "type": "string" },
+    "sha256": {
+      "type": "object",
+      "additionalProperties": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+    }
+  }
+}

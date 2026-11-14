@@ -28,7 +28,7 @@
 | Globo 3D + filtros (Marta) | ✅ v0 (globo, pins, ficha, coordenadas, pins propios) · ⏳ v1 requisitos de misión | `web/src/globe/`; filtro provisional en `requirements.ts` hasta la v1 (ver §5 Marta) |
 | Street View (Pablo) | ⏳ hueco listo | `web/src/streetview/` (placeholder que imprime Sol/Tierra az/el) |
 | Mission / juego (Cristóbal) | ⏳ diseño descrito (#52), hueco listo | `web/src/game/` (placeholder) |
-| Pipeline Python (Javi, Pablo) | ⏳ no integrado; Pablo tiene adquisición/exportación local | `python/terrain/` local, pendiente de PR; efemérides y horizonte real aún no publicados |
+| Pipeline Python (Javi, Pablo) | Entrega polar real reunida con el visor en rama #46; revisión/integración pendientes | `python/terrain/`, `web/public/data/terrain/`: heightmap 1025², máscara, elevación/pendiente y tabla de 20 sitios; horizonte/efemérides aún pendientes |
 | Deploy público | ⏳ pendiente | `web/vercel.json` listo; proyecto Vercel con raíz `web/` |
 
 ### Cómo arrancar (cualquiera)
@@ -376,6 +376,13 @@ Los umbrales son propuestas razonables, a ajustar con referencias.
 ### Pablo: topografía y Lunar Street View
 > ➕ (@javiseirulo, 2026-11-14, #67) **Alcance = toda la Luna, con énfasis en el polo sur.** Qué cambia para ti: **§10**.
 
+**Entrega actual para revisión:** rama unificada `pabloizgui/46-lunar-streetview`,
+con el terreno de #37, el visor y `dev` en `e6825cd` (incluye Design/Mission).
+Rutas exactas por destinatario, ejecución con token de la cuenta de Pablo y
+dependencias: [team-handoff.md](team/pabloizgui/team-handoff.md).
+Los perfiles numéricos de horizonte y vectores reales siguen pendientes;
+la siguiente tarea visual es corregir el giro 360° y mejorar legibilidad/controles.
+
 **Objetivo y alcance.** Construir una vista sintética desde la superficie lunar,
 orientable 360°, con topografía, coordenadas, altura del observador y azimut/elevación
 del Sol y la Tierra. La arquitectura debe admitir cualquier ubicación; el primer
@@ -418,11 +425,15 @@ de `layers.json` (§5 Marta). Objetivo inicial: rejilla 1025×1025 en Float32
 little-endian con máscara y manifest; Int16 es una opción solo si rango,
 NoData y cuantización quedan acordados. Registrar altura, referencia vertical,
 CRS/marco, dimensiones, orden de filas, escala y cobertura. El DEM PGDA 81 de
-87–90°S y el recorte local de 1,28 km no cubren todo el parche: hace falta
-seleccionar y validar un DEM de menor resolución para la ventana completa
-(el candidato de Marta sigue pendiente de verificar). No rellenar las zonas
-ausentes con datos inventados; publicar un mock explícito hasta disponer del
-producto real. El esquema y el loader se acuerdan con Marta/Javi2 mediante
+87–90°S y el recorte local de 1,28 km no cubren todo el parche. **Actualización
+#37:** verificado y descargado `LDEM_80S_80MPP_ADJ.TIF` de PGDA 90, junto con
+el LDSM de 80 m. Generada entrega real en `web/public/data/terrain/`: 1025²
+Float32 LE, máscara y manifest, más dos capas 512² y tabla de terreno por sitio.
+El paso de malla es 593,76171875 m (1024 intervalos con extremos incluidos),
+distinto del espaciado de 80 m del producto original. Las esquinas fuera del
+casquete y los datos ausentes siguen como NoData, sin inventar alturas.
+Ver [entrega e instrucciones](team/pabloizgui/terrain-handoff.md) y
+[pendientes](team/pabloizgui/tasks.md). El esquema propuesto y el loader se acuerdan con Marta/Javi2 mediante
 PR a `contracts/`; no reinterpretar `elevation.png` gray8 como altura precisa.
 
 **Entregables de terreno y horizonte.** Reutilizar el exportador existente de
@@ -505,9 +516,13 @@ global. La elección no cambia los contratos de selección, tiempo o series.
 **Estado real y límites.** Existen descargador, inspección y exportador offline;
 un primer recorte real de 1,28×1,28 km y doce pruebas correctas de esas herramientas.
 El recorte se eligió por disponibilidad de teselas recibidas, no es un sitio de
-misión validado. La descarga completa sigue pendiente. La escena Cesium, los
-perfiles de horizonte, las capas para el frontend, la integración web y el cielo
-estelar todavía no están implementados. El trabajo hecho sirve a la base científica
+  misión validado. El DEM completo ya está descargado y se han decodificado tres
+  ventanas de referencia; eso no valida todos los píxeles ni la geodesia. En la
+  rama de #46 se implementa el primer motor Cesium con cámara, marcadores de
+  dirección y reloj compartido: tipos, lint, 25 pruebas y build correctos. La
+  prueba del terreno real en ion sigue pendiente del token; no se afirma que
+  cámara/touch/alturas ya estén verificados con el asset. Perfiles de horizonte,
+  capas para el frontend y cielo estelar siguen pendientes. El trabajo sirve a la base científica
 y a la contingencia local; no obliga a construir la geometría visual global propia.
 
 **Fuentes del bloque:** [Cesium Moon](https://cesium.com/platform/cesium-ion/content/cesium-moon/),
@@ -527,6 +542,18 @@ Reconciliación solicitada por Pablo; seguimiento en **#59**.
 >   - Usa `skyAt(lat, lon, t)` de `@/ephem`: vectores Sol/Tierra en `MOON_ME` sacados de SPICE, con transformación topocéntrica y **paralaje exacta de la Tierra**. Da el az/el de ese punto en 2026–2055.
 >   - Si el punto no tiene perfil de horizonte, muestra solo el horizonte geométrico y etiquétalo ("no terrain").
 > - **Validación cruzada:** la que ya tienes prevista (2 sitios y fechas: render frente a `lit`/`earth_visible`) se anota en el PR (#41).
+
+**Configuración de producción de Pablo tras J0 (2026-11-14).**
+`config/terrain-processing.json` fija 5 m, 0,1°/3600 muestras en sitios curados y
+1°/360 en celdas de 5 km. Base de relieve lejano: **300 km**, con comparación
+hasta **310 km** antes de validar. Fuente adicional PGDA 90 de 240 m hasta
+−60°S para salir de la ventana visual −80°S cuando lo exija el horizonte.
+Se mantiene el heightmap de Marta sin añadir altura del observador.
+El catálogo lo decide #48; meta inicial de capacidad de Pablo: 20 perfiles,
+condicionada al benchmark y la lista final; **0 perfiles científicos listos hoy**.
+Sol/Tierra se consumirán desde `@/ephem` de Javi, sin fabricar vectores ni
+extrapolar los mocks. Falta confirmar DE421/DE440. Detalle y límites:
+[reconfiguración de Pablo](team/pabloizgui/javi-context-sync.md).
 
 ### Marta: visor 3D de la Luna y modo exploración
 > ➕ (@javiseirulo, 2026-11-14, #67) **Alcance = toda la Luna, con énfasis en el polo sur.** Qué cambia para ti: **§10**.
@@ -734,7 +761,7 @@ Lo propuesto aquí se publica para revisión compartida; no atribuye un OK a los
 
 | Con quién | Interfaz que se mantiene | Lo que hay que acordar antes de implementar |
 | --- | --- | --- |
-| Javi | `sites.json`, `timeseries/<id>.json`, azimut/elevación y visibilidad del pipeline | Perfil de horizonte (marco, altura, resolución y cobertura) y ampliación futura para coordenadas arbitrarias |
+| Javi | `sites.json`, `Timeseries` y vectores anuales desde `@/ephem` | J0/J10: observador 5 m, azimut 0,1° curados / 1° celdas, alcance base 300 km; marco DE421/DE440 y catálogo #48 por confirmar; coordenadas arbitrarias en el MVP |
 | Marta | Globo R3F, helpers de proyección, `layers.json`, `activeLayers`, `layerOpacity` | Heightmap polar Float32 + máscara/manifest sobre la ventana completa; el DEM de 87–90°S no basta para llegar a −80° |
 | Javi2 | Componente React Street View, rutas, selección, reloj y loaders de `@/core` | Dependencia/build Cesium, carga diferida y limpieza; altura del observador y coordenadas propias solo con extensión de contrato revisada |
 | Cristóbal | `mode: "game"`, selección y series del mismo pipeline; veredicto determinista | No introducir dependencia del renderer Cesium para jugar; respetar cobertura temporal y valores desconocidos |
@@ -749,6 +776,14 @@ No se publica código ni datos crudos de Pablo con #59. El descargador/exportado
 y las notas locales se conservan para sus propios PRs. Las pruebas de adquisición
 no acreditan una escena Cesium, una predicción de horizonte ni un enlace de radio.
 
+### Entrega posterior de terreno (#37, 2026-11-14)
+
+El candidato polar de Marta ya está verificado en la fuente oficial PGDA 90.
+La rama `pabloizgui/37-terrain-handoff` añade datos reales separados del catálogo
+mock, propuesta `PolarHeightmap`, pruebas Python/consumidor JS y guía de lectura.
+Se mantienen pendientes la revisión del contrato/loader por Marta/Javi2 y los
+horizontes de Javi (#38). El muestreo entrega terreno real en coordenadas de
+fixtures; no convierte scores, iluminación ni sitios inventados en resultados.
 ## 10. Toda la Luna, con énfasis en el polo sur (decisión de @javiseirulo, 2026-11-14, #67)
 
 > **Qué se decide.** La app permite **seleccionar y evaluar cualquier punto de la Luna**. El polo sur sigue siendo el foco: es donde hay más datos, terreno real y la mayoría de sitios. Ya estaba en J1 ("Se puede seleccionar toda la Luna, con énfasis en el polo sur"), pero el código y los mocks se habían quedado solo en el polo (≤ −80°). Esta sección dice qué cambia y qué necesita cada uno.
