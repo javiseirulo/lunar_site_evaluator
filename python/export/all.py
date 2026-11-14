@@ -7,17 +7,17 @@ for every site of ``export/catalog.yaml`` over 2027 ``[2027-01-01, 2028-01-01)``
 ``layers.json``, ``layers/`` or ``terrain/``. Every output is validated against
 ``contracts/*.schema.json``.
 
-Evaluation window: ``Site.valid``/``score`` are "over the manifest window" (contracts/types.ts and
-README rule 4), so they are evaluated over the whole year. DEFAULT_MISSION_CONFIG thresholds are
-sized for a 7-day stay, so over a year max_dark/max_blackout fail for most non-polar sites; the
-web re-evaluates per mission window with ``@/scoring``.
+Evaluation window (contracts/README v1.1, SitesFile.evaluation): ``Site.metrics`` are over the
+manifest window (all of 2027); ``valid``/``score``/``checks`` are over the default mission window
+``missionWindow(DEFAULT_MISSION_CONFIG)`` (7 days from 2027-11-08), because the default thresholds
+are sized for a 7-day stay. The web re-evaluates any other window with ``@/scoring``.
 """
 
 from __future__ import annotations
 
 import json
 import math
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -38,6 +38,15 @@ CATALOG = Path(__file__).with_name("catalog.yaml")
 START_UTC = "2027-01-01T00:00:00Z"
 END_UTC = "2028-01-01T00:00:00Z"
 ANTENNA_MARGIN_DEG = 2.0
+EVAL_START = DEFAULT_MISSION_CONFIG["landing_utc"]
+_eval_start = datetime.strptime(EVAL_START, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=UTC)
+_eval_end = _eval_start + timedelta(days=DEFAULT_MISSION_CONFIG["surface_days"])
+EVAL_END = _eval_end.strftime("%Y-%m-%dT%H:%M:%SZ")
+_year0 = datetime(2027, 1, 1, tzinfo=UTC)
+EVAL_SLICE = (
+    int((_eval_start - _year0).total_seconds() // STEP_S),
+    int((_eval_end - _year0).total_seconds() // STEP_S),
+)
 PENDING = ["slope_deg", "psr_dist_km"]  # need terrain (not published yet); placeholder 0
 CORE_KEYS = ["illum_pct", "earth_vis_pct", "slope_deg", "max_dark_hours", "psr_dist_km"]
 
@@ -64,10 +73,20 @@ def publish_timeseries(site: dict, t, sun, earth) -> dict:
     return ts
 
 
+def _slice(ts: dict, i0: int, i1: int) -> dict:
+    n = len(ts["t_utc"])
+    return {k: (v[i0:i1] if isinstance(v, list) and len(v) == n else v) for k, v in ts.items()}
+
+
 def site_record(entry: dict, ts: dict) -> dict:
     wm = {k: _r2(v) for k, v in window_metrics(ts).items()}
     metrics = {**wm, "slope_deg": 0.0, "psr_dist_km": 0.0}
-    ev = evaluate_site(metrics, DEFAULT_MISSION_CONFIG, pending=PENDING)
+    # valid/score/checks: over the default mission window (SitesFile.evaluation), not the year.
+    i0, i1 = EVAL_SLICE
+    ew = {k: _r2(v) for k, v in window_metrics(_slice(ts, i0, i1)).items()}
+    ev = evaluate_site(
+        {**ew, "slope_deg": 0.0, "psr_dist_km": 0.0}, DEFAULT_MISSION_CONFIG, pending=PENDING
+    )
     ordered = {k: metrics[k] for k in CORE_KEYS}
     ordered.update({k: wm[k] for k in ("sun_el_mean_deg", "max_blackout_hours", "sun_earth_pct")})
     return {
@@ -114,6 +133,7 @@ def main() -> int:
         "mock": False,
         "generated_utc": generated,
         "weights": weights,
+        "evaluation": {"start_utc": EVAL_START, "end_utc": EVAL_END, "config": "default"},
         "sites": sites,
     }
     _validate(sites_file, "sites")
