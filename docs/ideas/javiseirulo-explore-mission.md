@@ -20,7 +20,11 @@ Un único **pipeline de cálculo** (Sol/Tierra sobre el horizonte con terreno, a
    Capas opcionales: "barrios" lunares con nombre (regiones nombradas, estética pastel, family-friendly) y misiones históricas (botón tipo reloj, puntos en el mapa).
 2. **Mission / juego (B→A: sitio → resultado).** Alerta tipo Mission Control ("no podemos aterrizar donde estaba previsto"): pocos requisitos, 4-5 sitios con sus parámetros
    (sin decir cuál es mejor), eliges, se simula el tiempo (p. ej. 9 o 14 días) y el veredicto explica **por qué** ("sin visibilidad de la Tierra", "te quedaste sin Sol") + *retry*.
-   Mismo backend que Explore, recorrido al revés. Dificultad "pro" = V2. Opción: el modo juego recrea una misión histórica.
+   Mismo backend que Explore, recorrido al revés. Opción: el modo juego recrea una misión histórica.
+   **Decisión (2ª conversación, 2026-11-14):** el público objetivo principal es el **técnico/profesional** (no profesores). Mission tiene dos variantes:
+   *Modo misión profesional* (entrenamiento/decisión rápida tipo Mission Control) y *Modo estudiante* (jugador único, o una clase usando el mismo escenario; un botón lo activa).
+   **Sin multijugador tipo Kahoot** (no da tiempo, ni encaja con el target).
+   **Prioridad: 1º Explore, 2º Mission.** Mission no se empieza hasta que Explore funcione.
 
 ## Frase de una línea (borrador a pulir por el equipo)
 "Elige dónde aterrizar en la Luna con sliders, y descubre —simulando los días siguientes— si hiciste buena elección y por qué."
@@ -59,7 +63,10 @@ Presentation y Creativity fuertes si el demo se entiende en 30 s; Validity depen
 Premios candidatos: Most Inspirational, Best Storytelling, Art & Technology, Best Use of Data/Technology.
 
 ## Historia del demo en 30 s (por definir por el equipo)
+**Formato decidido: ≤7 diapositivas** (no vídeo de 30 s: el equipo cree que 30 s se queda corto para varias features), con capturas de cada feature y explicación oral rápida.
+Jugar en vivo con el jurado (estilo Kahoot) descartado: tarda demasiado entre conectarse y jugar. Alternativa barata a valorar: enlace/QR público en la última diapositiva para que lo prueben después.
 Pistas del equipo: no arrancar con "la Luna girando" (todos lo harán); mostrar el desplegable de objetivos ya abierto; slider → mapa cambia en vivo → pulsar sitio → horizonte 360°.
+Esquema borrador de las 7 diapositivas en `docs/07-mvp-plan.md`.
 
 ## Reparto modular propuesto (para trabajar en paralelo)
 Contratos de datos claros entre módulos: (a) pipeline/precompute · (b) API de scoring/filtrado · (c) globo+filtros UI · (d) ficha de sitio + horizonte 360° · (e) motor del juego · (f) demo/docs/referencias.
