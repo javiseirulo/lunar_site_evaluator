@@ -5,7 +5,13 @@
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import type { DataManifest, LayersManifest, SitesFile, Timeseries } from '@lunar/contracts';
+import type {
+  DataManifest,
+  HistoricSitesFile,
+  LayersManifest,
+  SitesFile,
+  Timeseries,
+} from '@lunar/contracts';
 
 const DATA = join(__dirname, '..', '..', 'public', 'data');
 const read = <T>(p: string): T => JSON.parse(readFileSync(join(DATA, p), 'utf8')) as T;
@@ -112,6 +118,48 @@ describe('public/data follows contracts/types.ts', () => {
       expect(existsSync(join(DATA, l.file)), l.file).toBe(true);
       expect(l.palette.length).toBeGreaterThanOrEqual(2);
       expect(l.value_range[0]).toBeLessThan(l.value_range[1]);
+    }
+  });
+});
+
+// historic_sites.json (Marta, v1.1): optional file, checked only when present.
+const HISTORIC = 'historic_sites.json';
+describe.runIf(existsSync(join(DATA, HISTORIC)))('historic_sites.json follows the contract', () => {
+  const ISO_UTC = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?Z$/;
+  const OUTCOMES = ['success', 'partial', 'failed'];
+  const KINDS = ['lander', 'rover', 'crewed', 'sample_return', 'impact'];
+
+  it('has unique ids, valid coordinates, ISO dates, known enums and URL sources', () => {
+    const file = read<HistoricSitesFile>(HISTORIC);
+    expect(file.version).toBe(1);
+    expect(Number.isNaN(Date.parse(file.generated_utc))).toBe(false);
+    const ids = file.sites.map((s) => s.id);
+    expect(new Set(ids).size).toBe(ids.length);
+    for (const s of file.sites) {
+      expect(s.id, s.id).toMatch(/^[a-z0-9_]+$/);
+      for (const k of ['name', 'agency', 'country', 'note'] as const) {
+        expect(s[k].trim().length, `${s.id}.${k}`).toBeGreaterThan(0);
+      }
+      expect(s.lat, s.id).toBeGreaterThanOrEqual(-90);
+      expect(s.lat, s.id).toBeLessThanOrEqual(90);
+      expect(s.lon, s.id).toBeGreaterThanOrEqual(-180);
+      expect(s.lon, s.id).toBeLessThanOrEqual(180);
+      expect(s.date_utc, s.id).toMatch(ISO_UTC);
+      expect(Number.isNaN(Date.parse(s.date_utc)), s.id).toBe(false);
+      expect(OUTCOMES, s.id).toContain(s.outcome);
+      expect(KINDS, s.id).toContain(s.kind);
+      expect(s.source, s.id).toMatch(/^https?:\/\/\S+$/);
+    }
+  });
+
+  it('keeps the same coordinates as sites.json for shared ids', () => {
+    const file = read<HistoricSitesFile>(HISTORIC);
+    const catalog = new Map(read<SitesFile>('sites.json').sites.map((s) => [s.id, s]));
+    for (const h of file.sites) {
+      const c = catalog.get(h.id);
+      if (!c) continue;
+      expect(h.lat, h.id).toBeCloseTo(c.lat, 6);
+      expect(h.lon, h.id).toBeCloseTo(c.lon, 6);
     }
   });
 });
