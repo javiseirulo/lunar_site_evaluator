@@ -50,3 +50,24 @@
   - §10 de Javi para Marta: pins por todo el globo (el clúster solo para el polo), clic → `selectedPoint` (cuando Javi2 lo añada al store), luz con `sunDirectionMoonME` de `@/ephem`, mapa de calor global.
   - Javi2: fecha/hora en el Mission Clock; `selectedPoint` en el store.
   - Pablo: heightmap del parche; teselas de horizonte.
+
+## 2026-11-14 — Sesión 3: v1 de Explore, requisitos de misión (#73, rama `martaplatero2002-star/73-requisitos-mision`)
+- `missionStats.ts` (puro, 12 tests): ventana (`resolveWindow`, `sliceIndices` con `indexAt`), % de luz, noche más larga, corte de Tierra más largo (null = unknown si falta `earth_visible`), autonomía = batería/consumo, energía media = panel × % luz, `evaluateSite` con textos ("Longest night 38 h ≤ battery autonomy 60 h ✔") y márgenes, `sortEvaluations`.
+  - Noche necesita batería + consumo; energía necesita panel + consumo. Un valor suelto no filtra (la UI avisa).
+  - Pendiente desde `site.metrics.slope_deg`; si el contrato v1.1 (#70) la marca en `pending_metrics` → "pending terrain" (unknown).
+- `requirementsStore.ts` (local): campos añadidos, valores, ventana, `sortBy`, `showNonMatching`. Todo vacío al empezar.
+- `useCandidates.ts`: carga las timeseries de los 20 sitios al activar el primer requisito; recalcula con memo y `useDeferredValue`.
+- UI (inglés): "+ Add requirement" con campos con unidades y placeholders (nunca valores), ventana (Landing UTC + Days), "Sort by", "N of M sites meet your requirements", top 5 numerado con ✔/✖, "Show non-matching", supuesto de paneles rotulado.
+- Ficha: sin score; "Meets X of Y requirements" + lista; "Now (Mission Clock)" (elevación del Sol, sunset/sunrise, Earthset/Earthrise con `hoursUntilChange`); estadísticas en la ventana (o en todos los datos si no hay ventana).
+- Globo: sin requisitos no hay pins de candidatos; candidatos en dorado y el top 5 como insignias numeradas (sprites, sin `<Html>`); no-candidatos atenuados solo con "Show non-matching"; ficha con "Meets X of Y".
+- Borrado el filtro provisional de la v0 (`ranking.ts`, `requirements.ts`, `requirementText.ts`); Explore ya no escribe en `missionConfig`.
+- Verificado: lint, typecheck, 45 tests, build, formato. En navegador: sin requisitos no hay sitios; batería sola → aviso; batería 3000 Wh + consumo 10 W → 10 de 20; pendiente ≤ 15° → 6; corte ≤ 100 h → 1; ventana de 7 días y recorte al rango; ficha correcta. Globo: no comprobado (panel oculto).
+- **Para pedir:**
+  - Javi2 (`src/core`): `candidateIds: string[] | null` en el store (o `selectedPoint` + lista) para que el mapa 2D (`PolarMap`) muestre los mismos candidatos y oculte el resto sin requisitos.
+  - Javi2 (`ExplorePage`): quitar `max-h-[300px]` a la barra izquierda o darle más alto; con requisitos + lista no cabe.
+  - Javi2: campo fecha/hora en el Mission Clock (ya en el plan).
+  - Javi (#70 / contrato): confirmar `pending_metrics` para `slope_deg`; decidir si `score`/`weights`/`valid` se retiran de `sites.json`; `ComparePage` y `metrics.ts` siguen usando `score`/`valid`.
+- Bug reportado (Shackleton rim A, ventana completa: "corte de comunicación 9,0 d en vez de 266 h"): **no era de `missionStats`**. Test con el archivo real añadido (266 h y noche 0 h) y pasa sin cambios; la ficha ya mostraba "Longest comm gap 11.1 d". Los 9,0 d eran la cuenta atrás de "Now" ("Earthrise in"), que empieza en el instante del Mission Clock (hora 50 → 266 − 50 = 216 h). Etiquetas aclaradas: "Countdowns start at this time…", "(whole window)" en la ventana y "not in data range" cuando no hay cambio.
+- Rama actualizada con `dev` (#77 efemérides, #78 `@/ephem` + `@/scoring` + `SiteCheckPanel`, #79 catálogo global).
+- Regla alineada con Javi (decisión de Marta, 2026-11-14): los requisitos sin dato (pendiente sin terreno, sin `earth_visible`) se muestran como "?" y **no cuentan**; un sitio es candidato si ningún requisito activo falla. Texto "Meets X of Y requirements · Z pending (no data)" (`meetsText`). En el umbral pasa.
+- `/review` (gstack) del PR #80: 6 especialistas + Red Team + pasada adversarial. Arreglado: sitios sin serie o con ventana vacía ya no son candidatos (la pendiente sin terreno sigue sin contar), valores ≤ 0 ignorados con aviso, top 5 solo con dato para ordenar, retoques de accesibilidad/maquetación en la barra lateral, test real sin valores exactos. Abierto para el equipo: dos controles de fecha de aterrizaje en Explore (MissionTimingPanel de Javi vs ventana local), mapa 2D aún por score/valid, token de color, cálculo del ranking una sola vez.
