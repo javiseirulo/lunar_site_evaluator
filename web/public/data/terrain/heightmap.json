@@ -1,0 +1,67 @@
+{
+  "version": 1,
+  "mock": false,
+  "projection": "+proj=stere +lat_0=-90 +lon_0=0 +k=1 +x_0=0 +y_0=0 +R=1737400 +units=m +no_defs",
+  "radius_m": 1737400,
+  "bounds_m": [
+    -304006,
+    -304006,
+    304006,
+    304006
+  ],
+  "lat_limit": -80,
+  "frame": "MOON_ME_DE421",
+  "width_px": 1025,
+  "height_px": 1025,
+  "registration": "vertices",
+  "sample_0_0_m": [
+    -304006.0,
+    304006.0
+  ],
+  "sample_step_col_m": [
+    593.76171875,
+    0
+  ],
+  "sample_step_row_m": [
+    0,
+    -593.76171875
+  ],
+  "row_order": "max_y_to_min_y",
+  "resampling": "bilinear",
+  "source_pixel_spacing_m": 80,
+  "height_unit": "m",
+  "height_reference_radius_m": 1737400,
+  "height_reference_note": "LOLA reference-sphere elevation convention; no Cesium offset applied",
+  "heights": {
+    "file": "terrain/heights.f32",
+    "encoding": "float32-le",
+    "order": "row-major",
+    "scale": 1,
+    "offset": 0,
+    "nodata": "NaN"
+  },
+  "mask": {
+    "file": "terrain/valid.u8",
+    "encoding": "uint8",
+    "valid": 1,
+    "nodata": 0
+  },
+  "height_range_m": [
+    -6665.0498046875,
+    7005.42138671875
+  ],
+  "valid_samples": 823469,
+  "total_samples": 1050625,
+  "source": "https://pgda.gsfc.nasa.gov/data/LOLA_20mpp/LDEM_80S_80MPP_ADJ.TIF",
+  "provenance_file": "terrain/provenance.json",
+  "sha256": {
+    "elevation.png": "f62460bfcce098578401ecb5101d47c1e256ed34eeb7955faa7bd265c2f3b529",
+    "heights.f32": "e8197ef60def4039e11c356caa648de61cd52898f885b982e82bb31ed3a146b3",
+    "layers.json": "69023a4431b6647c9ae817fc33b7710b7825de1d00274da90c0e87749e66338c",
+    "provenance.json": "c87bb27a7312397093332ea82895934478d99054d11e19dcf13d24701c449da3",
+    "site-terrain.csv": "637fdbf030c4d8d591d0992fb2f4b374e9fd705468b2c3a0bf84c2d1f4d67dab",
+    "site-terrain.json": "f30fb1265a7a0a6d628a452546914de17fc54e86f42fee9523b5e4c434013f43",
+    "slope.png": "ee453b154041c465f59dda2197ff17668fd103453e0c2557782a2eccb6737215",
+    "valid.u8": "4102802f36f0064d7f58ca1c0abc75ebf07ade61e0a72b5df3b126d5ed1c4a57"
+  }
+}
