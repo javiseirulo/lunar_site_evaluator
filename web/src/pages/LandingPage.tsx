@@ -72,7 +72,11 @@ export function LandingPage() {
             power and can see Earth. Compare sites and dates before the mission slips.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <button type="button" className="btn btn-go h-[42px] px-5 text-[15px]" onClick={openMap}>
+            <button
+              type="button"
+              className="btn btn-go h-[42px] px-5 text-[15px]"
+              onClick={openMap}
+            >
               Explore the map
             </button>
             <Link to="/compare" className="btn h-[42px] px-5 text-[15px]">

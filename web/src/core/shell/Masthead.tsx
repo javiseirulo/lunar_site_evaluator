@@ -16,7 +16,11 @@ export function Masthead() {
   return (
     <header className="portal">
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-        <Link to="/" className="mr-2 flex items-center gap-2.5" aria-label="Lunar Site Evaluator home">
+        <Link
+          to="/"
+          className="mr-2 flex items-center gap-2.5"
+          aria-label="Lunar Site Evaluator home"
+        >
           <Logo className="size-8 shrink-0" />
           <span className="font-display text-[20px] leading-none tracking-[-0.02em] text-[#f4f0e6]">
             Lunar Site Evaluator
