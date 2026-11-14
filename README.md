@@ -5,7 +5,7 @@ Herramienta para comparar sitios de aterrizaje lunares y fechas (Sol/Tierra sobr
 
 > ⏰ Entrega: abre sáb 14 nov 9:00 · **cierra dom 15 nov 23:59 (hora local del Local Event)**.
 
-## 🤖 Cómo trabajamos (humanos **y** IAs — leer primero)
+## 🤖 Cómo trabajamos (humanos **e** IAs — leer primero)
 
 Este repo es la memoria compartida del equipo. Cada persona usa su propia IA (Claude Code) y todas leen/escriben aquí.
 
