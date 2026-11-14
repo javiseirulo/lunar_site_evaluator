@@ -27,35 +27,35 @@ const COLUMNS: {
   },
   {
     key: 'illum',
-    label: 'Sunlight',
+    label: 'Sunny',
     get: (s) => s.metrics.illum_pct,
     fmt: (s) => pct(s.metrics.illum_pct),
     title: 'Share of the time window with the Sun above the terrain horizon',
   },
   {
     key: 'earth',
-    label: 'Earth',
+    label: 'Earth view',
     get: (s) => s.metrics.earth_vis_pct,
     fmt: (s) => pct(s.metrics.earth_vis_pct),
     title: 'Share of the time window with Earth above the terrain horizon',
   },
   {
     key: 'slope',
-    label: 'Slope',
+    label: 'Steepness',
     get: (s) => s.metrics.slope_deg,
     fmt: (s) => `${s.metrics.slope_deg.toFixed(1)}°`,
     title: 'Local slope',
   },
   {
     key: 'dark',
-    label: 'Longest night',
+    label: 'Longest dark',
     get: (s) => s.metrics.max_dark_hours,
     fmt: (s) => `${s.metrics.max_dark_hours} h`,
     title: 'Longest continuous period without sunlight',
   },
   {
     key: 'psr',
-    label: 'To PSR',
+    label: 'Icy craters',
     get: (s) => s.metrics.psr_dist_km,
     fmt: (s) => `${s.metrics.psr_dist_km} km`,
     title: 'Distance to the nearest permanently shadowed region',
@@ -105,9 +105,7 @@ export default function SitesPage() {
     <section className="box">
       <div className="box-head">
         Site Directory
-        <span className="ml-auto font-sans font-normal tracking-normal normal-case">
-          {rows.length} sites
-        </span>
+        <span className="ml-auto font-sans font-normal">{rows.length} sites</span>
       </div>
       <div className="box-body">
         <p className="text-ink-muted mb-3 max-w-[75ch]">
@@ -131,7 +129,7 @@ export default function SitesPage() {
               disabled={picked.length < 2}
               onClick={() => navigate(`/compare?ids=${picked.map(encodeURIComponent).join(',')}`)}
             >
-              Compare ticked ›
+              Compare ticked
             </button>
           </span>
         </div>

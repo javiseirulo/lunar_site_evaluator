@@ -1,54 +1,43 @@
 /**
- * Portal masthead in the style of mid-2000s science portals: wordmark + site finder, uppercase tab
- * bar, audience shortcuts ("For Educators" …) and an EVENTS strip with the next sunrise/sunset and
- * Earthrise/Earthset at a site, plus the shared simulation clock.
+ * Masthead: one line on the night page — mark, name, page links, site finder, Pro mode —
+ * then a single sentence about the next sunrise or Earthrise.
  */
 import { useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router';
 import { useAppStore } from '../store';
 import { useData, useSelectedSite, useTimeseries } from '../data';
-import { AUDIENCES, TABS, modeForPath, pathForMode } from '../navigation';
+import { TABS, modeForPath, pathForMode } from '../navigation';
 import { formatHours, formatUtc } from '../format';
+import { dayOfWindow, friendlyHours } from '../metrics';
 import { hoursUntilChange, sampleAt } from '../timeseries';
 import { Logo } from './Logo';
 
 export function Masthead() {
   return (
     <header className="portal">
-      <Banner />
-      <TabBar />
-      <AudienceBar />
-      <EventsStrip />
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+        <Link
+          to="/"
+          className="mr-2 flex items-center gap-2.5"
+          aria-label="Lunar Site Evaluator home"
+        >
+          <Logo className="size-8 shrink-0" />
+          <span className="font-display text-[20px] leading-none tracking-[-0.02em] text-[#f4f0e6]">
+            Lunar Site Evaluator
+          </span>
+        </Link>
+        <TabBar />
+        <div className="ml-auto flex max-w-full flex-wrap items-center gap-x-4 gap-y-2">
+          <SiteFinder />
+          <ProSwitch />
+        </div>
+      </div>
+      <NextUp />
     </header>
   );
 }
 
-function Banner() {
-  return (
-    <div
-      className="border-edge flex flex-wrap items-center gap-x-6 gap-y-2 border border-b-0 px-3 py-2"
-      style={{
-        background:
-          'radial-gradient(ellipse 60% 140% at 0% 50%, #1d3f7a 0%, transparent 70%), linear-gradient(#0c1c3a, #050d1f)',
-      }}
-    >
-      <Link to="/" className="flex items-center gap-2.5" aria-label="Lunar Site Evaluator home">
-        <Logo className="size-11 shrink-0" />
-        <span className="leading-none">
-          <span className="font-head block text-[22px] font-bold tracking-[0.04em] text-white uppercase [text-shadow:0_1px_0_#000]">
-            Lunar Site Evaluator
-          </span>
-          <span className="text-ink-muted mt-1 block text-[10px] tracking-[0.12em] uppercase">
-            South Pole Landing Sites · Sunlight &amp; Earth Visibility
-          </span>
-        </span>
-      </Link>
-      <SiteFinder />
-    </div>
-  );
-}
-
-/** "Find a site" box: picks a site and opens it in Explore (or the current mode). */
+/** Picks a site and opens it in Explore (or keeps the current mode). */
 function SiteFinder() {
   const sites = useData((s) => s.sites);
   const selectSite = useAppStore((s) => s.selectSite);
@@ -59,7 +48,7 @@ function SiteFinder() {
 
   return (
     <form
-      className="ml-auto flex items-center gap-1.5"
+      className="flex max-w-full flex-wrap items-center gap-2"
       onSubmit={(e) => {
         e.preventDefault();
         if (!value) return;
@@ -69,16 +58,16 @@ function SiteFinder() {
         else if (mode !== 'explore') navigate('/explore');
       }}
     >
-      <label htmlFor="site-finder" className="label text-ink-muted">
+      <label htmlFor="site-finder" className="text-[13px] text-[#b7b1a6]">
         Find a site
       </label>
       <select
         id="site-finder"
-        className="field w-44"
+        className="field w-40 max-w-full sm:w-48"
         value={value}
         onChange={(e) => setValue(e.target.value)}
       >
-        <option value="">Choose…</option>
+        <option value="">Choose a site</option>
         {sorted.map((s) => (
           <option key={s.id} value={s.id}>
             {s.name}
@@ -86,7 +75,7 @@ function SiteFinder() {
         ))}
       </select>
       <button type="submit" className="btn" disabled={!value}>
-        Go
+        Open
       </button>
     </form>
   );
@@ -95,139 +84,86 @@ function SiteFinder() {
 function TabBar() {
   const selectedSiteId = useAppStore((s) => s.selectedSiteId);
   return (
-    <nav
-      aria-label="Main"
-      className="flex h-[32px] overflow-x-auto border border-black bg-black [scrollbar-width:none]"
-    >
+    <nav aria-label="Main" className="flex overflow-x-auto [scrollbar-width:none]">
       {TABS.map((t) => (
         <NavLink
           key={t.label}
           to={t.mode ? pathForMode(t.mode, selectedSiteId) : t.path}
           end={t.end}
-          className="tab px-[13px]"
+          className="tab"
         >
           {t.label}
         </NavLink>
       ))}
-      <div
-        className="flex-1"
-        style={{
-          background: 'linear-gradient(#2b2f38 0%, #191c22 50%, #0b0d10 51%, #050608 100%)',
-        }}
-      />
     </nav>
   );
 }
 
-function AudienceBar() {
+function ProSwitch() {
+  const proMode = useAppStore((s) => s.proMode);
+  const setProMode = useAppStore((s) => s.setProMode);
   return (
-    <div className="border-edge flex flex-wrap items-center gap-x-1 border-x bg-[#c9d4e6] px-3 py-1 text-[11px] text-[#10213f]">
-      {AUDIENCES.map((a, i) => (
-        <span key={a.label} className="whitespace-nowrap">
-          {i > 0 && <span className="mx-1.5 text-[#6b7fa3]">|</span>}
-          <Link to={a.path} className="font-bold hover:underline">
-            {a.label}
-          </Link>
-        </span>
-      ))}
-    </div>
+    <button
+      type="button"
+      role="switch"
+      aria-checked={proMode}
+      onClick={() => setProMode(!proMode)}
+      className="flex cursor-pointer items-center gap-2 text-[13px] text-[#d9d3c7]"
+      title="Pro mode shows technical names, UTC times, coordinates and fine layer controls"
+    >
+      <span className="switch" data-on={proMode} aria-hidden />
+      Pro mode
+    </button>
   );
 }
 
-/** "EVENTS ◄ ►": next sunrise/sunset and Earthrise/Earthset at the selected (or a top) site. */
-function EventsStrip() {
+/** One plain sentence: what happens next at the selected (or best) site, plus day and Pro mode. */
+function NextUp() {
   const sites = useData((s) => s.sites);
   const isMock = useData((s) => s.isMock);
+  const range = useData((s) => s.manifest?.time_range);
   const selected = useSelectedSite();
-  const selectSite = useAppStore((s) => s.selectSite);
   const currentTimeUTC = useAppStore((s) => s.currentTimeUTC);
-  const navigate = useNavigate();
-  const [cursor, setCursor] = useState(0);
+  const proMode = useAppStore((s) => s.proMode);
 
-  const ranked = sites ? [...sites].filter((s) => s.valid).sort((a, b) => b.score - a.score) : [];
-  const subject =
-    selected ?? ranked[((cursor % ranked.length) + ranked.length) % ranked.length] ?? null;
+  const best = sites
+    ? [...sites].filter((s) => s.valid).sort((a, b) => b.score - a.score)[0]
+    : null;
+  const subject = selected ?? best ?? null;
   const ts = useTimeseries(subject?.id);
   const sample = ts ? sampleAt(ts, currentTimeUTC) : null;
   const toSun = ts ? hoursUntilChange(ts, ts.lit, currentTimeUTC) : null;
   const toEarth = ts?.earth_visible ? hoursUntilChange(ts, ts.earth_visible, currentTimeUTC) : null;
-  const when = (h: number | null) => (h === null ? 'after this window' : `in ${formatHours(h)}`);
+  const when = (h: number | null) =>
+    h === null ? 'not in this window' : proMode ? `in ${formatHours(h)}` : `in ${friendlyHours(h)}`;
+  const day = range ? dayOfWindow(currentTimeUTC, range.start_utc, range.end_utc) : null;
 
   return (
-    <div className="border-edge bg-navy-800 flex min-h-[26px] flex-wrap items-center gap-x-3 gap-y-1 border border-t-0 px-3 py-1 text-[11px]">
-      <span className="font-head text-ink font-bold tracking-[0.08em] uppercase">Events:</span>
-      {!selected && ranked.length > 1 && (
-        <span className="flex gap-px">
-          <button
-            type="button"
-            className="btn h-[16px] w-[16px] px-0 text-[8px]"
-            onClick={() => setCursor((c) => c - 1)}
-            aria-label="Previous site"
-          >
-            ◄
-          </button>
-          <button
-            type="button"
-            className="btn h-[16px] w-[16px] px-0 text-[8px]"
-            onClick={() => setCursor((c) => c + 1)}
-            aria-label="Next site"
-          >
-            ►
-          </button>
-        </span>
-      )}
-      {subject ? (
-        <span className="text-ink-muted">
-          <button
-            type="button"
-            className="lnk font-bold"
-            onClick={() => {
-              selectSite(subject.id);
-              if (!modeForPath(window.location.pathname)) navigate('/explore');
-            }}
-          >
-            {subject.name}
-          </button>
-          {sample && (
+    <div className="flex flex-col gap-1 pt-3 pb-4 text-[13px] text-[#9c968b] sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-5">
+      {subject && sample && (
+        <p className="min-w-0 sm:flex-1">
+          At <span className="text-[#f4f0e6]">{subject.name}</span>, the Sun{' '}
+          {sample.lit ? 'sets' : 'rises'} {when(toSun)}
+          {sample.earthVisible !== null && (
             <>
               {' '}
-              — <span className="text-sun">{sample.lit ? 'Sunset' : 'Sunrise'}</span> {when(toSun)}
-              {sample.earthVisible !== null && (
-                <>
-                  {' '}
-                  ·{' '}
-                  <span className="text-earth">
-                    {sample.earthVisible ? 'Earthset' : 'Earthrise'}
-                  </span>{' '}
-                  {when(toEarth)}
-                </>
-              )}
+              and Earth {sample.earthVisible ? 'sets' : 'rises'} {when(toEarth)}
             </>
           )}
-          {selected && (
-            <>
-              {' '}
-              <button type="button" className="lnk text-[10px]" onClick={() => selectSite(null)}>
-                [clear]
-              </button>
-            </>
-          )}
-        </span>
-      ) : (
-        <span className="text-ink-muted">Loading…</span>
+          .
+        </p>
       )}
-      <span className="ml-auto flex items-center gap-3">
+      <span className="ml-auto flex items-center gap-4">
         {isMock && (
           <span
-            className="chip border-warn/60 text-warn bg-warn/10"
+            className="text-[#e2b15a]"
             title="The app is showing invented placeholder data until the real pipeline output lands."
           >
             Mock data
           </span>
         )}
-        <span className="text-ink-muted">
-          <span className="label mr-1">Sim time</span>
-          <span className="num text-ink">{formatUtc(currentTimeUTC)}</span>
+        <span className="num text-[#d9d3c7]">
+          {proMode ? formatUtc(currentTimeUTC) : day && `Day ${day.day} of ${day.total}`}
         </span>
       </span>
     </div>
