@@ -69,6 +69,23 @@
       "citation": "Barker et al. (2023), Planetary Science Journal 4, 183",
       "doi": "https://doi.org/10.3847/PSJ/acf3e1",
       "publisher_checksum": null
+    },
+    {
+      "id": "lola-global-64ppd",
+      "filename": "ldem_64.img",
+      "format": "pds3-int16-le",
+      "url": "https://pds-geosciences.wustl.edu/lro/lro-l-lola-3-rdr-v1/lrolol_1xxx/data/lola_gdr/cylindrical/img/ldem_64.img",
+      "label_url": "https://pds-geosciences.wustl.edu/lro/lro-l-lola-3-rdr-v1/lrolol_1xxx/data/lola_gdr/cylindrical/img/ldem_64.lbl",
+      "product_page": "https://pds-geosciences.wustl.edu/missions/lro/lola.htm",
+      "expected_bytes": 530841600,
+      "pixel_spacing_m": 473.802,
+      "quantity": "DN * 0.5 = elevation meters; do not add OFFSET to elevation",
+      "reference_frame": "MOON_ME, JPL DE421",
+      "coverage": "global; pixel centres; longitude east 0..360",
+      "product_version": "V3.1",
+      "product_creation_date": "2019-03-15",
+      "vertical_reference": "LOLA elevation relative to the 1737400 m sphere",
+      "publisher_checksum": null
     }
   ]
 }

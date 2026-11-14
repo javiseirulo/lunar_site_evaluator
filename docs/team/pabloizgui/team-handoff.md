@@ -109,3 +109,28 @@ Resultados y límite del flujo automático: [push-validation.md](push-validation
 Una revisión automática rechazó crear una excepción persistente al escáner para
 un JWT real; se retiró la inclusión del valor en el repositorio y se usa el
 archivo local/variable de build. No se desactivó ni modificó el escáner.
+
+## Street View y horizontes de prueba — Pablo, 2026-11-14
+
+El nuevo bloque de trabajo está descrito en [streetview-navigation-v1.md](streetview-navigation-v1.md).
+La entrega de Marta sigue en `web/public/data/terrain/heightmap.json`, `heights.f32`,
+`valid.u8` y `layers.json`; su verificador mantiene 823 469 muestras válidas.
+No necesita descargar el nuevo DEM global para integrar esos archivos.
+
+Javi recibe `web/public/data/terrain/trials/shackleton_fixture_01deg_refined4.json`,
+el CSV equivalente y `benchmark.json`. Son **experimentos**, no perfiles de
+producción: todavía no se copian a `horizon/` ni alteran métricas de misión.
+Los pilotos globales a 1° demuestran lectura del DEM grueso en ecuador/norte.
+
+El Street View admite giro/zoom táctil, movimiento cercano con transición,
+coordenadas globales, luz de lectura y nombres IAU/USGS. Las coordenadas libres
+son locales al módulo mientras llega `selectedPoint`. Se invalida el cielo al
+moverse; no se reaprovechan las efemérides de Shackleton en otro punto.
+
+Pendiente del equipo: Javi, catálogo #48, vectores/`@/ephem` y validación de
+horizonte/frame; Javi2, `selectedPoint`, dominio/token de despliegue y revisión
+core/contratos; Marta, loader heightmap y acuerdo de resolución de rejilla;
+Cristóbal, escenarios enlazados por sitio/fecha de core. Pendiente de Pablo:
+validación angular/catálogo, DEM fino norte si aplica, calibración Cesium/LOLA,
+QR y QA en dispositivo físico. El token actual limitado a localhost no permite
+abrir directamente el visor desde la dirección LAN del ordenador en un móvil.

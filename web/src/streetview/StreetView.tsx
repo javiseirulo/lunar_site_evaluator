@@ -2,6 +2,9 @@
 import { lazy, Suspense, useMemo, useState } from 'react';
 import { formatUtc, useAppStore, useData, useSelectedSite, useTimeseries } from '@/core';
 import { sampleSiteSky } from './geometry';
+import { surfaceDistance } from './navigation';
+import type { Observer } from './lunarScene';
+import './streetview.css';
 
 const LunarViewport = lazy(() => import('./LunarViewport'));
 
@@ -19,20 +22,30 @@ export function StreetView() {
   const [accessRevision, setAccessRevision] = useState(0);
   const instanceId = `${site?.id ?? ''}:${accessRevision}`;
   const observer = useMemo(() => (site ? { lat: site.lat, lon: site.lon } : null), [site]);
+  const [walked, setWalked] = useState<{ siteId: string; point: Observer } | null>(null);
+  const activeObserver = walked?.siteId === site?.id ? walked?.point : observer;
   const sample = useMemo(
-    () => (site ? sampleSiteSky(series, site.id, time) : null),
-    [site, series, time],
+    () =>
+      site && activeObserver && surfaceDistance(site, activeObserver) < 0.01
+        ? sampleSiteSky(series, site.id, time)
+        : null,
+    [site, activeObserver, series, time],
   );
   if (!site || !observer) return <p className="p-4">Choose a site in Explore.</p>;
   const isMock = mockSites || !!series?.mock;
   return (
-    <div className="flex h-full min-h-0 flex-col gap-2 text-xs">
+    <div className="streetview-shell">
       <div className="flex flex-wrap items-center justify-between gap-1 text-white">
         <span className="font-mono">
-          {site.lat.toFixed(4)}° lat · {site.lon.toFixed(4)}° E
+          {activeObserver?.lat.toFixed(4)}° lat · {activeObserver?.lon.toFixed(4)}° E
         </span>
         <span>
-          {isMock ? 'MOCK coordinates / sky data' : 'Pipeline sky data'} · Cesium visual terrain
+          {activeObserver && surfaceDistance(site, activeObserver) >= 0.01
+            ? 'Free location'
+            : isMock
+              ? 'Mock catalogue / sky'
+              : 'Pipeline sky data'}{' '}
+          · Cesium Moon
         </span>
         {import.meta.env.DEV && (
           <button className="btn" onClick={() => setConfigure((value) => !value)}>
@@ -104,45 +117,57 @@ export function StreetView() {
               </p>
             }
           >
-            <LunarViewport key={instanceId} observer={observer} token={token} sample={sample} />
+            <LunarViewport
+              key={instanceId}
+              observer={observer}
+              token={token}
+              sample={sample}
+              mock={isMock}
+              onObserver={(point) => setWalked({ siteId: site.id, point })}
+            />
           </Suspense>
         )}
       </div>
-      <div className="border border-slate-500 bg-slate-950 p-2 text-white" aria-live="polite">
-        {sample ? (
-          <>
+      <details className="lunar-sky-details">
+        <summary>
+          Sky data · {sample ? (isMock ? 'mock' : 'pipeline') : 'unavailable for this point / time'}
+        </summary>
+        <div aria-live="polite">
+          {sample ? (
+            <>
+              <p>
+                Sky sample: {formatUtc(sample.t_utc)} · step {series!.step_s / 60} min
+              </p>
+              <div className="mt-1 flex flex-wrap gap-x-5 gap-y-1 font-mono">
+                <span className="text-sun">
+                  Sun az {sample.sun_az.toFixed(1)}° · el {sample.sun_el.toFixed(2)}° ·{' '}
+                  {sample.lit ? 'clear' : 'hidden'}
+                </span>
+                <span className="text-earth">
+                  Earth az {sample.earth_az.toFixed(1)}° · el {sample.earth_el.toFixed(2)}° ·{' '}
+                  {sample.earthVisible === null
+                    ? 'visibility unavailable'
+                    : sample.earthVisible
+                      ? 'clear'
+                      : 'hidden'}
+                </span>
+              </div>
+              <p className="mt-1 text-[10px]">
+                Markers show directions, not physical disk sizes. Visibility flags come from{' '}
+                {isMock ? 'synthetic fixtures' : 'the pipeline'}, not rendered shadows.
+              </p>
+            </>
+          ) : (
             <p>
-              Sky sample: {formatUtc(sample.t_utc)} · step {series!.step_s / 60} min
+              {seriesError
+                ? 'Sky data could not be loaded.'
+                : series
+                  ? 'No sky data for this observer and time. No extrapolation is shown.'
+                  : 'Loading sky data…'}
             </p>
-            <div className="mt-1 flex flex-wrap gap-x-5 gap-y-1 font-mono">
-              <span className="text-sun">
-                Sun az {sample.sun_az.toFixed(1)}° · el {sample.sun_el.toFixed(2)}° ·{' '}
-                {sample.lit ? 'clear' : 'hidden'}
-              </span>
-              <span className="text-earth">
-                Earth az {sample.earth_az.toFixed(1)}° · el {sample.earth_el.toFixed(2)}° ·{' '}
-                {sample.earthVisible === null
-                  ? 'visibility unavailable'
-                  : sample.earthVisible
-                    ? 'clear'
-                    : 'hidden'}
-              </span>
-            </div>
-            <p className="mt-1 text-[10px]">
-              Markers show directions, not physical disk sizes. Visibility flags come from{' '}
-              {isMock ? 'synthetic fixtures' : 'the pipeline'}, not rendered shadows.
-            </p>
-          </>
-        ) : (
-          <p>
-            {seriesError
-              ? 'Sky data could not be loaded.'
-              : series
-                ? 'No sky data for this observer and time. No extrapolation is shown.'
-                : 'Loading sky data…'}
-          </p>
-        )}
-      </div>
+          )}
+        </div>
+      </details>
     </div>
   );
 }

@@ -858,3 +858,17 @@ Física fuera de los polos, para que nadie se sorprenda con los resultados:
    - `evaluateSite`, `rankSites`, robustez, `bestDateCurve`, `paretoFront`;
    - panel de evaluación del sitio o del punto.
 4. **Datos reales:** catálogo global, `timeseries`, `sites.json` y `manifest` con `mock: false`. Después, mapa de calor.
+
+## Navegación e investigación de horizonte (Pablo, 2026-11-14)
+
+En la rama #46 hay controles móviles (un dedo/pinza), rueda, movimiento cercano
+limitado a 200 m con transición, coordenadas libres globales, luz artificial de
+lectura y rótulos IAU/USGS. Guía y dependencias actualizadas:
+`docs/team/pabloizgui/streetview-navigation-v1.md`. Se conserva la separación
+entre render y cálculo y el reloj de core; `selectedPoint` y `@/ephem` siguen
+siendo entregas externas pendientes.
+
+Descargado LOLA global LDEM_64 (unos 474 m) para ampliar la cobertura numérica
+de prueba. Hay seis perfiles experimentales y un CSV/benchmark en
+`web/public/data/terrain/trials/`; no son perfiles validados de producción ni
+alimentan score. La entrega polar Float32/máscara para Marta permanece intacta.

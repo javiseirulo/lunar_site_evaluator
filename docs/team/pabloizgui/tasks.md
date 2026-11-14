@@ -1,32 +1,33 @@
 # Pablo: progreso y pendientes
 
 Actualizado: 2026-11-14. Contexto vigente: `docs/10-plan-tecnico.md`, §5 y §9;
-`origin/dev` en `e6825cd` integrado conservando los commits locales; decisiones
+`origin/dev` en `0e00fc3` integrado conservando los commits locales; decisiones
 de Javi J0/J10 de `461507a`. Prioridad: desbloquear a Marta y
 entregar los datos que necesitan los demás módulos antes de continuar el visor.
 
 Entrega unificada en `pabloizgui/46-lunar-streetview`: incluye el terreno de #37
 y el visor. Índice por destinatario, puesta en marcha con la cuenta de Pablo y
-dependencias concretas: [team-handoff.md](team-handoff.md). El push se está
-preparando como PR borrador por autorización expresa de Pablo; no se considera
-integrado en `dev` hasta revisión y merge.
+dependencias concretas: [team-handoff.md](team-handoff.md). El PR #72 ya está
+publicado como borrador; el bloque de navegación/horizontes v1 se prepara
+localmente. No se considera integrado en `dev` hasta revisión y merge.
 
 | Prioridad | Tarea | Estado / criterio de cierre |
 |---|---|---|
-| P0 | Entrega unificada y revisión | Publicación manual como PR borrador autorizada por Pablo con pruebas nativas (24 Python / 37 web). Pendientes CI remoto y revisión del contrato; gate gstack (exit 127 y mapeo) documentado, sin merge automático |
+| P0 | Entrega unificada y revisión | PR #72 borrador publicado. Nuevo bloque v1 local: 31 pruebas Python / 62 web y verificaciones nativas; pendientes publicación de este bloque, CI remoto y revisión. Límite gstack documentado, sin merge automático |
 | P0 | Adquirir DEM LOLA 5 m de 87–90°S | Hecho localmente: 3 465 285 714 bytes, SHA-256, metadatos y tres ventanas decodificadas; no validación de todos los píxeles |
 | P0 | Exportar recortes científicos | Hecho: herramientas, primer recorte y entrega polar; 24 pruebas Python y verificación JS del producto tras el ajuste J0 |
 | P1 | Heightmap polar para Marta hasta −80° | Hecho en rama #37: 1025×1025 Float32 LE + máscara + manifest sobre `layers.json`; producto real PGDA 90 de 80 m |
 | P1 | Altitud y pendiente para Marta/Javi2 | Hecho: dos capas 512² gray8 + alfa y GeoTIFF; pendiente del LDSM publicado, no del heightmap reducido; integración pendiente |
 | P1 | Datos de terreno de los sitios para Javi | Hecho: CSV/JSON, 20/20 coordenadas cubiertas, píxel nativo 80 m; coordenadas aún del fixture, no métricas de aterrizaje finales |
-| P2 | Horizonte científico para Javi / Street View | Configurado según J0: 5 m, 0,1° curados / 1° celdas, alcance inicial 300 km y validación hasta 310 km; DEM lejano 240 m hasta −60°S. Pendientes benchmark, catálogo #48 y cálculo: 0 perfiles listos |
+| P2 | Horizonte científico para Javi / Street View | Seis perfiles experimentales calculados (sur 1°/0,1° y refinamientos; ecuador/norte global 1°). Curvatura exacta, 5 m, hasta 310 km, JSON/CSV + benchmark en `terrain/trials/`. 0 perfiles de producción: pendientes catálogo #48, convergencia angular y validación independiente |
 | P2 | Revisión e integración de contrato heightmap | Pendiente: propuesta aditiva por PR a `dev`, revisión Marta/Javi2; no editar su loader sin coordinar |
-| P1 | Cámara Street View en todas las orientaciones | Valor inicial 5 m desde configuración común. Giro de 90° produjo vista gris en prueba previa: revisar altura, orientación, clipping y tiles antes de cerrar |
-| P1 | Street View más amigable | Siguiente bloque: visor como protagonista, controles claros, legibilidad, carga/error y distinción didáctica/técnica; no rediseñar el shell ni ocultar el carácter mock del cielo |
+| P1 | Cámara Street View en todas las orientaciones | Vectores Moon-fixed explícitos, clipping cercano, normales geométricas y seguimiento del LOD visible implementados. El giro deja ver pendientes; el relieve puede llenar la vista si bloquea el horizonte. QA extendido en ubicaciones/dispositivos y artefactos temporales de LOD pendientes |
+| P1 | Street View más amigable | Implementado localmente: sin flechas, arrastre izquierdo/un dedo, rueda/pinza, lectura artificial del relieve, opciones plegadas, vista ampliada, movimiento hasta 200 m y nombres IAU/USGS. QA con móvil emulado; pendiente comprobación en teléfono físico |
 | P2 | Sol/Tierra reales y fecha compartida | Consumir `@/ephem` de Javi: vectores anuales 2026–2055, paralaje terrestre exacta; confirmar DE421/DE440. Módulo/datos todavía no disponibles en dev; series actuales mock |
 | P3 | Calibrar altura Cesium frente al DEM | Pendiente: varios puntos, mismo frame y datum; no aplicar un offset supuesto |
-| P3 | Ubicación libre y enlaces/QR didácticos | Pendiente tras cerrar datos y navegación; mantener estado compartido y ruta reproducible |
+| P2 | Ubicación libre y enlaces/QR didácticos | Coordenadas libres y desplazamiento local implementados en el visor. Pendiente `selectedPoint`/ruta compartida de Javi2 y QR reproducible; al moverse se invalidan series del sitio original |
 | P3 | `grid_metrics.bin`, PSR y productos adicionales | Después de acordar semántica con Javi; no inventar datos ni ampliar contratos innecesariamente |
+| P1 | DEM independiente global | Descargado y verificado LDEM_64 V3.1 (530 841 600 bytes, Int16 LE ×0,5 m, MOON_ME DE421). Base de prueba de unos 474 m, no resolución fina global. Polo norte fino y resolución global superior pendientes según catálogo/coste |
 
 ## Decisiones de esta entrega
 

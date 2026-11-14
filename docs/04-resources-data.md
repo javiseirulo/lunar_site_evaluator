@@ -84,3 +84,26 @@ Contactos de soporte: Microsoft samfal@microsoft.com · Google cloudstartupsuppo
 | 2026-11-14 | @javiseirulo | Meeus, J. (1998) *Astronomical Algorithms*, 2nd ed., cap. 47 (serie truncada de la distancia Tierra–Luna, Tabla 47.A) | Usado en `web/src/scoring/arrival.ts` para el tiempo de transferencia Hohmann; validado contra el ejemplo 47.a (<50 km). Se sustituirá por el vector Tierra de SPICE. Añadir a *References* |
 | 2026-11-14 | pabloizgui / Codex | [Cesium ion access tokens](https://cesium.com/learn/ion/cesium-ion-access-tokens/) y [pricing](https://cesium.com/platform/cesium-ion/pricing/) | Revisados para ejecutar la app con la cuenta de Pablo: token público assets:read limitado a Moon/orígenes locales, cuotas de la cuenta propietaria; pruebas del endpoint local 200 / externo 403. Sin token literal en Git. |
 | 2026-11-14 | @martaplatero2002-star | Textura del globo: `lroc_color_poles_4k.tif` (4096×2048) del CGI Moon Kit, NASA Scientific Visualization Studio — https://svs.gsfc.nasa.gov/4720 — LROC WAC color con los polos rellenados con LOLA | Convertida a JPG (2,9 MB) en `web/public/textures/lroc_color_poles_4k.jpg`; la usa el globo 3D (`web/src/globe/`). Citar en *References*: NASA SVS CGI Moon Kit (créditos LROC/ASU y LOLA/GSFC según la página). Sin logotipos. |
+
+### 2026-11-14 — Pablo: base global y nombres del Street View
+
+- NASA LRO LOLA GDR **LDEM_64 V3.1** (creado 2019-03-15), ME/polar axis DE421,
+  Int16 little-endian, 23040×11520, 64 píxeles/grado. Elevación = DN×0,5 m;
+  `OFFSET=1737400` se usa solo para radio. Base global de prueba de unos 474 m,
+  no sustituto del detalle polar. [Etiqueta PDS](https://pds-geosciences.wustl.edu/lro/lro-l-lola-3-rdr-v1/lrolol_1xxx/data/lola_gdr/cylindrical/img/ldem_64.lbl),
+  [IMG oficial](https://pds-geosciences.wustl.edu/lro/lro-l-lola-3-rdr-v1/lrolol_1xxx/data/lola_gdr/cylindrical/img/ldem_64.img).
+  Descarga completa 530841600 bytes; SHA-256 local
+  `1c4958699d4cffd7e777d51421b6044bba300aa0bef286a544309efb082cdbd6`.
+  Incluye interpolación del productor y posibles artefactos entre bandas de 45°;
+  la etiqueta y el origen se conservan junto al fichero ignorado.
+- **IAU/USGS Gazetteer of Planetary Nomenclature**, catálogo lunar de centros,
+  control LOLA 2011, coordenadas planetocéntricas y longitudes este.
+  [Descripción y coordenadas](https://planetarynames.wr.usgs.gov/GIS_Downloads),
+  [KMZ oficial](https://asc-planetarynames-data.s3.us-west-2.amazonaws.com/MOON_nomenclature_center_pts.kmz).
+  Exportados 2023 accidentes aprobados, omitiendo los satélites con letras para
+  reducir ruido visual. Cada nombre conserva su enlace oficial; SHA del KMZ en
+  `web/public/data/terrain/lunar-names.json`. Los puntos no son cumbres medidas.
+- Cesium: [guía oficial CustomShader](https://github.com/CesiumGS/cesium/blob/main/Documentation/CustomShaderGuide/README.md)
+  y código local engine 26.3.0 (`Picking.js`, `ApproximateTerrainHeights.js`).
+  Luz de lectura artificial, sin atribuirle fidelidad fotométrica. El rayo de
+  muestreo se inicia sobre 30 km para evitar el límite terrestre inicial de 9 km.

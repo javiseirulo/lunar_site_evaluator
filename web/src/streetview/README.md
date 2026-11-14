@@ -88,3 +88,29 @@ Javi J0/J10 alignment: the default and retry observer height come from
 Until that module/data exists, same-site temporal bounds still apply. No annual
 vectors or terrain horizons are fabricated. The 360-degree camera validation
 and DE421/DE440/mesh alignment remain pending.
+
+## Navegación v1 (2026-11-14)
+
+Left drag / one-finger drag looks around; wheel / pinch changes field of view
+(25–90 degrees). On-screen arrows are removed; keyboard arrows remain.
+Click or tap visible ground 1–200 m away to walk. The route samples the actual
+visual mesh every ≤5 m, then eases for one second (instant with reduced motion).
+Far mountains and sky are rejected. Global relocation is explicit under
+**View options → Go anywhere on the Moon**. **Expand view** works on mobile too.
+
+Relief reading light is enabled by default. It is artificial, camera-relative
+fill derived from geometric normals, with a subtle solar-state tint. It is not
+physical lighting, a new shadow calculation or a remedy for missing ephemerides.
+The lunar sky stays black. Toggle it off to inspect the source imagery.
+The solar badge is marked mock when the source series is synthetic. After moving,
+that series is invalidated and the state becomes unknown until point-specific
+`@/ephem` data is available. Scientific observer height remains 5 m.
+
+Official IAU/USGS names use thin elbow leaders, at most four visible labels,
+with overlap/depth checks. Anchors refer to feature centres, not measured peaks.
+The catalogue and its original KMZ hash are in `terrain/lunar-names.json`.
+
+See [navigation and dependencies](../../../docs/team/pabloizgui/streetview-navigation-v1.md)
+and [trial horizons](../../public/data/terrain/trials/README.md). The older
+verification paragraph above describes v0; current evidence is recorded in the
+navigation document. Physical-phone QA and Cesium/LOLA calibration remain pending.
