@@ -17,12 +17,12 @@
       "lon": 0,
       "elev_m": 649,
       "valid": false,
-      "score": 0.46,
+      "score": 0.64,
       "metrics": {
-        "illum_pct": 0.64,
-        "earth_vis_pct": 0.49,
+        "illum_pct": 1,
+        "earth_vis_pct": 0.46,
         "slope_deg": 37.2,
-        "max_dark_hours": 191,
+        "max_dark_hours": 0,
         "psr_dist_km": 5
       },
       "reasons": [
@@ -40,12 +40,12 @@
       "lon": 141,
       "elev_m": -2763,
       "valid": false,
-      "score": 0.09,
+      "score": 0.11,
       "metrics": {
-        "illum_pct": 0.09,
-        "earth_vis_pct": 0.13,
+        "illum_pct": 0,
+        "earth_vis_pct": 0.38,
         "slope_deg": 74.7,
-        "max_dark_hours": 422,
+        "max_dark_hours": 720,
         "psr_dist_km": 0
       },
       "reasons": [
@@ -63,19 +63,19 @@
       "lon": -137,
       "elev_m": -52,
       "valid": true,
-      "score": 0.48,
+      "score": 0.63,
       "metrics": {
-        "illum_pct": 0.51,
-        "earth_vis_pct": 0.44,
+        "illum_pct": 0.8,
+        "earth_vis_pct": 0.43,
         "slope_deg": 10.3,
-        "max_dark_hours": 246,
+        "max_dark_hours": 76,
         "psr_dist_km": 12.4
       },
       "reasons": [
         "slope_ok",
         "illum_ok",
         "earth_low",
-        "dark_long"
+        "dark_ok"
       ],
       "source": "mock"
     },
@@ -86,12 +86,12 @@
       "lon": -68,
       "elev_m": 192,
       "valid": false,
-      "score": 0.16,
+      "score": 0.29,
       "metrics": {
-        "illum_pct": 0.19,
-        "earth_vis_pct": 0.2,
+        "illum_pct": 0.33,
+        "earth_vis_pct": 0.44,
         "slope_deg": 62.3,
-        "max_dark_hours": 380,
+        "max_dark_hours": 387,
         "psr_dist_km": 5.3
       },
       "reasons": [
@@ -109,12 +109,12 @@
       "lon": -95,
       "elev_m": -2043,
       "valid": false,
-      "score": 0.1,
+      "score": 0.24,
       "metrics": {
-        "illum_pct": 0.1,
-        "earth_vis_pct": 0.15,
+        "illum_pct": 0.25,
+        "earth_vis_pct": 0.41,
         "slope_deg": 61.5,
-        "max_dark_hours": 418,
+        "max_dark_hours": 428,
         "psr_dist_km": 0
       },
       "reasons": [
@@ -132,17 +132,17 @@
       "lon": 124,
       "elev_m": -514,
       "valid": true,
-      "score": 0.5,
+      "score": 0.53,
       "metrics": {
-        "illum_pct": 0.46,
-        "earth_vis_pct": 0.41,
+        "illum_pct": 0.54,
+        "earth_vis_pct": 0.43,
         "slope_deg": 5.1,
-        "max_dark_hours": 267,
+        "max_dark_hours": 328,
         "psr_dist_km": 18.8
       },
       "reasons": [
         "slope_ok",
-        "illum_low",
+        "illum_ok",
         "earth_low",
         "dark_long"
       ],
@@ -155,12 +155,12 @@
       "lon": -0.1,
       "elev_m": 3786,
       "valid": true,
-      "score": 0.78,
+      "score": 0.62,
       "metrics": {
-        "illum_pct": 1,
-        "earth_vis_pct": 0.78,
+        "illum_pct": 0.67,
+        "earth_vis_pct": 0.73,
         "slope_deg": 14.5,
-        "max_dark_hours": 40,
+        "max_dark_hours": 121,
         "psr_dist_km": 29.7
       },
       "reasons": [
@@ -178,12 +178,12 @@
       "lon": 31.7,
       "elev_m": 3782,
       "valid": false,
-      "score": 0.73,
+      "score": 0.54,
       "metrics": {
-        "illum_pct": 1,
-        "earth_vis_pct": 0.78,
+        "illum_pct": 0.64,
+        "earth_vis_pct": 0.74,
         "slope_deg": 23.9,
-        "max_dark_hours": 40,
+        "max_dark_hours": 189,
         "psr_dist_km": 26.1
       },
       "reasons": [
@@ -201,12 +201,12 @@
       "lon": -15,
       "elev_m": 259,
       "valid": false,
-      "score": 0.45,
+      "score": 0.46,
       "metrics": {
         "illum_pct": 0.53,
-        "earth_vis_pct": 0.6,
+        "earth_vis_pct": 0.61,
         "slope_deg": 19.5,
-        "max_dark_hours": 237,
+        "max_dark_hours": 205,
         "psr_dist_km": 10.1
       },
       "reasons": [
@@ -224,18 +224,18 @@
       "lon": 63,
       "elev_m": 1506,
       "valid": false,
-      "score": 0.2,
+      "score": 0.37,
       "metrics": {
-        "illum_pct": 0.24,
-        "earth_vis_pct": 0.25,
+        "illum_pct": 0.45,
+        "earth_vis_pct": 0.52,
         "slope_deg": 41.9,
-        "max_dark_hours": 359,
+        "max_dark_hours": 322,
         "psr_dist_km": 13.3
       },
       "reasons": [
         "slope_high",
         "illum_low",
-        "earth_low",
+        "earth_ok",
         "dark_long"
       ],
       "source": "mock"
@@ -247,18 +247,18 @@
       "lon": 41,
       "elev_m": 411,
       "valid": false,
-      "score": 0.17,
+      "score": 0.39,
       "metrics": {
-        "illum_pct": 0.18,
-        "earth_vis_pct": 0.24,
+        "illum_pct": 0.44,
+        "earth_vis_pct": 0.56,
         "slope_deg": 56.2,
-        "max_dark_hours": 384,
+        "max_dark_hours": 278,
         "psr_dist_km": 6.1
       },
       "reasons": [
         "slope_high",
         "illum_low",
-        "earth_low",
+        "earth_ok",
         "dark_long"
       ],
       "source": "mock"
@@ -270,18 +270,18 @@
       "lon": 82,
       "elev_m": 330,
       "valid": true,
-      "score": 0.53,
+      "score": 0.51,
       "metrics": {
-        "illum_pct": 0.54,
-        "earth_vis_pct": 0.5,
+        "illum_pct": 0.55,
+        "earth_vis_pct": 0.47,
         "slope_deg": 9.3,
-        "max_dark_hours": 233,
+        "max_dark_hours": 312,
         "psr_dist_km": 16.6
       },
       "reasons": [
         "slope_ok",
         "illum_ok",
-        "earth_ok",
+        "earth_low",
         "dark_long"
       ],
       "source": "mock"
@@ -293,12 +293,12 @@
       "lon": 80,
       "elev_m": -1808,
       "valid": false,
-      "score": 0.1,
+      "score": 0.33,
       "metrics": {
-        "illum_pct": 0.09,
-        "earth_vis_pct": 0.17,
+        "illum_pct": 0.42,
+        "earth_vis_pct": 0.44,
         "slope_deg": 27.4,
-        "max_dark_hours": 422,
+        "max_dark_hours": 367,
         "psr_dist_km": 0
       },
       "reasons": [
@@ -316,12 +316,12 @@
       "lon": -55,
       "elev_m": -525,
       "valid": true,
-      "score": 0.51,
+      "score": 0.58,
       "metrics": {
-        "illum_pct": 0.37,
-        "earth_vis_pct": 0.62,
+        "illum_pct": 0.49,
+        "earth_vis_pct": 0.68,
         "slope_deg": 6.2,
-        "max_dark_hours": 305,
+        "max_dark_hours": 293,
         "psr_dist_km": 62
       },
       "reasons": [
@@ -344,7 +344,7 @@
         "illum_pct": 0.55,
         "earth_vis_pct": 0.56,
         "slope_deg": 9.8,
-        "max_dark_hours": 229,
+        "max_dark_hours": 248,
         "psr_dist_km": 16.8
       },
       "reasons": [
@@ -362,12 +362,12 @@
       "lon": -150,
       "elev_m": 263,
       "valid": false,
-      "score": 0.39,
+      "score": 0.36,
       "metrics": {
-        "illum_pct": 0.54,
-        "earth_vis_pct": 0.39,
+        "illum_pct": 0.56,
+        "earth_vis_pct": 0.33,
         "slope_deg": 30.1,
-        "max_dark_hours": 233,
+        "max_dark_hours": 314,
         "psr_dist_km": 12.2
       },
       "reasons": [
@@ -385,12 +385,12 @@
       "lon": -112,
       "elev_m": 74,
       "valid": false,
-      "score": 0.4,
+      "score": 0.37,
       "metrics": {
-        "illum_pct": 0.54,
-        "earth_vis_pct": 0.43,
+        "illum_pct": 0.55,
+        "earth_vis_pct": 0.4,
         "slope_deg": 24,
-        "max_dark_hours": 233,
+        "max_dark_hours": 326,
         "psr_dist_km": 9.3
       },
       "reasons": [
@@ -408,19 +408,19 @@
       "lon": -95,
       "elev_m": 2422,
       "valid": true,
-      "score": 0.74,
+      "score": 0.58,
       "metrics": {
-        "illum_pct": 0.82,
-        "earth_vis_pct": 0.55,
+        "illum_pct": 0.59,
+        "earth_vis_pct": 0.44,
         "slope_deg": 3.2,
-        "max_dark_hours": 116,
+        "max_dark_hours": 292,
         "psr_dist_km": 93.8
       },
       "reasons": [
         "slope_ok",
         "illum_ok",
-        "earth_ok",
-        "dark_ok"
+        "earth_low",
+        "dark_long"
       ],
       "source": "mock"
     },
@@ -431,19 +431,19 @@
       "lon": 31,
       "elev_m": 3486,
       "valid": true,
-      "score": 0.83,
+      "score": 0.68,
       "metrics": {
-        "illum_pct": 0.97,
-        "earth_vis_pct": 0.81,
+        "illum_pct": 0.61,
+        "earth_vis_pct": 0.89,
         "slope_deg": 8.6,
-        "max_dark_hours": 53,
+        "max_dark_hours": 203,
         "psr_dist_km": 38.8
       },
       "reasons": [
         "slope_ok",
         "illum_ok",
         "earth_ok",
-        "dark_ok"
+        "dark_long"
       ],
       "source": "mock"
     },
@@ -454,17 +454,17 @@
       "lon": 120,
       "elev_m": -788,
       "valid": true,
-      "score": 0.39,
+      "score": 0.4,
       "metrics": {
-        "illum_pct": 0.35,
-        "earth_vis_pct": 0.26,
+        "illum_pct": 0.5,
+        "earth_vis_pct": 0.12,
         "slope_deg": 6.7,
-        "max_dark_hours": 313,
+        "max_dark_hours": 362,
         "psr_dist_km": 119.5
       },
       "reasons": [
         "slope_ok",
-        "illum_low",
+        "illum_ok",
         "earth_low",
         "dark_long"
       ],
