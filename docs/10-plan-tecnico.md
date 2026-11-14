@@ -29,6 +29,7 @@
 | Street View (Pablo) | ⏳ hueco listo | `web/src/streetview/` (placeholder que imprime Sol/Tierra az/el) |
 | Mission / juego (Cristóbal) | ⏳ diseño descrito (#52), hueco listo | `web/src/game/` (placeholder) |
 | Pipeline Python (Javi, Pablo) | Entrega polar real reunida con el visor en rama #46; revisión/integración pendientes | `python/terrain/`, `web/public/data/terrain/`: heightmap 1025², máscara, elevación/pendiente y tabla de 20 sitios; horizonte/efemérides aún pendientes |
+| Efemérides SPICE + `@/ephem` + `@/scoring` (Javi) | ✅ en `dev` (#70, #77, #78) · ⏳ export real | `python/ephem/`, `web/src/ephem/`, `web/src/scoring/`; diseño y qué usar: `docs/team/javiseirulo/diseno-efemerides-scoring.md` |
 | Deploy público | ⏳ pendiente | `web/vercel.json` listo; proyecto Vercel con raíz `web/` |
 
 ### Cómo arrancar (cualquiera)
@@ -54,11 +55,13 @@ Contratos y mocks: **`contracts/README.md`**.
 
 ### Siguiente paso por persona
 > ➕ (@javiseirulo, 2026-11-14, #67) **Alcance = toda la Luna, con énfasis en el polo sur.** Qué tiene que cambiar cada uno: **§10**.
-- **Javi**: sustituir los mocks por datos reales con la misma forma (`"mock": false`); `pnpm test` en `web/` comprueba el formato.
+- **Javi**: ➕ (2026-11-14) contrato v1.1, efemérides y `@/scoring` ya en `dev`; **qué podéis usar cada uno: `docs/team/javiseirulo/diseno-efemerides-scoring.md` §5**. Siguiente: export real.
+  Antes: sustituir los mocks por datos reales con la misma forma (`"mock": false`); `pnpm test` en `web/` comprueba el formato.
 - **Pablo**: prototipo Cesium aislado en `web/src/streetview/StreetView.tsx`, con `useTimeseries` + `sampleAt` y límites explícitos; DEM/horizontes en `python/terrain/`. Acordar y exportar además el heightmap polar para Marta (ver §5 y §9).
 - **Marta**: v1 de Explore = formulario de requisitos de misión (batería, consumo, panel, corte de comunicación, pendiente, ventana) con `src/globe/missionStats.ts` y orden sin pesos (§5 Marta).
   Depende de: Javi (si `score`/`weights`/`valid` siguen en `sites.json`; `evaluateSite` oficial en `@/scoring`), Javi2 (fecha/hora en el Mission Clock), Pablo (heightmap del parche, teselas de horizonte).
   ⚠️ A conciliar con Javi: §10 le pide a Marta sliders sobre `missionConfig` y score de `@/scoring`; lo acordado por Marta el 2026-11-14 son requisitos duros sin pesos.
+  ➕ (@javiseirulo) Compatible: `evaluateSite().valid`/`.checks` son requisitos duros sin pesos; el score es opcional (ver `docs/team/javiseirulo/diseno-efemerides-scoring.md` §5).
 - **Cristóbal**: `web/src/game/`: motor de simulación de N días + veredicto explicado (ver §5, actualizado con su descripción del módulo Mission), leyendo `sites`, timeseries y `selectedSiteId`.
 - **Javi2**: v1 = design system (shadcn), onboarding y deploy público.
 
