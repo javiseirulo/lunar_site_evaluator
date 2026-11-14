@@ -1,0 +1,71 @@
+{
+  "version": 1,
+  "description": "Golden cases for evaluateSite (web/src/scoring) and the Python export. score = round(Σwu/Σw, 3), 0 if Σw = 0; pending/missing metrics are excluded; at threshold passes.",
+  "config": {
+    "requirements": {
+      "slope_deg": { "threshold": 8, "objective": 2 },
+      "illum_pct": { "threshold": 0.5, "objective": 0.85 },
+      "max_dark_hours": { "threshold": 100, "objective": 24 },
+      "earth_vis_pct": { "threshold": 0.5, "objective": 0.95 },
+      "max_blackout_hours": { "threshold": 72, "objective": 12 }
+    },
+    "weights": {
+      "slope_deg": 0.2,
+      "illum_pct": 0.2,
+      "max_dark_hours": 0.2,
+      "earth_vis_pct": 0.2,
+      "max_blackout_hours": 0.2
+    }
+  },
+  "cases": [
+    {
+      "name": "all at objective",
+      "metrics": {
+        "slope_deg": 2,
+        "illum_pct": 0.85,
+        "max_dark_hours": 24,
+        "earth_vis_pct": 0.95,
+        "max_blackout_hours": 12
+      },
+      "expected": { "valid": true, "score": 1 }
+    },
+    {
+      "name": "all at threshold",
+      "metrics": {
+        "slope_deg": 8,
+        "illum_pct": 0.5,
+        "max_dark_hours": 100,
+        "earth_vis_pct": 0.5,
+        "max_blackout_hours": 72
+      },
+      "expected": { "valid": true, "score": 0 }
+    },
+    {
+      "name": "slope fails",
+      "metrics": {
+        "slope_deg": 11,
+        "illum_pct": 0.675,
+        "max_dark_hours": 62,
+        "earth_vis_pct": 0.725,
+        "max_blackout_hours": 42
+      },
+      "expected": { "valid": false, "score": 0.4 }
+    },
+    {
+      "name": "slope pending",
+      "metrics": {
+        "illum_pct": 0.85,
+        "max_dark_hours": 24,
+        "earth_vis_pct": 0.5,
+        "max_blackout_hours": 72
+      },
+      "pending": ["slope_deg"],
+      "expected": { "valid": true, "score": 0.5 }
+    },
+    {
+      "name": "everything missing",
+      "metrics": {},
+      "expected": { "valid": true, "score": 0 }
+    }
+  ]
+}

@@ -24,3 +24,4 @@
 - Terreno: esperar a Pablo. Horizonte plano "no terrain"; `slope_deg`/`psr_dist_km` como `pending_metrics`.
 - Catálogo #48: 20 ids actuales re-fuenteados + candidatos del polo sur + aterrizajes reales del resto de la Luna, todos con fuente.
 - Plan de implementación (4 PRs: contrato v1.1 → `python/` efemérides → `@/ephem` + `@/scoring` → datos reales) en `docs/team/javiseirulo/plan-implementacion.md`. Se trabaja en paralelo con subagentes en worktrees.
+- 2026-11-14 noche: mergeados #70, #77, #78 en dev (CI verde). Catálogo #48 con plain_81s reubicado (OK de Javi). Documento de diseño para el equipo.

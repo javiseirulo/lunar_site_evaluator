@@ -1,0 +1,447 @@
+{
+  "version": 1,
+  "provided_by": "pabloizgui",
+  "provided_on": "2026-11-14",
+  "source_archive": "mission_assets_48_completos.zip",
+  "source_archive_sha256": "140073c8c2f840b55cf4561e34490a02856a83749fe591a3f8d3ac641f54158c",
+  "purpose": "Mission game illustrations; artistic assets, not scientific terrain or mission evidence.",
+  "provenance": "Images created by Pablo using Codex, based on the prompt document supplied by Cristóbal. User confirmation recorded on 2026-11-14; no image generation or editing performed during this import.",
+  "files": [
+    {
+      "path": "sites/site-rim-1.png",
+      "bytes": 1474226,
+      "sha256": "b991ae3d1f6448b96ec9dbf6464720221744afd93497c3781edeafffa0295c47",
+      "width": 1086,
+      "height": 1448,
+      "mode": "RGB",
+      "format": "WEBP"
+    },
+    {
+      "path": "sites/site-rim-2.png",
+      "bytes": 636210,
+      "sha256": "6a11b24778de5ec66b999a628eb9d000ebea1dae904cb45c7d1d040f07e686c8",
+      "width": 768,
+      "height": 1024,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "path": "sites/site-cliff-1.png",
+      "bytes": 1728728,
+      "sha256": "05414ed733bf44127f4499675ac55ad069aa8b0d031521c898e5481fedb10c2b",
+      "width": 1086,
+      "height": 1448,
+      "mode": "RGB",
+      "format": "WEBP"
+    },
+    {
+      "path": "sites/site-cliff-2.png",
+      "bytes": 769904,
+      "sha256": "947f18d698cfc4d6f33efca2df357838c4a4e9e0f31e891266793c34144e3fc2",
+      "width": 768,
+      "height": 1024,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "path": "sites/site-ridge-1.png",
+      "bytes": 1601998,
+      "sha256": "e24b7ee4417d8c6d75707ce3551063706fa961b52d808b2db9861aa04eab2b6e",
+      "width": 1086,
+      "height": 1448,
+      "mode": "RGB",
+      "format": "WEBP"
+    },
+    {
+      "path": "sites/site-ridge-2.png",
+      "bytes": 656106,
+      "sha256": "4665a9e056d49e892e8eacc4ee1c04b1aaeefb478282039980dfd4eb24844177",
+      "width": 768,
+      "height": 1024,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "path": "sites/site-peak-1.png",
+      "bytes": 589818,
+      "sha256": "23a7d8e0e521683786687c241228a5a557acb64ad9c463b741ffed87631e4fea",
+      "width": 768,
+      "height": 1024,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "path": "sites/site-peak-2.png",
+      "bytes": 697960,
+      "sha256": "d1e9d7302ce87158bf067fa338836d545a662d5f0bb481c358bf80404678dc37",
+      "width": 768,
+      "height": 1024,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "path": "sites/site-massif-1.png",
+      "bytes": 1817532,
+      "sha256": "88702f4565ced5435fd09b6bee4f6614ad503787e300d9d93ffbae18c2d48434",
+      "width": 1086,
+      "height": 1448,
+      "mode": "RGB",
+      "format": "WEBP"
+    },
+    {
+      "path": "sites/site-massif-2.png",
+      "bytes": 696559,
+      "sha256": "e3336018e5ef70ec667bbc499fb0b20eadf4cacdd276b48bcde72f51b750e3b1",
+      "width": 768,
+      "height": 1024,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "path": "sites/site-mons-1.png",
+      "bytes": 620368,
+      "sha256": "9a6f0ab64a6a37b5863ca76e33895fe4dba8326ff94cb48776162662f4426de5",
+      "width": 768,
+      "height": 1024,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "path": "sites/site-mons-2.png",
+      "bytes": 654829,
+      "sha256": "59aef42138ebe3e3c3ba435ab93b04aee866ab2eb5a1146cb1278ee764b2e98b",
+      "width": 768,
+      "height": 1024,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "path": "sites/site-plateau-1.png",
+      "bytes": 1742130,
+      "sha256": "3aa36753ed6787b8b075c07e73897318d532b06c944f590a2fa3c0a520a7a666",
+      "width": 1086,
+      "height": 1448,
+      "mode": "RGB",
+      "format": "WEBP"
+    },
+    {
+      "path": "sites/site-plateau-2.png",
+      "bytes": 572471,
+      "sha256": "d65b8d056874e67ee0e9be5f2158af062fc9f5c951870a4afa9f81425a4c5443",
+      "width": 768,
+      "height": 1024,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "path": "sites/site-crater-1.png",
+      "bytes": 1708374,
+      "sha256": "30ae9abfee457ec39e113a22086b9d9673a536b6b40f80957e5f2c542df6db88",
+      "width": 1086,
+      "height": 1448,
+      "mode": "RGB",
+      "format": "WEBP"
+    },
+    {
+      "path": "sites/site-crater-2.png",
+      "bytes": 733595,
+      "sha256": "aea08c2ba1b5e1758e405ba33f29daa4ea46407d0fc29be5e908ff7d245a8eae",
+      "width": 768,
+      "height": 1024,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "path": "card-back.png",
+      "bytes": 1300638,
+      "sha256": "58e6b88019f4f5f4de5ee3bc85eeac18f32b4db5fc07a8ced67483b973442f89",
+      "width": 1086,
+      "height": 1448,
+      "mode": "RGB",
+      "format": "WEBP"
+    },
+    {
+      "path": "characters/dr-regolith-neutral.png",
+      "bytes": 71815,
+      "sha256": "39a35fa37d2fb81109cced292dd148620f4826d6b4bb6d039409ec2f2428948a",
+      "width": 256,
+      "height": 256,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "path": "characters/dr-regolith-talk.png",
+      "bytes": 1039904,
+      "sha256": "a4f1595e50e8aa7d82a7e82995d7f65a97763b515d65d74ae4079885fd8ca801",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "format": "WEBP"
+    },
+    {
+      "path": "characters/dr-regolith-alarm.png",
+      "bytes": 81889,
+      "sha256": "dfb063d403dbbda2a3ee93d12f1d88fc679efe45de96c97064098723ac20c128",
+      "width": 256,
+      "height": 256,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "path": "characters/dr-regolith-happy.png",
+      "bytes": 83321,
+      "sha256": "fb82b4a6e7cfa1d2edbea939822c60f9ab30f62bf957d2e42fcfb01d84f0ee9c",
+      "width": 256,
+      "height": 256,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "path": "characters/dr-regolith-sad.png",
+      "bytes": 83167,
+      "sha256": "d5eeea59334e1ced984420a310dc7895780379579e5f653f62f4a240094f3db0",
+      "width": 256,
+      "height": 256,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "path": "characters/astro-veteran.png",
+      "bytes": 3294,
+      "sha256": "45ca2f8044f531f438c2c023827d10ce41fa5a9131edd40c8cc12dda0ec0a485",
+      "width": 256,
+      "height": 256,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "path": "characters/astro-rookie.png",
+      "bytes": 2947,
+      "sha256": "f43d5f91c235fc75e4ee832c3ac018c9d9382a44b35e6dd3220600590d48eda3",
+      "width": 256,
+      "height": 256,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "path": "characters/astro-commander.png",
+      "bytes": 3187,
+      "sha256": "4fa565d6fa3c5869f599b36f84a800c482319926a75d5ba29b947884d758d5f6",
+      "width": 256,
+      "height": 256,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "path": "lander/lander-side.png",
+      "bytes": 580198,
+      "sha256": "3c808b85f264d3c031e91388083df0613757b6f5b820b1c84a2695b3c425a634",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "format": "WEBP"
+    },
+    {
+      "path": "lander/lander-icon.png",
+      "bytes": 843,
+      "sha256": "f5d5caf9a5457b1a976c4f60630b8d2d8e8e667afd995f73d34480aeae580ba2",
+      "width": 64,
+      "height": 64,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "path": "lander/lander-tipped.png",
+      "bytes": 60734,
+      "sha256": "818bb5ea5f4c7983088b093b02405c3e44f65aa6b564998df421dc63a3ab7e68",
+      "width": 256,
+      "height": 256,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "path": "lander/lander-frozen.png",
+      "bytes": 41513,
+      "sha256": "157cf9ea6190e9b6c1df86a0a785a06843927bf30276f28fbb8207f2195d25ab",
+      "width": 256,
+      "height": 256,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "path": "emergencies/emergency-propulsion.png",
+      "bytes": 116699,
+      "sha256": "a058ff91c98a21350e4ce84a07f677fb95e384f9fdb10ac1ec5e9ac5d4d5e690",
+      "width": 1280,
+      "height": 720,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "path": "emergencies/emergency-solar-storm.png",
+      "bytes": 267425,
+      "sha256": "a50d961d56b3678950d81e34e497634b3ee2a035386778f2e7e729b972d5e3b8",
+      "width": 1280,
+      "height": 720,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "path": "emergencies/emergency-guidance.png",
+      "bytes": 43257,
+      "sha256": "8c73b0460678411149356b728862b0d58bdb9ce6777a079bf10d05ff4da4f659",
+      "width": 1280,
+      "height": 720,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "path": "emergencies/emergency-fuel-leak.png",
+      "bytes": 122726,
+      "sha256": "7e3ee3fc7c7ba96387b0423e3ca381ee2240c60a829f1070129230cd8a30b002",
+      "width": 1280,
+      "height": 720,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "path": "emergencies/emergency-comms.png",
+      "bytes": 114424,
+      "sha256": "803a69f9a474b10c14924a3394a228b6a77961c274cc2c476b291528c7ad59df",
+      "width": 1280,
+      "height": 720,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "path": "verdicts/win.png",
+      "bytes": 1259737,
+      "sha256": "af97cccea8f3b40c4a39570931f31dff6764d45a4da3f3c8f27ce07b641fe80a",
+      "width": 1280,
+      "height": 720,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "path": "verdicts/lose-slope.png",
+      "bytes": 1341379,
+      "sha256": "1bffaa6c7f8fd6bce9876a3a939bcdca3dbce8c0d482246eb3be7bf391f948b0",
+      "width": 1280,
+      "height": 720,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "path": "verdicts/lose-cold.png",
+      "bytes": 1052626,
+      "sha256": "f7164bd323a7d68e3e1b5031b172dc170c01ea33732b7e5f34db686f4a18595e",
+      "width": 1280,
+      "height": 720,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "path": "verdicts/lose-blackout.png",
+      "bytes": 1002058,
+      "sha256": "28e833a005c1d1a152584187667b63c37eafd03af60b3a2f5c8811ce6da19046",
+      "width": 1280,
+      "height": 720,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "path": "verdicts/lose-low-sun.png",
+      "bytes": 536319,
+      "sha256": "45ab8ab6d18d64c5f09c166843941c4ec930f37be60715b800c7b00476488d9e",
+      "width": 1280,
+      "height": 720,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "path": "verdicts/lose-low-comm.png",
+      "bytes": 800087,
+      "sha256": "e2eee63219808af202c25f219970568748eaccc35832da36283b91d12075a187",
+      "width": 1280,
+      "height": 720,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "path": "verdicts/timeout.png",
+      "bytes": 121718,
+      "sha256": "68e018d4d56853fd83935d6f894930b042cd3bd8dfb4eb9c1f30e6b092b29588",
+      "width": 1280,
+      "height": 720,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "path": "menu-bg.png",
+      "bytes": 1225684,
+      "sha256": "a0e38f0b649820fc9c1a97b16539aa3aaff4aeb7f5c5b3b41680c47ea9c25c74",
+      "width": 1672,
+      "height": 941,
+      "mode": "RGB",
+      "format": "WEBP"
+    },
+    {
+      "path": "mode-south-pole.png",
+      "bytes": 20631,
+      "sha256": "ff81adb2dcd4719cd6f856b84130d61614fd34b72398de828123104f1dc03edd",
+      "width": 768,
+      "height": 1024,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "path": "mode-historical.png",
+      "bytes": 1353648,
+      "sha256": "79cf7d08c0038fddc02dd444752e0cbc5d66d70412f6e2390bed797092ea2b63",
+      "width": 768,
+      "height": 1024,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "path": "orbit-bg.png",
+      "bytes": 74161,
+      "sha256": "473c63c9095982583f99cf0617801807895c7997fc7b47c2ab8e76219fa68e8b",
+      "width": 1920,
+      "height": 1080,
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "path": "ui/star-full.png",
+      "bytes": 1011,
+      "sha256": "5f3281cd9130cae9a2d343d2fc8fffa37136efdc541b637b1256006fea4bada4",
+      "width": 128,
+      "height": 128,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "path": "ui/star-empty.png",
+      "bytes": 987,
+      "sha256": "161bee665437ad17f2521ed344fbf3ee78763250976f5b4391cb07d4a663eca5",
+      "width": 128,
+      "height": 128,
+      "mode": "RGBA",
+      "format": "PNG"
+    },
+    {
+      "path": "ui/alarm.png",
+      "bytes": 1110,
+      "sha256": "ab820969b55dbc0f6a36e97897fd24519c89ad3e69b0db4a79f009b5098fc00c",
+      "width": 128,
+      "height": 128,
+      "mode": "RGBA",
+      "format": "PNG"
+    }
+  ],
+  "creation_tool": "Codex",
+  "prompt_contributor": "Cristóbal",
+  "prompt_document_sha256": "acafe366e612236348505665be3d23e51d4c3fabfcda61435041baf7a362872e",
+  "prompt_source": "generacionimagenes.md (privately supplied by Cristóbal; source content retained locally, not published)"
+}

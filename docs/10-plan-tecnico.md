@@ -29,6 +29,7 @@
 | Street View (Pablo) | v0 integrado con la entrega de terreno en rama #46; observador inicial 5 m; giro completo pendiente | `web/src/streetview/` y `web/public/data/terrain/`; revisiones/CI pendientes antes de integrar en dev |
 | Mission / juego (Cristóbal) | ⏳ diseño descrito (#52), hueco listo | `web/src/game/` (placeholder) |
 | Pipeline Python (Javi, Pablo) | Entrega polar real reunida con el visor en rama #46; revisión/integración pendientes | `python/terrain/`, `web/public/data/terrain/`: heightmap 1025², máscara, elevación/pendiente y tabla de 20 sitios; horizonte/efemérides aún pendientes |
+| Efemérides SPICE + `@/ephem` + `@/scoring` (Javi) | ✅ en `dev` (#70, #77, #78) · ⏳ export real | `python/ephem/`, `web/src/ephem/`, `web/src/scoring/`; diseño y qué usar: `docs/team/javiseirulo/diseno-efemerides-scoring.md` |
 | Deploy público | ⏳ pendiente | `web/vercel.json` listo; proyecto Vercel con raíz `web/` |
 
 ### Cómo arrancar (cualquiera)
@@ -55,10 +56,13 @@ Contratos y mocks: **`contracts/README.md`**.
 ### Siguiente paso por persona
 > ➕ (@javiseirulo, 2026-11-14, #67) **Alcance = toda la Luna, con énfasis en el polo sur.** Qué tiene que cambiar cada uno: **§10**.
 - **Javi**: sustituir los mocks por datos reales con la misma forma (`"mock": false`); `pnpm test` en `web/` comprueba el formato.
+- **Javi**: ➕ (2026-11-14) contrato v1.1, efemérides y `@/scoring` ya en `dev`; **qué podéis usar cada uno: `docs/team/javiseirulo/diseno-efemerides-scoring.md` §5**. Siguiente: export real.
+  Antes: sustituir los mocks por datos reales con la misma forma (`"mock": false`); `pnpm test` en `web/` comprueba el formato.
 - **Pablo**: prototipo Cesium aislado en `web/src/streetview/StreetView.tsx`, con `useTimeseries` + `sampleAt` y límites explícitos; DEM/horizontes en `python/terrain/`. Acordar y exportar además el heightmap polar para Marta (ver §5 y §9).
 - **Marta**: v1 de Explore = formulario de requisitos de misión (batería, consumo, panel, corte de comunicación, pendiente, ventana) con `src/globe/missionStats.ts` y orden sin pesos (§5 Marta).
   Depende de: Javi (si `score`/`weights`/`valid` siguen en `sites.json`; `evaluateSite` oficial en `@/scoring`), Javi2 (fecha/hora en el Mission Clock), Pablo (heightmap del parche, teselas de horizonte).
   ⚠️ A conciliar con Javi: §10 le pide a Marta sliders sobre `missionConfig` y score de `@/scoring`; lo acordado por Marta el 2026-11-14 son requisitos duros sin pesos.
+  ➕ (@javiseirulo) Compatible: `evaluateSite().valid`/`.checks` son requisitos duros sin pesos; el score es opcional (ver `docs/team/javiseirulo/diseno-efemerides-scoring.md` §5).
 - **Cristóbal**: `web/src/game/`: motor de simulación de N días + veredicto explicado (ver §5, actualizado con su descripción del módulo Mission), leyendo `sites`, timeseries y `selectedSiteId`.
 - **Javi2**: v1 = design system (shadcn), onboarding y deploy público.
 
@@ -264,7 +268,7 @@ Si se recorta a 20 km, la iluminación sale **sobreestimada**. Por eso el alcanc
 | Métrica | Definición |
 |---|---|
 | `illum_pct` | % de la ventana con Sol sobre el horizonte local (ponderado por la fracción de disco) |
-| `sun_el_mean_deg` ⚠️ | Elevación solar media sobre el horizonte local. **Métrica clave de energía según el reto** |
+| `sun_el_mean_deg` | Elevación solar media, ponderada por la fracción visible del disco: `mean(sun_frac · max(0, sun_el))`. Por la noche cuenta 0. **Métrica clave de energía según el reto.** Definición exacta en `contracts/README.md` |
 | `max_dark_hours` | Racha más larga sin Sol (dimensiona las baterías) |
 | `earth_vis_pct` | % con la Tierra visible por encima de horizonte + margen |
 | `max_blackout_hours` ⚠️ | Racha más larga sin contacto con la Tierra |
@@ -283,14 +287,14 @@ El tiempo hasta Sunset/Earthset (lo pide el reto) ya lo calcula la web a partir 
 - Hay dos tipos de requisito:
   - **De seguridad**, fijos: pendiente máxima, área plana.
   - **De misión**: en **Explore** los fija el usuario con sliders; en **Mission** los fija el escenario (ver el bloque de Cristóbal).
-- Cada requisito se evalúa con su **margen** `(valor − umbral)/umbral`. Si falla, `reasons` dice cuál y por cuánto ("noche máxima 142 h > 96 h"). Encaja con el veredicto explicado de Mission.
+- Cada requisito se evalúa con su **margen** relativo y con signo (≥ 0 pasa; justo en el umbral pasa), que va en `Site.checks`. Si falla, la UI dice cuál y por cuánto ("noche máxima 142 h > 96 h"). Encaja con el veredicto explicado de Mission. Fórmula exacta en `contracts/README.md`, "Validity and score".
 - Las métricas de `sites.json` se calculan sobre todo el rango. **La web las recalcula para la ventana elegida** a partir de la `timeseries` (como ya hace `fractionOn`).
 
 #### J7. Score (solo para los sitios válidos). Responde a la "normalización real" que pide Marta
 1. **Utilidad por criterio con threshold/objective:** vale 0 en el umbral (el mismo valor del requisito) y 1 en el objetivo, lineal entre ambos (invertida si "menos es mejor": pendiente, noche, blackout, distancia a PSR).
    - **No se usa min-max**, porque haría depender el score del conjunto de sitios.
    - Sustituye a la normalización provisional del mock (`1 − slope/20`, `1 − dark_h/500`).
-2. **Suma ponderada** `S = Σ wᵢ·uᵢ` con los pesos de los sliders. La web enseña la contribución de cada criterio en barra apilada.
+2. **Suma ponderada normalizada** `S = Σ wᵢ·uᵢ / Σ wᵢ` con los pesos de los sliders (0 si Σw = 0). La web enseña la contribución de cada criterio en barra apilada.
    - ⚠️ Una sola función TypeScript pura, con tests, reproduce `site.score` con los pesos por defecto. Hay que acordar con Marta si vive en su `score.ts` o en `web/src/scoring/`; lo importante es que haya **una sola**.
 3. **Robustez temporal:** % de desplazamientos de ±1…N días en los que el sitio sigue siendo válido ("¿y si se retrasa el lanzamiento?"). Es barata porque corre en el cliente.
    - La **robustez espacial** (vecinos dentro de la elipse de aterrizaje) queda para V2.
@@ -322,12 +326,12 @@ Valores por defecto = valores iniciales de los sliders al abrir Explore y base q
 | `llo_alt_km` | 100 |
 | `surface_days` | 7 (del orden de Artemis III, ~6,5 días) |
 | `antenna_margin_deg` | 2 |
-| `slope_max_deg` | 8 |
-| `illum` threshold → objective | 50 % → 85 % |
-| `max_dark_h` threshold → objective | 100 → 24 |
-| `comm` threshold → objective | 50 % → 95 % |
-| `max_blackout_h` threshold → objective | 72 → 12 |
-| Pesos | Iguales |
+| `slope_deg` threshold → objective | 8° → 2° |
+| `illum_pct` threshold → objective | 50 % → 85 % |
+| `max_dark_hours` threshold → objective | 100 → 24 |
+| `earth_vis_pct` threshold → objective | 50 % → 95 % |
+| `max_blackout_hours` threshold → objective | 72 → 12 |
+| Pesos | Iguales (0,2 cada uno). Fuente de verdad: `DEFAULT_MISSION_CONFIG` en `web/src/scoring/defaults.ts` |
 
 Los umbrales son propuestas razonables, a ajustar con referencias.
 
@@ -337,7 +341,7 @@ Los umbrales son propuestas razonables, a ajustar con referencias.
   "trajectory": "hohmann", "llo_alt_km": 100,
   "start_in_orbit": true,
   "surface_days": 5,
-  "requirements": { "max_dark_h": { "threshold": 48 }, "comm_pct": { "threshold": 0.6 } },
+  "requirements": { "max_dark_hours": { "threshold": 48 }, "earth_vis_pct": { "threshold": 0.6 } },
   "goal": { "type": "reach_valid_site", "deadline_days": 3 } }
 ```
 

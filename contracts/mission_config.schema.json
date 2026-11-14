@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "mission_config.schema.json",
+  "title": "MissionConfig — mission timing + requirements (see types.ts MissionConfig; store `missionConfig`; Mission scenarios extend it)",
+  "type": "object",
+  "required": [
+    "time_mode",
+    "landing_utc",
+    "launch_utc",
+    "trajectory",
+    "llo_alt_km",
+    "surface_days",
+    "antenna_margin_deg",
+    "requirements",
+    "weights"
+  ],
+  "properties": {
+    "time_mode": { "enum": ["design", "mission"] },
+    "landing_utc": { "type": "string", "format": "date-time" },
+    "launch_utc": { "type": "string", "format": "date-time" },
+    "trajectory": { "enum": ["hohmann", "fast", "low_energy"] },
+    "llo_alt_km": { "type": "number", "minimum": 20, "maximum": 500 },
+    "start_in_orbit": { "type": "boolean" },
+    "orbit_plane_lon_deg": { "type": "number", "minimum": -180, "maximum": 360 },
+    "surface_days": { "type": "number", "exclusiveMinimum": 0, "maximum": 60 },
+    "antenna_margin_deg": { "type": "number", "minimum": 0, "maximum": 20 },
+    "requirements": {
+      "type": "object",
+      "propertyNames": {
+        "enum": [
+          "illum_pct",
+          "earth_vis_pct",
+          "slope_deg",
+          "max_dark_hours",
+          "psr_dist_km",
+          "sun_el_mean_deg",
+          "max_blackout_hours",
+          "sun_earth_pct"
+        ]
+      },
+      "additionalProperties": {
+        "type": "object",
+        "required": ["threshold"],
+        "properties": { "threshold": { "type": "number" }, "objective": { "type": "number" } },
+        "additionalProperties": false
+      }
+    },
+    "weights": {
+      "type": "object",
+      "propertyNames": {
+        "enum": [
+          "illum_pct",
+          "earth_vis_pct",
+          "slope_deg",
+          "max_dark_hours",
+          "psr_dist_km",
+          "sun_el_mean_deg",
+          "max_blackout_hours",
+          "sun_earth_pct"
+        ]
+      },
+      "additionalProperties": { "type": "number", "minimum": 0 }
+    }
+  }
+}
