@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "sites.schema.json",
+  "title": "sites.json — candidate landing sites (see types.ts SitesFile)",
+  "type": "object",
+  "required": ["version", "mock", "generated_utc", "weights", "sites"],
+  "properties": {
+    "version": { "const": 1 },
+    "mock": { "type": "boolean" },
+    "generated_utc": { "type": "string", "format": "date-time" },
+    "weights": {
+      "type": "object",
+      "required": ["illum_pct", "earth_vis_pct", "slope_deg", "max_dark_hours", "psr_dist_km"],
+      "additionalProperties": { "type": "number" }
+    },
+    "sites": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "lat", "lon", "elev_m", "valid", "score", "metrics", "reasons"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z0-9_]+$" },
+          "name": { "type": "string" },
+          "lat": { "type": "number", "minimum": -90, "maximum": 90 },
+          "lon": { "type": "number", "minimum": -180, "maximum": 180 },
+          "elev_m": { "type": "number" },
+          "valid": { "type": "boolean" },
+          "score": { "type": "number", "minimum": 0, "maximum": 1 },
+          "metrics": {
+            "type": "object",
+            "required": [
+              "illum_pct",
+              "earth_vis_pct",
+              "slope_deg",
+              "max_dark_hours",
+              "psr_dist_km"
+            ],
+            "properties": {
+              "illum_pct": { "type": "number", "minimum": 0, "maximum": 1 },
+              "earth_vis_pct": { "type": "number", "minimum": 0, "maximum": 1 },
+              "slope_deg": { "type": "number", "minimum": 0, "maximum": 90 },
+              "max_dark_hours": { "type": "number", "minimum": 0 },
+              "psr_dist_km": { "type": "number", "minimum": 0 }
+            }
+          },
+          "reasons": { "type": "array", "items": { "type": "string" } },
+          "source": { "type": "string" }
+        }
+      }
+    }
+  }
+}

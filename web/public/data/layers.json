@@ -1,0 +1,167 @@
+{
+  "version": 1,
+  "mock": true,
+  "projection": "+proj=stere +lat_0=-90 +lon_0=0 +k=1 +x_0=0 +y_0=0 +R=1737400 +units=m +no_defs",
+  "radius_m": 1737400,
+  "bounds_m": [
+    -304006,
+    -304006,
+    304006,
+    304006
+  ],
+  "lat_limit": -80,
+  "width_px": 512,
+  "height_px": 512,
+  "layers": [
+    {
+      "id": "elevation",
+      "label": "Elevation",
+      "kind": "continuous",
+      "units": "m",
+      "value_range": [
+        -4400,
+        3900
+      ],
+      "palette": [
+        [
+          0,
+          "#14151d"
+        ],
+        [
+          0.45,
+          "#5d6170"
+        ],
+        [
+          1,
+          "#f1efe9"
+        ]
+      ],
+      "default_visible": true,
+      "default_opacity": 1,
+      "description": "Height relative to the 1737.4 km reference sphere.",
+      "file": "layers/elevation.png",
+      "encoding": "gray8",
+      "source": "MOCK — synthetic terrain, replace with LOLA-derived product"
+    },
+    {
+      "id": "slope",
+      "label": "Slope",
+      "kind": "continuous",
+      "units": "°",
+      "value_range": [
+        0,
+        30
+      ],
+      "palette": [
+        [
+          0,
+          "#0d0887"
+        ],
+        [
+          0.5,
+          "#cc4778"
+        ],
+        [
+          1,
+          "#f0f921"
+        ]
+      ],
+      "default_visible": false,
+      "default_opacity": 0.7,
+      "description": "Terrain steepness. Landers generally need gentle slopes.",
+      "file": "layers/slope.png",
+      "encoding": "gray8",
+      "source": "MOCK — synthetic terrain, replace with LOLA-derived product"
+    },
+    {
+      "id": "illumination",
+      "label": "Sunlight",
+      "kind": "continuous",
+      "units": "% of time",
+      "value_range": [
+        0,
+        1
+      ],
+      "palette": [
+        [
+          0,
+          "#09090d"
+        ],
+        [
+          0.5,
+          "#9a5b19"
+        ],
+        [
+          1,
+          "#ffe7a3"
+        ]
+      ],
+      "default_visible": false,
+      "default_opacity": 0.75,
+      "description": "Share of the time window with the Sun above the local horizon.",
+      "file": "layers/illumination.png",
+      "encoding": "gray8",
+      "source": "MOCK — synthetic terrain, replace with LOLA-derived product"
+    },
+    {
+      "id": "psr",
+      "label": "Permanent shadow",
+      "kind": "categorical",
+      "units": "",
+      "value_range": [
+        0,
+        1
+      ],
+      "palette": [
+        [
+          0,
+          "#00000000"
+        ],
+        [
+          1,
+          "#7c6cff"
+        ]
+      ],
+      "categories": {
+        "0": "Sometimes lit",
+        "1": "Permanently shadowed"
+      },
+      "default_visible": false,
+      "default_opacity": 0.8,
+      "description": "Regions that never receive direct sunlight (cold traps, possible ice).",
+      "file": "layers/psr.png",
+      "encoding": "gray8",
+      "source": "MOCK — synthetic terrain, replace with LOLA-derived product"
+    },
+    {
+      "id": "score",
+      "label": "Site score",
+      "kind": "continuous",
+      "units": "0–1",
+      "value_range": [
+        0,
+        1
+      ],
+      "palette": [
+        [
+          0,
+          "#2a1638"
+        ],
+        [
+          0.5,
+          "#1f7a8c"
+        ],
+        [
+          1,
+          "#b8f36b"
+        ]
+      ],
+      "default_visible": false,
+      "default_opacity": 0.7,
+      "description": "Weighted combination of sunlight, Earth visibility and slope.",
+      "file": "layers/score.png",
+      "encoding": "gray8",
+      "source": "MOCK — synthetic terrain, replace with LOLA-derived product"
+    }
+  ]
+}

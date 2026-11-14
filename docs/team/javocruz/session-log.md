@@ -1,0 +1,15 @@
+# Notas de sesión — javocruz (rol Javi2: web, estética, layers)
+
+## 2026-11-14 — Sesión 1: esqueleto web v0
+- Rama `javocruz/36-web-shell`. Sigue el plan técnico por persona (`plan-tecnico-por-persona.md`), no el reparto A–E de los issues (ver decisión en `docs/decisions/log.md`).
+- gstack no estaba instalado en esta máquina; se trabajó sin él (pendiente instalar).
+- Hecho:
+  - Monorepo pnpm (`web/`, `contracts/`), Node 22 fijado por `.npmrc`.
+  - `contracts/types.ts` + JSON Schemas + `pnpm mocks` (20 sitios, 30 días horarios desde 2027-01-01, 5 capas PNG). Todo mock, marcado `"mock": true` y con badge "Mock data" en la UI.
+  - `web/src/core`: store zustand (4 campos del contrato + opacidad de capas), carga de datos con caché de timeseries, router con lazy-load, sincronización URL ↔ `mode`, helpers (sampleAt, tiempo hasta Sunset/Earthset, proyección polar, coloreado de PNG).
+  - Shell: barra superior + navegación móvil, landing, About/créditos/declaración IA (sin branding NASA), barra temporal compartida con play y ventanas de Sol/Tierra del sitio.
+  - Capas: panel (mostrar, opacidad, orden, leyenda, info), leyenda flotante, mapa polar 2D con pins y retícula.
+  - Placeholders para Marta (`globe/`, con lista y ficha de sitio de arranque), Pablo (`streetview/`) y Cristóbal (`game/`).
+  - Tests (vitest): store, helpers de timeseries y validación de `public/data` contra el contrato. CI en `.github/workflows/web.yml`.
+- Verificado: lint, typecheck, 12 tests, build, y en navegador (escritorio y móvil 375 px): seleccionar sitio → ficha → "Street View" navega a `/streetview/<id>`, play avanza el tiempo, capas se apilan, deep links funcionan.
+- Siguiente (v1): design system con shadcn/ui, onboarding, deploy público (Vercel con raíz `web/`), y acordar con el equipo qué plan manda.

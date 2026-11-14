@@ -38,3 +38,12 @@ CLAUDE.md / AGENTS.md   instrucciones para IAs
 docs/                   base de conocimiento (Markdown)
 scripts/                check-gstack.sh, sync-docs.sh
 ```
+
+## 🛠️ App web (`web/`) — arrancar en local
+```bash
+pnpm install   # pnpm descarga Node 22 solo para este repo (.npmrc)
+pnpm dev       # http://localhost:5173
+pnpm test      # tests + validación de web/public/data contra contracts/
+```
+Contratos de datos: [`contracts/`](contracts/README.md) · quién toca qué carpeta y cómo usar el store: [`web/README.md`](web/README.md).
+Mientras no haya datos reales, `pnpm mocks` regenera datos inventados (la UI muestra "Mock data").

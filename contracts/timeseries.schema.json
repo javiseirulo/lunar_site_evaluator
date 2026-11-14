@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "timeseries.schema.json",
+  "title": "timeseries/<site_id>.json — Sun/Earth sky positions (see types.ts Timeseries). All arrays have the same length.",
+  "type": "object",
+  "required": [
+    "version",
+    "mock",
+    "site_id",
+    "step_s",
+    "t_utc",
+    "sun_az",
+    "sun_el",
+    "earth_az",
+    "earth_el",
+    "lit"
+  ],
+  "properties": {
+    "version": { "const": 1 },
+    "mock": { "type": "boolean" },
+    "site_id": { "type": "string" },
+    "step_s": { "type": "integer", "minimum": 1 },
+    "t_utc": { "type": "array", "items": { "type": "string", "format": "date-time" } },
+    "sun_az": {
+      "type": "array",
+      "items": { "type": "number", "minimum": 0, "exclusiveMaximum": 360 }
+    },
+    "sun_el": { "type": "array", "items": { "type": "number", "minimum": -90, "maximum": 90 } },
+    "earth_az": {
+      "type": "array",
+      "items": { "type": "number", "minimum": 0, "exclusiveMaximum": 360 }
+    },
+    "earth_el": { "type": "array", "items": { "type": "number", "minimum": -90, "maximum": 90 } },
+    "lit": { "type": "array", "items": { "enum": [0, 1] } },
+    "earth_visible": { "type": "array", "items": { "enum": [0, 1] } }
+  }
+}
