@@ -46,3 +46,45 @@ Sin multijugador. Esta descripción sustituye a la lista anterior de mecánicas 
 - Siguiente paso: describir entera cómo se imagina una partida antes de redactar los módulos.
 - Issues: #49 actualizado al plan vigente (`web/src/game/`, base `dev`) y asignado a Manuel. #48 (catálogo curado) es de Javi.
   #50 (entrega) queda sin dueño por ahora.
+## Cómo es una partida (2026-11-14, 3ª ronda) — descrita por @Manuelcgg165
+> Origen humano: lo que sigue es la descripción de Manuel, ordenada por la IA sin añadir mecánicas. Lo marcado ⚠️ son
+> avisos de la IA (reglas del concurso, dependencias, datos que faltan), no decisiones.
+
+1. **Pantalla de entrada al módulo:** eliges entre **modo misión polo sur** y **modo misiones históricas**. Hay un selector de
+   **dificultad** con dos niveles, *normal* (por defecto) y *expert*.
+2. **Introducción (cinemática de diálogo):** estilo Pokémon / Profesor Layton: aparece un científico, el texto se escribe letra a
+   letra con cursor parpadeando. Explica que la misión va al polo sur y por qué interesa (agua congelada). Un punto de fantasía y
+   estética *classic gaming*, respetando la estética general del proyecto.
+   - En **misiones históricas** (no tienen por qué ser del polo sur): información real de astronautas y diálogos con humor
+     al inicio, para dar contexto histórico de forma entretenida.
+3. **Emergencia:** cada partida empieza con una emergencia ficticia al azar (unas 4-5: fallo de propulsión, tormenta solar...).
+   Saltan alarmas rojas llamativas y arranca una **cuenta atrás** (unos 3 minutos, por ejemplo).
+4. **Elección de sitio con cartas:** aparecen una tras otra hasta 4 cartas ("Landing site 1, 2..."), boca abajo con el logo de la
+   página; cuando están las cuatro se destapan en secuencia. Cada carta lleva imágenes genéricas de cómo podría verse un sitio
+   lunar (generadas por IA) y **barras de calidad 0-100** por parámetro (0 = rojo oscuro, 100 = verde claro).
+   - *Normal*: parámetros "simples" o resumidos. *Expert*: los parámetros del modo avanzado de Explore, para que decidir cueste más.
+   - Qué parámetros se muestran depende de cómo los definan Javi y Marta; la puntuación usa los pesos del algoritmo de Javi.
+5. **Al elegir:** la carta elegida sube, las demás desaparecen y empieza la simulación: la nave va desde su posición de espera
+   hasta el sitio, sobre la esfera 3D de la Luna, con una cinemática simpática del alunizaje.
+6. **Timelapse:** el tiempo avanza y **se detiene justo cuando pierdes**; si no pierdes, sigue hasta el final y te anuncia la
+   victoria de forma espectacular.
+7. **Veredicto:** explica brevemente por qué has perdido, enseña algo didáctico sobre el parámetro que más ha pesado y te anima
+   a reintentar.
+- **Formas de perder:** demasiado frío, demasiado calor, ángulo de visión insuficiente (capa de elevación mínima, de Javi).
+  Manuel delega en la IA proponer más criterios según lo que añada Javi; se presentarán como propuesta para que él decida.
+- **Modo histórico:** además de esas reglas, dice si elegiste el mismo sitio que la misión real (umbral de cercanía amplio).
+- **Referencia estética aportada por Manuel:** ilustración synthwave (cielo negro estrellado, rejilla magenta en perspectiva,
+  neones morado/naranja). Solo como inspiración de ambiente; no se copia ni se incluye en el repo (es arte de terceros).
+
+### ⚠️ Avisos de la IA sobre esta descripción (para decidir)
+- **Alcance del equipo:** el issue #51 deja fuera del MVP "cinemática de cámara" y "capa de misiones históricas", y la prioridad
+  acordada es 1º Explore, 2º Mission. Entrega: domingo 15 nov 23:59.
+- **Estética:** la decisión vigente de @javocruz es "portal científico de los 2000" (azul marino, Verdana, esquinas rectas,
+  acento naranja), no synthwave. Si Mission lleva otra piel hay que acordarlo con él.
+- **Temperatura:** el contrato de datos no tiene temperatura (`illum_pct`, `earth_vis_pct`, `slope_deg`, `max_dark_hours`,
+  `psr_dist_km` + series `sun_el`, `earth_el`, `lit`, `earth_visible`). Hace falta una fuente (p. ej. LRO Diviner, por verificar)
+  o derivar la regla de las horas de luz/oscuridad.
+- **Misiones históricas:** las series temporales solo cubren el polo sur; sitios como los Apollo necesitarían datos de Javi.
+- **Imágenes generadas por IA:** marca de agua visible obligatoria y etiqueta de "ilustrativa"; sin logos, insignias ni
+  identificadores de misión. Citas de astronautas reales: solo con fuente; el humor inventado no se pone en boca de personas reales.
+- **Simulación en la esfera 3D:** depende del globo de Marta (hoy placeholder); el mapa polar 2D ya existe como respaldo.
