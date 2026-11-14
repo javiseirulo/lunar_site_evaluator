@@ -12,7 +12,7 @@ import { create } from 'zustand';
 import type { Difficulty } from '../engine/bars';
 import type { Hand } from '../engine/deal';
 import { mulberry32 } from '../engine/random';
-import emergencies from '../data/emergencies.json';
+import emergencies from '../content/emergencies.json';
 
 export type Phase =
   | 'menu'

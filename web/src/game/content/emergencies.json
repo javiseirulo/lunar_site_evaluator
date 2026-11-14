@@ -1,0 +1,37 @@
+[
+  {
+    "id": "propulsion",
+    "title": "Main Engine Failure",
+    "alarm": "MAIN ENGINE OFFLINE - DIVERT NOW",
+    "briefing": "The main descent engine has lost thrust and we cannot reach the planned landing site. Pick a new site we can still reach, fast.",
+    "catastrophe": "The clock hits zero with no new target. The lander tumbles past every safe site and ends its mission in a silent, unplanned crater."
+  },
+  {
+    "id": "solar_storm",
+    "title": "Solar Storm Warning",
+    "alarm": "SOLAR STORM INBOUND - DIVERT NOW",
+    "briefing": "A burst of charged particles is heading our way and our current approach is no longer safe. We must divert to a new landing site right now.",
+    "catastrophe": "The storm arrives while the crew is still deciding. Electronics fry, screens go dark, and the lander drifts away with no one at the controls."
+  },
+  {
+    "id": "guidance",
+    "title": "Guidance Computer Reboot",
+    "alarm": "GUIDANCE COMPUTER REBOOTING - DIVERT NOW",
+    "briefing": "The guidance computer has crashed and our planned site is off the table. We need a fresh landing site before it comes back online.",
+    "catastrophe": "The computer reboots just in time to find no target. It chooses by itself, and the lander touches down on a boulder field."
+  },
+  {
+    "id": "fuel_leak",
+    "title": "Fuel Leak",
+    "alarm": "FUEL LEAK DETECTED - DIVERT NOW",
+    "briefing": "A propellant line is leaking and we cannot fly to the original site. Choose a new landing site while we still have fuel to get there.",
+    "catastrophe": "The tanks run dry before a site is chosen. The lander falls the last stretch without thrust and crumples into the regolith."
+  },
+  {
+    "id": "comms_glitch",
+    "title": "Comms Glitch",
+    "alarm": "COMMS LINK LOST - DIVERT NOW",
+    "briefing": "We have lost the link with mission control and the original site can no longer be confirmed. Pick a new landing site on your own, now.",
+    "catastrophe": "No decision comes in and the silence stretches on. The lander lands blind, far from any help, and its mission ends in radio silence."
+  }
+]
