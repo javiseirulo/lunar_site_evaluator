@@ -1,5 +1,8 @@
 # lunar_site_evaluator
 
+Entrega de Pablo: [archivos por compañero y ejecución del Street View](docs/team/pabloizgui/team-handoff.md)
+· [pendientes y dependencias](docs/team/pabloizgui/tasks.md).
+
 NASA Space Apps Challenge 2026 — reto **Lunar Landing Site Navigator**.
 Herramienta para comparar sitios de aterrizaje lunares y fechas (Sol/Tierra sobre el horizonte → energía y comunicaciones).
 

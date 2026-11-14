@@ -4,6 +4,8 @@
 Contrato **propuesto**, pendiente de revisión por Marta/Javi2 antes de integrar
 en `dev`. No modifica el globo, loaders, store ni catálogo principal de mocks.
 Seguimiento completo: [tasks.md](tasks.md).
+La entrega actual se reúne con el visor en `pabloizgui/46-lunar-streetview`.
+Ver [índice para todo el equipo](team-handoff.md); #37 queda como rama histórica.
 
 ## Archivos y destinatarios
 

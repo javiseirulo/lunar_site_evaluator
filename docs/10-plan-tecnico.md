@@ -28,7 +28,7 @@
 | Globo 3D + filtros (Marta) | ⏳ hueco listo | `web/src/globe/` (placeholder + lista/ficha de sitio de arranque) |
 | Street View (Pablo) | v0 integrado con la entrega de terreno en rama #46; observador inicial 5 m; giro completo pendiente | `web/src/streetview/` y `web/public/data/terrain/`; revisiones/CI pendientes antes de integrar en dev |
 | Mission / juego (Cristóbal) | ⏳ diseño descrito (#52), hueco listo | `web/src/game/` (placeholder) |
-| Pipeline Python (Javi, Pablo) | Entrega polar real generada en rama #37; revisión/integración pendientes | `python/terrain/`, `web/public/data/terrain/`: heightmap 1025², máscara, elevación/pendiente y tabla de 20 sitios; horizonte/efemérides aún pendientes |
+| Pipeline Python (Javi, Pablo) | Entrega polar real reunida con el visor en rama #46; revisión/integración pendientes | `python/terrain/`, `web/public/data/terrain/`: heightmap 1025², máscara, elevación/pendiente y tabla de 20 sitios; horizonte/efemérides aún pendientes |
 | Deploy público | ⏳ pendiente | `web/vercel.json` listo; proyecto Vercel con raíz `web/` |
 
 ### Cómo arrancar (cualquiera)
@@ -370,6 +370,13 @@ Los umbrales son propuestas razonables, a ajustar con referencias.
   - Resultado anotado en el PR.
 
 ### Pablo: topografía y Lunar Street View
+
+**Entrega actual para revisión:** rama unificada `pabloizgui/46-lunar-streetview`,
+con el terreno de #37, el visor y `dev` en `e6825cd` (incluye Design/Mission).
+Rutas exactas por destinatario, ejecución con token de la cuenta de Pablo y
+dependencias: [team-handoff.md](team/pabloizgui/team-handoff.md).
+Los perfiles numéricos de horizonte y vectores reales siguen pendientes;
+la siguiente tarea visual es corregir el giro 360° y mejorar legibilidad/controles.
 
 **Objetivo y alcance.** Construir una vista sintética desde la superficie lunar,
 orientable 360°, con topografía, coordenadas, altura del observador y azimut/elevación

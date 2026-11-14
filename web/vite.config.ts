@@ -6,6 +6,7 @@ import tailwindcss from '@tailwindcss/vite';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
 
 export default defineConfig({
+  server: { host: '127.0.0.1', port: 5173, strictPort: true },
   plugins: [
     react(),
     tailwindcss(),

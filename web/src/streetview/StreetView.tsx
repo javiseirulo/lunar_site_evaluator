@@ -17,6 +17,7 @@ export function StreetView() {
   const [draftToken, setDraftToken] = useState('');
   const [configure, setConfigure] = useState(false);
   const [accessRevision, setAccessRevision] = useState(0);
+  const instanceId = `${site?.id ?? ''}:${accessRevision}`;
   const observer = useMemo(() => (site ? { lat: site.lat, lon: site.lon } : null), [site]);
   const sample = useMemo(
     () => (site ? sampleSiteSky(series, site.id, time) : null),
@@ -103,12 +104,7 @@ export function StreetView() {
               </p>
             }
           >
-            <LunarViewport
-              key={`${site.id}:${accessRevision}`}
-              observer={observer}
-              token={token}
-              sample={sample}
-            />
+            <LunarViewport key={instanceId} observer={observer} token={token} sample={sample} />
           </Suspense>
         )}
       </div>

@@ -1,5 +1,8 @@
 # PR draft: Deliver polar terrain and align production with Javi J0
 
+> Borrador histórico de la entrega separada. La descripción actual de la rama
+> unificada está en [team-push-pr.md](team-push-pr.md).
+
 Base: `dev`. Head: `pabloizgui/37-terrain-handoff`.
 Closes #37. Refs #38, #48, #64.
 

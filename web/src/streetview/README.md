@@ -6,6 +6,14 @@ It never writes the shared clock or changes the catalog/data contract.
 
 ## Configure access locally
 
+For the team, use Pablo's read-only Moon application token in `web/.env.local`
+(`VITE_CESIUM_ION_TOKEN`). Copy `web/.env.example` only if the local file does
+not already exist, then request the token from Pablo through the team's private
+channel. No individual Cesium account is needed. Vite uses port 5173 strictly.
+The value is embedded in the browser build, so only public `assets:read`
+permissions belong here. The actual token is not committed.
+See [team handoff and dependencies](../../../docs/team/pabloizgui/team-handoff.md).
+
 Open `/streetview/shackleton_rim_01` through `pnpm dev`. In development, enter a
 public application token in the access panel. It is retained only while this view
 is mounted, never written to storage or logged. Alternatively set
