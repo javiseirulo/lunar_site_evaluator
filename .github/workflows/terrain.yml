@@ -1,0 +1,35 @@
+name: terrain
+
+on:
+  pull_request:
+    paths:
+      - 'python/terrain/**'
+      - 'scripts/terrain_data.py'
+      - 'scripts/check-terrain-delivery.mjs'
+      - 'config/terrain-sources.json'
+      - 'requirements-terrain.txt'
+      - 'contracts/heightmap.schema.json'
+      - 'contracts/types.ts'
+      - 'web/public/data/terrain/**'
+      - 'tests/test_terrain*.py'
+      - '.github/workflows/terrain.yml'
+      - '.gitattributes'
+  push:
+    branches: [dev, main]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: pip
+          cache-dependency-path: requirements-terrain.txt
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: python -m pip install -r requirements-terrain.txt
+      - run: python -m unittest discover -s tests -v
+      - run: node scripts/check-terrain-delivery.mjs
