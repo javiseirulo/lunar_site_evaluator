@@ -1,8 +1,8 @@
 /**
  * STARTER — owner: Marta (src/globe). A minimal ranked list + detail card so the other modes
  * can be tested end to end. Marta replaces/extends it with filters and weight sliders.
+ * Styling follows the portal design system in src/index.css (.box, .box-head, .btn, .lnk).
  */
-import { ArrowRight, Check, X } from 'lucide-react';
 import type { Site } from '@lunar/contracts';
 import { cn } from '@/lib/utils';
 import {
@@ -24,41 +24,66 @@ export function SiteList({ className }: { className?: string }) {
   const ranked = [...sites].sort((a, b) => Number(b.valid) - Number(a.valid) || b.score - a.score);
 
   return (
-    <section
-      className={cn('panel flex min-h-0 flex-col overflow-hidden', className)}
-      aria-labelledby="sites-heading"
-    >
-      <div className="flex items-baseline gap-2 px-4 pt-3 pb-2">
-        <h2 id="sites-heading" className="text-sm font-medium">
-          Candidate sites
-        </h2>
-        <span className="text-ink-faint font-mono text-[11px]">
-          {sites.filter((s) => s.valid).length} pass
+    <section className={cn('box flex min-h-0 flex-col', className)} aria-labelledby="sites-heading">
+      <div className="box-head">
+        <h2 id="sites-heading">Candidate Sites</h2>
+        <span className="ml-auto font-sans font-normal tracking-normal normal-case">
+          {sites.filter((s) => s.valid).length} of {sites.length} pass
         </span>
       </div>
-      <ol className="min-h-0 flex-1 overflow-y-auto px-2 pb-2">
-        {ranked.map((s, i) => (
-          <li key={s.id}>
-            <button
-              type="button"
-              onClick={() => selectSite(s.id)}
-              className={cn(
-                'flex w-full items-center gap-3 rounded-lg px-2 py-1.5 text-left transition-colors',
-                s.id === selectedSiteId ? 'bg-space-700' : 'hover:bg-space-800',
-                !s.valid && 'opacity-50',
-              )}
-            >
-              <span className="num text-ink-faint w-4 text-right text-[11px]">{i + 1}</span>
-              <span
-                className="size-2 shrink-0 rounded-full"
-                style={{ background: scoreColor(s.score) }}
-              />
-              <span className="min-w-0 flex-1 truncate text-sm">{s.name}</span>
-              <span className="num text-ink-muted text-xs">{Math.round(s.score * 100)}</span>
-            </button>
-          </li>
-        ))}
-      </ol>
+      <div className="min-h-0 flex-1 overflow-y-auto">
+        <table className="w-full border-collapse text-[11px]">
+          <thead className="bg-navy-800 sticky top-0">
+            <tr className="text-ink-faint text-left">
+              <th className="label w-6 px-1.5 py-1 text-right">#</th>
+              <th className="label px-1.5 py-1">Site</th>
+              <th className="label px-1.5 py-1 text-right">Score</th>
+            </tr>
+          </thead>
+          <tbody>
+            {ranked.map((s, i) => {
+              const selected = s.id === selectedSiteId;
+              return (
+                <tr
+                  key={s.id}
+                  className={cn(
+                    'border-edge cursor-pointer border-t border-dotted',
+                    selected ? 'bg-navy-600 text-white' : i % 2 ? 'bg-navy-850' : '',
+                    !s.valid && !selected && 'text-ink-faint',
+                  )}
+                  onClick={() => selectSite(s.id)}
+                >
+                  <td className="num px-1.5 py-[3px] text-right">{i + 1}</td>
+                  <td className="px-1.5 py-[3px]">
+                    <button
+                      type="button"
+                      className={cn(
+                        'text-left',
+                        selected ? 'font-bold' : 'lnk no-underline hover:underline',
+                      )}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        selectSite(s.id);
+                      }}
+                    >
+                      {s.name}
+                    </button>
+                  </td>
+                  <td className="px-1.5 py-[3px] text-right">
+                    <span className="num inline-flex items-center gap-1">
+                      <span
+                        className="inline-block size-[7px] rotate-45 border border-black"
+                        style={{ background: scoreColor(s.score) }}
+                      />
+                      {Math.round(s.score * 100)}
+                    </span>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
     </section>
   );
 }
@@ -68,49 +93,50 @@ export function SiteDetail({ className }: { className?: string }) {
   const setMode = useAppStore((s) => s.setMode);
   if (!site) {
     return (
-      <div className={cn('panel text-ink-muted px-4 py-3 text-sm', className)}>
-        Pick a site on the map or in the list.
-      </div>
+      <section className={cn('box', className)}>
+        <div className="box-head">Site Data</div>
+        <p className="box-body text-ink-muted">
+          Select a site on the map, in the list, or with <b>Find a site</b> at the top of the page.
+        </p>
+      </section>
     );
   }
   return (
-    <section className={cn('panel px-4 py-3', className)} aria-label={`${site.name} details`}>
-      <div className="flex items-start gap-3">
-        <div className="min-w-0 flex-1">
-          <h2 className="truncate font-medium">{site.name}</h2>
-          <p className="text-ink-faint num text-[11px]">
-            {formatLatLon(site.lat, site.lon)} · {site.elev_m.toLocaleString('en')} m
-          </p>
-        </div>
-        <span
-          className="num text-space-950 rounded-md px-1.5 py-0.5 text-sm font-semibold"
-          style={{ background: scoreColor(site.score) }}
-        >
-          {Math.round(site.score * 100)}
-        </span>
-      </div>
-      <Metrics site={site} />
-      <ul className="mt-3 flex flex-wrap gap-1.5">
-        {site.reasons.map((r) => (
-          <li
-            key={r}
-            className={cn(
-              'flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[11px]',
-              reasonIsGood(r) ? 'bg-good/10 text-good' : 'bg-bad/10 text-bad',
-            )}
+    <section className={cn('box', className)} aria-label={`${site.name} details`}>
+      <div className="box-head">Site Data</div>
+      <div className="box-body">
+        <div className="flex items-start gap-2">
+          <div className="min-w-0 flex-1">
+            <h2 className="text-[15px] leading-tight font-bold text-white">{site.name}</h2>
+            <p className="text-ink-faint num mt-0.5 text-[10px]">
+              {formatLatLon(site.lat, site.lon)} · {site.elev_m.toLocaleString('en')} m
+            </p>
+          </div>
+          <div
+            className="num border border-black px-1.5 py-0.5 text-center text-black"
+            style={{ background: scoreColor(site.score) }}
+            title="Score with the default weights (0–100)"
           >
-            {reasonIsGood(r) ? <Check className="size-3" /> : <X className="size-3" />}
-            {reasonText(r)}
-          </li>
-        ))}
-      </ul>
-      <button
-        type="button"
-        onClick={() => setMode('streetview')}
-        className="bg-ink text-space-950 hover:bg-accent mt-3 flex w-full items-center justify-center gap-2 rounded-lg py-2 text-sm font-medium transition-colors"
-      >
-        Stand here in Street View <ArrowRight className="size-4" />
-      </button>
+            <div className="text-[9px] font-bold uppercase">Score</div>
+            <div className="text-[16px] leading-none font-bold">{Math.round(site.score * 100)}</div>
+          </div>
+        </div>
+        <Metrics site={site} />
+        <ul className="mt-2 space-y-0.5 text-[11px]">
+          {site.reasons.map((r) => (
+            <li key={r} className={reasonIsGood(r) ? 'text-good' : 'text-bad'}>
+              {reasonIsGood(r) ? '✔' : '✖'} {reasonText(r)}
+            </li>
+          ))}
+        </ul>
+        <button
+          type="button"
+          onClick={() => setMode('streetview')}
+          className="btn btn-go mt-2.5 w-full"
+        >
+          Stand here in Street View ›
+        </button>
+      </div>
     </section>
   );
 }
@@ -125,13 +151,17 @@ function Metrics({ site }: { site: Site }) {
     { label: 'To shadowed crater', value: `${m.psr_dist_km} km`, tone: 'text-psr' },
   ];
   return (
-    <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-1.5">
-      {rows.map((r) => (
-        <div key={r.label} className="flex items-baseline justify-between gap-2">
-          <dt className="text-ink-muted text-xs">{r.label}</dt>
-          <dd className={cn('num text-sm', r.tone)}>{r.value}</dd>
-        </div>
-      ))}
-    </dl>
+    <table className="border-edge mt-2 w-full border text-[11px]">
+      <tbody>
+        {rows.map((r, i) => (
+          <tr key={r.label} className={i % 2 ? 'bg-navy-850' : 'bg-navy-950'}>
+            <th className="text-ink-muted px-1.5 py-[3px] text-left font-normal">{r.label}</th>
+            <td className={cn('num px-1.5 py-[3px] text-right font-bold', r.tone || 'text-ink')}>
+              {r.value}
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
   );
 }

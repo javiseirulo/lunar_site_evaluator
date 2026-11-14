@@ -1,8 +1,8 @@
-import { Link } from 'react-router';
-import { motion } from 'motion/react';
-import { ArrowRight, Compass, Mountain, Rocket } from 'lucide-react';
-import type { AppMode } from '@lunar/contracts';
-import { MODES, formatUtc, pathForMode, useData } from '@/core';
+import { Link, useNavigate } from 'react-router';
+import { Compass, Mountain, Rocket } from 'lucide-react';
+import type { AppMode, Site } from '@lunar/contracts';
+import { MODES, pathForMode, pct, useAppStore, useData } from '@/core';
+import { PolarMap, scoreColor } from '@/layers';
 
 const ICONS: Record<AppMode, typeof Compass> = {
   explore: Compass,
@@ -10,126 +10,202 @@ const ICONS: Record<AppMode, typeof Compass> = {
   game: Rocket,
 };
 
-const rise = {
-  hidden: { opacity: 0, y: 12 },
-  show: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: { delay: 0.08 * i, duration: 0.5, ease: [0.2, 0.7, 0.2, 1] as const },
-  }),
-};
-
+/** Front page laid out like a 2000s portal: feature story, quick facts, mode tiles, bulletins. */
 export function LandingPage() {
   const sites = useData((s) => s.sites);
   const manifest = useData((s) => s.manifest);
+  const ranked = sites ? [...sites].filter((s) => s.valid).sort((a, b) => b.score - a.score) : [];
+  const top = ranked[0];
 
   return (
-    <div className="relative flex-1 overflow-y-auto">
-      {/* Horizon glow: a low Sun grazing the limb, which is what the south pole looks like. */}
-      <div
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-[60%]"
-        style={{
-          background:
-            'radial-gradient(120% 80% at 70% 105%, rgb(245 183 74 / 0.16), transparent 55%), radial-gradient(90% 60% at 20% 110%, rgb(90 174 255 / 0.10), transparent 60%)',
-        }}
-        aria-hidden
-      />
-      <div className="relative mx-auto flex max-w-5xl flex-col gap-14 px-5 pt-16 pb-24 md:pt-24">
-        <section className="max-w-2xl">
-          <motion.p
-            className="eyebrow mb-4"
-            variants={rise}
-            initial="hidden"
-            animate="show"
-            custom={0}
-          >
-            Lunar south pole · landing site planner
-          </motion.p>
-          <motion.h1
-            className="text-4xl leading-[1.05] font-semibold tracking-tight text-balance md:text-6xl"
-            variants={rise}
-            initial="hidden"
-            animate="show"
-            custom={1}
-          >
-            Where the Sun never quite sets,{' '}
-            <span className="text-ink-muted">and Earth stays in view.</span>
-          </motion.h1>
-          <motion.p
-            className="text-ink-muted mt-5 max-w-xl text-lg leading-relaxed"
-            variants={rise}
-            initial="hidden"
-            animate="show"
-            custom={2}
-          >
-            Compare landing sites and dates by how much sunlight they get for power and how often
-            Earth is above the horizon for direct communications.
-          </motion.p>
-          <motion.div
-            className="mt-8 flex flex-wrap items-center gap-3"
-            variants={rise}
-            initial="hidden"
-            animate="show"
-            custom={3}
-          >
-            <Link
-              to="/explore"
-              className="bg-ink text-space-950 hover:bg-accent flex items-center gap-2 rounded-xl px-5 py-3 font-medium transition-colors"
-            >
-              Start exploring <ArrowRight className="size-4" />
-            </Link>
-            <Link to="/about" className="text-ink-muted hover:text-ink px-3 py-3 text-sm">
-              Data and method
-            </Link>
-          </motion.div>
-          {sites && manifest && (
-            <motion.dl
-              className="text-ink-muted mt-10 flex flex-wrap gap-x-8 gap-y-3 text-sm"
-              variants={rise}
-              initial="hidden"
-              animate="show"
-              custom={4}
-            >
-              <div>
-                <dt className="eyebrow">Candidate sites</dt>
-                <dd className="num text-ink mt-1 text-2xl">{sites.length}</dd>
-              </div>
-              <div>
-                <dt className="eyebrow">Time window</dt>
-                <dd className="num text-ink mt-1 text-2xl">
-                  {formatUtc(manifest.time_range.start_utc).slice(0, 10)} →{' '}
-                  {formatUtc(manifest.time_range.end_utc).slice(0, 10)}
-                </dd>
-              </div>
-            </motion.dl>
-          )}
+    <div className="flex flex-col gap-2">
+      <div className="grid gap-2 md:grid-cols-[minmax(0,1fr)_280px]">
+        <section className="box">
+          <div className="box-head">Welcome</div>
+          <div className="box-body">
+            <h1 className="text-[20px] leading-tight font-bold text-white">
+              Where should the next lander touch down?
+            </h1>
+            <p className="text-ink-muted mt-1.5 max-w-[60ch]">
+              Compare candidate landing sites near the lunar south pole by how much{' '}
+              <b className="text-sun">sunlight</b> they get for power and how often{' '}
+              <b className="text-earth">Earth</b> is above the horizon for direct communications,
+              and see how both change from one day to the next.
+            </p>
+            {top && <FeaturedSite site={top} />}
+          </div>
         </section>
 
-        <section aria-label="Modes" className="grid gap-3 md:grid-cols-3">
-          {MODES.map((m, i) => {
-            const Icon = ICONS[m.id];
-            return (
-              <motion.div key={m.id} variants={rise} initial="hidden" animate="show" custom={5 + i}>
-                <Link
-                  to={pathForMode(m.id)}
-                  className="panel hover:border-line-strong group flex h-full flex-col gap-3 p-5 transition-colors"
-                >
-                  <Icon
-                    className="text-ink-muted group-hover:text-accent size-5 transition-colors"
-                    aria-hidden
-                  />
-                  <h2 className="font-medium">{m.label}</h2>
-                  <p className="text-ink-muted text-sm leading-relaxed">{m.blurb}</p>
-                  <ArrowRight
-                    className="text-ink-faint group-hover:text-ink mt-auto size-4 transition-all group-hover:translate-x-1"
-                    aria-hidden
-                  />
-                </Link>
-              </motion.div>
-            );
-          })}
-        </section>
+        <div className="flex flex-col gap-2">
+          <section className="box">
+            <div className="box-head">Quick Facts</div>
+            <table className="w-full text-[11px]">
+              <tbody className="rows">
+                <Fact label="Candidate sites" value={sites ? String(sites.length) : '…'} />
+                <Fact
+                  label="Pass hard filters"
+                  value={sites ? String(sites.filter((s) => s.valid).length) : '…'}
+                />
+                <Fact
+                  label="Data window"
+                  value={
+                    manifest
+                      ? `${manifest.time_range.start_utc.slice(0, 10)} – ${manifest.time_range.end_utc.slice(5, 10)}`
+                      : '…'
+                  }
+                />
+                <Fact
+                  label="Time step"
+                  value={manifest ? `${manifest.time_range.step_s / 3600} h` : '…'}
+                />
+                <Fact
+                  label="Data status"
+                  value={
+                    manifest ? (manifest.mock ? 'Mock (development)' : 'Pipeline output') : '…'
+                  }
+                  warn={manifest?.mock}
+                />
+              </tbody>
+            </table>
+          </section>
+          <section className="box">
+            <div className="box-head-dark">Why the south pole?</div>
+            <p className="box-body text-ink-muted text-[11px]">
+              Near the pole the Sun skims the horizon, so a few hundred metres of height or a few
+              days of date can decide whether a lander has power — and whether it can see Earth to
+              call home.{' '}
+              <Link to="/about" className="lnk more">
+                Data &amp; method
+              </Link>
+            </p>
+          </section>
+        </div>
+      </div>
+
+      <section aria-label="Modes" className="grid gap-2 sm:grid-cols-3">
+        {MODES.map((m) => {
+          const Icon = ICONS[m.id];
+          return (
+            <Link
+              key={m.id}
+              to={pathForMode(m.id)}
+              className="box group flex gap-2.5 p-2.5 hover:border-edge-hi"
+            >
+              <span
+                className="flex size-12 shrink-0 items-center justify-center border border-black"
+                style={{
+                  background: 'linear-gradient(#5b8fd8 0%, #3567b4 48%, #24529a 52%, #1d4583 100%)',
+                  boxShadow: 'inset 1px 1px 0 #ffffff40',
+                }}
+              >
+                <Icon className="size-6 text-white" aria-hidden />
+              </span>
+              <span>
+                <span className="font-head block text-[13px] font-bold tracking-[0.04em] text-white uppercase group-hover:text-link-hover">
+                  {m.label}
+                </span>
+                <span className="text-ink-muted mt-0.5 block text-[11px]">{m.blurb}</span>
+                <span className="lnk more mt-1 block text-[11px]">Open {m.label}</span>
+              </span>
+            </Link>
+          );
+        })}
+      </section>
+
+      {ranked.length > 0 && (
+        <Bulletins sites={ranked.slice(0, 6)} start={manifest?.time_range.start_utc} />
+      )}
+    </div>
+  );
+}
+
+function Fact({ label, value, warn }: { label: string; value: string; warn?: boolean }) {
+  return (
+    <tr>
+      <th className="text-ink-muted px-2.5 py-1 text-left font-normal">{label}</th>
+      <td className={`num px-2.5 py-1 text-right font-bold ${warn ? 'text-warn' : 'text-ink'}`}>
+        {value}
+      </td>
+    </tr>
+  );
+}
+
+function useOpenSite() {
+  const selectSite = useAppStore((s) => s.selectSite);
+  const navigate = useNavigate();
+  return (id: string) => {
+    selectSite(id);
+    navigate('/explore');
+  };
+}
+
+function FeaturedSite({ site }: { site: Site }) {
+  const openSite = useOpenSite();
+  return (
+    <div className="border-edge bg-navy-950 mt-3 flex flex-col gap-3 border p-2 sm:flex-row">
+      <div
+        className="pointer-events-none aspect-square w-full shrink-0 bg-black sm:w-[170px]"
+        aria-hidden
+      >
+        <PolarMap className="size-full" />
+      </div>
+      <div className="min-w-0">
+        <p className="label text-accent">Featured site · top score</p>
+        <h2 className="mt-0.5 text-[16px] font-bold text-white">{site.name}</h2>
+        <p className="text-ink-muted mt-1 text-[11px]">
+          With the default weights, {site.name} ranks first among the sites that pass every hard
+          filter: sunlit <b className="text-sun">{pct(site.metrics.illum_pct)}</b> of the time,
+          Earth in view <b className="text-earth">{pct(site.metrics.earth_vis_pct)}</b>, a{' '}
+          {site.metrics.slope_deg.toFixed(1)}° slope and a longest night of{' '}
+          {site.metrics.max_dark_hours} h.
+        </p>
+        <p className="mt-2 flex items-center gap-2">
+          <span
+            className="num border border-black px-1.5 text-[11px] font-bold text-black"
+            style={{ background: scoreColor(site.score) }}
+          >
+            Score {Math.round(site.score * 100)}
+          </span>
+          <button type="button" className="lnk more text-[11px]" onClick={() => openSite(site.id)}>
+            Explore this site
+          </button>
+        </p>
       </div>
     </div>
+  );
+}
+
+function Bulletins({ sites, start }: { sites: Site[]; start?: string }) {
+  const openSite = useOpenSite();
+  const stamp = start ? `${start.slice(5, 7)}.${start.slice(8, 10)}.${start.slice(2, 4)}` : ''; // MM.DD.YY
+  return (
+    <section className="box">
+      <div className="box-head">
+        Site Bulletins
+        <span className="ml-auto font-sans font-normal tracking-normal normal-case">
+          top {sites.length} by score
+        </span>
+      </div>
+      <ul className="rows">
+        {sites.map((s) => (
+          <li
+            key={s.id}
+            className="flex flex-wrap items-baseline gap-x-2 px-2.5 py-1.5 text-[11px]"
+          >
+            <span className="num text-accent font-bold">{stamp}</span>
+            <button type="button" className="lnk font-bold" onClick={() => openSite(s.id)}>
+              {s.name}
+            </button>
+            <span className="text-ink-muted">
+              — sunlit {pct(s.metrics.illum_pct)}, Earth in view {pct(s.metrics.earth_vis_pct)},
+              longest night {s.metrics.max_dark_hours} h, slope {s.metrics.slope_deg.toFixed(1)}°.
+            </span>
+            <button type="button" className="lnk more ml-auto" onClick={() => openSite(s.id)}>
+              Details
+            </button>
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }

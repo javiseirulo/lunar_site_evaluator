@@ -1,48 +1,57 @@
 @import 'tailwindcss';
 
 /*
- * Design tokens (owner: Javi2). Use the Tailwind classes they generate, e.g.
- * bg-space-900, text-ink-muted, border-line, text-sun, bg-earth/20, font-mono.
+ * Design system (owner: Javi2) — "2000s science portal".
+ * Inspired by the era of dense, fixed-width institutional portals (c. 2003–2008): deep navy page on a
+ * starfield, glossy blue panel title bars, uppercase tab navigation, square corners, 1px bevelled
+ * borders, small Verdana text, underlined links. Our own identity: no agency logos or insignia.
+ *
+ * Use the component classes below (.portal, .box, .box-head, .tab, .btn, .field, .lnk, .chip) and the
+ * colour tokens (bg-navy-900, text-ink-muted, border-edge, text-sun, ...). Avoid rounded corners,
+ * blur and soft drop shadows: they break the look.
  */
 @theme {
-  --font-sans: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
-  --font-mono: 'JetBrains Mono Variable', ui-monospace, SFMono-Regular, monospace;
+  --font-sans: Verdana, Tahoma, 'DejaVu Sans', Geneva, sans-serif;
+  --font-head: 'Trebuchet MS', 'Lucida Grande', Tahoma, sans-serif;
+  --font-mono: 'Lucida Console', Monaco, 'Courier New', monospace;
 
-  --color-space-950: #05060a;
-  --color-space-900: #0a0c12;
-  --color-space-850: #0e1118;
-  --color-space-800: #131722;
-  --color-space-700: #1b2030;
-  --color-space-600: #262c3f;
-  --color-line: #232838;
-  --color-line-strong: #343b52;
+  /* Page and panel blues */
+  --color-navy-950: #02050c;
+  --color-navy-900: #061022;
+  --color-navy-850: #0a1830;
+  --color-navy-800: #0e2040;
+  --color-navy-700: #15305c;
+  --color-navy-600: #1e4380;
+  --color-navy-500: #2a5aa6;
+  --color-edge: #24406e;
+  --color-edge-hi: #4c74b4;
+  --color-edge-lo: #050b18;
 
-  --color-ink: #ecebe6;
-  --color-ink-muted: #a3a6b4;
-  --color-ink-faint: #6b7084;
+  --color-ink: #e6edf7;
+  --color-ink-muted: #9fb2d0;
+  --color-ink-faint: #6a7fa3;
+  --color-link: #8cc4ff;
+  --color-link-hover: #ffd27a;
 
-  /* Semantic colours used across modules: keep Sun/Earth/PSR consistent everywhere. */
-  --color-sun: #f5b74a;
-  --color-earth: #5aaeff;
-  --color-psr: #8b7cff;
+  /* Semantic colours shared by all modules: keep Sun/Earth/PSR consistent everywhere. */
+  --color-sun: #ffb43c;
+  --color-earth: #5ab4ff;
+  --color-psr: #9a8cff;
   --color-good: #8fe39a;
-  --color-warn: #f2c55c;
+  --color-warn: #ffcc4d;
   --color-bad: #ff7a6b;
-  --color-accent: #c9f36b;
+  --color-accent: #ff9b2f;
 
-  --radius-panel: 14px;
-  --shadow-panel: 0 1px 0 0 rgb(255 255 255 / 0.04) inset, 0 12px 40px -12px rgb(0 0 0 / 0.6);
-
-  --animate-twinkle: twinkle 6s ease-in-out infinite;
-  @keyframes twinkle {
-    0%,
-    100% {
-      opacity: 0.55;
-    }
-    50% {
-      opacity: 1;
-    }
-  }
+  /* Legacy aliases so module placeholders keep working (space-*, line, ...). */
+  --color-space-950: var(--color-navy-950);
+  --color-space-900: var(--color-navy-900);
+  --color-space-850: var(--color-navy-850);
+  --color-space-800: var(--color-navy-800);
+  --color-space-700: var(--color-navy-700);
+  --color-space-600: var(--color-navy-600);
+  --color-line: var(--color-edge);
+  --color-line-strong: var(--color-edge-hi);
+  --radius-panel: 0px;
 }
 
 @layer base {
@@ -52,59 +61,164 @@
     height: 100%;
   }
   body {
-    @apply bg-space-950 text-ink font-sans antialiased;
-    font-feature-settings: 'cv11', 'ss01';
+    @apply bg-navy-950 text-ink font-sans text-[12px] leading-[1.45];
+    background-image:
+      radial-gradient(1px 1px at 12% 18%, #ffffff99 50%, transparent 51%),
+      radial-gradient(1px 1px at 72% 12%, #ffffff77 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 38% 64%, #ffffff88 50%, transparent 51%),
+      radial-gradient(1px 1px at 88% 52%, #ffffff66 50%, transparent 51%),
+      radial-gradient(1px 1px at 22% 86%, #ffffff55 50%, transparent 51%),
+      radial-gradient(1px 1px at 58% 32%, #ffffff66 50%, transparent 51%),
+      radial-gradient(ellipse 120% 60% at 50% 0%, #0d2147 0%, transparent 70%);
+    background-size:
+      380px 380px,
+      380px 380px,
+      380px 380px,
+      380px 380px,
+      380px 380px,
+      380px 380px,
+      100% 100%;
+    background-attachment: fixed;
   }
   ::selection {
-    background: rgb(201 243 107 / 0.3);
+    background: #2a5aa6;
+    color: #fff;
   }
   :focus-visible {
-    outline: 2px solid var(--color-accent);
-    outline-offset: 2px;
+    outline: 1px dotted var(--color-link-hover);
+    outline-offset: 1px;
+  }
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-head);
   }
 }
 
 @layer components {
-  .panel {
-    @apply bg-space-900/85 border-line rounded-[var(--radius-panel)] border shadow-[var(--shadow-panel)] backdrop-blur-md;
-  }
-  .eyebrow {
-    @apply text-ink-faint font-mono text-[11px] tracking-[0.14em] uppercase;
-  }
-  .num {
-    @apply font-mono tabular-nums;
+  /* Fixed-width centred column, like the portals of the time. */
+  .portal {
+    @apply mx-auto w-full max-w-[1004px];
   }
 
-  /* Range input styled once for the whole app. */
+  /* Bevelled box with a glossy title bar. */
+  .box {
+    @apply border-edge bg-navy-900 border;
+    box-shadow:
+      inset 1px 1px 0 #ffffff12,
+      inset -1px -1px 0 #00000060;
+  }
+  .box-head {
+    @apply font-head flex h-[22px] items-center gap-2 px-2 text-[11px] font-bold tracking-[0.06em] text-white uppercase;
+    background: linear-gradient(#4a7cc6 0%, #2d5ea9 48%, #1f4b90 52%, #1a3f7a 100%);
+    border-bottom: 1px solid var(--color-edge-lo);
+    text-shadow: 0 1px 0 #00000080;
+  }
+  .box-head-dark {
+    @apply font-head flex h-[22px] items-center gap-2 px-2 text-[11px] font-bold tracking-[0.06em] text-white uppercase;
+    background: linear-gradient(#3a3f4b 0%, #23272f 50%, #15181e 51%, #0c0e12 100%);
+    border-bottom: 1px solid #000;
+  }
+  .box-body {
+    @apply p-2.5;
+  }
+
+  /* Top navigation tabs. */
+  .tab {
+    @apply font-head flex h-full items-center border-r border-black/70 px-4 text-[12px] font-bold tracking-[0.08em] whitespace-nowrap text-white uppercase;
+    background: linear-gradient(#2b2f38 0%, #191c22 50%, #0b0d10 51%, #050608 100%);
+    box-shadow: inset 1px 0 0 #ffffff14;
+  }
+  .tab:hover {
+    background: linear-gradient(#3b414e 0%, #262a33 50%, #14171c 51%, #0b0d10 100%);
+  }
+  .tab[aria-current='page'],
+  .tab.active {
+    background: linear-gradient(#5b8fd8 0%, #3567b4 48%, #24529a 52%, #1d4583 100%);
+  }
+
+  /* Bevelled button. */
+  .btn {
+    @apply font-head inline-flex h-[22px] cursor-pointer items-center justify-center gap-1.5 border px-2.5 text-[11px] font-bold tracking-[0.04em] text-white uppercase;
+    border-color: #6f97d4 #0b1a33 #0b1a33 #6f97d4;
+    background: linear-gradient(#3f70bb 0%, #2a5aa3 50%, #1f4a8d 51%, #1a3e77 100%);
+  }
+  .btn:hover {
+    background: linear-gradient(#5585cf 0%, #366ab7 50%, #2a5aa3 51%, #224d8d 100%);
+  }
+  .btn:active {
+    border-color: #0b1a33 #6f97d4 #6f97d4 #0b1a33;
+  }
+  .btn:disabled {
+    @apply cursor-default opacity-40;
+  }
+  .btn-go {
+    border-color: #ffc27a #6b3500 #6b3500 #ffc27a;
+    background: linear-gradient(#ffb04d 0%, #f08a1d 50%, #d97006 51%, #b95c00 100%);
+    text-shadow: 0 1px 0 #00000060;
+  }
+  .btn-go:hover {
+    background: linear-gradient(#ffc06b 0%, #ff9b2f 50%, #e57a0c 51%, #c86500 100%);
+  }
+
+  /* Inset form field. */
+  .field {
+    @apply h-[20px] border bg-white px-1.5 text-[11px] text-black;
+    border-color: #0b1a33 #8aa9d6 #8aa9d6 #0b1a33;
+  }
+
+  .lnk {
+    @apply text-link cursor-pointer underline underline-offset-2;
+  }
+  .lnk:hover {
+    @apply text-link-hover;
+  }
+  /* "› Read more" style link. */
+  .more::before {
+    content: '› ';
+    @apply text-accent no-underline;
+  }
+
+  .chip {
+    @apply font-head inline-flex items-center gap-1 border px-1.5 py-px text-[10px] font-bold tracking-[0.05em] uppercase;
+  }
+
+  .num {
+    @apply tabular-nums;
+  }
+  .label {
+    @apply text-ink-faint text-[10px] font-bold tracking-[0.08em] uppercase;
+  }
+
+  /* Dotted rule between list items, as in old news lists. */
+  .rows > * + * {
+    border-top: 1px dotted var(--color-edge);
+  }
+
+  /* Range input: square thumb on a sunken track. */
   .range {
-    @apply h-5 w-full cursor-pointer appearance-none bg-transparent;
+    @apply h-4 w-full cursor-pointer appearance-none bg-transparent;
   }
   .range::-webkit-slider-runnable-track {
-    @apply bg-space-600 h-1 rounded-full;
+    @apply h-[5px] border;
+    border-color: #050b18 #3a5c94 #3a5c94 #050b18;
+    background: #0a1428;
   }
   .range::-moz-range-track {
-    @apply bg-space-600 h-1 rounded-full;
+    @apply h-[5px] border;
+    border-color: #050b18 #3a5c94 #3a5c94 #050b18;
+    background: #0a1428;
   }
   .range::-webkit-slider-thumb {
-    @apply bg-ink border-space-950 -mt-1.5 size-4 appearance-none rounded-full border-2;
+    @apply -mt-[5px] h-[13px] w-[9px] appearance-none border;
+    border-color: #ffffff #2a3f66 #2a3f66 #ffffff;
+    background: linear-gradient(#f2f5fa, #b8c6dc);
   }
   .range::-moz-range-thumb {
-    @apply bg-ink border-space-950 size-4 rounded-full border-2;
+    @apply h-[13px] w-[9px] rounded-none border;
+    border-color: #ffffff #2a3f66 #2a3f66 #ffffff;
+    background: linear-gradient(#f2f5fa, #b8c6dc);
   }
-}
-
-/* Faint starfield used behind the shell. Pure CSS, no images. */
-.starfield {
-  background-image:
-    radial-gradient(1px 1px at 12% 18%, #fff9 50%, transparent 51%),
-    radial-gradient(1px 1px at 72% 12%, #fff7 50%, transparent 51%),
-    radial-gradient(1.5px 1.5px at 38% 64%, #fff8 50%, transparent 51%),
-    radial-gradient(1px 1px at 88% 52%, #fff6 50%, transparent 51%),
-    radial-gradient(1px 1px at 22% 86%, #fff5 50%, transparent 51%),
-    radial-gradient(1.5px 1.5px at 58% 32%, #fff6 50%, transparent 51%),
-    radial-gradient(1px 1px at 92% 88%, #fff5 50%, transparent 51%),
-    radial-gradient(1px 1px at 5% 48%, #fff6 50%, transparent 51%);
-  background-size: 420px 420px;
 }
 
 @media (prefers-reduced-motion: reduce) {

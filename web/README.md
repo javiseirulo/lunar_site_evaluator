@@ -47,6 +47,22 @@ Useful helpers in `@/core`: `loadLayerTexture(layerDef)` (colorized canvas → `
 
 Data types live in [`../contracts/types.ts`](../contracts/types.ts). Change them only via a PR to `contracts/`.
 
+## Look and feel (design system)
+
+"2000s science portal": fixed ~1000 px centred column, navy starfield, glossy blue panel title bars, uppercase tabs,
+square corners, 1px bevelled borders, system Verdana/Trebuchet. Build panels with the classes in `src/index.css`:
+
+```tsx
+<section className="box">
+  <div className="box-head">Panel Title</div>
+  <div className="box-body">… <button className="btn">Go</button> <a className="lnk more">Read more</a></div>
+</section>
+```
+
+Also `.box-head-dark`, `.btn-go` (orange call to action), `.field` (inputs/selects), `.chip`, `.label`, `.rows` (dotted
+separators), `.range`. Colours: `text-sun`, `text-earth`, `text-psr`, `bg-navy-*`, `border-edge`, `text-ink(-muted|-faint)`.
+Avoid rounded corners, blur and soft shadows. No agency logos or insignia.
+
 ## Deploy
 
 Static build in `web/dist`. `vercel.json` rewrites client routes to `index.html` (set the Vercel project root to `web/`).
