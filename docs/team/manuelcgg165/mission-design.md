@@ -91,6 +91,46 @@ web/src/game/
 4. Modo histórico (cuando Marta tenga los sitios y sus series) y dificultad Expert afinada.
 
 ## 8. Pendiente de Manuel
-- Duración: 9 o 14 días.
-- R3: cuántas horas seguidas sin Tierra hacen perder.
+- Duración: 9 o 14 días. Se decidirá más adelante según la duración típica de este tipo de misión y cuánto complica el juego.
+- ~~R3: cuántas horas seguidas sin Tierra hacen perder.~~ → lo define Javi (ver §9).
 - Visto bueno a R1 (pendiente) como criterio añadido y a los umbrales iniciales.
+- ¿Varios ganadores en una misma mano o uno solo? (ver §9.4).
+
+## 9. Alineación con el plan de Javi (`docs/10-plan-tecnico.md` §5 Javi, PR #64, 2026-11-14 18:05)
+Javi cerró con el equipo cómo deben funcionar los escenarios de Mission. **Manda sobre §4 y §6 donde choquen.**
+
+1. **Una sola fuente de verdad para "¿es válido?"**: el veredicto usa la función de validez de `@/scoring` (`web/src/scoring/`,
+   de Javi), la misma que Explore, con `valid` + `reasons` con margen ("noche máxima 142 h > 48 h"). Mission **no** tiene
+   umbrales propios: `rules.json` desaparece y los umbrales salen de `missionConfig` (5º campo del store) + `requirements` del escenario.
+   - **Lo que añade Mission encima:** el *momento* del fallo (hora en la que se rompe cada requisito) para parar el timelapse.
+     Se calcula sobre la misma `Timeseries` y los mismos umbrales; un test comprueba que gana/pierde coincide con `@/scoring`.
+2. **Umbrales por defecto (J9 de Javi)** sustituyen a los de §4: pendiente máx. **8°**; noche más larga umbral **100 h**
+   (objetivo 24 h); comunicaciones **50 %** (objetivo 95 %); **blackout máx. 72 h** (objetivo 12 h); margen de antena **2°**;
+   `surface_days` por defecto **7** ("del orden de Artemis III, ~6,5 días") — dato útil para cerrar la duración.
+   R3 (Tierra) = `max_blackout_hours` con la Tierra por encima de horizonte + 2°. R4 (calor) no está en el plan de Javi: queda solo para el modo histórico.
+3. **Formato de escenario:** `web/src/game/scenarios/<id>.json` = `MissionConfig` + campos de juego (`title`, `briefing`, `site_ids`,
+   `surface_days`, `requirements`, `start_in_orbit`, `orbit_plane_lon_deg`, `goal: reach_valid_site`, `variant`).
+   Llegada con `computeArrival(config, site)` de `@/scoring` → fases lanzamiento/llegada/espera en órbita/aterrizaje: es justo
+   lo que necesita la cinemática "la nave va de su espera al sitio".
+   - Encaje con lo de Manuel: la **emergencia** al azar = `title`/`briefing`; las 4 cartas = `site_ids` barajados al azar.
+   - ⚠️ `variant: professional | student` de Javi ≠ los dos estilos de Manuel (polo sur / histórico) + dificultad (normal / expert).
+     Propuesta: `variant` = dificultad (student ≈ normal, professional ≈ expert) y el estilo va en un campo `style: south_pole | historical`.
+4. **Varios ganadores:** con `@/scoring` cada sitio tiene `score` además de `valid`. Propuesta: pueden ganar varios sitios
+   (es realista: hay varios aptos), y el veredicto de victoria muestra 1-3 estrellas según el score. Decide Manuel.
+5. **Barras de las cartas:** el PR #63 (abierto, de Javi2) trae `web/src/core/metrics.ts` con nombres para estudiante
+   ("Sunlight", "Earth view", "Longest dark", "Slope"…), ayuda y escala 0-1, y un interruptor global **Pro mode**.
+   Las cartas los reutilizan; *Expert* puede apoyarse en Pro mode en vez de tener un selector propio.
+
+### Dependencias y riesgo de plazos
+| Necesito | Dueño | Estado (14-nov 18:05) | Mientras tanto |
+|---|---|---|---|
+| `@/scoring` (validez + score) y `computeArrival` | Javi | plan escrito; llega "15-nov a mediodía" | adaptador en `game/` con la misma forma, sobre los mocks; se cambia la importación cuando exista |
+| `missionConfig` en el store + tipo `MissionConfig` | Javi/Javi2 (contrato v1.1) | "14-nov por la noche" | tipo local provisional con los mismos campos |
+| Métricas v1.1 (`max_blackout_hours`, `sun_el_mean_deg`, `sun_earth_pct`) | Javi | opcionales en v1.1 | se calculan en el cliente desde la `Timeseries` |
+| `metrics.ts` y Pro mode | Javi2 | PR #63 abierto y en conflicto | barras propias simples, se cambian al mergear |
+| Freeze del equipo | — | 15-nov ~18:00 | — |
+
+### Para debatir con el equipo
+- **Pendiente máxima:** hay tres valores en el repo: 8° (Javi, J9), 15° (texto de ayuda de `metrics.ts` en PR #63) y 10° (mi §4,
+  requisito de aterrizaje de Artemis/HLS). Debe haber uno solo.
+- **Nombres `variant`:** acordar con Javi cómo se llaman los dos estilos y las dos dificultades en el formato de escenario.
