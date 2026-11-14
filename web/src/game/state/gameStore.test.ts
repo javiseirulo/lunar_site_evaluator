@@ -154,6 +154,33 @@ describe('useGame phase machine', () => {
     expect(useGame.getState().difficulty).toBe('expert');
   });
 
+  it('a pending pick blocks timeUp and still reaches travel', () => {
+    const g = () => useGame.getState();
+    useGame.setState({ phase: 'choosing', hand });
+    g().pick(3);
+    expect(g().pendingSlot).toBe(3);
+    g().pick(1); // only the first pick counts
+    expect(g().pendingSlot).toBe(3);
+    g().timeUp();
+    expect(g().phase).toBe('choosing');
+    g().choose(3);
+    expect(g().phase).toBe('travel');
+    expect(g().chosenSlot).toBe(3);
+    expect(g().pendingSlot).toBeNull();
+  });
+
+  it('pick is a no-op outside choosing, and retry clears a pending pick', () => {
+    const g = () => useGame.getState();
+    g().pick(2);
+    expect(g().pendingSlot).toBeNull();
+    useGame.setState({ phase: 'timeout', hand, pendingSlot: 2 });
+    g().retry(0);
+    expect(g().phase).toBe('choosing');
+    expect(g().pendingSlot).toBeNull();
+    g().timeUp();
+    expect(g().phase).toBe('timeout');
+  });
+
   it('quit returns to menu from any phase, dropping the hand but keeping difficulty', () => {
     useGame.setState({ phase: 'choosing', hand, chosenSlot: 2, difficulty: 'expert' });
     useGame.getState().quit();

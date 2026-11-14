@@ -7,6 +7,7 @@ import {
   emergencyImage,
   gameAsset,
   handSiteImages,
+  knownTerrain,
   scientistImage,
   siteImage,
   siteTerrain,
@@ -53,7 +54,7 @@ describe('assets', () => {
     expect(scientistImage('alarm')).toMatch(/game\/characters\/dr-regolith-alarm\.png$/);
   });
 
-  it('maps every real site to a terrain and unknown ids to plateau', () => {
+  it('explicitly maps every real site to a terrain and unknown ids to plateau', () => {
     const data = join(__dirname, '..', '..', '..', 'public', 'data', 'sites.json');
     const sites = (JSON.parse(readFileSync(data, 'utf8')) as SitesFile).sites;
     expect(siteTerrain('shackleton_rim_01')).toBe('rim');
@@ -61,7 +62,13 @@ describe('assets', () => {
     expect(siteTerrain('cabeus_b')).toBe('crater');
     expect(siteTerrain('mons_mouton')).toBe('mons');
     expect(siteTerrain('nowhere')).toBe('plateau');
-    for (const s of sites) expect(siteImage(s.id, 1)).toMatch(/sites\/site-[a-z]+-1\.png$/);
+    expect(knownTerrain('nowhere')).toBeUndefined();
+    expect(knownTerrain('toString')).toBeUndefined();
+    expect(sites.length).toBeGreaterThan(0);
+    for (const s of sites) {
+      expect(knownTerrain(s.id), `${s.id} has no explicit terrain`).toBeDefined();
+      expect(siteImage(s.id, 1)).toBe(gameAsset(`sites/site-${knownTerrain(s.id)}-1.png`));
+    }
   });
 
   it('gives cards of the same terrain different variants within a hand', () => {

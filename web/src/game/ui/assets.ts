@@ -37,9 +37,14 @@ const TERRAIN_BY_SITE: Record<string, Terrain> = {
   cabeus_b: 'crater',
 };
 
+/** Terrain explicitly mapped for a site id, or undefined if the id is not in the map. */
+export function knownTerrain(siteId: string): Terrain | undefined {
+  return Object.hasOwn(TERRAIN_BY_SITE, siteId) ? TERRAIN_BY_SITE[siteId] : undefined;
+}
+
 /** Terrain illustration family for a site; unknown ids fall back to `plateau`. */
 export function siteTerrain(siteId: string): Terrain {
-  return TERRAIN_BY_SITE[siteId] ?? 'plateau';
+  return knownTerrain(siteId) ?? 'plateau';
 }
 
 export function siteImage(siteId: string, variant: 1 | 2): string {

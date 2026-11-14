@@ -35,6 +35,8 @@ export interface GameState {
   emergencyId: string | null;
   hand: Hand | null;
   chosenSlot: number | null;
+  /** Slot clicked during `choosing` whose pick animation is playing; locks out `timeUp`. */
+  pendingSlot: number | null;
   /** Epoch ms at which the countdown ends. */
   deadline: number;
 
@@ -48,13 +50,15 @@ export interface GameState {
   beginDealing: (hand: Hand) => void;
   /** dealing → choosing. */
   revealed: () => void;
+  /** During `choosing`: lock in a slot so the countdown can no longer expire. */
+  pick: (slot: number) => void;
   /** choosing → travel. */
   choose: (slot: number) => void;
   /** travel → timelapse. */
   landed: () => void;
   /** timelapse → verdict. */
   finish: () => void;
-  /** alert | dealing | choosing → timeout. */
+  /** alert | dealing | choosing → timeout (ignored while a pick is pending). */
   timeUp: () => void;
   /** verdict | timeout → choosing, same hand, fresh deadline. */
   retry: (now?: number) => void;
@@ -88,13 +92,21 @@ export const useGame = create<GameState>()((set, get) => {
     emergencyId: null,
     hand: null,
     chosenSlot: null,
+    pendingSlot: null,
     deadline: 0,
 
     setDifficulty: (difficulty) => set({ difficulty }),
 
     start: (seed = Date.now()) => {
       if (get().phase !== 'menu') return;
-      set({ phase: 'intro', seed, emergencyId: null, hand: null, chosenSlot: null });
+      set({
+        phase: 'intro',
+        seed,
+        emergencyId: null,
+        hand: null,
+        chosenSlot: null,
+        pendingSlot: null,
+      });
     },
 
     endIntro: (now = Date.now()) => leaveIntro(now),
@@ -108,8 +120,13 @@ export const useGame = create<GameState>()((set, get) => {
       if (get().phase === 'dealing') set({ phase: 'choosing' });
     },
 
+    pick: (slot) => {
+      const { phase, pendingSlot } = get();
+      if (phase === 'choosing' && pendingSlot === null) set({ pendingSlot: slot });
+    },
+
     choose: (slot) => {
-      if (get().phase === 'choosing') set({ phase: 'travel', chosenSlot: slot });
+      if (get().phase === 'choosing') set({ phase: 'travel', chosenSlot: slot, pendingSlot: null });
     },
 
     landed: () => {
@@ -121,23 +138,25 @@ export const useGame = create<GameState>()((set, get) => {
     },
 
     timeUp: () => {
-      const p = get().phase;
+      const { phase: p, pendingSlot } = get();
+      if (pendingSlot !== null) return;
       if (p === 'alert' || p === 'dealing' || p === 'choosing') set({ phase: 'timeout' });
     },
 
     retry: (now = Date.now()) => {
       const { phase, hand } = get();
       if ((phase !== 'verdict' && phase !== 'timeout') || !hand) return;
-      set({ phase: 'choosing', chosenSlot: null, deadline: now + COUNTDOWN_MS });
+      set({ phase: 'choosing', chosenSlot: null, pendingSlot: null, deadline: now + COUNTDOWN_MS });
     },
 
     newGame: (seed = Date.now(), now = Date.now()) => {
       const p = get().phase;
       if (p !== 'verdict' && p !== 'timeout') return;
-      set({ seed, hand: null, chosenSlot: null });
+      set({ seed, hand: null, chosenSlot: null, pendingSlot: null });
       enterAlert(now);
     },
 
-    quit: () => set({ phase: 'menu', emergencyId: null, hand: null, chosenSlot: null }),
+    quit: () =>
+      set({ phase: 'menu', emergencyId: null, hand: null, chosenSlot: null, pendingSlot: null }),
   };
 });
