@@ -1,0 +1,12 @@
+.DS_Store
+node_modules/
+.venv/
+__pycache__/
+.env
+.env.*
+# datasets pesados: no subir al repo (enlazar en docs/04-resources-data.md)
+data/
+*.tif
+*.tiff
+*.bsp
+*.xyzi

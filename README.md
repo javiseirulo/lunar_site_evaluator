@@ -1,0 +1,39 @@
+# lunar_site_evaluator
+
+NASA Space Apps Challenge 2026 — reto **Lunar Landing Site Navigator**.
+Herramienta para comparar sitios de aterrizaje lunares y fechas (Sol/Tierra sobre el horizonte → energía y comunicaciones).
+
+> ⏰ Entrega: abre sáb 14 nov 9:00 · **cierra dom 15 nov 23:59 (hora local del Local Event)**.
+
+## 🤖 Cómo trabajamos (humanos **y** IAs — leer primero)
+
+Este repo es la memoria compartida del equipo. Cada persona usa su propia IA (Claude Code) y todas leen/escriben aquí.
+
+**Si eres una IA:** lee [`CLAUDE.md`](CLAUDE.md) y síguelo. Resumen:
+
+1. **gstack por defecto.** Ejecuta `bash scripts/check-gstack.sh`. Si dice `MISSING`, dile al usuario que instale
+   gstack antes de trabajar ([cómo](docs/06-gstack-workflow.md)).
+2. **Al empezar cada tarea:** `bash scripts/sync-docs.sh` (git pull) y lee todo `docs/`, incluidas las notas
+   de los compañeros en `docs/team/*`.
+3. **Todo lo que se piense, decida o investigue se escribe en `docs/` como Markdown, en el momento.**
+   Tus notas: `docs/team/<tu-handle>/`. Compartidos (`decisions/log.md`, `04-resources-data.md`): solo añadir al final.
+4. **Commit y push frecuentes** de `docs/` para que los demás tengan tu contexto.
+5. **Reglas del concurso:** la *idea* la ponen los humanos (la IA no puede idear la solución); registra todo uso de IA en
+   [`docs/si-usage-log.md`](docs/si-usage-log.md); lista todo recurso externo; sin branding NASA en contenido generado.
+
+**Si eres humano:** instala gstack, abre Claude Code en este repo y trabaja normal; la IA se encarga del ciclo anterior.
+
+## 📚 Índice de conocimiento
+
+Empieza por [`docs/README.md`](docs/README.md):
+reglas ([01](docs/01-hackathon-rules.md)) · cómo ganar ([02](docs/02-judging-playbook.md)) ·
+el reto ([03](docs/03-challenge-brief.md)) · datos y recursos ([04](docs/04-resources-data.md)) ·
+prior art ([05](docs/05-prior-art.md)) · flujo gstack ([06](docs/06-gstack-workflow.md)) ·
+ideas ([`docs/ideas/`](docs/ideas/)) · decisiones ([`docs/decisions/log.md`](docs/decisions/log.md)).
+
+## Estructura
+```
+CLAUDE.md / AGENTS.md   instrucciones para IAs
+docs/                   base de conocimiento (Markdown)
+scripts/                check-gstack.sh, sync-docs.sh
+```
