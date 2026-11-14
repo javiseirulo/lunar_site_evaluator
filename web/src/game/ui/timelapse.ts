@@ -3,6 +3,7 @@
  * landing hour (`hand.startIndex`), the same convention as `Verdict.failHour`.
  */
 import type { Timeseries } from '@lunar/contracts';
+import { hourlyFlags } from '../engine/simulate';
 
 /** Wall-clock length of a full mission timelapse. */
 export const TIMELAPSE_MS = 25_000;
@@ -42,15 +43,6 @@ export function dayOfMission(hour: number, days: number): number {
   return Math.min(days, Math.floor(Math.max(0, hour) / 24) + 1);
 }
 
-/** Earth link rule shared with the engine: Earth visible (if known) and high enough. */
-export function isLinkUp(
-  earthVisible: boolean | null,
-  earthEl: number,
-  marginDeg: number,
-): boolean {
-  return earthVisible !== false && earthEl >= marginDeg;
-}
-
 /** `out[i]` = length of the run of `true` ending at `i` (0 where `flags[i]` is false). */
 export function runLengths(flags: readonly boolean[]): number[] {
   let run = 0;
@@ -64,24 +56,13 @@ export interface MissionRuns {
   blackout: number[];
 }
 
-/** Running dark and blackout counters for each hour of the mission window, as the engine counts. */
+/** Running dark and blackout counters for each hour of the mission window (engine rules). */
 export function missionRuns(
   ts: Timeseries,
   startIndex: number,
   missionHours: number,
   marginDeg: number,
 ): MissionRuns {
-  const n = Math.max(0, Math.min(missionHours, ts.t_utc.length - startIndex));
-  const idx = (i: number) => startIndex + i;
-  const dark = Array.from({ length: n }, (_, i) => ts.lit[idx(i)] !== 1);
-  const blackout = Array.from(
-    { length: n },
-    (_, i) =>
-      !isLinkUp(
-        ts.earth_visible ? ts.earth_visible[idx(i)] === 1 : null,
-        ts.earth_el[idx(i)] ?? -90,
-        marginDeg,
-      ),
-  );
-  return { dark: runLengths(dark), blackout: runLengths(blackout) };
+  const { dark, linked } = hourlyFlags(ts, startIndex, missionHours, marginDeg);
+  return { dark: runLengths(dark), blackout: runLengths(linked.map((l) => !l)) };
 }

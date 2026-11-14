@@ -45,6 +45,49 @@ function starsFor(score: number): 1 | 2 | 3 {
   return score < 1 / 3 ? 1 : score < 2 / 3 ? 2 : 3;
 }
 
+/**
+ * Earth link rule (adapter approximation until real horizon profiles exist): Earth visible by
+ * terrain (`null` = unknown, counts as visible) and elevation at or above the antenna margin.
+ */
+export function isLinkUp(
+  earthVisible: boolean | null,
+  earthEl: number | undefined,
+  marginDeg: number,
+): boolean {
+  return earthVisible !== false && (earthEl ?? -90) >= marginDeg;
+}
+
+export interface HourlyFlags {
+  /** `dark[i]`: no sunlight at mission hour i. */
+  dark: boolean[];
+  /** `linked[i]`: Earth link up at mission hour i (see `isLinkUp`). */
+  linked: boolean[];
+}
+
+/**
+ * Per-hour sunlight and Earth-link flags for `hours` samples from `startIndex` (truncated at the
+ * end of the series). The single source of the per-hour rules, shared with the game UI.
+ */
+export function hourlyFlags(
+  ts: Timeseries,
+  startIndex: number,
+  hours: number,
+  marginDeg: number,
+): HourlyFlags {
+  const n = Math.max(0, Math.min(hours, ts.t_utc.length - startIndex));
+  const at = (i: number) => startIndex + i;
+  const visible = (i: number): boolean | null => {
+    const v = ts.earth_visible?.[at(i)];
+    return v === undefined ? null : v === 1;
+  };
+  return {
+    dark: Array.from({ length: n }, (_, i) => ts.lit[at(i)] !== 1),
+    linked: Array.from({ length: n }, (_, i) =>
+      isLinkUp(visible(i), ts.earth_el[at(i)], marginDeg),
+    ),
+  };
+}
+
 export function simulate(
   site: Site,
   ts: Timeseries,
@@ -58,16 +101,7 @@ export function simulate(
     );
   }
 
-  const win = (i: number) => startIndex + i;
-  const dark = Array.from({ length: hours }, (_, i) => ts.lit[win(i)] !== 1);
-  // Adapter approximation until real horizon profiles exist: Earth link needs
-  // terrain visibility (when provided) and elevation above the antenna margin.
-  const linked = Array.from(
-    { length: hours },
-    (_, i) =>
-      (ts.earth_visible?.[win(i)] ?? 1) === 1 &&
-      (ts.earth_el[win(i)] ?? -90) >= req.antenna_margin_deg,
-  );
+  const { dark, linked } = hourlyFlags(ts, startIndex, hours, req.antenna_margin_deg);
 
   const cold = runs(dark, req.max_dark_h.threshold);
   const blackout = runs(
