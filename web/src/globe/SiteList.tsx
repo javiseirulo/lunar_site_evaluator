@@ -262,20 +262,24 @@ export function SiteDetail({ className }: { className?: string }) {
       {!site.valid && (
         <p className="text-bad mt-2 text-[13px]">
           Fails a safety rule:{' '}
-          {site.metrics.slope_deg > 15 ? 'too steep to land.' : 'too little sunlight.'}
+          {!site.pending_metrics?.includes('slope_deg') && site.metrics.slope_deg > 15
+            ? 'too steep to land.'
+            : 'too little sunlight.'}
         </p>
       )}
 
       <ul className="rows border-edge mt-4 border-t">
         {METRICS.map((m) => {
-          const good = m.goodness(site.metrics);
+          // contracts/README v1.1: pending_metrics are placeholders until terrain arrives.
+          const pending = site.pending_metrics?.some((k) => k === m.key) ?? false;
+          const good = pending ? null : m.goodness(site.metrics);
           return (
             <li key={m.key} className="py-2.5" title={m.help}>
               <div className="flex items-center gap-2 text-[14px]">
                 <m.Icon className="text-ink-faint size-4 shrink-0" strokeWidth={1.8} aria-hidden />
                 <span className="text-ink">{proMode ? m.proLabel : m.label}</span>
                 <span className="num text-heading ml-auto font-medium">
-                  {m.format(site.metrics, proMode)}
+                  {pending ? 'pending terrain' : m.format(site.metrics, proMode)}
                 </span>
               </div>
               {good !== null && (
