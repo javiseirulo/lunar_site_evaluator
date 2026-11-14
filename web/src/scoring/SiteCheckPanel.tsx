@@ -5,7 +5,7 @@
  */
 import { useMemo, useState } from 'react';
 import { cn } from '@/lib/utils';
-import { useAppStore, useSelectedSite } from '@/core';
+import { formatUtc, useAppStore, useSelectedSite } from '@/core';
 import {
   buildTimeseries,
   earthMoonDistanceKmAt,
@@ -19,6 +19,34 @@ import { robustnessRange, temporalRobustness } from './robustness';
 
 const fmt = (v: number | null | undefined, d = 2) =>
   typeof v === 'number' && Number.isFinite(v) ? v.toFixed(d) : '—';
+
+/** Plain-language label and unit per requirement key. */
+const LABEL: Record<string, { label: string; unit: 'pct' | 'h' | 'deg' | 'km' }> = {
+  illum_pct: { label: 'Sunlight', unit: 'pct' },
+  earth_vis_pct: { label: 'Earth in view', unit: 'pct' },
+  max_dark_hours: { label: 'Longest night', unit: 'h' },
+  max_blackout_hours: { label: 'Longest Earth blackout', unit: 'h' },
+  sun_el_mean_deg: { label: 'Mean Sun height', unit: 'deg' },
+  sun_earth_pct: { label: 'Sun and Earth together', unit: 'pct' },
+  slope_deg: { label: 'Slope', unit: 'deg' },
+  psr_dist_km: { label: 'To icy craters', unit: 'km' },
+};
+const label = (k: string) => LABEL[k]?.label ?? k;
+function show(k: string, v: number | null | undefined): string {
+  if (typeof v !== 'number' || !Number.isFinite(v)) return '—';
+  switch (LABEL[k]?.unit) {
+    case 'pct':
+      return `${Math.round(v * 100)}%`;
+    case 'h':
+      return `${Math.round(v)} h`;
+    case 'deg':
+      return `${v.toFixed(1)}°`;
+    case 'km':
+      return `${v.toFixed(1)} km`;
+    default:
+      return fmt(v);
+  }
+}
 
 export function SiteCheckPanel({ className }: { className?: string }) {
   const config = useAppStore((s) => s.missionConfig);
@@ -91,82 +119,104 @@ export function SiteCheckPanel({ className }: { className?: string }) {
           {custom ? 'Use selected site' : 'Any lat/lon'}
         </button>
       </div>
-      {custom && (
-        <div className="flex gap-2 text-[11px]">
-          <label>
-            Lat{' '}
-            <input
-              className="w-20 bg-transparent border px-1"
-              value={custom.lat}
-              onChange={(e) => setCustom({ ...custom, lat: e.target.value })}
-            />
-          </label>
-          <label>
-            Lon{' '}
-            <input
-              className="w-20 bg-transparent border px-1"
-              value={custom.lon}
-              onChange={(e) => setCustom({ ...custom, lon: e.target.value })}
-            />
-          </label>
-        </div>
-      )}
-      {!point ? (
-        <p className="text-[11px] opacity-70">Select a site or enter a valid lat/lon.</p>
-      ) : ephem.error ? (
-        <p className="text-[11px] opacity-70">{ephem.error}</p>
-      ) : !result ? (
-        <p className="text-[11px] opacity-70">Computing…</p>
-      ) : (
-        <div className="text-[11px]">
-          <div className="flex items-baseline gap-2">
-            <strong className={result.ev.valid ? 'text-green-400' : 'text-red-400'}>
-              {result.ev.valid ? 'VALID' : 'INVALID'}
-            </strong>
-            <span>{point.name}</span>
-            <span className="ml-auto">score {fmt(result.ev.score, 3)}</span>
+      <div className="box-body flex flex-col gap-2 text-[11px]">
+        {custom && (
+          <div className="flex gap-2">
+            <label>
+              Lat{' '}
+              <input
+                className="field num w-20"
+                value={custom.lat}
+                onChange={(e) => setCustom({ ...custom, lat: e.target.value })}
+              />
+            </label>
+            <label>
+              Lon{' '}
+              <input
+                className="field num w-20"
+                value={custom.lon}
+                onChange={(e) => setCustom({ ...custom, lon: e.target.value })}
+              />
+            </label>
           </div>
-          <div className="opacity-70">
-            {win.start_utc.slice(0, 16)}Z → {win.end_utc.slice(0, 16)}Z · {result.horizonSource}
-          </div>
-          <table className="mt-1 w-full">
-            <thead>
-              <tr className="opacity-70">
-                <th className="text-left">Requirement</th>
-                <th className="text-right">Value</th>
-                <th className="text-right">Threshold</th>
-                <th className="text-right">Margin</th>
-              </tr>
-            </thead>
-            <tbody>
-              {result.ev.checks.map((c) => (
-                <tr key={c.key} className={c.pending ? 'opacity-60' : c.ok ? '' : 'text-red-400'}>
-                  <td>{c.key}</td>
-                  <td className="text-right">{c.pending ? 'pending' : fmt(c.value)}</td>
-                  <td className="text-right">{fmt(c.threshold)}</td>
-                  <td className="text-right">
-                    {c.margin === null ? '—' : `${(c.margin * 100).toFixed(0)}%`}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <div className="mt-1">
-            Score breakdown:{' '}
-            {result.ev.contributions.length === 0
-              ? '—'
-              : result.ev.contributions
-                  .map((c) => `${c.key} ${fmt(c.share, 3)} (u=${fmt(c.utility)})`)
-                  .join(' · ')}
-          </div>
-          <div>
-            Robustness (±3 d):{' '}
-            {result.rob.total > 0
-              ? `${result.rob.valid_count}/${result.rob.total} shifts valid`
-              : '—'}
-          </div>
-        </div>
-      )}
+        )}
+        {!point ? (
+          <p className="text-ink-faint text-[10px]">
+            Select a site, or press “Any lat/lon” to check any point of the Moon for the current
+            mission window.
+          </p>
+        ) : ephem.error ? (
+          <p className="text-ink-faint text-[10px]">{ephem.error}</p>
+        ) : !result ? (
+          <p className="text-ink-faint text-[10px]">Computing…</p>
+        ) : (
+          <>
+            <div className="flex items-baseline gap-2">
+              <strong
+                className={cn(
+                  'shrink-0 border px-1.5 text-[11px] whitespace-nowrap',
+                  result.ev.valid
+                    ? 'border-green-600 text-green-700'
+                    : 'border-red-600 text-red-700',
+                )}
+              >
+                {result.ev.valid ? 'VALID' : 'NOT VALID'}
+              </strong>
+              <span className="min-w-0 truncate">{point.name}</span>
+              <span className="num ml-auto shrink-0">
+                score {Math.round(result.ev.score * 100)}/100
+              </span>
+            </div>
+            <p className="text-ink-faint text-[10px]">
+              Mission window <span className="num">{formatUtc(win.start_utc)}</span> →{' '}
+              <span className="num">{formatUtc(win.end_utc)}</span> · horizon:{' '}
+              {result.horizonSource}
+            </p>
+            <ul className="border-edge-lo flex flex-col border-t">
+              {result.ev.checks.map((c) => {
+                const less = ['max_dark_hours', 'max_blackout_hours', 'slope_deg', 'psr_dist_km'];
+                const op = less.includes(c.key) ? '≤' : '≥';
+                return (
+                  <li
+                    key={c.key}
+                    className={cn(
+                      'border-edge-lo border-b py-1',
+                      c.pending ? 'text-ink-faint' : c.ok ? '' : 'text-red-700',
+                    )}
+                  >
+                    <div className="flex justify-between gap-2">
+                      <span>
+                        {c.pending ? '–' : c.ok ? '✔' : '✖'} {label(c.key)}
+                      </span>
+                      <span className="num">
+                        {c.pending ? 'pending terrain' : show(c.key, c.value)}
+                      </span>
+                    </div>
+                    <div className="text-ink-faint text-[10px]">
+                      needs {op} {show(c.key, c.threshold)}
+                      {c.margin !== null && ` · margin ${Math.round(c.margin * 100)}%`}
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+            <p className="text-ink-faint text-[10px]">
+              Score points (of 100):{' '}
+              {result.ev.contributions.length === 0
+                ? '—'
+                : result.ev.contributions
+                    .map((c) => `${label(c.key)} ${Math.round(c.share * 100)}`)
+                    .join(' · ')}
+            </p>
+            <p className="text-ink-faint text-[10px]">
+              If the landing slips ±3 days:{' '}
+              {result.rob.total > 0
+                ? `valid in ${result.rob.valid_count} of ${result.rob.total} shifted windows`
+                : '—'}
+            </p>
+          </>
+        )}
+      </div>
     </section>
   );
 }

@@ -17,3 +17,4 @@ web/dist/
 data_raw/
 # generated small mocks/exports DO go in the repo (overrides "data/" above)
 !web/public/data/
+.gstack/
