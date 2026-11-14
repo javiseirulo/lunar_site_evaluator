@@ -1,11 +1,11 @@
 /**
- * STARTER — owner: Marta (src/globe). A ranked list + site card so the other modes can be tested
+ * STARTER — owner: Marta (src/globe). A ranked list + site sheet so the other modes can be tested
  * end to end. Marta replaces/extends it with filters and weight sliders.
  * Wording/metrics come from METRICS in @/core (short names by default, technical in Pro mode).
  */
 import { cn } from '@/lib/utils';
 import { METRICS, formatLatLon, useAppStore, useData, useSelectedSite } from '@/core';
-import { ScoreBox, scoreColor } from '@/layers';
+import { scoreColor } from '@/layers';
 
 export function SiteList({ className }: { className?: string }) {
   const sites = useData((s) => s.sites);
@@ -16,15 +16,13 @@ export function SiteList({ className }: { className?: string }) {
 
   return (
     <section className={cn('box flex min-h-0 flex-col', className)} aria-labelledby="sites-heading">
-      <h2 id="sites-heading" className="box-head text-[18px]">
-        Landing Sites
-      </h2>
-      <div className="text-ink-faint grid grid-cols-[36px_1fr_44px] px-4 pt-2 pb-1 text-[12px]">
-        <span>Rank</span>
-        <span>Site name</span>
-        <span className="text-right">Score</span>
+      <div className="flex items-baseline justify-between px-5 pt-4 pb-2">
+        <h2 id="sites-heading" className="text-[18px]">
+          Sites
+        </h2>
+        <span className="text-ink-faint text-[12px]">score out of 100</span>
       </div>
-      <ol className="min-h-0 flex-1 overflow-y-auto px-2 pb-2">
+      <ol className="min-h-0 flex-1 overflow-y-auto px-2 pb-3">
         {ranked.map((s, i) => {
           const selected = s.id === selectedSiteId;
           return (
@@ -34,18 +32,18 @@ export function SiteList({ className }: { className?: string }) {
                 onClick={() => selectSite(s.id)}
                 aria-pressed={selected}
                 className={cn(
-                  'grid w-full grid-cols-[36px_1fr_44px] items-center rounded-[3px] border px-2 py-1.5 text-left text-[14px] transition-colors duration-150',
-                  selected
-                    ? 'border-[#6d9be6] bg-[#0b3d91]/45'
-                    : 'hover:bg-panel-2 border-transparent',
-                  !s.valid && !selected && 'opacity-55',
+                  'grid w-full grid-cols-[22px_1fr_auto] items-baseline rounded-[4px] px-3 py-[7px] text-left text-[14px] transition-colors duration-100',
+                  selected ? 'bg-violet text-white' : 'hover:bg-panel-2',
+                  !s.valid && !selected && 'text-ink-faint',
                 )}
               >
-                <span className="num font-bold" style={{ color: scoreColor(s.score) }}>
+                <span
+                  className={cn('num text-[12px]', selected ? 'text-white/70' : 'text-ink-faint')}
+                >
                   {i + 1}
                 </span>
-                <span className="text-heading truncate">{s.name}</span>
-                <span className="num text-ink text-right">{Math.round(s.score * 100)}</span>
+                <span className="truncate">{s.name}</span>
+                <span className="num font-medium">{Math.round(s.score * 100)}</span>
               </button>
             </li>
           );
@@ -63,79 +61,64 @@ export function SiteDetail({ className }: { className?: string }) {
   if (!site) {
     return (
       <section className={cn('box p-5', className)}>
-        <h2 className="text-heading text-[18px] font-extrabold">Start here</h2>
-        <ol className="mt-3 space-y-3">
-          {[
-            ['Pick a spot', 'Click a diamond on the Moon or a name in the list.'],
-            ['Press Play', 'Watch the days pass. When does it get dark?'],
-            ['Compare', 'Put two or three spots side by side.'],
-          ].map(([title, text], i) => (
-            <li key={title} className="flex gap-3">
-              <span className="bg-pink flex size-7 shrink-0 items-center justify-center rounded-full text-[14px] font-bold text-white ">
-                {i + 1}
-              </span>
-              <span>
-                <b className="text-heading block">{title}</b>
-                <span className="text-ink-muted text-[13px]">{text}</span>
-              </span>
-            </li>
-          ))}
+        <h2 className="text-[18px]">No site selected</h2>
+        <ol className="text-ink mt-3 list-decimal space-y-2 pl-5 text-[14px]">
+          <li>Click a diamond on the map, or a name in the list.</li>
+          <li>Press Play and watch when the site gets sunlight and sees Earth.</li>
+          <li>Open Compare to put two or three sites side by side.</li>
         </ol>
       </section>
     );
   }
 
   return (
-    <section
-      className={cn('box animate-enter p-5', className)}
-      key={site.id}
-      aria-label={`${site.name} details`}
-    >
-      <h2 className="text-heading text-center text-[20px] font-bold">{site.name}</h2>
+    <section className={cn('box p-5', className)} aria-label={`${site.name} details`}>
+      <h2 className="text-[24px] leading-tight">{site.name}</h2>
       {proMode && (
-        <p className="text-ink-faint num mt-0.5 text-center text-[12px]">
-          {formatLatLon(site.lat, site.lon)} · {site.elev_m.toLocaleString('en')} m
+        <p className="text-ink-faint num mt-1 text-[12px]">
+          {formatLatLon(site.lat, site.lon)}, {site.elev_m.toLocaleString('en')} m
         </p>
       )}
-      <div className="mt-3 flex justify-center">
-        <ScoreBox score={site.score} size="lg" />
-      </div>
+      <p className="num mt-3 leading-none">
+        <span
+          className="mr-2 inline-block size-3 align-middle"
+          style={{ background: scoreColor(site.score) }}
+          aria-hidden
+        />
+        <span className="text-heading text-[48px] font-medium">{Math.round(site.score * 100)}</span>
+        <span className="text-ink-faint text-[14px]"> / 100</span>
+      </p>
+      {!site.valid && (
+        <p className="text-bad mt-2 text-[13px]">
+          Fails a safety rule:{' '}
+          {site.metrics.slope_deg > 15 ? 'too steep to land.' : 'too little sunlight.'}
+        </p>
+      )}
 
-      <ul className="mt-5 space-y-4">
+      <ul className="rows border-edge mt-4 border-t">
         {METRICS.map((m) => {
           const good = m.goodness(site.metrics);
           return (
-            <li key={m.key} className="flex items-center gap-3" title={m.help}>
-              <m.Icon className={cn('size-7 shrink-0', m.tone)} strokeWidth={1.7} aria-hidden />
-              <div className="min-w-0 flex-1">
-                <div className="flex items-baseline justify-between gap-2 text-[14px]">
-                  <span className="text-heading">{proMode ? m.proLabel : m.label}</span>
-                  <span className={cn('num font-bold', m.tone)}>
-                    {m.format(site.metrics, proMode)}
-                  </span>
-                </div>
-                {good !== null && (
-                  <div className="meter mt-1.5">
-                    <span
-                      style={{
-                        width: `${Math.round(good * 100)}%`,
-                        background: m.bar,
-                      }}
-                    />
-                  </div>
-                )}
+            <li key={m.key} className="py-2.5" title={m.help}>
+              <div className="flex items-center gap-2 text-[14px]">
+                <m.Icon className="text-ink-faint size-4 shrink-0" strokeWidth={1.8} aria-hidden />
+                <span className="text-ink">{proMode ? m.proLabel : m.label}</span>
+                <span className="num text-heading ml-auto font-medium">
+                  {m.format(site.metrics, proMode)}
+                </span>
               </div>
+              {good !== null && (
+                <div className="meter mt-2 ml-6">
+                  <span style={{ width: `${Math.round(good * 100)}%`, background: m.bar }} />
+                </div>
+              )}
             </li>
           );
         })}
       </ul>
 
-      <button
-        type="button"
-        onClick={() => setMode('streetview')}
-        className="btn btn-go mt-6 h-[40px] w-full text-[15px]"
-      >
-        Street View →
+      <button type="button" onClick={() => setMode('streetview')} className="btn mt-5 w-full">
+        Stand here in Street View
       </button>
     </section>
   );

@@ -74,7 +74,7 @@ export function TimeBar({ className }: { className?: string }) {
   return (
     <section className={cn('box px-4 py-3', className)} aria-label="Mission clock">
       <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-        <h2 className="text-heading text-[17px] font-extrabold">Mission Clock</h2>
+        <h2 className="text-heading text-[17px] font-medium">Mission Clock</h2>
         <span className="num text-ink-muted text-[13px]">
           {proMode ? formatUtc(currentTimeUTC) : `Day ${day.day} of ${day.total}`}
         </span>
@@ -164,7 +164,7 @@ export function TimeBar({ className }: { className?: string }) {
             <b className="text-heading">{when(toSunChange)}</b>
             {sample.earthVisible !== null && (
               <>
-                {' · '}
+                {', '}
                 {sample.earthVisible ? 'Earthset' : 'Earthrise'} in{' '}
                 <b className="text-heading">{when(toEarthChange)}</b>
               </>

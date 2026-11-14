@@ -145,9 +145,7 @@ export default function ComparePage() {
                     <th className="w-40 px-3 py-2" />
                     {chosen.map((s) => (
                       <th key={s.id} className="px-3 py-2 text-left">
-                        <span className="block text-[14px] text-heading font-extrabold">
-                          {s.name}
-                        </span>
+                        <span className="block text-[14px] text-heading font-medium">{s.name}</span>
                         <span className="text-ink-faint num block text-[10px] font-normal">
                           {formatLatLon(s.lat, s.lon)}
                         </span>
@@ -218,8 +216,8 @@ export default function ComparePage() {
         <section className="box">
           <div className="box-head">
             Sunlight &amp; Earth Windows
-            <span className="ml-auto font-sans font-normal tracking-normal normal-case">
-              <span className="text-sun">■</span> sunlit · <span className="text-earth">■</span>{' '}
+            <span className="ml-auto font-sans font-normal">
+              <span className="text-sun">■</span> sunlit, <span className="text-earth">■</span>{' '}
               Earth in view
             </span>
           </div>
@@ -274,7 +272,7 @@ function TimelineRow({ site }: { site: Site }) {
             <span className="text-sun">{sample.lit ? 'Sunset' : 'Sunrise'}</span> {when(toSun)}
             {sample.earthVisible !== null && (
               <>
-                {' · '}
+                {', '}
                 <span className="text-earth">
                   {sample.earthVisible ? 'Earthset' : 'Earthrise'}
                 </span>{' '}

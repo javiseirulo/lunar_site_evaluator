@@ -67,7 +67,7 @@ export default function LearnPage() {
       </nav>
 
       <article className="box">
-        <div className="box-head">Learn · Light and Line of Sight at the Lunar South Pole</div>
+        <div className="box-head">Light and line of sight at the lunar south pole</div>
         <div className="box-body max-w-[72ch] space-y-6">
           <p className="text-ink-muted text-[13px]">
             Two questions decide whether a landing site near the lunar south pole can work: will the

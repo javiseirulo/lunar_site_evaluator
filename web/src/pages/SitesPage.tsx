@@ -105,9 +105,7 @@ export default function SitesPage() {
     <section className="box">
       <div className="box-head">
         Site Directory
-        <span className="ml-auto font-sans font-normal tracking-normal normal-case">
-          {rows.length} sites
-        </span>
+        <span className="ml-auto font-sans font-normal">{rows.length} sites</span>
       </div>
       <div className="box-body">
         <p className="text-ink-muted mb-3 max-w-[75ch]">
@@ -131,7 +129,7 @@ export default function SitesPage() {
               disabled={picked.length < 2}
               onClick={() => navigate(`/compare?ids=${picked.map(encodeURIComponent).join(',')}`)}
             >
-              Compare ticked ›
+              Compare ticked
             </button>
           </span>
         </div>

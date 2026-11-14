@@ -21,10 +21,10 @@ export default function ExplorePage() {
 
       {/* Centre: map + clock */}
       <section className="order-1 flex flex-col gap-4 md:order-2">
-        <div className="box overflow-hidden">
-          <div className="space relative p-3">
+        <div className="overflow-hidden rounded-[8px]">
+          <div className="space relative p-4">
             <div
-              className="absolute top-3 right-3 z-10 flex overflow-hidden border-edge-hi rounded-[3px] border"
+              className="absolute top-4 right-4 z-10 flex overflow-hidden rounded-[4px] border border-white/30"
               role="group"
               aria-label="Map view"
             >
@@ -34,8 +34,8 @@ export default function ExplorePage() {
                   type="button"
                   onClick={() => setView(v)}
                   className={cn(
-                    'px-2.5 py-1 text-[12px] font-bold transition-colors',
-                    view === v ? 'bg-violet text-white' : 'text-ink-muted hover:text-white',
+                    'px-2.5 py-1 text-[12px] font-medium transition-colors',
+                    view === v ? 'bg-white text-black' : 'text-ink-muted hover:text-white',
                   )}
                   aria-pressed={view === v}
                 >
@@ -48,7 +48,7 @@ export default function ExplorePage() {
             </div>
           </div>
           {proMode && (
-            <p className="text-ink-faint border-edge border-t px-3 py-1.5 text-[11px]">
+            <p className="space text-ink-muted border-t border-white/15 px-4 py-2 text-[12px]">
               Polar stereographic view to 80°S. Diamonds are candidate sites coloured by score; dim
               = fails a hard filter. Hover the map for coordinates.
             </p>

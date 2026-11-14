@@ -10,11 +10,7 @@ export default function StreetViewPage() {
       <section className="box">
         <div className="box-head">
           Street View
-          {site && (
-            <span className="ml-auto font-sans font-normal tracking-normal normal-case">
-              {site.name}
-            </span>
-          )}
+          {site && <span className="ml-auto font-sans font-normal">{site.name}</span>}
         </div>
         <div className="space h-[460px] p-3">
           {site ? (
@@ -23,7 +19,7 @@ export default function StreetViewPage() {
             <div className="flex size-full flex-col items-center justify-center gap-2 text-center">
               <p className="text-ink-muted">No site selected. Choose one first.</p>
               <Link to="/explore" className="btn btn-go">
-                Go to Explore ›
+                Go to Explore
               </Link>
             </div>
           )}

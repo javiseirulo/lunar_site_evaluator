@@ -84,7 +84,7 @@ export function PolarMap({ className }: { className?: string }) {
       <div className="num text-pale bg-night/80 pointer-events-none absolute bottom-0 left-0 rounded-[3px] px-1.5 py-0.5 text-[11px]">
         {hover
           ? formatLatLon(hover[0], hover[1])
-          : `South pole · to ${Math.abs(manifest.lat_limit)}°S`}
+          : `South pole to ${Math.abs(manifest.lat_limit)}°S`}
       </div>
     </div>
   );
@@ -180,7 +180,7 @@ function Pin({
       />
       <span
         className={cn(
-          'pointer-events-none absolute top-1/2 left-full z-10 ml-1 -translate-y-1/2 border-edge-hi bg-panel text-heading rounded-[4px] border px-1.5 py-0.5 text-[12px] font-bold whitespace-nowrap shadow-[var(--shadow-lift)]',
+          'pointer-events-none absolute top-1/2 left-full z-10 ml-1 -translate-y-1/2 rounded-[3px] bg-white px-1.5 py-0.5 text-[12px] font-medium whitespace-nowrap text-black',
           selected ? 'block' : 'hidden group-hover:block',
         )}
       >

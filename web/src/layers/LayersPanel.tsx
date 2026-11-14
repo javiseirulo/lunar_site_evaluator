@@ -1,5 +1,5 @@
 /**
- * Layer controls (owner: Javi2): one coloured on/off switch per layer in layers.json. Pro mode adds
+ * Layer controls (owner: Javi2): one on/off switch per layer in layers.json. Pro mode adds
  * legend, opacity and draw order. Writes only to the store (activeLayers, layerOpacity); the 2D map
  * and the 3D globe read the same state and draw it.
  */
@@ -8,13 +8,13 @@ import { cn } from '@/lib/utils';
 import { useAppStore, useData } from '@/core';
 import { LegendBar } from './Legend';
 
-/** Friendly names and switch colours for known layer ids; unknown ids fall back to layers.json. */
-const LAYER_UI: Record<string, { label: string; color: string }> = {
-  illumination: { label: 'Sunlight', color: '#f2a900' },
-  slope: { label: 'Slope', color: '#fc3d21' },
-  psr: { label: 'Ice (shadowed craters)', color: '#9fb4d9' },
-  elevation: { label: 'Height', color: '#e6eaf0' },
-  score: { label: 'Score', color: '#4cb963' },
+/** Friendly names for known layer ids; unknown ids fall back to layers.json. */
+const LAYER_UI: Record<string, { label: string }> = {
+  illumination: { label: 'Sunlight' },
+  slope: { label: 'Slope' },
+  psr: { label: 'Icy craters' },
+  elevation: { label: 'Height' },
+  score: { label: 'Score' },
 };
 const ORDER = ['illumination', 'slope', 'psr', 'elevation', 'score'];
 
@@ -29,8 +29,10 @@ export function LayersPanel({ className }: { className?: string }) {
   );
 
   return (
-    <section className={cn('box px-4 py-3', className)} aria-label="Map layers">
-      {proMode && <h2 className="text-heading mb-1 text-[15px] font-extrabold">Map layers</h2>}
+    <section className={cn('box px-5 pt-4 pb-3', className)} aria-labelledby="layers-heading">
+      <h2 id="layers-heading" className="mb-1 text-[18px]">
+        Map layers
+      </h2>
       <ul className="space-y-1">
         {layers.map((l) => (
           <LayerRow
@@ -62,7 +64,7 @@ function LayerRow({
   const setLayerOpacity = useAppStore((s) => s.setLayerOpacity);
   const opacity = useAppStore((s) => s.layerOpacity[layer.id] ?? layer.default_opacity);
   const active = index >= 0;
-  const ui = LAYER_UI[layer.id] ?? { label: layer.label, color: '#6d9be6' };
+  const ui = LAYER_UI[layer.id] ?? { label: layer.label };
 
   return (
     <li title={layer.description}>
@@ -71,32 +73,15 @@ function LayerRow({
         role="switch"
         aria-checked={active}
         onClick={() => toggleLayer(layer.id)}
-        className="flex w-full items-center justify-between gap-3 rounded-[6px] px-1 py-1.5 text-left text-[15px] transition-colors hover:bg-white/5"
+        className="hover:bg-panel-2 flex w-full items-center justify-between gap-3 rounded-[4px] px-1 py-2 text-left text-[14px] transition-colors"
       >
         <span className={active ? 'text-heading' : 'text-ink-muted'}>
           {proMode ? layer.label : ui.label}
         </span>
-        <span
-          className="relative inline-flex h-[22px] w-[40px] shrink-0 rounded-full border transition-colors duration-200"
-          style={{
-            borderColor: active ? ui.color : '#4b5870',
-            background: active ? `${ui.color}33` : '#05070b',
-            boxShadow: 'none',
-          }}
-          aria-hidden
-        >
-          <span
-            className="absolute top-[2px] size-[16px] rounded-full transition-transform duration-200 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
-            style={{
-              left: 2,
-              background: active ? ui.color : '#6e7889',
-              transform: active ? 'translateX(18px)' : 'none',
-            }}
-          />
-        </span>
+        <span className="switch" data-on={active} aria-hidden />
       </button>
       {active && proMode && (
-        <div className="animate-enter mt-1 mb-2 space-y-1.5 px-1">
+        <div className="mt-1 mb-2 space-y-1.5 px-1">
           <LegendBar layer={layer} />
           <div className="flex items-center gap-2">
             <span className="label w-14">Opacity</span>

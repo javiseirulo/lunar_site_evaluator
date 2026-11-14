@@ -94,7 +94,7 @@ export default function AboutPage() {
             </ul>
             {manifest && (
               <p className="text-ink-faint mt-1.5 text-[10px]">
-                Loaded data: {manifest.sources.join(' · ')} (generated{' '}
+                Loaded data: {manifest.sources.join('; ')} (generated{' '}
                 <span className="num">{manifest.generated_utc}</span>)
               </p>
             )}
