@@ -4,7 +4,6 @@
  * 3D globe read the same state and draw it.
  */
 import { useState } from 'react';
-import { ChevronDown, ChevronUp, Eye, EyeOff, Layers, Info } from 'lucide-react';
 import type { LayerDef } from '@lunar/contracts';
 import { cn } from '@/lib/utils';
 import { useAppStore, useData } from '@/core';
@@ -22,25 +21,23 @@ export function LayersPanel({ className }: { className?: string }) {
   const inactive = manifest.layers.filter((l) => !activeLayers.includes(l.id));
 
   return (
-    <section className={cn('panel overflow-hidden', className)} aria-labelledby="layers-heading">
-      <button
-        type="button"
-        className="flex w-full items-center gap-2 px-4 py-3 text-left"
-        onClick={() => setOpen((o) => !o)}
-        aria-expanded={open}
-      >
-        <Layers className="text-ink-muted size-4" aria-hidden />
-        <h2 id="layers-heading" className="text-sm font-medium">
-          Map layers
-        </h2>
-        <span className="text-ink-faint ml-1 font-mono text-[11px]">{activeLayers.length} on</span>
-        <ChevronDown
-          className={cn('text-ink-faint ml-auto size-4 transition-transform', open && 'rotate-180')}
-          aria-hidden
-        />
-      </button>
+    <section className={cn('box', className)} aria-labelledby="layers-heading">
+      <div className="box-head">
+        <h2 id="layers-heading">Map Layers</h2>
+        <span className="ml-auto font-sans font-normal tracking-normal normal-case">
+          {activeLayers.length} on ·{' '}
+          <button
+            type="button"
+            className="underline"
+            onClick={() => setOpen((o) => !o)}
+            aria-expanded={open}
+          >
+            {open ? 'hide' : 'show'}
+          </button>
+        </span>
+      </div>
       {open && (
-        <ul className="border-line divide-line divide-y border-t">
+        <ul className="rows">
           {active.map((l, i) => (
             <LayerRow key={l.id} layer={l} active canUp={i > 0} canDown={i < active.length - 1} />
           ))}
@@ -69,69 +66,69 @@ function LayerRow({
   const moveLayer = useAppStore((s) => s.moveLayer);
   const setLayerOpacity = useAppStore((s) => s.setLayerOpacity);
   const [showInfo, setShowInfo] = useState(false);
+  const id = `layer-${layer.id}`;
 
   return (
-    <li className={cn('px-4 py-2.5', !active && 'opacity-60 hover:opacity-100')}>
-      <div className="flex items-center gap-2">
-        <button
-          type="button"
-          onClick={() => toggleLayer(layer.id)}
-          className={cn(
-            'rounded-md p-1 transition-colors',
-            active ? 'text-ink hover:bg-space-700' : 'text-ink-faint hover:text-ink',
-          )}
-          aria-pressed={active}
+    <li className={cn('px-3 py-2', active && 'bg-navy-850')}>
+      <div className="flex items-center gap-1.5">
+        <input
+          id={id}
+          type="checkbox"
+          checked={active}
+          onChange={() => toggleLayer(layer.id)}
+          className="accent-navy-500 size-3.5"
           aria-label={`${active ? 'Hide' : 'Show'} ${layer.label}`}
+        />
+        <label
+          htmlFor={id}
+          className={cn('cursor-pointer', active ? 'text-ink font-bold' : 'text-ink-muted')}
         >
-          {active ? <Eye className="size-4" /> : <EyeOff className="size-4" />}
-        </button>
-        <span className="text-sm">{layer.label}</span>
+          {layer.label}
+        </label>
         <button
           type="button"
           onClick={() => setShowInfo((v) => !v)}
-          className="text-ink-faint hover:text-ink rounded p-0.5"
+          className="lnk text-[10px]"
           aria-label={`About ${layer.label}`}
           aria-expanded={showInfo}
         >
-          <Info className="size-3.5" />
+          [?]
         </button>
         {active && (
-          <div className="ml-auto flex">
+          <span className="ml-auto flex gap-px">
             {/* "Up" in this list = drawn on top = later in activeLayers. */}
             <button
               type="button"
               disabled={!canUp}
               onClick={() => moveLayer(layer.id, 1)}
-              className="text-ink-faint hover:text-ink rounded p-0.5 disabled:opacity-25"
+              className="btn h-[16px] w-[18px] px-0 text-[9px]"
               aria-label={`Move ${layer.label} up`}
             >
-              <ChevronUp className="size-4" />
+              ▲
             </button>
             <button
               type="button"
               disabled={!canDown}
               onClick={() => moveLayer(layer.id, -1)}
-              className="text-ink-faint hover:text-ink rounded p-0.5 disabled:opacity-25"
+              className="btn h-[16px] w-[18px] px-0 text-[9px]"
               aria-label={`Move ${layer.label} down`}
             >
-              <ChevronDown className="size-4" />
+              ▼
             </button>
-          </div>
+          </span>
         )}
       </div>
       {showInfo && (
-        <p className="text-ink-muted mt-1.5 text-xs leading-relaxed">
+        <p className="text-ink-muted mt-1 pl-5 text-[11px]">
           {layer.description}
-          <span className="text-ink-faint mt-1 block font-mono text-[10px]">
-            Source: {layer.source}
-          </span>
+          <span className="text-ink-faint mt-0.5 block text-[10px]">Source: {layer.source}</span>
         </p>
       )}
       {active && (
-        <div className="mt-2 space-y-2 pl-8">
+        <div className="mt-1.5 space-y-1 pl-5">
           <LegendBar layer={layer} />
           <label className="flex items-center gap-2">
-            <span className="text-ink-faint w-12 font-mono text-[10px]">Opacity</span>
+            <span className="label w-12">Opacity</span>
             <input
               type="range"
               className="range"
@@ -142,8 +139,8 @@ function LayerRow({
               onChange={(e) => setLayerOpacity(layer.id, Number(e.target.value))}
               aria-label={`${layer.label} opacity`}
             />
-            <span className="num text-ink-muted w-8 text-right text-[11px]">
-              {Math.round(opacity * 100)}
+            <span className="num text-ink-muted w-8 text-right text-[10px]">
+              {Math.round(opacity * 100)}%
             </span>
           </label>
         </div>

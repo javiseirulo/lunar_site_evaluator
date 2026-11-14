@@ -9,6 +9,9 @@ const ExplorePage = lazy(() => import('@/pages/ExplorePage'));
 const StreetViewPage = lazy(() => import('@/pages/StreetViewPage'));
 const GamePage = lazy(() => import('@/pages/GamePage'));
 const AboutPage = lazy(() => import('@/pages/AboutPage'));
+const SitesPage = lazy(() => import('@/pages/SitesPage'));
+const ComparePage = lazy(() => import('@/pages/ComparePage'));
+const LearnPage = lazy(() => import('@/pages/LearnPage'));
 
 export const router = createBrowserRouter(
   [
@@ -19,6 +22,9 @@ export const router = createBrowserRouter(
         { path: 'explore', element: <ExplorePage /> },
         { path: 'streetview/:siteId?', element: <StreetViewPage /> },
         { path: 'game', element: <GamePage /> },
+        { path: 'sites', element: <SitesPage /> },
+        { path: 'compare', element: <ComparePage /> },
+        { path: 'learn', element: <LearnPage /> },
         { path: 'about', element: <AboutPage /> },
         { path: '*', element: <NotFoundPage /> },
       ],

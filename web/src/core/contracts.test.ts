@@ -54,6 +54,30 @@ describe('public/data follows contracts/types.ts', () => {
     }
   });
 
+  it("site metrics agree with that site's timeseries (same time window)", () => {
+    for (const s of sites.sites) {
+      const ts = read<Timeseries>(`timeseries/${s.id}.json`);
+      const frac = (f: (0 | 1)[]) => f.reduce<number>((a, b) => a + b, 0) / f.length;
+      expect(s.metrics.illum_pct, `${s.id} illum_pct vs lit[]`).toBeCloseTo(frac(ts.lit), 1);
+      if (ts.earth_visible) {
+        expect(s.metrics.earth_vis_pct, `${s.id} earth_vis_pct vs earth_visible[]`).toBeCloseTo(
+          frac(ts.earth_visible),
+          1,
+        );
+      }
+      let run = 0;
+      let longest = 0;
+      for (const f of ts.lit) {
+        run = f ? 0 : run + 1;
+        longest = Math.max(longest, run);
+      }
+      // max_dark_hours can only be >= the longest night visible inside the file's window.
+      expect(s.metrics.max_dark_hours, `${s.id} max_dark_hours`).toBeGreaterThanOrEqual(
+        (longest * ts.step_s) / 3600 - 1,
+      );
+    }
+  });
+
   it('every layer points to an existing PNG and has a usable palette', () => {
     expect(layers.bounds_m).toHaveLength(4);
     for (const l of layers.layers) {

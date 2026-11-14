@@ -15,6 +15,7 @@ Rules:
 
 1. Changes go through a PR to `contracts/` and the whole team is told.
 2. The real pipeline writes the same files with `"mock": false`. The app shows a "Mock data" badge while any file is mock.
-3. `pnpm test` (in `web/`) checks whatever is in `public/data` against the contract: equal-length arrays, ids, existing PNGs.
+3. `pnpm test` (in `web/`) checks whatever is in `public/data` against the contract: equal-length arrays, ids, existing PNGs, and that each site's `illum_pct` / `earth_vis_pct` / `max_dark_hours` agree with its own timeseries.
+4. Site metrics are measured over the manifest's time window, the same window as the timeseries files, so the detail card, the time bar and the game always agree.
 
 Mock data is invented (synthetic terrain, approximate feature coordinates, toy Sun/Earth geometry) and must not be presented as results.

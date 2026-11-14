@@ -9,31 +9,13 @@ import { useAppStore } from '../store';
 import { useData, useTimeseries } from '../data';
 import { formatHours, formatUtc } from '../format';
 import { hoursUntilChange, sampleAt } from '../timeseries';
+import { EARTH_BAND, SUN_BAND, windowsGradient } from '../timeline';
 
 const SPEEDS = [
   { label: '1 h/s', hoursPerSec: 1 },
   { label: '6 h/s', hoursPerSec: 6 },
   { label: '1 d/s', hoursPerSec: 24 },
 ];
-
-/** CSS gradient with a solid band wherever `flags` is 1. */
-function windowsGradient(flags: (0 | 1)[], color: string): string {
-  const n = flags.length;
-  if (n === 0) return 'transparent';
-  const stops: string[] = [];
-  let start = -1;
-  for (let i = 0; i <= n; i++) {
-    const on = i < n && flags[i] === 1;
-    if (on && start < 0) start = i;
-    if (!on && start >= 0) {
-      const a = (start / n) * 100;
-      const b = (i / n) * 100;
-      stops.push(`transparent ${a}%`, `${color} ${a}%`, `${color} ${b}%`, `transparent ${b}%`);
-      start = -1;
-    }
-  }
-  return stops.length ? `linear-gradient(to right, ${stops.join(', ')})` : 'transparent';
-}
 
 export function TimeBar({ className }: { className?: string }) {
   const range = useData((s) => s.manifest?.time_range);
@@ -70,9 +52,9 @@ export function TimeBar({ className }: { className?: string }) {
     return () => cancelAnimationFrame(raf.current);
   }, [playing, speed, range, t1]);
 
-  const sun = useMemo(() => (ts ? windowsGradient(ts.lit, 'rgb(245 183 74 / 0.55)') : null), [ts]);
+  const sun = useMemo(() => (ts ? windowsGradient(ts.lit, SUN_BAND) : null), [ts]);
   const earth = useMemo(
-    () => (ts?.earth_visible ? windowsGradient(ts.earth_visible, 'rgb(90 174 255 / 0.55)') : null),
+    () => (ts?.earth_visible ? windowsGradient(ts.earth_visible, EARTH_BAND) : null),
     [ts],
   );
   const sample = ts ? sampleAt(ts, currentTimeUTC) : null;
@@ -82,114 +64,134 @@ export function TimeBar({ className }: { className?: string }) {
     : null;
 
   if (!range) return null;
+  const pct = t1 > t0 ? ((Math.min(t1, Math.max(t0, now)) - t0) / (t1 - t0)) * 100 : 0;
 
   return (
-    <div className={cn('panel flex flex-col gap-2 px-3 py-2.5 md:px-4', className)}>
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5">
-        <div className="flex items-center gap-1">
-          <button
-            type="button"
-            className="hover:bg-space-700 text-ink-muted hover:text-ink rounded-md p-1.5"
-            onClick={() => {
-              setPlaying(false);
-              setTime(range.start_utc);
-            }}
-            aria-label="Back to start"
-          >
-            <SkipBack className="size-4" />
-          </button>
-          <button
-            type="button"
-            className="bg-ink text-space-950 hover:bg-accent rounded-md p-1.5 transition-colors"
-            onClick={() => setPlaying((p) => !p)}
-            aria-label={playing ? 'Pause' : 'Play'}
-          >
-            {playing ? <Pause className="size-4" /> : <Play className="size-4" />}
-          </button>
-          <div
-            className="bg-space-800 ml-1 flex rounded-md p-0.5"
-            role="group"
-            aria-label="Playback speed"
-          >
-            {SPEEDS.map((s, i) => (
-              <button
-                key={s.label}
-                type="button"
-                onClick={() => setSpeed(i)}
-                className={cn(
-                  'rounded px-1.5 py-0.5 font-mono text-[11px]',
-                  speed === i ? 'bg-space-600 text-ink' : 'text-ink-faint hover:text-ink',
-                )}
-                aria-pressed={speed === i}
-              >
-                {s.label}
-              </button>
-            ))}
+    <section className={cn('box', className)} aria-label="Mission clock">
+      <div className="box-head">
+        Mission Clock
+        <span className="num ml-auto font-sans font-normal tracking-normal normal-case">
+          {formatUtc(currentTimeUTC)}
+        </span>
+      </div>
+      <div className="box-body flex flex-col gap-2">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+          <div className="flex items-center gap-1">
+            <button
+              type="button"
+              className="btn w-7 px-0"
+              onClick={() => {
+                setPlaying(false);
+                setTime(range.start_utc);
+              }}
+              aria-label="Back to start"
+              title="Back to start"
+            >
+              <SkipBack className="size-3" />
+            </button>
+            <button
+              type="button"
+              className="btn btn-go w-16"
+              onClick={() => setPlaying((p) => !p)}
+              aria-label={playing ? 'Pause' : 'Play'}
+            >
+              {playing ? <Pause className="size-3" /> : <Play className="size-3" />}
+              {playing ? 'Pause' : 'Play'}
+            </button>
           </div>
-        </div>
-        <span className="num text-sm">{formatUtc(currentTimeUTC)}</span>
-        {sample && (
-          <div className="text-ink-muted flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
-            <span className="flex items-center gap-1.5">
-              <span className={cn('size-2 rounded-full', sample.lit ? 'bg-sun' : 'bg-space-600')} />
-              {sample.lit ? 'Sunset in' : 'Sunrise in'}{' '}
-              <span className="num text-ink">
-                {toSunChange === null ? 'after this window' : formatHours(toSunChange)}
-              </span>
-            </span>
-            {sample.earthVisible !== null && (
+          <label className="flex items-center gap-1.5">
+            <span className="label">Speed</span>
+            <select
+              className="field"
+              value={speed}
+              onChange={(e) => setSpeed(Number(e.target.value))}
+            >
+              {SPEEDS.map((s, i) => (
+                <option key={s.label} value={i}>
+                  {s.label}
+                </option>
+              ))}
+            </select>
+          </label>
+          {sample && (
+            <div className="ml-auto flex flex-wrap items-center gap-x-4 gap-y-1">
               <span className="flex items-center gap-1.5">
                 <span
                   className={cn(
-                    'size-2 rounded-full',
-                    sample.earthVisible ? 'bg-earth' : 'bg-space-600',
+                    'size-2 border border-black',
+                    sample.lit ? 'bg-sun' : 'bg-navy-600',
                   )}
                 />
-                {sample.earthVisible ? 'Earthset in' : 'Earthrise in'}{' '}
-                <span className="num text-ink">
-                  {toEarthChange === null ? 'after this window' : formatHours(toEarthChange)}
-                </span>
+                {sample.lit ? 'Sunset in' : 'Sunrise in'}{' '}
+                <b className="num text-ink">
+                  {toSunChange === null ? 'after this window' : formatHours(toSunChange)}
+                </b>
               </span>
-            )}
-          </div>
-        )}
-      </div>
+              {sample.earthVisible !== null && (
+                <span className="flex items-center gap-1.5">
+                  <span
+                    className={cn(
+                      'size-2 border border-black',
+                      sample.earthVisible ? 'bg-earth' : 'bg-navy-600',
+                    )}
+                  />
+                  {sample.earthVisible ? 'Earthset in' : 'Earthrise in'}{' '}
+                  <b className="num text-ink">
+                    {toEarthChange === null ? 'after this window' : formatHours(toEarthChange)}
+                  </b>
+                </span>
+              )}
+            </div>
+          )}
+        </div>
 
-      <div className="relative">
-        {(sun || earth) && (
-          <div
-            className="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2"
-            aria-hidden
-          >
-            {sun && <div className="h-1.5 rounded-t-sm" style={{ background: sun }} />}
-            {earth && <div className="h-1.5 rounded-b-sm" style={{ background: earth }} />}
+        {/* Timeline: sunlit / Earth-in-view bands under a draggable slider. */}
+        <div className="border-edge-lo bg-navy-950 relative border px-1 pt-1 pb-0.5">
+          <div className="pointer-events-none mx-[4px]" aria-hidden>
+            <div className="h-[6px]" style={{ background: sun ?? 'transparent' }} />
+            <div className="h-[6px]" style={{ background: earth ?? 'transparent' }} />
           </div>
-        )}
-        <input
-          type="range"
-          className="range relative"
-          min={t0}
-          max={t1}
-          step={3_600_000}
-          value={Math.min(t1, Math.max(t0, now))}
-          onChange={(e) => {
-            setPlaying(false);
-            setTime(new Date(Number(e.target.value)).toISOString());
-          }}
-          aria-label="Time"
-          aria-valuetext={formatUtc(currentTimeUTC)}
-        />
+          <div
+            className="bg-accent pointer-events-none absolute top-0 bottom-0 w-px"
+            style={{ left: `calc(4px + ${pct / 100} * (100% - 8px))` }}
+            aria-hidden
+          />
+          <input
+            type="range"
+            className="range relative"
+            min={t0}
+            max={t1}
+            step={3_600_000}
+            value={Math.min(t1, Math.max(t0, now))}
+            onChange={(e) => {
+              setPlaying(false);
+              setTime(new Date(Number(e.target.value)).toISOString());
+            }}
+            aria-label="Time"
+            aria-valuetext={formatUtc(currentTimeUTC)}
+          />
+        </div>
+        <div className="text-ink-faint flex justify-between text-[10px]">
+          <span className="num">{range.start_utc.slice(0, 10)}</span>
+          {ts ? (
+            <span className="flex gap-3">
+              <span>
+                <span className="text-sun">■</span> sunlit
+              </span>
+              {ts.earth_visible && (
+                <span>
+                  <span className="text-earth">■</span> Earth in view
+                </span>
+              )}
+            </span>
+          ) : (
+            <span className="hidden sm:inline">
+              Select a site to see its sunlight and Earth windows
+            </span>
+          )}
+          <span className="num">{range.end_utc.slice(0, 10)}</span>
+        </div>
       </div>
-      <div className="text-ink-faint flex justify-between font-mono text-[10px]">
-        <span>{formatUtc(range.start_utc).slice(0, 10)}</span>
-        {ts && (
-          <span className="flex gap-3">
-            <span className="text-sun/80">▬ sunlit</span>
-            {ts.earth_visible && <span className="text-earth/80">▬ Earth in view</span>}
-          </span>
-        )}
-        <span>{formatUtc(range.end_utc).slice(0, 10)}</span>
-      </div>
-    </div>
+    </section>
   );
 }
