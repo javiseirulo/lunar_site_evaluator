@@ -63,7 +63,7 @@ describe('public/data follows contracts/types.ts', () => {
         expect(ts[key].length, `${s.id}.${key}`).toBe(n);
       }
       // Real data must include earth_visible (contracts/README.md v1.1).
-      if (!sites.mock) expect(ts.earth_visible, `${s.id}.earth_visible`).toBeDefined();
+      if (!ts.mock) expect(ts.earth_visible, `${s.id}.earth_visible`).toBeDefined();
       if (ts.earth_visible) expect(ts.earth_visible.length).toBe(n);
       // v1.1: sun_frac has the same length and lit = sun_frac >= 0.5.
       if (ts.sun_frac) {

@@ -37,10 +37,11 @@ New optional fields:
 - `Timeseries`: `sun_frac`, `horizon_source`.
 
 ### Notes for consumers
+- **UTC strings** have no milliseconds: `2027-01-01T00:00:00Z`.
 - **Real data (`mock: false`) always includes `earth_visible`.** All Earth metrics depend on it.
 - **`region`** follows lat/lon: `south_pole` if lat ≤ −80, `north_pole` if lat ≥ 80, otherwise `near_side` if |lon| ≤ 90, else `far_side` (checked by `web/src/core/contracts.test.ts`).
-- **`antenna_margin_deg`** in a timeseries/grid is the margin baked into `earth_visible`. If the user changes the margin, `@/scoring` rebuilds the window with `@/ephem` instead of reusing the static file.
-- **Mission scenarios** (Cristóbal) are partial overrides. Merge them onto `DEFAULT_MISSION_CONFIG` first, then validate the result against `mission_config.schema.json`.
+- **`antenna_margin_deg`** in a timeseries/grid is the margin baked into `earth_visible`. If the user changes the margin, `@/scoring` rebuilds the window with `@/ephem` instead of reusing the static file. Missing = 0.
+- **Mission scenarios** (Cristóbal) are partial overrides. Merge them onto `DEFAULT_MISSION_CONFIG` with `mergeMissionConfig` from `@/scoring` first, then validate the result against `mission_config.schema.json`.
 - **Historic landings:**
   - in `sites.json` they are sites like any other (`kind: "historic_landing"`), so they can be evaluated and compared;
   - Marta's planned `historic_sites.json` (display layer with agency, date and outcome) can reuse the same `id`s so both link.
@@ -59,12 +60,12 @@ New optional fields:
 - **Site position:** sphere of R = 1737.4 km; position `(R + elev_m + observer_height) · (cos φ cos λ, cos φ sin λ, sin φ)`.
 - **Axes:** ENU, with E = (−sin λ, cos λ, 0), N = (−sin φ cos λ, −sin φ sin λ, cos φ), U = radial.
 - **Azimuth and elevation:**
-  - azimuth = atan2(E·v, N·v), clockwise from local north, in [0, 360);
+  - azimuth = atan2(E·v, N·v), clockwise from local north, in [0, 360) (true north of the ENU frame; after rounding, 360 → 0);
   - elevation = asin(U·v/|v|);
   - for the Earth, v = `earth_km − r_site` (exact parallax).
 - **Flat horizon** (no terrain): −acos(R/(R+h)), which is −0.1375° for h = 5 m. `horizon_source: "flat (no terrain)"`.
 - **Sun:**
-  - `sun_frac` = visible fraction of the solar disc (radius 0.2666°) above the horizon h(az);
+  - `sun_frac` = visible fraction of the solar disc (radius r = 0.2666°) above the horizon h(az): x = clamp((el − h)/r, −1, 1), f = 1 − (acos x − x√(1 − x²))/π;
   - `lit` = 1 when `sun_frac` ≥ 0.5.
 - **Earth:** `earth_visible` = 1 when `earth_el` > h(`earth_az`) + `antenna_margin_deg` (default 2°).
 
@@ -74,10 +75,12 @@ New optional fields:
 - `max_dark_hours` = longest run of `lit` = 0, in hours.
 - `earth_vis_pct` = mean(`earth_visible`).
 - `max_blackout_hours` = longest run of `earth_visible` = 0, in hours.
-- `sun_earth_pct` = mean(`lit` ∧ `earth_visible`).
+- `sun_earth_pct` = mean(`sun_frac` · `earth_visible`).
+- **Sampling:** the window is half-open [start, end); the first sample is `start` rounded up to the hour; a run lasts count × `step_s`.
+- **Rounding:** files publish 2 decimals; validity and score are computed on the published values, so Python and TypeScript agree.
 
 ### Validity and score (docs/10 J6–J7; one implementation in `web/src/scoring/`, mirrored by the export)
-- **Validity:** a site is valid for a mission window when every requirement in `MissionConfig.requirements` that is not in `pending_metrics` passes its threshold.
+- **Validity:** a site is valid for a mission window when every requirement in `MissionConfig.requirements` that is not in `pending_metrics` passes its threshold. A requirement whose metric is missing counts as pending (`ok: true`, `value: null`, `margin: null`, `pending: true`); never NaN. JSON is written without NaN (`null`).
   - "Less is better" metrics fail above the threshold: `slope_deg`, `max_dark_hours`, `max_blackout_hours`, `psr_dist_km`.
   - All other metrics fail below it.
   - **At exactly the threshold the requirement passes** (`value ≥ threshold`, or `value ≤ threshold` for less-is-better), so `margin = 0` passes. Python and TypeScript compare unrounded values.
@@ -87,4 +90,4 @@ New optional fields:
   - without an objective, u = 1 when the requirement passes.
   - There is no min-max normalisation, so a site's score does not depend on the other sites.
 - **Score:** `score = Σ wᵢ·uᵢ / Σ wᵢ` over the weighted, non-pending criteria. If Σ wᵢ = 0 (no weights, or every weighted criterion pending), `score = 0`, never NaN. The ranking only lets valid sites compete (J7): `rankSites` puts every valid site first and orders by score. Invalid sites keep their number so the UI can show how far they are, but they are always labelled "not valid".
-- **Margins:** `checks[].margin` is relative and signed (> 0 passes). The UI turns it into text such as "longest night 142 h > 100 h".
+- **Margins:** `checks[].margin` is relative and signed (≥ 0 passes; with threshold 0 the margin is absolute). The UI turns it into text such as "longest night 142 h > 100 h".
