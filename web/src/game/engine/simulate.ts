@@ -8,7 +8,8 @@ export interface WindowMetrics {
   comm_pct: number;
   max_dark_h: number;
   max_blackout_h: number;
-  slope_deg: number;
+  /** null when slope is listed in `site.pending_metrics` (placeholder value, not real yet). */
+  slope_deg: number | null;
 }
 
 export interface Verdict {
@@ -93,6 +94,11 @@ export function hourlyFlags(
   };
 }
 
+/** True if `key` is a placeholder for this site (listed in `site.pending_metrics`). */
+export function isPending(site: Site, key: string): boolean {
+  return site.pending_metrics?.some((k) => k === key) ?? false;
+}
+
 export function simulate(
   site: Site,
   ts: Timeseries,
@@ -118,16 +124,20 @@ export function simulate(
     comm_pct: linked.filter(Boolean).length / hours,
     max_dark_h: cold.longest,
     max_blackout_h: blackout.longest,
-    slope_deg: site.metrics.slope_deg,
+    slope_deg: isPending(site, 'slope_deg') ? null : site.metrics.slope_deg,
   };
 
-  const score =
-    (utility(metrics.illum_pct, req.illum_pct) +
-      utility(metrics.comm_pct, req.comm_pct) +
-      utility(metrics.max_dark_h, req.max_dark_h) +
-      utility(metrics.max_blackout_h, req.max_blackout_h) +
-      utility(metrics.slope_deg, { threshold: req.slope_max_deg, objective: 0 })) /
-    5;
+  // A pending slope is a placeholder: it is left out of the score and of the slope rule.
+  const utilities = [
+    utility(metrics.illum_pct, req.illum_pct),
+    utility(metrics.comm_pct, req.comm_pct),
+    utility(metrics.max_dark_h, req.max_dark_h),
+    utility(metrics.max_blackout_h, req.max_blackout_h),
+  ];
+  if (metrics.slope_deg !== null) {
+    utilities.push(utility(metrics.slope_deg, { threshold: req.slope_max_deg, objective: 0 }));
+  }
+  const score = utilities.reduce((a, b) => a + b, 0) / utilities.length;
 
   const lose = (cause: FailCause, failHour: number, detail: string): Verdict => ({
     win: false,
@@ -139,7 +149,7 @@ export function simulate(
     detail,
   });
 
-  if (metrics.slope_deg > req.slope_max_deg) {
+  if (metrics.slope_deg !== null && metrics.slope_deg > req.slope_max_deg) {
     return lose('slope', 0, `Slope ${metrics.slope_deg.toFixed(1)}° > ${req.slope_max_deg}° limit`);
   }
 

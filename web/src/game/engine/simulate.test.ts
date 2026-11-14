@@ -1,12 +1,7 @@
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import type { Site, SitesFile, Timeseries } from '@lunar/contracts';
+import type { Site, Timeseries } from '@lunar/contracts';
 import { DEFAULT_REQUIREMENTS } from './requirements';
-import { simulate, starsFor, utility } from './simulate';
-
-const DATA = join(__dirname, '..', '..', '..', 'public', 'data');
-const read = <T>(p: string): T => JSON.parse(readFileSync(join(DATA, p), 'utf8')) as T;
+import { isPending, simulate, starsFor, utility } from './simulate';
 
 const HOURS = 168;
 
@@ -106,13 +101,20 @@ describe('simulate', () => {
     expect(DEFAULT_REQUIREMENTS.surface_days).toBe(7);
   });
 
-  it('mock data: mons_mouton from day 9 wins, shackleton_rim_01 loses by slope', () => {
-    const sites = read<SitesFile>('sites.json').sites;
-    const byId = (id: string): Site => sites.find((s) => s.id === id)!;
-    const tsOf = (id: string): Timeseries => read<Timeseries>(`timeseries/${id}.json`);
-    expect(simulate(byId('mons_mouton'), tsOf('mons_mouton'), 216).win).toBe(true);
-    const r = simulate(byId('shackleton_rim_01'), tsOf('shackleton_rim_01'), 216);
-    expect(r).toMatchObject({ win: false, cause: 'slope' });
+  it('a pending slope is neither a failure nor part of the score', () => {
+    const ts = makeTs(ones(HOURS), ones(HOURS));
+    const steep: Site = { ...makeSite(12), pending_metrics: ['slope_deg', 'psr_dist_km'] };
+    expect(isPending(steep, 'slope_deg')).toBe(true);
+    expect(isPending(makeSite(12), 'slope_deg')).toBe(false);
+    const v = simulate(steep, ts, 0);
+    expect(v).toMatchObject({ win: true, cause: null, stars: 3 });
+    expect(v.metrics.slope_deg).toBeNull();
+    // Perfect window: the 4 remaining criteria are all at their objective.
+    expect(v.score).toBe(1);
+    // The same steep slope, when real, fails at landing and drags the score down.
+    const real = simulate(makeSite(12), ts, 0);
+    expect(real).toMatchObject({ win: false, cause: 'slope', failHour: 0 });
+    expect(real.score).toBeCloseTo(4 / 5);
   });
 });
 
