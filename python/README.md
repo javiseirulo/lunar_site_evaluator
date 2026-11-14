@@ -24,3 +24,18 @@ Replaces the mock `manifest.json`, `sites.json` and `timeseries/*.json` in `web/
   sized for a 7-day stay, so over a full year the night/blackout requirements fail almost
   everywhere; the web re-evaluates per mission window with `@/scoring`.
 - Every output is validated against `contracts/*.schema.json`. `pnpm mocks` still regenerates mocks.
+
+## Heat-map grids (`export.grids`)
+
+```bash
+uv run python -m export.grids   # ~25 s
+```
+
+Writes `web/public/data/grid/global_1deg.bin` (equirectangular 360×180, 1.3 MB),
+`grid/south_5km.bin` (south polar stereographic, `layers.json` bounds, 122×122 cells of ~4.98 km
+so the bounds stay exact, NaN outside `lat_limit`, 0.3 MB) and `grid/index.json` (GridIndex,
+validated against `contracts/grid-index.schema.json`). Same window/sampling as `export.all`
+(2027 hourly), flat 5 m horizon, antenna margin 2°, `elev_m` 0. Float32 LE, one plane per metric:
+`illum_pct, max_dark_hours, earth_vis_pct, max_blackout_hours, sun_el_mean_deg`. Vectorised
+equivalent of `window_metrics(build_timeseries(...))` (chunks of 512 cells), checked cell by cell
+in `tests/test_grids.py`. Web: `loadGrid` / `sampleGrid` in `@/ephem`.
