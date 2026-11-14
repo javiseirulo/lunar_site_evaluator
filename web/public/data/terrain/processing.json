@@ -1,0 +1,86 @@
+{
+  "version": 1,
+  "context_commit": "461507a",
+  "reference_frame": "MOON_ME_DE421",
+  "radius_m": 1737400,
+  "observer_height_m": 5,
+  "horizon": {
+    "output_pattern": "horizon/<id>.json",
+    "azimuth_origin": "local_lunar_north",
+    "azimuth_direction": "clockwise",
+    "azimuth_endpoint": "exclude_360",
+    "curated": {
+      "az_step_deg": 0.1,
+      "sample_count": 3600
+    },
+    "heatmap": {
+      "az_step_deg": 1,
+      "sample_count": 360,
+      "cell_size_m": 5000
+    },
+    "max_range_km": 300,
+    "validation_ranges_km": [
+      150,
+      200,
+      300,
+      310
+    ],
+    "convergence_target_deg": 0.05,
+    "curvature": "spherical_geometry",
+    "refraction": false,
+    "missing_terrain": "unknown_never_zero",
+    "validation_required_before_publish": true,
+    "source_rings": [
+      {
+        "from_km": 0,
+        "to_km": 5,
+        "preferred_source": "lola-south-pole-5m",
+        "fallback_source": "lola-south-pole-80m"
+      },
+      {
+        "from_km": 5,
+        "to_km": 80,
+        "preferred_source": "lola-south-pole-80m",
+        "fallback_source": "lola-south-pole-far-240m"
+      },
+      {
+        "from_km": 80,
+        "to_km": 310,
+        "preferred_source": "lola-south-pole-far-240m",
+        "fallback_source": null
+      }
+    ]
+  },
+  "coverage": {
+    "catalogue_issue": 48,
+    "catalogue_owner": "team_product",
+    "initial_profile_capacity_target": 20,
+    "capacity_status": "target_pending_benchmark_and_curated_catalogue",
+    "visual_patch_lat_limit": -80,
+    "far_dem_lat_limit": -60
+  },
+  "ephemerides": {
+    "owner": "Javi",
+    "module": "@/ephem",
+    "index_file": "ephem/index.json",
+    "annual_file_pattern": "ephem/<YYYY>.bin",
+    "start_utc": "2026-01-01T00:00:00Z",
+    "end_exclusive_utc": "2056-01-01T00:00:00Z",
+    "step_s": 3600,
+    "encoding": "float32-le",
+    "values_per_sample": 6,
+    "layout": [
+      "sun_unit_x",
+      "sun_unit_y",
+      "sun_unit_z",
+      "earth_km_x",
+      "earth_km_y",
+      "earth_km_z"
+    ],
+    "earth_origin": "moon_center",
+    "earth_parallax": "subtract_observer_position_km_before_ENU_rotation",
+    "frame_realization_confirmation_required": true,
+    "fallback_without_horizon": "geometric_sky_label_no_terrain",
+    "legacy_timeseries": "same_site_and_available_time_window_only"
+  }
+}
