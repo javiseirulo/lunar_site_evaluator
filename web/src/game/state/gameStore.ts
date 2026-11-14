@@ -60,6 +60,8 @@ export interface GameState {
   retry: (now?: number) => void;
   /** verdict | timeout → alert with a fresh seed. */
   newGame: (seed?: number, now?: number) => void;
+  /** Any phase → menu, dropping the current hand (keeps difficulty). */
+  quit: () => void;
 }
 
 function pickEmergency(seed: number): string {
@@ -135,5 +137,7 @@ export const useGame = create<GameState>()((set, get) => {
       set({ seed, hand: null, chosenSlot: null });
       enterAlert(now);
     },
+
+    quit: () => set({ phase: 'menu', emergencyId: null, hand: null, chosenSlot: null }),
   };
 });
