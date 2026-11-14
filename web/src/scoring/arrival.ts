@@ -75,8 +75,8 @@ const DISTANCE_TERMS: ReadonlyArray<readonly [number, number, number, number, nu
 
 /**
  * Geocentric Earth–Moon distance (centre to centre), km. Truncated Meeus series: good to a few
- * hundred km, which moves the Hohmann transfer time by well under an hour. To be replaced by the
- * SPICE-derived Earth vector of `@/ephem` once the pipeline publishes it.
+ * hundred km, which moves the Hohmann transfer time by well under an hour. Fallback for
+ * `computeArrival` when no SPICE distance is available (`opts.earthMoonKm`, e.g. from `@/ephem`).
  */
 export function earthMoonDistanceKm(date: Date): number {
   const jd = date.getTime() / DAY_MS + 2_440_587.5;
@@ -138,6 +138,16 @@ export interface Arrival {
   llo_period_hours: number;
   /** Earth–Moon distance used for the transfer, km (Hohmann only). */
   earth_moon_km: number | null;
+  /** Where that distance came from: the SPICE ephemeris (`@/ephem`) or the Meeus series. */
+  earth_moon_source: 'spice' | 'meeus' | null;
+}
+
+export interface ArrivalOptions {
+  /**
+   * Earth–Moon distance provider, km (e.g. `earthMoonDistanceKmAt` from `@/ephem`). When it returns
+   * null (data not loaded / out of range) the Meeus series is used instead.
+   */
+  earthMoonKm?: (date: Date) => number | null;
 }
 
 export interface SiteLocation {
@@ -152,18 +162,31 @@ export interface SiteLocation {
  * - Wait in orbit: one orbital period (upper bound) when the arrival is targeted at the site;
  *   with `start_in_orbit`, the wait for the fixed plane to pass over the site plus one period.
  */
-export function computeArrival(config: MissionConfig, site?: SiteLocation | null): Arrival {
+export function computeArrival(
+  config: MissionConfig,
+  site?: SiteLocation | null,
+  opts: ArrivalOptions = {},
+): Arrival {
   const launch = Date.parse(config.launch_utc);
   const r1 = R_EARTH_KM + LEO_ALT_KM;
   let transferDays: number;
   let earthMoonKm: number | null = null;
+  let source: Arrival['earth_moon_source'] = null;
 
   if (config.start_in_orbit) {
     transferDays = 0;
   } else if (config.trajectory === 'hohmann') {
     transferDays = 5;
     for (let i = 0; i < 4; i++) {
-      earthMoonKm = earthMoonDistanceKm(new Date(launch + transferDays * DAY_MS));
+      const at = new Date(launch + transferDays * DAY_MS);
+      const spice = opts.earthMoonKm?.(at);
+      if (typeof spice === 'number' && Number.isFinite(spice) && spice > 0) {
+        earthMoonKm = spice;
+        source = 'spice';
+      } else {
+        earthMoonKm = earthMoonDistanceKm(at);
+        source = 'meeus';
+      }
       transferDays = hohmannTransferDays(r1, earthMoonKm);
     }
   } else {
@@ -192,22 +215,28 @@ export function computeArrival(config: MissionConfig, site?: SiteLocation | null
     descent_hours: DESCENT_HOURS,
     llo_period_hours: period,
     earth_moon_km: earthMoonKm,
+    earth_moon_source: source,
   };
 }
 
 /** Landing time for either time mode. */
-export function landingTime(config: MissionConfig, site?: SiteLocation | null): string {
+export function landingTime(
+  config: MissionConfig,
+  site?: SiteLocation | null,
+  opts?: ArrivalOptions,
+): string {
   return config.time_mode === 'design'
     ? new Date(Date.parse(config.landing_utc)).toISOString()
-    : computeArrival(config, site).landing_utc;
+    : computeArrival(config, site, opts).landing_utc;
 }
 
 /** The window the site is evaluated / simulated over: [landing, landing + surface_days]. */
 export function missionWindow(
   config: MissionConfig,
   site?: SiteLocation | null,
+  opts?: ArrivalOptions,
 ): { start_utc: string; end_utc: string } {
-  const start = Date.parse(landingTime(config, site));
+  const start = Date.parse(landingTime(config, site, opts));
   return {
     start_utc: new Date(start).toISOString(),
     end_utc: new Date(start + config.surface_days * DAY_MS).toISOString(),

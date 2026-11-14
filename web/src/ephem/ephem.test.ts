@@ -113,9 +113,9 @@ describe('buildTimeseries', () => {
     __setEphemYearForTests(2027, syntheticYear());
     const ts = buildTimeseries(site, null, '2027-01-01T00:30:00Z', '2027-01-31T00:00:00Z')!;
     expect(ts).not.toBeNull();
-    const n = 30 * 24;
+    const n = 30 * 24 - 1; // half-open, first sample = start rounded up to the hour
     expect(ts.t_utc).toHaveLength(n);
-    expect(ts.t_utc[0]).toBe('2027-01-01T00:00:00Z');
+    expect(ts.t_utc[0]).toBe('2027-01-01T01:00:00Z');
     expect(ts.t_utc[n - 1]).toBe('2027-01-30T23:00:00Z');
     for (const k of ['sun_az', 'sun_el', 'earth_az', 'earth_el', 'lit'] as const) {
       expect(ts[k]).toHaveLength(n);
@@ -143,8 +143,8 @@ describe('buildTimeseries', () => {
     const litFrac = ts.lit.reduce<number>((a, b) => a + b, 0) / n;
     expect(litFrac).toBeGreaterThan(0.45);
     expect(litFrac).toBeLessThan(0.55);
-    // At hour 0 the Sun is at the zenith; at half a synodic month it is at the nadir.
-    expect(ts.sun_el[0]).toBeCloseTo(90, 1);
+    // At hour 0 the Sun is at the zenith (sample 0 = hour 1, ~0.5 deg lower); at half a synodic month it is at the nadir.
+    expect(ts.sun_el[0]).toBeGreaterThan(89);
     expect(ts.lit[Math.round(SYNODIC_H / 2)]).toBe(0);
   });
 

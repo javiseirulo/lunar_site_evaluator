@@ -49,8 +49,8 @@ const round = (v: number, digits: number) => {
 };
 
 /**
- * Hourly (or `stepS`) Sun/Earth sky for `site` over [start, end): first sample = start floored to
- * the hour, last sample < end. Returns null if the ephemeris for that window is not loaded.
+ * Hourly (or `stepS`) Sun/Earth sky for `site` over [start, end): first sample = start rounded UP
+ * to the hour (half-open window), last sample < end. Returns null if the ephemeris for that window is not loaded.
  *
  * - az/el rounded to 2 decimals (az in [0, 360)), `sun_frac` to 3 decimals.
  * - `lit` = rounded `sun_frac` ≥ 0.5, so the published arrays are self-consistent.
@@ -82,7 +82,7 @@ export function buildTimeseries(
   const earth_visible: (0 | 1)[] = [];
   const sun_frac: number[] = [];
 
-  for (let t = Math.floor(start / HOUR_MS) * HOUR_MS; t < end; t += stepS * 1000) {
+  for (let t = Math.ceil(start / HOUR_MS) * HOUR_MS; t < end; t += stepS * 1000) {
     const v = vectorsAt(t);
     if (!v) return null;
     const sky = skyFromVectors(site.lat, site.lon, v.sunUnit, v.earthKm, skyOpts);
