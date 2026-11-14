@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { mulberry32 } from '../engine/random';
 import type { Hand } from '../engine/deal';
-import emergencies from '../data/emergencies.json';
+import emergencies from '../content/emergencies.json';
 import { COUNTDOWN_MS, useGame } from './gameStore';
 
 const hand: Hand = { startIndex: 0, landingUtc: '2027-01-01T00:00:00Z', cards: [] };
@@ -54,7 +54,7 @@ describe('useGame phase machine', () => {
     useGame.getState().skipIntro(0);
     const s = useGame.getState();
     expect(s.phase).toBe('alert');
-    expect(s.emergencyId).toBe(emergencies[Math.floor(mulberry32(7)() * 5)]!.id);
+    expect(s.emergencyId).toBe(emergencies[Math.floor(mulberry32(7)() * emergencies.length)]!.id);
     expect(s.deadline).toBe(COUNTDOWN_MS);
   });
 
@@ -135,6 +135,18 @@ describe('useGame phase machine', () => {
   it('newGame is a no-op outside verdict/timeout', () => {
     useGame.getState().newGame(5);
     expect(useGame.getState().phase).toBe('menu');
+  });
+
+  it('endIntro/skipIntro are no-ops outside intro', () => {
+    useGame.getState().endIntro();
+    useGame.getState().skipIntro();
+    expect(useGame.getState().phase).toBe('menu');
+  });
+
+  it('retry is a no-op when there is no hand', () => {
+    useGame.setState({ phase: 'timeout', hand: null });
+    useGame.getState().retry();
+    expect(useGame.getState().phase).toBe('timeout');
   });
 
   it('setDifficulty updates difficulty', () => {
