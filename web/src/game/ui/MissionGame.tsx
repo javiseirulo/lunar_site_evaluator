@@ -46,7 +46,7 @@ export function MissionGame() {
   return (
     <MotionConfig reducedMotion="user">
       <MissionFx />
-      <div className="bg-navy-950 text-ink relative flex min-h-[544px] w-full flex-col overflow-hidden font-sans">
+      <div className="mission-root bg-navy-950 text-ink relative flex min-h-[544px] w-full flex-col overflow-hidden font-sans">
         {screen}
       </div>
     </MotionConfig>
