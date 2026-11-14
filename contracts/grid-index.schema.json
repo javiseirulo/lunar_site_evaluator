@@ -50,11 +50,19 @@
                 "max_blackout_hours",
                 "sun_earth_pct"
               ]
-            }
+            },
+            "minItems": 1,
+            "uniqueItems": true
           },
-          "horizon_source": { "type": "string" }
-        }
-      }
+          "horizon_source": { "type": "string" },
+          "n_times": { "type": "integer", "minimum": 1 },
+          "time_step_s": { "type": "integer", "minimum": 1 },
+          "antenna_margin_deg": { "type": "number", "minimum": 0 }
+        },
+        "if": { "properties": { "projection": { "const": "south_polar_stereographic" } } },
+        "then": { "required": ["bounds_m", "radius_m", "lat_limit"] }
+      },
+      "minItems": 1
     }
   }
 }
