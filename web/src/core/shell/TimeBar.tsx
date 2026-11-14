@@ -29,7 +29,8 @@ export function TimeBar({ className }: { className?: string }) {
   const [speed, setSpeed] = useState(1);
 
   const t0 = range ? Date.parse(range.start_utc) : 0;
-  const t1 = range ? Date.parse(range.end_utc) : 0;
+  // end_utc is exclusive (contracts/README v1.1): the last sample is one step earlier.
+  const t1 = range ? Date.parse(range.end_utc) - range.step_s * 1000 : 0;
   const now = Date.parse(currentTimeUTC);
 
   // Playback loop: advance the shared clock while playing.

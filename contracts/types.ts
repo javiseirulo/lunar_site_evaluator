@@ -144,6 +144,12 @@ export interface SitesFile {
    * v1.1: may also carry weights for the extra metrics (e.g. max_blackout_hours).
    */
   weights: Record<keyof SiteMetrics, number> & Partial<Record<keyof SiteMetricsExtra, number>>;
+  /**
+   * v1.1: mission window that `Site.valid`, `score` and `checks` were evaluated over
+   * (`missionWindow(DEFAULT_MISSION_CONFIG)`). `Site.metrics` stay over the manifest window.
+   * Absent in v1 data: valid/score are then over the manifest window.
+   */
+  evaluation?: { start_utc: string; end_utc: string; config: 'default' };
   sites: Site[];
 }
 

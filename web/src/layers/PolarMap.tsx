@@ -72,15 +72,18 @@ export function PolarMap({ className }: { className?: string }) {
         />
       </div>
       <Graticule manifest={manifest} />
-      {sites?.map((s) => (
-        <Pin
-          key={s.id}
-          site={s}
-          manifest={manifest}
-          selected={s.id === selectedSiteId}
-          onSelect={() => selectSite(s.id === selectedSiteId ? null : s.id)}
-        />
-      ))}
+      {/* contracts/README v1.1: whole-Moon catalog; this map only covers the south pole. */}
+      {sites
+        ?.filter((s) => s.region === 'south_pole' || s.lat <= manifest.lat_limit)
+        .map((s) => (
+          <Pin
+            key={s.id}
+            site={s}
+            manifest={manifest}
+            selected={s.id === selectedSiteId}
+            onSelect={() => selectSite(s.id === selectedSiteId ? null : s.id)}
+          />
+        ))}
       <div className="num text-pale bg-night/80 pointer-events-none absolute bottom-0 left-0 rounded-[3px] px-1.5 py-0.5 text-[11px]">
         {hover
           ? formatLatLon(hover[0], hover[1])

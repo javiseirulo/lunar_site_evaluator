@@ -62,6 +62,8 @@ export function utility(value: number, req: Requirement, better: 'high' | 'low')
 }
 
 function metricValue(site: Site, key: RequirementKey): number | undefined {
+  // contracts/README v1.1: pending_metrics are placeholders until terrain arrives.
+  if (site.pending_metrics?.includes(key)) return undefined;
   const v = (site.metrics as unknown as Record<string, unknown>)[key];
   return typeof v === 'number' && Number.isFinite(v) ? v : undefined;
 }

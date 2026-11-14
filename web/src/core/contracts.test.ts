@@ -68,14 +68,15 @@ describe('public/data follows contracts/types.ts', () => {
       // v1.1: sun_frac has the same length and lit = sun_frac >= 0.5.
       if (ts.sun_frac) {
         expect(ts.sun_frac.length, `${s.id}.sun_frac`).toBe(n);
-        ts.sun_frac.forEach((f, i) => {
-          expect(f >= 0 && f <= 1, `${s.id} sun_frac[${i}]`).toBe(true);
-          expect(ts.lit[i], `${s.id} lit[${i}] vs sun_frac`).toBe(f >= 0.5 ? 1 : 0);
-        });
+        // One assertion per file (real data: 8760 samples × 59 sites); first bad index reported.
+        const badFrac = ts.sun_frac.findIndex((f) => !(f >= 0 && f <= 1));
+        expect(badFrac, `${s.id} sun_frac out of [0, 1] at`).toBe(-1);
+        const badLit = ts.sun_frac.findIndex((f, i) => ts.lit[i] !== (f >= 0.5 ? 1 : 0));
+        expect(badLit, `${s.id} lit vs sun_frac mismatch at`).toBe(-1);
       }
       expect(ts.t_utc[0]).toBe(manifest.time_range.start_utc);
     }
-  });
+  }, 60_000);
 
   it("site metrics agree with that site's timeseries (same time window)", () => {
     for (const s of sites.sites) {
@@ -103,7 +104,7 @@ describe('public/data follows contracts/types.ts', () => {
         (longest * ts.step_s) / 3600 - 1,
       );
     }
-  });
+  }, 60_000);
 
   it('every layer points to an existing PNG and has a usable palette', () => {
     expect(layers.bounds_m).toHaveLength(4);

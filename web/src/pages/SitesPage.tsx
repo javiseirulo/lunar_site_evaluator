@@ -9,6 +9,9 @@ import { cn } from '@/lib/utils';
 import { formatLatLon, pct, useAppStore, useData } from '@/core';
 import { scoreColor } from '@/layers';
 
+// contracts/README v1.1: pending_metrics are placeholders until terrain arrives.
+const isPending = (s: Site, k: string) => s.pending_metrics?.some((p) => p === k) ?? false;
+
 type Key = 'name' | 'score' | 'illum' | 'earth' | 'slope' | 'dark' | 'psr' | 'elev';
 
 const COLUMNS: {
@@ -42,8 +45,8 @@ const COLUMNS: {
   {
     key: 'slope',
     label: 'Steepness',
-    get: (s) => s.metrics.slope_deg,
-    fmt: (s) => `${s.metrics.slope_deg.toFixed(1)}°`,
+    get: (s) => (isPending(s, 'slope_deg') ? Infinity : s.metrics.slope_deg),
+    fmt: (s) => (isPending(s, 'slope_deg') ? '—' : `${s.metrics.slope_deg.toFixed(1)}°`),
     title: 'Local slope',
   },
   {
@@ -56,8 +59,8 @@ const COLUMNS: {
   {
     key: 'psr',
     label: 'Icy craters',
-    get: (s) => s.metrics.psr_dist_km,
-    fmt: (s) => `${s.metrics.psr_dist_km} km`,
+    get: (s) => (isPending(s, 'psr_dist_km') ? Infinity : s.metrics.psr_dist_km),
+    fmt: (s) => (isPending(s, 'psr_dist_km') ? '—' : `${s.metrics.psr_dist_km} km`),
     title: 'Distance to the nearest permanently shadowed region',
   },
   {
