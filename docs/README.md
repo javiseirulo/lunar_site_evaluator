@@ -13,6 +13,7 @@ Las IAs (y las personas) lo leen al empezar cada tarea. Ver `../CLAUDE.md`.
 | [05-prior-art.md](05-prior-art.md) | Soluciones existentes y huecos que podemos explotar |
 | [06-gstack-workflow.md](06-gstack-workflow.md) | Secuencia de skills gstack y cómo instalarlo |
 | [07-mvp-plan.md](07-mvp-plan.md) | Plan de MVP: módulos, contratos, esquema de 7 diapositivas (borrador) |
+| [08-work-plan.md](08-work-plan.md) | Reparto en 5 roles, issues, fases y dependencias (propuesta) |
 | [si-usage-log.md](si-usage-log.md) | Registro de uso de IA (obligatorio declararlo en la entrega) |
 | [decisions/log.md](decisions/log.md) | Registro de decisiones (append-only) |
 | [ideas/](ideas/) | Una idea por archivo + plantilla |
