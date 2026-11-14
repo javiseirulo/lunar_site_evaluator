@@ -93,3 +93,12 @@ no se considera cerrada la cámara 360°, ni calibradas las alturas Cesium/LOLA.
 Verificado en esta rama: 26 pruebas web, TypeScript, lint y build correctos.
 El primer lint encontró un bloqueo transitorio de lectura en OneDrive; el
 reintento terminó correctamente sin cambiar dependencias ni políticas.
+
+## Ver el visor local tras preparar datos
+
+La rama `pabloizgui/37-terrain-handoff` mantiene el placeholder de `dev` porque
+su entrega es independiente de Cesium. Para probar el visor, activar
+`pabloizgui/46-lunar-streetview` y recargar la pestaña de Vite. Se ha dejado
+esta rama activa y se ha comprobado HTTP 200 para la ruta de De Gerlache y el
+módulo real: contiene `LunarViewport`, sin «Street View goes here».
+Esta comprobación confirma qué código sirve Vite, no la carga visual del terreno.
