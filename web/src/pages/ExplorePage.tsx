@@ -4,6 +4,7 @@ import { useAppStore } from '@/core';
 import { TimeBar } from '@/core/shell/TimeBar';
 import { LayersPanel, PolarMap } from '@/layers';
 import { GlobeView, SiteDetail, SiteList } from '@/globe';
+import { MissionTimingPanel } from '@/scoring';
 
 type View = '2d' | '3d';
 
@@ -54,6 +55,7 @@ export default function ExplorePage() {
             </p>
           )}
         </div>
+        <MissionTimingPanel />
         <TimeBar />
       </section>
 

@@ -22,6 +22,7 @@ pnpm mocks            # regenerate mock data in public/data (repo root)
 | `src/globe/` | Marta | 3D globe, filters, site list/detail (`SiteList` is a starter to replace) |
 | `src/streetview/` | Pablo | Street View (placeholder) |
 | `src/game/` | Cristóbal | Missions and game (placeholder) |
+| `src/scoring/` | Javi | Mission config defaults, arrival model (`computeArrival`), Explore time-mode panel; score/validity next. Import from `@/scoring` |
 | `public/data/` | Javi / Pablo (pipeline) | Generated data. Mock until the pipeline writes it |
 
 Only touch another person's folder through a PR they review.

@@ -12,3 +12,9 @@
 - Plan detallado añadido a `docs/10-plan-tecnico.md` §5 Javi (J1–J11), sin tocar los bloques de los demás.
 - Hallazgo: Moon Trek WMTS sirve imágenes renderizadas (no valores) → para mostrar/validar; el DEM numérico y los perfiles de horizonte los produce Pablo (PGDA/PDS).
 - Pendiente: PR de contrato v1.1 (aditivo) y empezar #39 (efemérides SPICE + validación Horizons) en rama desde `dev`.
+
+## 2026-11-14 — Sesión 2b: selector de modo de tiempo (#65)
+- `web/src/scoring/`: `DEFAULT_MISSION_CONFIG`, `computeArrival` (Hohmann con distancia Tierra–Luna de Meeus, LLO polar, espera por traza, descenso), `MissionTimingPanel` montado en Explore encima del Mission Clock.
+- `missionConfig` en el store (quinto campo) y tipo `MissionConfig` en `contracts/types.ts`.
+- Verificado: lint, typecheck, 24 tests, build y navegador (escritorio y 375 px; sin errores de consola).
+- Matiz físico: con plano orbital fijo (`start_in_orbit`), solo los sitios a ≲1° del polo se alcanzan en cada órbita; a 85°S la espera también puede ser de días.
