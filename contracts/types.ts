@@ -160,3 +160,47 @@ export interface AppEvents {
   activeLayers: string[];
   mode: AppMode;
 }
+
+// ---------------------------------------------------------------------------
+// MissionConfig — mission timing + requirements (owner: Javi / scoring). v1.1, additive.
+// Lives in the store as `missionConfig`; Mission scenarios extend it (docs/10 §5 Javi, J0/J9).
+// ---------------------------------------------------------------------------
+/** "design": the user picks the landing time. "mission": the user picks the launch; landing is computed. */
+export type TimeMode = 'design' | 'mission';
+
+/** Earth→Moon transfer: Hohmann is computed from the Earth–Moon distance; the others are fixed durations. */
+export type Trajectory = 'hohmann' | 'fast' | 'low_energy';
+
+/** Metrics a mission can put requirements and weights on. */
+export type RequirementKey =
+  keyof SiteMetrics | 'sun_el_mean_deg' | 'max_blackout_hours' | 'sun_earth_pct';
+
+/**
+ * Threshold/objective requirement. The threshold is the hard limit (fail below it, or above it for
+ * "less is better" metrics); utility goes linearly from 0 at the threshold to 1 at the objective.
+ */
+export interface Requirement {
+  threshold: number;
+  objective?: number;
+}
+
+export interface MissionConfig {
+  time_mode: TimeMode;
+  /** ISO 8601 UTC. Used in "design" mode. */
+  landing_utc: string;
+  /** ISO 8601 UTC. Used in "mission" mode. */
+  launch_utc: string;
+  trajectory: Trajectory;
+  /** Altitude of the polar low lunar orbit, km. */
+  llo_alt_km: number;
+  /** The spacecraft is already in a polar lunar orbit whose plane is fixed (Mission emergencies). */
+  start_in_orbit?: boolean;
+  /** East longitude (deg) of that orbit plane at launch_utc, Moon body-fixed. Only with start_in_orbit. */
+  orbit_plane_lon_deg?: number;
+  /** Days on the surface = length of the evaluated / simulated window after landing. */
+  surface_days: number;
+  /** Minimum Earth elevation above the terrain horizon for a usable direct link, degrees. */
+  antenna_margin_deg: number;
+  requirements: Partial<Record<RequirementKey, Requirement>>;
+  weights: Partial<Record<RequirementKey, number>>;
+}
