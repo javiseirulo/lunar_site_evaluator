@@ -15,7 +15,7 @@ El equipo trabaja por defecto con la suite de skills **gstack** (`/office-hours`
 
 ## 1. Al empezar CADA tarea/sesión (OBLIGATORIO)
 
-1. `bash scripts/sync-docs.sh` (hace `git pull --rebase`; si no hay red, avisa al usuario).
+1. `bash scripts/sync-docs.sh` (`git fetch`, activa hooks, muestra cambios de `docs/` en `origin/main` y PRs abiertos; si no hay red, avisa al usuario).
 2. Lee **todo** `docs/` (empieza por `docs/README.md`), especialmente:
    - `docs/00-protocol.md` (cómo trabajamos)
    - `docs/01-hackathon-rules.md` y `docs/02-judging-playbook.md` (cómo se gana)
@@ -31,8 +31,15 @@ El equipo trabaja por defecto con la suite de skills **gstack** (`/office-hours`
   El `<handle>` es el usuario de GitHub (ej. `javiseirulo`).
 - Archivos compartidos (`docs/decisions/log.md`, `docs/04-resources-data.md`...) son **append-only**: añade al
   final con fecha y autor, no reescribas lo de otros.
-- Al terminar un bloque de trabajo: `git add docs && git commit && git pull --rebase && git push`
-  (pregunta al usuario antes del primer push de la sesión si no lo ha autorizado).
+- Al terminar un bloque de trabajo: commit en tu rama y push de la rama (nunca a `main`); abre/actualiza el PR.
+  Pregunta al usuario antes de hacer push o mergear si no lo ha autorizado.
+
+## 2b. Issues, ramas y PRs — NUNCA trabajar ni pushear en `main`
+
+- Toda tarea parte de un **issue** (`gh issue list` / `gh issue create`). Si el usuario pide algo sin issue, propón crearlo.
+- Rama: `<handle>/<n>-<slug>` desde `origin/main` actualizado. Si estás en `main`, crea la rama antes de editar.
+- PR con `Closes #n`, plantilla rellenada, verificación descrita. Mergear a `main` solo tras verificar (otra persona o
+  `/review`) y con confirmación del usuario. Detalle: `docs/00-protocol.md`.
 
 ## 3. Reglas del concurso que NO se pueden romper
 

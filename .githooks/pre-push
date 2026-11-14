@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# Bloquea push directo a main: todo va por rama + Pull Request.
+while read -r local_ref local_sha remote_ref remote_sha; do
+  if [ "$remote_ref" = "refs/heads/main" ]; then
+    echo "✖ Push directo a main bloqueado. Crea una rama (<handle>/<issue>-<slug>) y abre un PR." >&2
+    echo "  (Emergencia: git push --no-verify, solo con acuerdo del equipo.)" >&2
+    exit 1
+  fi
+done
+exit 0
