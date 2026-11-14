@@ -10,3 +10,43 @@
   - Estado compartido = store de `@/core`; pesos y rango de fechas son locales de `src/globe`.
   - Contratos nuevos (PR a `contracts/`): heightmap del parche (Pablo), normalización del score (Javi), `historic_sites.json` (yo), `grid_metrics.bin` (opcional).
   - Pendiente de verificar: autoría y versión de `LDEM_80S_80MPP_ADJ` y de las texturas LROC/LOLA → `04-resources-data.md`.
+
+## 2026-11-14 — Sesión 2: globo 3D v0 (rama `martaplatero2002-star/61-globo-v0`)
+- `GlobeView.tsx` carga en diferido `GlobeCanvas.tsx` (R3F): three.js solo se descarga al pulsar 3D, no al abrir Explore en 2D.
+- Escena: esfera r=1 (128×64) con `lroc_color_poles_4k.jpg` (SVS CGI Moon Kit, registrada en `04-resources`), `Stars`, luz ambiente + direccional fija (la luz por fecha llega en v2), `OrbitControls` sin pan, distancia 1.01–5, con damping y velocidad de giro que baja al acercarse.
+- `geo.ts`: `latLonToVec3` (y arriba, lon 0 → +X, lon 90 → −Z; coincide con las UV de `SphereGeometry`), con test.
+- Pins: un mesh por sitio, color `scoreColor`, opacidad 0,35 si `valid: false`; tamaño proporcional a la distancia cámara–superficie; el seleccionado ×1,6 con anillo. Clic → `selectSite`. Etiqueta (nombre · score) solo para el pin bajo el ratón y el seleccionado, oculta si queda detrás del globo.
+- Marcador "South Pole · N sites" visible con la cámara a distancia > 2; al pulsarlo la cámara vuela (lerp) a lat −89°, distancia 1,3, manteniendo el azimut.
+- Hallazgo: desmontar un `<Html>` de drei con React 19 lanza "removeChild … not a child of this node" y rompe el árbol. Solución: todos los `<Html>` se quedan montados y se ocultan por estilo; el aviso de carga es un div fuera del Canvas.
+- Verificado: lint, typecheck, 17 tests y build. En navegador (antes del arreglo de `<Html>`): textura, vuelo al polo, pins separados al acercar y hover con etiqueta. Pendiente: repetir la prueba tras el arreglo (clic en pin → ficha).
+- Controles, a petición de Marta: botón izquierdo = mover, derecho = girar, rueda = zoom; velocidad a la mitad (`MOUSE_SPEED = 0.5`).
+- Probado `TrackballControls` para poder girar por encima de los polos (OrbitControls se bloquea ahí): a Marta no le gustó y se volvió a `OrbitControls`. El bloqueo en los polos se queda por ahora.
+- Interacción con clic (un clic sin arrastrar; si el puntero se mueve más de 4 px cuenta como arrastre):
+  - En un pin de sitio: lo selecciona (`selectSite`) y abre una ficha junto al pin (nombre, score, coordenadas, aviso si no pasa los filtros). Volver a pulsarlo o la ✕ lo deselecciona.
+  - En el suelo: ficha "Point on the Moon" con las coordenadas, botón Copy (al portapapeles como `lat, lon` decimal) y "Create pin here".
+  - Formulario "Pin by coordinates" (arriba a la izquierda del globo): nombre opcional, lat y lon (admite `-89.5`, `89.5 S`, `45,2`, `45.2 E`); al añadir, la cámara vuela al pin.
+  - Pins propios (rombo azul claro): ficha con coordenadas, Copy y "Delete pin". Se guardan en localStorage (`customPins.ts`).
+- Decisión (según docs/10 §"Coordenadas personalizadas"): los pins propios son locales del globo, **no** cambian `selectedSiteId` y avisan de que no hay datos de luz/Tierra para ese punto. Compartirlos con el mapa 2D, Compare o Mission requiere ampliar el store con Javi2; calcular su ciencia requiere a Javi (coordenadas arbitrarias).
+
+## 2026-11-14 — Sesión 2 (cont.): requisitos, filtrado y orden en vivo
+- Rama actualizada con `dev` (#63 night plate, #64 plan de Javi, #66 selector Design/Mission). Conflictos solo en `04-resources` y `si-usage-log` (append-only): se conservaron todas las líneas.
+- Explore: los sitios candidatos **no aparecen** (ni en la lista ni como pins del globo) hasta pulsar **Show matching sites**. Después, cada slider re-filtra y re-ordena en vivo.
+  - Formulario de requisitos en `SiteList`: Sunlight ≥, Earth view ≥, Slope ≤, Longest dark ≤. Lee y escribe `missionConfig.requirements` del store (J9 de Javi). Botones Reset (valores por defecto de Javi) y Hide sites.
+  - Lista: los que cumplen, ordenados por score; debajo, plegados, los que no, con el primer requisito que fallan ("Slope 10° (needs at most 8°) +1 more").
+  - Globo: pins solo tras aplicar; los que cumplen con color por score, los que no en gris tenue. Ficha y etiqueta con el score según requisitos. Marcador "South Pole · N matching".
+- Score: `web/src/scoring/evaluate.ts` (`evaluateSite`, `rankSites`, `utility`) + 7 tests, siguiendo J7 de Javi (0 en el umbral, 1 en el objetivo, media ponderada; omite métricas sin datos; `site.valid` = filtro de seguridad). Va en `src/scoring` por J0 #1 (una sola función, dueño Javi) → **pedir revisión a Javi en el PR**.
+- Hallazgo: con los requisitos por defecto de Javi (noche ≤ 100 h, pendiente ≤ 8°) no pasa ninguno de los 20 sitios mock; con pendiente ≤ 15° pasan 3. Es cosa de los mocks, no del filtro.
+- Ficha y formulario del globo adaptados al tema nuevo (papel sobre `.space`).
+- El mapa 2D (`PolarMap`, de Javi2) sigue mostrando todos los sitios: ocultarlos ahí también requiere PR a `src/layers`.
+- Los avisos "synchronously unmount a root" en consola son del doble montaje de `StrictMode` en desarrollo (uno por `<Html>`); no rompen nada y no salen en producción.
+- Verificado: lint, typecheck, 40 tests, build; en navegador, la lista oculta → aparece al aplicar → filtra/ordena en vivo, y el globo carga con "South Pole · 3 matching". Pendiente: probar a mano el clic en pins del globo con la ficha nueva.
+
+## 2026-11-14 — Sesión 2 (cierre): plan actualizado y PR
+- `docs/10` §5 Marta reescrita con lo acordado (Explore por requisitos de misión sin pesos, ventana de misión, rejilla, sin servidor, iteraciones v0–v5, hito domingo 13:00) y entrada en `decisions/log.md`.
+- Rama actualizada con `dev` (#68: alcance toda la Luna, §10). Javi publicará `evaluateSite`/`rankSites` en `@/scoring`, así que el filtro de esta sesión **sale de `src/scoring`** y queda como provisional en `src/globe/requirements.ts` (+ tests), sin tocar carpetas ajenas.
+- Pendientes / dependencias:
+  - v1: formulario de requisitos de misión + `missionStats.ts` + orden sin pesos (sustituye a los sliders provisionales).
+  - Javi: `score`/`weights`/`valid` en `sites.json` (PR a `contracts/`); conciliar §10 (sliders sobre `missionConfig`) con lo acordado hoy.
+  - §10 de Javi para Marta: pins por todo el globo (el clúster solo para el polo), clic → `selectedPoint` (cuando Javi2 lo añada al store), luz con `sunDirectionMoonME` de `@/ephem`, mapa de calor global.
+  - Javi2: fecha/hora en el Mission Clock; `selectedPoint` en el store.
+  - Pablo: heightmap del parche; teselas de horizonte.

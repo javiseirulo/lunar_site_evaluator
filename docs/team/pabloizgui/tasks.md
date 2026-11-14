@@ -69,3 +69,43 @@ Siguiente orden: (1) cerrar revisión y publicación de la entrega,
 (2) corregir cámara 360° y mejorar la vista, (3) benchmark/horizontes para Javi,
 (4) integrar el catálogo final, alinear marcos y conectar efemérides reales.
 Pablo puede avanzar en cámara/UX y benchmark sin esperar los vectores.
+
+## Sincronización posterior con dev — 2026-11-14
+
+Pull de `origin/dev` en `0e00fc3`: incorpora #68 (alcance global, #67) y #71
+(globo v0 de Marta). Se conserva la entrega local del PR borrador #72; no se
+publica ni se mergea ese PR por esta sincronización. Conflictos documentales
+resueltos preservando ambas aportaciones y los estados reales de Marta/Pablo.
+
+Información útil y dependencias:
+
+- Toda la Luna seleccionable: Cesium sigue siendo global. El horizonte real,
+  pendiente y PSR tienen cobertura propia; fuera de ella se muestra «no terrain»
+  o «pending terrain». Javi amplía catálogo y evaluación, no hay que inventar
+  métricas para completar coordenadas.
+- PR #70, aún abierto, propone contrato v1.1 aditivo. `HorizonProfile` conserva
+  los campos previstos en nuestra configuración (5 m; 0,1° para curados).
+  Leer su schema como propuesta; no incorporarlo unilateralmente. Añade
+  `pending_metrics`, `sun_frac`, `horizon_source` e índices binarios.
+- Marta tiene globo, pins y coordenadas en dev. Sus pins propios siguen siendo
+  estado local de `src/globe`; `selectedPoint` aún no existe en core. La conexión
+  de un punto libre con Street View requiere ese acuerdo con Javi2.
+- Siguen ausentes en dev `@/ephem`, los vectores anuales, perfiles calculados
+  y `catalog-for-pablo.md`. El plan de implementación de Javi describe entregas
+  futuras, no archivos ya consumibles.
+- Nueva petición de Marta: teselas a 1 km, luego 200 m, con 72 azimuts (paso 5°),
+  más resumen mensual por celda. Difiere de J0/J10 y nuestra configuración de
+  1° para celdas de 5 km. Mantener los 0,1° de sitios curados separados y acordar
+  coste/formato/resolución de rejilla antes del lote; hacer primero el benchmark.
+- Explore v1 de Marta cambia a requisitos duros y orden sin pesos (#73), mientras
+  §10 de Javi mantiene score ponderado. Ambos documentos reconocen el acuerdo
+  pendiente; no cambiar por nuestra cuenta contratos ni la lógica de score.
+- PR #72 sin comentarios, reviews ni comentarios inline al consultar. No hay
+  comprobaciones CI reportadas sobre su head remoto; no afirmar aprobación.
+
+Verificación de la integración local: 53 tests web y TypeScript correctos.
+El primer intento de Vitest sufrió EBUSY en el watcher de Cesium bajo OneDrive;
+el reintento con `CHOKIDAR_USEPOLLING=1` pasó. No se ha probado el giro WebGL 360°.
+Siguiente bloque recomendado: cámara/legibilidad y benchmark de un horizonte;
+después conectar el contrato y vectores cuando entren en dev. La nueva rejilla
+y el polo norte amplían el alcance, no son entregables ya implementados.
