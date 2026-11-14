@@ -2,6 +2,23 @@
   "schema_version": 1,
   "sources": [
     {
+      "id": "lola-south-pole-far-240m",
+      "filename": "LDEM_60S_240MPP_ADJ.TIF",
+      "url": "https://pgda.gsfc.nasa.gov/data/LOLA_20mpp/LDEM_60S_240MPP_ADJ.TIF",
+      "product_page": "https://pgda.gsfc.nasa.gov/products/90",
+      "expected_bytes": 218961039,
+      "coverage": "60 to 90 degrees south; extends beyond the visual patch",
+      "pixel_spacing_m": 240,
+      "quantity": "surface height, meters",
+      "reference_frame": "MOON_ME, JPL DE421",
+      "projection": "south polar stereographic; inspect embedded CRS",
+      "vertical_reference": "LOLA elevation relative to the 1737400 m sphere",
+      "source_last_modified_http": "2023-07-07T22:04:03Z",
+      "citation": "Barker et al. (2023), Planetary Science Journal 4, 183",
+      "doi": "https://doi.org/10.3847/PSJ/acf3e1",
+      "publisher_checksum": null
+    },
+    {
       "id": "lola-south-pole-5m",
       "filename": "ldem_87s_5mpp.tif",
       "url": "https://pgda.gsfc.nasa.gov/data/LOLA_5mpp/87S/ldem_87s_5mpp.tif",

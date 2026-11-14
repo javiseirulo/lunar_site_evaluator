@@ -7,6 +7,7 @@ on:
       - 'scripts/terrain_data.py'
       - 'scripts/check-terrain-delivery.mjs'
       - 'config/terrain-sources.json'
+      - 'config/terrain-processing.json'
       - 'requirements-terrain.txt'
       - 'contracts/heightmap.schema.json'
       - 'contracts/types.ts'

@@ -1,7 +1,7 @@
 # Pablo: progreso y pendientes
 
 Actualizado: 2026-11-14. Contexto vigente: `docs/10-plan-tecnico.md`, §5 y §9;
-`origin/dev` en `6a9395e`. Prioridad indicada por Pablo: desbloquear a Marta y
+`origin/dev` en `461507a` integrado conservando los commits locales. Prioridad: desbloquear a Marta y
 entregar los datos que necesitan los demás módulos antes de continuar el visor.
 
 | Prioridad | Tarea | Estado / criterio de cierre |
@@ -11,10 +11,10 @@ entregar los datos que necesitan los demás módulos antes de continuar el visor
 | P1 | Heightmap polar para Marta hasta −80° | Hecho en rama #37: 1025×1025 Float32 LE + máscara + manifest sobre `layers.json`; producto real PGDA 90 de 80 m |
 | P1 | Altitud y pendiente para Marta/Javi2 | Hecho: dos capas 512² gray8 + alfa y GeoTIFF; pendiente del LDSM publicado, no del heightmap reducido; integración pendiente |
 | P1 | Datos de terreno de los sitios para Javi | Hecho: CSV/JSON, 20/20 coordenadas cubiertas, píxel nativo 80 m; coordenadas aún del fixture, no métricas de aterrizaje finales |
-| P2 | Horizonte científico para Javi / Street View | Pendiente #38: norte lunar local, curvatura, cobertura lejana, altura del observador y convergencia de resolución; el recorte local no basta |
+| P2 | Horizonte científico para Javi / Street View | Configurado según J0: 5 m, 0,1° curados / 1° celdas, alcance inicial 300 km y validación hasta 310 km; DEM lejano 240 m hasta −60°S. Pendientes benchmark, catálogo #48 y cálculo: 0 perfiles listos |
 | P2 | Revisión e integración de contrato heightmap | Pendiente: propuesta aditiva por PR a `dev`, revisión Marta/Javi2; no editar su loader sin coordinar |
 | P2 | Cámara Street View en todas las orientaciones | v0 en commit local `a1c6216`, rama `pabloizgui/46-lunar-streetview`; terreno ion visible con token correcto, pero giro de 90° produjo vista gris: investigar antes de cerrar |
-| P2 | Sol/Tierra reales y fecha compartida | Integración del visor preparada; series actuales mock. Depende de Javi y del horizonte real |
+| P2 | Sol/Tierra reales y fecha compartida | Consumir `@/ephem` de Javi: vectores anuales 2026–2055, paralaje terrestre exacta; confirmar DE421/DE440. Módulo/datos todavía no disponibles en dev; series actuales mock |
 | P3 | Calibrar altura Cesium frente al DEM | Pendiente: varios puntos, mismo frame y datum; no aplicar un offset supuesto |
 | P3 | Ubicación libre y enlaces/QR didácticos | Pendiente tras cerrar datos y navegación; mantener estado compartido y ruta reproducible |
 | P3 | `grid_metrics.bin`, PSR y productos adicionales | Después de acordar semántica con Javi; no inventar datos ni ampliar contratos innecesariamente |
@@ -42,7 +42,9 @@ del equipo. Este documento no acredita integración ni validación científica f
 ## Resultado de la entrega
 
 Productos en `web/public/data/terrain/`; guía: [terrain-handoff.md](terrain-handoff.md).
-Paquete local: `data/exports/lunar-terrain-marta-v1.zip`.
+Paquete original conservado: `data/exports/lunar-terrain-marta-v1.zip`.
+Entrega actualizada: `data/exports/lunar-terrain-team-v2.zip`, con configuración
+y estados de cobertura/horizonte/efemérides. Ver [ajuste a Javi](javi-context-sync.md).
 1 050 625 muestras, 823 469 válidas; las esquinas/bordes del cuadrado fuera de
 la cobertura circular quedan enmascarados. Rango de la malla remuestreada:
 −6665,05 a 7005,42 m. Paso: 593,76171875 m; no equivale a la resolución fuente.

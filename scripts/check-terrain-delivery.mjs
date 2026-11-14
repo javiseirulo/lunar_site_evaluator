@@ -1,7 +1,7 @@
 /** Check the actual binary handoff as a JS consumer. AI-assisted: OpenAI Codex. */
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { dirname, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -16,6 +16,25 @@ const read = (file) => {
 const json = (file) => JSON.parse(read(file).toString('utf8'));
 const meta = json('terrain/heightmap.json');
 const shared = json('layers.json');
+if (existsSync(resolve(root, 'terrain/delivery.json'))) {
+  const delivery = json('terrain/delivery.json');
+  const processing = json(delivery.production_settings.file);
+  assert.equal(
+    createHash('sha256').update(read(delivery.production_settings.file)).digest('hex'),
+    delivery.production_settings.sha256,
+  );
+  assert.equal(
+    createHash('sha256').update(read('terrain/heightmap.json')).digest('hex'),
+    delivery.heightmap.sha256,
+  );
+  assert.equal(delivery.heightmap.observer_offset_applied, false);
+  assert.equal(processing.observer_height_m, 5);
+  assert.equal(processing.horizon.curated.sample_count, 3600);
+  assert.equal(processing.horizon.heatmap.sample_count, 360);
+  assert.equal(processing.horizon.max_range_km, 300);
+  assert.equal(delivery.horizon.ready_profiles, 0);
+  assert.equal(delivery.horizon.status, 'pending_computation_and_validation');
+}
 for (const key of ['projection', 'radius_m', 'bounds_m', 'lat_limit']) {
   assert.deepEqual(meta[key], shared[key], `Shared grid mismatch: ${key}`);
 }

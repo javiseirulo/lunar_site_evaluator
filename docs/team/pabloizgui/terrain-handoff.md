@@ -7,6 +7,13 @@ Seguimiento completo: [tasks.md](tasks.md).
 
 ## Archivos y destinatarios
 
+Actualizado tras integrar `origin/dev` en `461507a` (Javi, J0/J10).
+El nuevo ZIP es `data/exports/lunar-terrain-team-v2.zip`; se conserva el v1.
+Los binarios de altura/máscara y las capas previas no cambian.
+Se añaden `terrain/processing.json` (5 m, azimut 0,1°/1°, base 300 km) y
+`terrain/delivery.json` (archivos listos, hashes y dependencias pendientes).
+Detalle: [javi-context-sync.md](javi-context-sync.md).
+
 La carpeta generada es `web/public/data/terrain/`. El paquete ZIP de entrega en
 `data/exports/` incluye esa carpeta y los GeoTIFF de comprobación opcionales
 en `verification/`. Estos se conservan localmente en
@@ -129,6 +136,7 @@ python scripts/terrain_data.py inspect --source lola-south-pole-80m
 python scripts/terrain_data.py inspect --source lola-south-pole-slope-80m
 python python/terrain/export_polar.py data/terrain/lola-south-pole-80m/LDEM_80S_80MPP_ADJ.TIF data/terrain/lola-south-pole-slope-80m/LDSM_80S_80MPP_ADJ.TIF web/public/data/terrain --verification-output data/exports/lunar-terrain-gis-v1
 python -m unittest discover -s tests -v
+python python/terrain/prepare_handoff.py
 node scripts/check-terrain-delivery.mjs
 ```
 

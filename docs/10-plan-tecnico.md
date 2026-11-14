@@ -527,6 +527,18 @@ Reconciliación solicitada por Pablo; seguimiento en **#59**.
 >   - Si el punto no tiene perfil de horizonte, muestra solo el horizonte geométrico y etiquétalo ("no terrain").
 > - **Validación cruzada:** la que ya tienes prevista (2 sitios y fechas: render frente a `lit`/`earth_visible`) se anota en el PR (#41).
 
+**Configuración de producción de Pablo tras J0 (2026-11-14).**
+`config/terrain-processing.json` fija 5 m, 0,1°/3600 muestras en sitios curados y
+1°/360 en celdas de 5 km. Base de relieve lejano: **300 km**, con comparación
+hasta **310 km** antes de validar. Fuente adicional PGDA 90 de 240 m hasta
+−60°S para salir de la ventana visual −80°S cuando lo exija el horizonte.
+Se mantiene el heightmap de Marta sin añadir altura del observador.
+El catálogo lo decide #48; meta inicial de capacidad de Pablo: 20 perfiles,
+condicionada al benchmark y la lista final; **0 perfiles científicos listos hoy**.
+Sol/Tierra se consumirán desde `@/ephem` de Javi, sin fabricar vectores ni
+extrapolar los mocks. Falta confirmar DE421/DE440. Detalle y límites:
+[reconfiguración de Pablo](team/pabloizgui/javi-context-sync.md).
+
 ### Marta: visor 3D de la Luna y modo exploración
 > Revisado 2026-11-14 contra el código de `dev` (`contracts/types.ts`, `web/src/core`, `web/src/layers`, mocks de `public/data`).
 > Marta trabaja en `web/src/globe/`; todo lo que sea de otra carpeta o de `contracts/` va por PR con su dueño.
@@ -710,7 +722,7 @@ Lo propuesto aquí se publica para revisión compartida; no atribuye un OK a los
 
 | Con quién | Interfaz que se mantiene | Lo que hay que acordar antes de implementar |
 | --- | --- | --- |
-| Javi | `sites.json`, `timeseries/<id>.json`, azimut/elevación y visibilidad del pipeline | Perfil de horizonte (marco, altura, resolución y cobertura) y ampliación futura para coordenadas arbitrarias |
+| Javi | `sites.json`, `Timeseries` y vectores anuales desde `@/ephem` | J0/J10: observador 5 m, azimut 0,1° curados / 1° celdas, alcance base 300 km; marco DE421/DE440 y catálogo #48 por confirmar; coordenadas arbitrarias en el MVP |
 | Marta | Globo R3F, helpers de proyección, `layers.json`, `activeLayers`, `layerOpacity` | Heightmap polar Float32 + máscara/manifest sobre la ventana completa; el DEM de 87–90°S no basta para llegar a −80° |
 | Javi2 | Componente React Street View, rutas, selección, reloj y loaders de `@/core` | Dependencia/build Cesium, carga diferida y limpieza; altura del observador y coordenadas propias solo con extensión de contrato revisada |
 | Cristóbal | `mode: "game"`, selección y series del mismo pipeline; veredicto determinista | No introducir dependencia del renderer Cesium para jugar; respetar cobertura temporal y valores desconocidos |
