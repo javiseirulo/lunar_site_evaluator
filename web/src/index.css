@@ -16,7 +16,7 @@
 @theme {
   --font-sans: 'Nunito Variable', 'Trebuchet MS', 'Segoe UI', sans-serif;
   --font-head: 'Nunito Variable', 'Trebuchet MS', sans-serif;
-  --font-display: 'Audiowide', 'Arial Black', sans-serif;
+  --font-display: 'Nunito Variable', 'Trebuchet MS', sans-serif;
   --font-mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
 
   /* Panels and ink (dark synthwave) */
@@ -72,7 +72,7 @@
   --color-line-strong: var(--color-edge-hi);
   --radius-panel: 6px;
 
-  --shadow-card: 0 1px 0 #ffffff0d inset, 0 12px 28px -14px #000000e0, 0 0 26px -12px #9b5cff70;
+  --shadow-card: 0 0 0 1px #ffffff06 inset, 0 0 18px -6px #7b4dff70, 0 14px 30px -16px #000000f0;
   --shadow-lift: 0 1px 0 #ffffff14 inset, 0 16px 34px -14px #000000f0, 0 0 30px -8px #ff3fa480;
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 
@@ -128,24 +128,6 @@
       100% 100%;
     background-attachment: fixed;
   }
-  /* Neon floor grid fixed at the bottom of the viewport, behind everything. */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: auto -50% 0 -50%;
-    height: 34vh;
-    z-index: -1;
-    pointer-events: none;
-    background-image:
-      linear-gradient(#ff3fa480 1px, transparent 1px),
-      linear-gradient(90deg, #ff3fa480 1px, transparent 1px);
-    background-size: 60px 40px;
-    background-position: center bottom;
-    transform: perspective(300px) rotateX(60deg);
-    transform-origin: bottom;
-    mask-image: linear-gradient(transparent, #000 60%);
-    opacity: 0.55;
-  }
   ::selection {
     background: var(--color-pink);
     color: #fff;
@@ -168,20 +150,13 @@
 
   /* Panel with a title bar. */
   .box {
-    @apply border-edge bg-panel rounded-[6px] border;
+    @apply rounded-[8px] border border-[#7b4dff70] bg-[#0b0716];
     box-shadow: var(--shadow-card);
   }
-  .box-head {
-    @apply font-head flex min-h-[30px] items-center gap-2 rounded-t-[5px] px-3.5 text-[12px] font-extrabold tracking-[0.08em] text-white uppercase;
-    background: linear-gradient(90deg, #5631d6, #7b4dff 55%, #a04dff);
-    border-bottom: 1px solid #ff3fa4;
-    box-shadow: 0 1px 0 #ffffff30 inset;
-  }
+  /* Panel title: plain heading text (no bar), keeps the old class name for every page. */
+  .box-head,
   .box-head-dark {
-    @apply font-head flex min-h-[30px] items-center gap-2 rounded-t-[5px] px-3.5 text-[12px] font-extrabold tracking-[0.08em] text-white uppercase;
-    background: linear-gradient(90deg, #c81f7c, #ff3fa4 60%, #ff8a3d);
-    border-bottom: 1px solid #ffb37a;
-    box-shadow: 0 1px 0 #ffffff40 inset;
+    @apply text-heading flex min-h-[40px] items-center gap-2 px-4 pt-3 text-[16px] font-extrabold tracking-normal normal-case;
   }
   .box-body {
     @apply p-4;
@@ -189,6 +164,7 @@
   .box-head :is(h1, h2, h3),
   .box-head-dark :is(h1, h2, h3) {
     color: inherit;
+    font-size: inherit;
   }
 
   /* Clickable card: lifts on hover, settles on press. */
@@ -210,26 +186,23 @@
 
   /* Top navigation tabs. */
   .tab {
-    @apply font-head text-pale flex h-full items-center px-4 text-[12.5px] font-extrabold tracking-[0.07em] whitespace-nowrap uppercase;
+    @apply text-ink flex h-full flex-1 items-center justify-center px-4 text-[15px] font-bold whitespace-nowrap;
     transition:
       background-color 150ms var(--ease-out),
       color 150ms var(--ease-out);
   }
   .tab:hover {
-    @apply bg-violet-dark text-white;
+    @apply bg-[#1b1033] text-white;
   }
   .tab[aria-current='page'],
   .tab.active {
     @apply bg-pink text-white;
-    box-shadow:
-      0 -3px 0 var(--color-glow) inset,
-      0 0 18px -2px #ff3fa4;
-    text-shadow: 0 0 8px #ffffffa0;
+    box-shadow: 0 0 18px -4px #ff3fa4;
   }
 
   /* Buttons: solid fill with a short "pressed" shadow. */
   .btn {
-    @apply font-head bg-violet inline-flex h-[30px] cursor-pointer items-center justify-center gap-1.5 rounded-[4px] px-3 text-[12px] font-extrabold tracking-[0.04em] text-white uppercase;
+    @apply font-head bg-violet inline-flex h-[32px] cursor-pointer items-center justify-center gap-1.5 rounded-[6px] px-3.5 text-[14px] font-bold text-white;
     box-shadow:
       0 1px 0 #ffffff40 inset,
       0 2px 0 var(--color-violet-dark),
@@ -275,7 +248,7 @@
 
   /* Form field. */
   .field {
-    @apply border-edge-hi text-ink h-[30px] rounded-[4px] border bg-[#0c0719] px-2 text-[13px];
+    @apply border-edge-hi text-ink h-[32px] rounded-[6px] border bg-[#0c0719] px-2 text-[14px];
     box-shadow: 0 1px 3px #00000080 inset;
     transition: border-color 150ms var(--ease-out);
   }
@@ -310,8 +283,8 @@
   }
   .display {
     font-family: var(--font-display);
-    font-weight: 400;
-    letter-spacing: 0.01em;
+    font-weight: 900;
+    letter-spacing: -0.01em;
   }
   .rows > * + * {
     border-top: 1px solid var(--color-edge);
@@ -432,31 +405,6 @@
     --color-line: #9b5cff66;
     --color-line-strong: #c79bffaa;
     color: var(--color-ink);
-  }
-  .space::before {
-    content: '';
-    @apply pointer-events-none absolute inset-x-[-50%] bottom-[-2px] -z-10 h-[38%];
-    background-image:
-      linear-gradient(#ff3fa4cc 1.5px, transparent 1.5px),
-      linear-gradient(90deg, #ff3fa4cc 1.5px, transparent 1.5px);
-    background-size: 44px 30px;
-    background-position: center bottom;
-    transform: perspective(240px) rotateX(58deg);
-    transform-origin: bottom;
-    filter: drop-shadow(0 0 3px #ff3fa4);
-    mask-image: linear-gradient(transparent, #000 45%);
-    animation: grid-drift 6s linear infinite;
-  }
-  .space::after {
-    content: '';
-    @apply pointer-events-none absolute inset-x-0 bottom-[38%] -z-10 h-px;
-    background: linear-gradient(90deg, transparent, #ff8a3d, #ff3fa4, #9b5cff, transparent);
-    box-shadow: 0 0 10px 1px #ff3fa4;
-  }
-  @keyframes grid-drift {
-    to {
-      background-position: center calc(100% + 30px);
-    }
   }
   .neon-text {
     color: #ffe3f3;

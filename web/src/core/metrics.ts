@@ -2,13 +2,13 @@
  * One place that says how each site metric is named, explained and shown — in plain language for
  * students (default) and with technical names in Pro mode. Shared by the site card, Sites, Compare.
  */
-import { Globe, Moon, Mountain, Snowflake, Sun, type LucideIcon } from 'lucide-react';
+import { Moon, Mountain, SatelliteDish, Snowflake, Sun, type LucideIcon } from 'lucide-react';
 import type { Site, SiteMetrics } from '@lunar/contracts';
 import { pct } from './format';
 
 export interface MetricDef {
   key: keyof SiteMetrics;
-  /** Plain-language question shown by default. */
+  /** Short plain-language name shown by default. */
   label: string;
   /** Technical name shown in Pro mode. */
   proLabel: string;
@@ -36,7 +36,7 @@ export function friendlyHours(h: number): string {
 export const METRICS: MetricDef[] = [
   {
     key: 'illum_pct',
-    label: 'How sunny?',
+    label: 'Sunlight',
     proLabel: 'Sunlight (illumination)',
     help: 'Share of the time the Sun is above the hills around the site. More sun means more solar power.',
     Icon: Sun,
@@ -48,10 +48,10 @@ export const METRICS: MetricDef[] = [
   },
   {
     key: 'earth_vis_pct',
-    label: 'Can it call home?',
+    label: 'Earth view',
     proLabel: 'Earth in view',
     help: 'Share of the time Earth is above the horizon, so the lander can radio home directly.',
-    Icon: Globe,
+    Icon: SatelliteDish,
     tone: 'text-earth',
     bar: 'var(--color-earth)',
     format: (m) => pct(m.earth_vis_pct),
@@ -72,7 +72,7 @@ export const METRICS: MetricDef[] = [
   },
   {
     key: 'slope_deg',
-    label: 'How steep?',
+    label: 'Slope',
     proLabel: 'Slope',
     help: 'How tilted the ground is. Landers need gentle ground; here anything over 15° fails.',
     Icon: Mountain,
@@ -84,7 +84,7 @@ export const METRICS: MetricDef[] = [
   },
   {
     key: 'psr_dist_km',
-    label: 'Distance to icy craters',
+    label: 'To icy craters',
     proLabel: 'To permanently shadowed region',
     help: 'How far to the nearest crater floor that never sees sunlight, where water ice may be hiding.',
     Icon: Snowflake,

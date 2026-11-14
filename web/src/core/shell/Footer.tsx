@@ -1,8 +1,8 @@
 import { Link } from 'react-router';
 import { useData } from '../data';
-import { TABS } from '../navigation';
+import { ALL_PAGES } from '../navigation';
 
-const LINKS = TABS.map((t) => ({ to: t.path, label: t.label }));
+const LINKS = ALL_PAGES.map((t) => ({ to: t.path, label: t.label }));
 
 export function Footer() {
   const manifest = useData((s) => s.manifest);

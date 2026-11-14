@@ -1,139 +1,135 @@
 /**
- * Layer controls (owner: Javi2): toggle, opacity, draw order and legend for every layer
- * in layers.json. Writes only to the store (activeLayers, layerOpacity); the 2D map and the
- * 3D globe read the same state and draw it.
+ * Layer controls (owner: Javi2): one coloured on/off switch per layer in layers.json. Pro mode adds
+ * legend, opacity and draw order. Writes only to the store (activeLayers, layerOpacity); the 2D map
+ * and the 3D globe read the same state and draw it.
  */
-import { useState } from 'react';
 import type { LayerDef } from '@lunar/contracts';
 import { cn } from '@/lib/utils';
-import { Hint, useAppStore, useData } from '@/core';
+import { useAppStore, useData } from '@/core';
 import { LegendBar } from './Legend';
+
+/** Friendly names and switch colours for known layer ids; unknown ids fall back to layers.json. */
+const LAYER_UI: Record<string, { label: string; color: string }> = {
+  illumination: { label: 'Sunlight', color: '#ffb84d' },
+  slope: { label: 'Slope', color: '#ff6fb5' },
+  psr: { label: 'Ice (shadowed craters)', color: '#b894ff' },
+  elevation: { label: 'Height', color: '#c9c3d9' },
+  score: { label: 'Score', color: '#4fdc8a' },
+};
+const ORDER = ['illumination', 'slope', 'psr', 'elevation', 'score'];
 
 export function LayersPanel({ className }: { className?: string }) {
   const manifest = useData((s) => s.layers);
+  const proMode = useAppStore((s) => s.proMode);
   const activeLayers = useAppStore((s) => s.activeLayers);
-  const [open, setOpen] = useState(true);
-
   if (!manifest) return null;
-  // Active layers first, top of the stack first; then the inactive ones in manifest order.
-  const byId = new Map(manifest.layers.map((l) => [l.id, l]));
-  const active = [...activeLayers].reverse().flatMap((id) => byId.get(id) ?? []);
-  const inactive = manifest.layers.filter((l) => !activeLayers.includes(l.id));
+
+  const layers = [...manifest.layers].sort(
+    (a, b) => ((ORDER.indexOf(a.id) + 99) % 99) - ((ORDER.indexOf(b.id) + 99) % 99),
+  );
 
   return (
-    <section className={cn('box', className)} aria-labelledby="layers-heading">
-      <div className="box-head">
-        <h2 id="layers-heading">Map Layers</h2>
-        <span className="ml-auto font-sans font-normal tracking-normal normal-case">
-          {activeLayers.length} on ·{' '}
-          <button
-            type="button"
-            className="underline"
-            onClick={() => setOpen((o) => !o)}
-            aria-expanded={open}
-          >
-            {open ? 'hide' : 'show'}
-          </button>
-        </span>
-      </div>
-      {open && (
-        <ul className="rows">
-          {active.map((l, i) => (
-            <LayerRow key={l.id} layer={l} active canUp={i > 0} canDown={i < active.length - 1} />
-          ))}
-          {inactive.map((l) => (
-            <LayerRow key={l.id} layer={l} active={false} canUp={false} canDown={false} />
-          ))}
-        </ul>
-      )}
+    <section className={cn('box px-4 py-3', className)} aria-label="Map layers">
+      {proMode && <h2 className="text-heading mb-1 text-[15px] font-extrabold">Map layers</h2>}
+      <ul className="space-y-1">
+        {layers.map((l) => (
+          <LayerRow
+            key={l.id}
+            layer={l}
+            index={activeLayers.indexOf(l.id)}
+            count={activeLayers.length}
+            proMode={proMode}
+          />
+        ))}
+      </ul>
     </section>
   );
 }
 
 function LayerRow({
   layer,
-  active,
-  canUp,
-  canDown,
+  index,
+  count,
+  proMode,
 }: {
   layer: LayerDef;
-  active: boolean;
-  canUp: boolean;
-  canDown: boolean;
+  index: number;
+  count: number;
+  proMode: boolean;
 }) {
-  const opacity = useAppStore((s) => s.layerOpacity[layer.id] ?? layer.default_opacity);
   const toggleLayer = useAppStore((s) => s.toggleLayer);
   const moveLayer = useAppStore((s) => s.moveLayer);
   const setLayerOpacity = useAppStore((s) => s.setLayerOpacity);
-  const proMode = useAppStore((s) => s.proMode);
-  const id = `layer-${layer.id}`;
+  const opacity = useAppStore((s) => s.layerOpacity[layer.id] ?? layer.default_opacity);
+  const active = index >= 0;
+  const ui = LAYER_UI[layer.id] ?? { label: layer.label, color: '#b394ff' };
 
   return (
-    <li className={cn('px-3.5 py-2.5 transition-colors', active && 'bg-panel-2')}>
-      <div className="flex items-center gap-2">
-        <input
-          id={id}
-          type="checkbox"
-          checked={active}
-          onChange={() => toggleLayer(layer.id)}
-          className="accent-pink size-4 cursor-pointer"
-          aria-label={`${active ? 'Hide' : 'Show'} ${layer.label}`}
-        />
-        <label
-          htmlFor={id}
-          className={cn(
-            'cursor-pointer',
-            active ? 'text-heading font-extrabold' : 'text-ink-muted font-bold',
-          )}
+    <li title={layer.description}>
+      <button
+        type="button"
+        role="switch"
+        aria-checked={active}
+        onClick={() => toggleLayer(layer.id)}
+        className="flex w-full items-center justify-between gap-3 rounded-[6px] px-1 py-1.5 text-left text-[15px] transition-colors hover:bg-white/5"
+      >
+        <span className={active ? 'text-heading' : 'text-ink-muted'}>
+          {proMode ? layer.label : ui.label}
+        </span>
+        <span
+          className="relative inline-flex h-[22px] w-[40px] shrink-0 rounded-full border transition-colors duration-200"
+          style={{
+            borderColor: active ? ui.color : '#4a3a6e',
+            background: active ? `${ui.color}40` : '#120a22',
+            boxShadow: active ? `0 0 10px -2px ${ui.color}` : 'none',
+          }}
+          aria-hidden
         >
-          {layer.label}
-        </label>
-        <Hint text={proMode ? `${layer.description} Source: ${layer.source}` : layer.description} />
-        {active && proMode && (
-          <span className="ml-auto flex gap-1">
-            {/* "Up" in this list = drawn on top = later in activeLayers. */}
+          <span
+            className="absolute top-[2px] size-[16px] rounded-full transition-transform duration-200 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
+            style={{
+              left: 2,
+              background: active ? ui.color : '#6b5c8f',
+              transform: active ? 'translateX(18px)' : 'none',
+            }}
+          />
+        </span>
+      </button>
+      {active && proMode && (
+        <div className="animate-enter mt-1 mb-2 space-y-1.5 px-1">
+          <LegendBar layer={layer} />
+          <div className="flex items-center gap-2">
+            <span className="label w-14">Opacity</span>
+            <input
+              type="range"
+              className="range"
+              min={0}
+              max={1}
+              step={0.05}
+              value={opacity}
+              onChange={(e) => setLayerOpacity(layer.id, Number(e.target.value))}
+              aria-label={`${layer.label} opacity`}
+            />
+            {/* "Up" = drawn on top = later in activeLayers. */}
             <button
               type="button"
-              disabled={!canUp}
+              className="btn btn-quiet h-[22px] w-[24px] px-0 text-[9px]"
+              disabled={index >= count - 1}
               onClick={() => moveLayer(layer.id, 1)}
-              className="btn btn-quiet h-[20px] w-[22px] px-0 text-[9px]"
               aria-label={`Move ${layer.label} up`}
             >
               ▲
             </button>
             <button
               type="button"
-              disabled={!canDown}
+              className="btn btn-quiet h-[22px] w-[24px] px-0 text-[9px]"
+              disabled={index <= 0}
               onClick={() => moveLayer(layer.id, -1)}
-              className="btn btn-quiet h-[20px] w-[22px] px-0 text-[9px]"
               aria-label={`Move ${layer.label} down`}
             >
               ▼
             </button>
-          </span>
-        )}
-      </div>
-      {active && (
-        <div className="animate-enter mt-2 space-y-1.5 pl-6">
-          <LegendBar layer={layer} />
-          {proMode && (
-            <label className="flex items-center gap-2">
-              <span className="label w-14">Opacity</span>
-              <input
-                type="range"
-                className="range"
-                min={0}
-                max={1}
-                step={0.05}
-                value={opacity}
-                onChange={(e) => setLayerOpacity(layer.id, Number(e.target.value))}
-                aria-label={`${layer.label} opacity`}
-              />
-              <span className="num text-ink-muted w-9 text-right text-[11px]">
-                {Math.round(opacity * 100)}%
-              </span>
-            </label>
-          )}
+          </div>
         </div>
       )}
     </li>
