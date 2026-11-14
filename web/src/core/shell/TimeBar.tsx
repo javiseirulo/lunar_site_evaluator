@@ -124,7 +124,7 @@ export function TimeBar({ className }: { className?: string }) {
           <div className="mt-[2px] h-[5px] bg-white/5" style={{ background: earth ?? undefined }} />
         </div>
         <div
-          className="bg-white pointer-events-none absolute -top-1 -bottom-1 w-[2px]"
+          className="bg-heading pointer-events-none absolute -top-1 -bottom-1 w-[2px]"
           style={{ left: `calc(8px + ${pct / 100} * (100% - 16px))` }}
           aria-hidden
         />

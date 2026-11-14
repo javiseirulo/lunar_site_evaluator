@@ -1,7 +1,6 @@
 /**
- * Masthead: a document-style title row (logo, name, one-line purpose, site finder), the NASA-blue
- * tab band, and one plain sentence about what happens next at the selected site, with the day
- * counter and the Pro mode switch.
+ * Masthead: one line on the night page — mark, name, page links, site finder, Pro mode —
+ * then a single sentence about the next sunrise or Earthrise.
  */
 import { useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router';
@@ -16,29 +15,21 @@ import { Logo } from './Logo';
 export function Masthead() {
   return (
     <header className="portal">
-      <TitleRow />
-      <TabBar />
-      <NextUp />
-    </header>
-  );
-}
-
-function TitleRow() {
-  return (
-    <div className="flex flex-wrap items-end gap-x-8 gap-y-3 pb-4">
-      <Link to="/" className="flex items-center gap-3" aria-label="Lunar Site Evaluator home">
-        <Logo className="size-11 shrink-0" />
-        <span>
-          <span className="text-heading block text-[24px] leading-tight font-medium tracking-[-0.015em]">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+        <Link to="/" className="mr-2 flex items-center gap-2.5" aria-label="Lunar Site Evaluator home">
+          <Logo className="size-8 shrink-0" />
+          <span className="font-display text-[20px] leading-none tracking-[-0.02em] text-[#f4f0e6]">
             Lunar Site Evaluator
           </span>
-          <span className="text-ink-muted block text-[14px]">
-            Compare landing sites near the Moon&apos;s south pole by sunlight and view of Earth
-          </span>
-        </span>
-      </Link>
-      <SiteFinder />
-    </div>
+        </Link>
+        <TabBar />
+        <div className="ml-auto flex max-w-full flex-wrap items-center gap-x-4 gap-y-2">
+          <SiteFinder />
+          <ProSwitch />
+        </div>
+      </div>
+      <NextUp />
+    </header>
   );
 }
 
@@ -53,7 +44,7 @@ function SiteFinder() {
 
   return (
     <form
-      className="ml-auto flex items-center gap-2"
+      className="flex max-w-full flex-wrap items-center gap-2"
       onSubmit={(e) => {
         e.preventDefault();
         if (!value) return;
@@ -63,12 +54,12 @@ function SiteFinder() {
         else if (mode !== 'explore') navigate('/explore');
       }}
     >
-      <label htmlFor="site-finder" className="label">
+      <label htmlFor="site-finder" className="text-[13px] text-[#b7b1a6]">
         Find a site
       </label>
       <select
         id="site-finder"
-        className="field w-48"
+        className="field w-40 max-w-full sm:w-48"
         value={value}
         onChange={(e) => setValue(e.target.value)}
       >
@@ -89,21 +80,36 @@ function SiteFinder() {
 function TabBar() {
   const selectedSiteId = useAppStore((s) => s.selectedSiteId);
   return (
-    <nav
-      aria-label="Main"
-      className="bg-violet flex h-[46px] overflow-x-auto rounded-t-[8px] px-2 pt-2 [scrollbar-width:none]"
-    >
+    <nav aria-label="Main" className="flex overflow-x-auto [scrollbar-width:none]">
       {TABS.map((t) => (
         <NavLink
           key={t.label}
           to={t.mode ? pathForMode(t.mode, selectedSiteId) : t.path}
           end={t.end}
-          className="tab rounded-t-[6px]"
+          className="tab"
         >
           {t.label}
         </NavLink>
       ))}
     </nav>
+  );
+}
+
+function ProSwitch() {
+  const proMode = useAppStore((s) => s.proMode);
+  const setProMode = useAppStore((s) => s.setProMode);
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={proMode}
+      onClick={() => setProMode(!proMode)}
+      className="flex cursor-pointer items-center gap-2 text-[13px] text-[#d9d3c7]"
+      title="Pro mode shows technical names, UTC times, coordinates and fine layer controls"
+    >
+      <span className="switch" data-on={proMode} aria-hidden />
+      Pro mode
+    </button>
   );
 }
 
@@ -115,7 +121,6 @@ function NextUp() {
   const selected = useSelectedSite();
   const currentTimeUTC = useAppStore((s) => s.currentTimeUTC);
   const proMode = useAppStore((s) => s.proMode);
-  const setProMode = useAppStore((s) => s.setProMode);
 
   const best = sites
     ? [...sites].filter((s) => s.valid).sort((a, b) => b.score - a.score)[0]
@@ -130,10 +135,10 @@ function NextUp() {
   const day = range ? dayOfWindow(currentTimeUTC, range.start_utc, range.end_utc) : null;
 
   return (
-    <div className="bg-void text-ink-muted flex flex-wrap items-center gap-x-5 gap-y-1 pt-3 pb-1 text-[13px]">
+    <div className="flex flex-col gap-1 pt-3 pb-4 text-[13px] text-[#9c968b] sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-5">
       {subject && sample && (
-        <p>
-          At <span className="text-heading font-medium">{subject.name}</span>, the Sun{' '}
+        <p className="min-w-0 sm:flex-1">
+          At <span className="text-[#f4f0e6]">{subject.name}</span>, the Sun{' '}
           {sample.lit ? 'sets' : 'rises'} {when(toSun)}
           {sample.earthVisible !== null && (
             <>
@@ -144,29 +149,18 @@ function NextUp() {
           .
         </p>
       )}
-      <span className="ml-auto flex items-center gap-5">
+      <span className="ml-auto flex items-center gap-4">
         {isMock && (
           <span
-            className="text-warn"
+            className="text-[#e2b15a]"
             title="The app is showing invented placeholder data until the real pipeline output lands."
           >
             Mock data
           </span>
         )}
-        <span className="text-ink num">
+        <span className="num text-[#d9d3c7]">
           {proMode ? formatUtc(currentTimeUTC) : day && `Day ${day.day} of ${day.total}`}
         </span>
-        <button
-          type="button"
-          role="switch"
-          aria-checked={proMode}
-          onClick={() => setProMode(!proMode)}
-          className="text-ink flex cursor-pointer items-center gap-2"
-          title="Pro mode shows technical names, UTC times, coordinates and fine layer controls"
-        >
-          <span className="switch" data-on={proMode} aria-hidden />
-          Pro mode
-        </button>
       </span>
     </div>
   );

@@ -16,7 +16,7 @@ export function AppShell() {
   }, []);
 
   return (
-    <div className="flex min-h-full flex-col px-3 pt-5 sm:px-5 sm:pt-7">
+    <div className="flex min-h-full flex-col px-4 pt-4 sm:px-6 sm:pt-5">
       <ModeSync />
       <Masthead />
       <main className="portal mt-3 flex-1">

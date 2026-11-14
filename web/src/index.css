@@ -1,65 +1,63 @@
 @import 'tailwindcss';
 
 /*
- * Design system (owner: Javi2) — "mission document with a window into space".
- * The interface reads like a bright 1970s NASA technical sheet (lunar-gray page, white sheets,
- * black Helvetica), and the Moon is the only thing shown in black space. NASA blue carries
- * structure (tab band, selection, Earth); NASA red is reserved for the one action per screen and
- * the "now" marker. Palette: NASA insignia blue #0B3D91 and red #FC3D21 with the black, white and
- * grays of the 1976 NASA Graphics Standards Manual — colours only, never the insignia, logotype
- * or their elements (CLAUDE.md §3).
+ * Design system (owner: Javi2) — "night plate".
+ * The page is a warm night. Reading happens on cream survey sheets. The Moon is the only
+ * photograph, set in true black. Navigation is a line of words on the night, with an amber
+ * rule under the current page. Ink (near-black) is selection and the one action per screen.
+ * Amber is sunlight and "now". Steel blue is Earth in view. No agency colours, insignia,
+ * or logotype (CLAUDE.md §3).
  *
- * Deliberately avoided (they read as generated): dark page + single neon accent, identical rounded
- * cards with shadows, gradients, glows, all-caps eyebrow labels, "→" on buttons, "A · B" meta
- * strings, one coloured word in a headline, hover lifts and fade-ins on everything.
+ * Type: Iowan Old Style / Palatino for titles, system sans for controls and body.
+ * Scale 12 / 14 / 18 / 24 / 40. Sentence case.
  *
- * Type: Helvetica only (as in the 1976 manual). Scale 12 / 14 / 18 / 24 / 36 / 48. Medium (500)
- * for headings, regular for text, sentence case throughout.
+ * Deliberately avoided: a filled tab bar, neon on black, identical shadowed cards,
+ * all-caps labels, arrows on buttons, one coloured word in a headline.
  *
  * Component classes: .portal .box .box-head .box-body .tab .btn .btn-go .btn-quiet .field .lnk
- * .chip .label .num .rows .hint .switch .range .space .meter. Token roles: violet = NASA blue,
- * pink = NASA red (names kept so existing modules keep working).
+ * .chip .label .num .rows .hint .switch .range .space .meter. Token names violet/pink are kept
+ * so existing modules keep working: violet = ink selection, pink = ink action.
  */
 @theme {
-  --font-sans: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  --font-head: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  --font-display: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  --font-mono: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-sans: 'Avenir Next', 'Segoe UI', sans-serif;
+  --font-head: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
+  --font-display: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
+  --font-mono: 'SF Mono', ui-monospace, Menlo, Consolas, monospace;
 
-  /* Paper */
-  --color-void: #e4e5e8;
-  --color-panel: #ffffff;
-  --color-panel-2: #f3f4f6;
-  --color-panel-3: #e9eaed;
-  --color-pale: #ffffff;
-  --color-edge: #d3d6db;
-  --color-edge-hi: #a2a7b0;
-  --color-edge-lo: #6b7079;
-  --color-heading: #000000;
-  --color-ink: #16181d;
-  --color-ink-muted: #545862;
-  --color-ink-faint: #80858f;
-  --color-night: #000000;
+  /* Night page. Sheets are warm paper; ink is for text on those sheets. */
+  --color-void: #101114;
+  --color-panel: #f4f0e6;
+  --color-panel-2: #ebe4d6;
+  --color-panel-3: #e2dac8;
+  --color-pale: #faf7f1;
+  --color-edge: #d9d0c0;
+  --color-edge-hi: #b7ad9c;
+  --color-edge-lo: #6e675c;
+  --color-heading: #1c1915;
+  --color-ink: #2c2822;
+  --color-ink-muted: #6a6256;
+  --color-ink-faint: #8a8174;
+  --color-night: #07080b;
 
-  /* Roles: violet = NASA blue (structure, selection), pink = NASA red (action, now) */
-  --color-violet: #0b3d91;
-  --color-violet-dark: #082d6b;
-  --color-violet-light: #0b3d91;
-  --color-pink: #fc3d21;
-  --color-pink-dark: #d92d13;
-  --color-glow: #16181d;
+  /* violet = selection ink, pink = action ink */
+  --color-violet: #1c1915;
+  --color-violet-dark: #000000;
+  --color-violet-light: #3a342c;
+  --color-pink: #1c1915;
+  --color-pink-dark: #000000;
+  --color-glow: #1c1915;
 
-  --color-link: #0b3d91;
-  --color-link-hover: #d92d13;
+  --color-link: #1c1915;
+  --color-link-hover: #8a5a10;
 
-  /* Data colours, dark enough to read on white. */
-  --color-sun: #c08400;
-  --color-earth: #2f74c8;
-  --color-psr: #5f6f9c;
-  --color-good: #2e8a47;
-  --color-warn: #a86f00;
-  --color-bad: #d92d13;
-  --color-accent: #fc3d21;
+  /* Data colours, dark enough to read on paper. */
+  --color-sun: #a86f00;
+  --color-earth: #2d6eae;
+  --color-psr: #5c6a90;
+  --color-good: #2a7a40;
+  --color-warn: #8a5a10;
+  --color-bad: #9c2f1a;
+  --color-accent: #a86f00;
 
   /* Legacy aliases used by older panels. */
   --color-navy-950: var(--color-panel-2);
@@ -77,7 +75,7 @@
   --color-space-600: var(--color-edge);
   --color-line: var(--color-edge);
   --color-line-strong: var(--color-edge-hi);
-  --radius-panel: 8px;
+  --radius-panel: 2px;
 
   --shadow-card: none;
   --shadow-lift: 0 6px 18px -10px #00000040;
@@ -114,30 +112,31 @@
     -webkit-font-smoothing: antialiased;
   }
   ::selection {
-    background: #0b3d91;
-    color: #fff;
+    background: #1c1915;
+    color: #f4f0e6;
   }
   :focus-visible {
-    outline: 2px solid #0b3d91;
+    outline: 2px solid #a86f00;
     outline-offset: 2px;
   }
   h1,
   h2,
   h3 {
     color: var(--color-heading);
+    font-family: var(--font-display);
     font-weight: 500;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.015em;
   }
 }
 
 @layer components {
   .portal {
-    @apply mx-auto w-full max-w-[1040px];
+    @apply mx-auto w-full max-w-[1180px];
   }
 
-  /* A working sheet: white on the lunar-gray page. No border, no shadow. */
+  /* A survey sheet on the night page. Square corners, a hairline, no shadow. */
   .box {
-    @apply bg-panel rounded-[8px];
+    @apply bg-panel border-edge rounded-[2px] border;
   }
   .box-head,
   .box-head-dark {
@@ -157,24 +156,36 @@
     transition: background-color 150ms var(--ease-out);
   }
 
-  /* Tab band (NASA blue). The active tab becomes part of the page below it. */
+  /* Header buttons on the night. The current page is a cream button. */
   .tab {
-    @apply flex h-full items-center px-5 text-[15px] font-medium whitespace-nowrap text-white/85;
+    @apply flex h-8 items-center rounded-[2px] border border-transparent px-3 text-[14px] font-medium whitespace-nowrap text-[#d9d3c7];
+    transition:
+      background-color 120ms var(--ease-out),
+      color 120ms var(--ease-out),
+      border-color 120ms var(--ease-out);
+  }
+  .tab:hover {
+    @apply border-[#3a3834] text-[#f4f0e6];
+  }
+  .tab[aria-current='page'],
+  .tab.active {
+    @apply border-[#f4f0e6] bg-[#f4f0e6] text-[#1c1915];
+  }
+
+  /* Footer and other night-page links that should read as buttons. */
+  .nav-btn {
+    @apply inline-flex h-8 items-center rounded-[2px] border border-[#3a3834] px-3 text-[13px] text-[#f4f0e6];
     transition:
       background-color 120ms var(--ease-out),
       color 120ms var(--ease-out);
   }
-  .tab:hover {
-    @apply bg-violet-dark text-white;
-  }
-  .tab[aria-current='page'],
-  .tab.active {
-    @apply bg-void text-violet;
+  .nav-btn:hover {
+    @apply bg-[#f4f0e6] text-[#1c1915];
   }
 
-  /* Buttons: quiet by default; .btn-go (NASA red) for the one main action on a screen. */
+  /* Buttons: quiet by default; .btn-go (ink) for the one main action on a screen. */
   .btn {
-    @apply border-edge-hi text-ink inline-flex h-[34px] cursor-pointer items-center justify-center gap-1.5 rounded-[4px] border bg-white px-3.5 text-[14px] font-medium;
+    @apply border-edge-hi text-ink inline-flex h-[34px] cursor-pointer items-center justify-center gap-1.5 rounded-[2px] border bg-pale px-3.5 text-[14px] font-medium;
     transition:
       background-color 120ms var(--ease-out),
       border-color 120ms var(--ease-out);
@@ -202,7 +213,7 @@
   }
 
   .field {
-    @apply border-edge-hi text-ink h-[34px] rounded-[4px] border bg-white px-2 text-[14px];
+    @apply border-edge-hi text-ink h-[34px] rounded-[2px] border bg-pale px-2 text-[14px];
   }
   .field:hover {
     @apply border-edge-lo;
@@ -219,7 +230,7 @@
   }
 
   .chip {
-    @apply inline-flex items-center gap-1 rounded-[4px] border px-2 py-0.5 text-[12px] font-medium;
+    @apply inline-flex items-center gap-1 rounded-[2px] border px-2 py-0.5 text-[12px] font-medium;
   }
   .num {
     @apply tabular-nums;
@@ -240,7 +251,7 @@
     @apply bg-panel-3 text-ink-muted relative inline-flex size-[18px] shrink-0 cursor-help items-center justify-center rounded-full align-middle text-[12px] font-medium;
   }
   .hint > span {
-    @apply pointer-events-none absolute bottom-[calc(100%+8px)] left-1/2 z-30 w-60 max-w-[80vw] -translate-x-1/2 rounded-[4px] bg-black px-3 py-2 text-left text-[13px] leading-snug font-normal text-white opacity-0;
+    @apply pointer-events-none absolute bottom-[calc(100%+8px)] left-1/2 z-30 w-60 max-w-[80vw] -translate-x-1/2 rounded-[2px] bg-black px-3 py-2 text-left text-[13px] leading-snug font-normal text-white opacity-0;
     transition: opacity 120ms var(--ease-out);
   }
   .hint[data-align='left'] > span {
@@ -270,7 +281,7 @@
   }
   .switch[aria-checked='true'],
   .switch[data-on='true'] {
-    @apply bg-violet;
+    background: #e2b15a;
   }
   .switch[aria-checked='true']::after,
   .switch[data-on='true']::after {
@@ -288,8 +299,8 @@
     @apply bg-edge h-[4px] rounded-full;
   }
   .range::-webkit-slider-thumb {
-    @apply bg-pink -mt-[6px] size-[16px] appearance-none rounded-full border-2 border-white;
-    box-shadow: 0 0 0 1px #d92d13;
+    @apply bg-heading -mt-[6px] size-[16px] appearance-none rounded-full border-2 border-[#f4f0e6];
+    box-shadow: 0 0 0 1px #1c1915;
   }
   .range::-moz-range-thumb {
     @apply bg-pink size-[14px] rounded-full border-2 border-white;

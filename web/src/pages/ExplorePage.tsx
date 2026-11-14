@@ -21,7 +21,7 @@ export default function ExplorePage() {
 
       {/* Centre: map + clock */}
       <section className="order-1 flex flex-col gap-4 md:order-2">
-        <div className="overflow-hidden rounded-[8px]">
+        <div className="overflow-hidden rounded-[2px]">
           <div className="space relative p-4">
             <div
               className="absolute top-4 right-4 z-10 flex overflow-hidden rounded-[4px] border border-white/30"
@@ -43,7 +43,7 @@ export default function ExplorePage() {
                 </button>
               ))}
             </div>
-            <div className="mx-auto aspect-square w-full max-w-[440px]">
+            <div className="mx-auto aspect-square w-full max-w-[560px]">
               {view === '2d' ? <PolarMap className="size-full" /> : <GlobeView />}
             </div>
           </div>

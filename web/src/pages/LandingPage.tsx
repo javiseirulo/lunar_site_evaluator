@@ -1,10 +1,48 @@
-import { useNavigate } from 'react-router';
-import { METRICS, useAppStore, useData, useSelectedSite } from '@/core';
+import { Link, useNavigate } from 'react-router';
+import { useAppStore, useData, useSelectedSite } from '@/core';
 import { PolarMap, scoreColor } from '@/layers';
 
+const PLACES: { to: string; title: string; line: string }[] = [
+  {
+    to: '/explore',
+    title: 'Explore',
+    line: 'Open the south-pole map, turn layers on, and pick a site.',
+  },
+  {
+    to: '/compare',
+    title: 'Compare',
+    line: 'Put two or three sites side by side and see which one wins.',
+  },
+  {
+    to: '/game',
+    title: 'Mission',
+    line: 'A landing site just fell through. Choose another and watch the days play out.',
+  },
+  {
+    to: '/learn',
+    title: 'Learn',
+    line: 'Why a few kilometres of ground decide power and a call home.',
+  },
+  {
+    to: '/sites',
+    title: 'All sites',
+    line: 'The full list, with a score out of 100 for each one.',
+  },
+  {
+    to: '/streetview',
+    title: 'Street View',
+    line: 'Stand on the ground and watch the Sun and Earth move.',
+  },
+  {
+    to: '/about',
+    title: 'Data and method',
+    line: 'Where the numbers come from, and what is still mock data.',
+  },
+];
+
 /**
- * Home: the Moon is the hero. A live polar map (click a site) sits in black space; beside it, a
- * plain question, the selected (or best) site's key figures, one red action and map shortcuts.
+ * Home is a landing page: a short pitch and the live map, then buttons for every page.
+ * The header and the footer carry the same trips on every other screen.
  */
 export function LandingPage() {
   const sites = useData((s) => s.sites);
@@ -15,87 +53,70 @@ export function LandingPage() {
   const site = selected ?? best;
   const navigate = useNavigate();
   const selectSite = useAppStore((s) => s.selectSite);
-  const setLayerActive = useAppStore((s) => s.setLayerActive);
 
-  const openMap = (layerId?: string) => {
+  const openMap = () => {
     if (site && !selected) selectSite(site.id);
-    if (layerId) setLayerActive(layerId, true);
     navigate('/explore');
   };
 
   return (
-    <section className="box grid overflow-hidden md:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]">
-      <div className="space p-5 sm:p-7">
-        <div className="mx-auto aspect-square w-full max-w-[460px]">
-          <PolarMap className="size-full" />
-        </div>
-        <p className="text-ink-muted mt-3 text-center text-[13px]">
-          The lunar south pole, down to 80° south. Click a diamond to choose a site.
-        </p>
-      </div>
-
-      <div className="flex flex-col p-6 sm:p-8">
-        <h1 className="text-[36px] leading-[1.1] tracking-[-0.02em]">
-          Where should the next lander touch down?
-        </h1>
-        <p className="text-ink mt-4 max-w-[44ch] text-[16px] leading-relaxed">
-          Near the south pole the Sun barely rises above the hills, so a few kilometres can decide
-          whether a lander has power and can talk to Earth. Pick a site and see.
-        </p>
-
-        {site && (
-          <div className="mt-8">
-            <p className="label">{selected ? 'Selected site' : 'Best site in this data'}</p>
-            <div className="mt-1 flex items-end justify-between gap-4">
-              <h2 className="text-[24px] leading-tight">{site.name}</h2>
-              <p className="num leading-none">
-                <span
-                  className="mr-2 inline-block size-3 align-middle"
-                  style={{ background: scoreColor(site.score) }}
-                  aria-hidden
-                />
-                <span className="text-heading text-[48px] font-medium">
-                  {Math.round(site.score * 100)}
-                </span>
-                <span className="text-ink-faint text-[14px]"> / 100</span>
-              </p>
-            </div>
-            <dl className="rows border-edge mt-3 border-t">
-              {METRICS.slice(0, 3).map((m) => (
-                <div key={m.key} className="flex justify-between py-2 text-[14px]">
-                  <dt className="text-ink-muted">{m.label}</dt>
-                  <dd className="num text-heading font-medium">{m.format(site.metrics, false)}</dd>
-                </div>
-              ))}
-            </dl>
-          </div>
-        )}
-
-        <div className="mt-8">
-          <button
-            type="button"
-            className="btn btn-go h-[42px] px-5 text-[15px]"
-            onClick={() => openMap()}
-          >
-            Explore the map
-          </button>
-          <p className="text-ink-muted mt-4 text-[14px]">
-            Or open the map showing{' '}
-            <button type="button" className="lnk" onClick={() => openMap('illumination')}>
-              sunlight
-            </button>
-            ,{' '}
-            <button type="button" className="lnk" onClick={() => openMap('slope')}>
-              slope
-            </button>{' '}
-            or{' '}
-            <button type="button" className="lnk" onClick={() => openMap('psr')}>
-              icy craters
-            </button>
-            .
+    <div className="flex flex-col gap-8">
+      <section className="box grid overflow-hidden md:grid-cols-[minmax(280px,0.85fr)_minmax(0,1.15fr)]">
+        <div className="flex flex-col justify-center p-6 sm:p-10">
+          <p className="label">A tool for the lunar south pole</p>
+          <h1 className="font-display mt-3 text-[40px] leading-[1.05] tracking-[-0.02em] sm:text-[46px]">
+            Where should the next lander touch down?
+          </h1>
+          <p className="text-ink mt-4 max-w-[38ch] text-[16px] leading-relaxed">
+            Near the south pole the Sun stays low, so a short move can decide whether a lander has
+            power and can see Earth. Compare sites and dates before the mission slips.
           </p>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <button type="button" className="btn btn-go h-[42px] px-5 text-[15px]" onClick={openMap}>
+              Explore the map
+            </button>
+            <Link to="/compare" className="btn h-[42px] px-5 text-[15px]">
+              Compare sites
+            </Link>
+          </div>
         </div>
-      </div>
-    </section>
+
+        <div className="space flex flex-col justify-center p-5 sm:p-7">
+          <div className="mx-auto aspect-square w-full max-w-[480px]">
+            <PolarMap className="size-full" />
+          </div>
+          {site && (
+            <p className="mt-3 text-center text-[13px] text-[#c8c2b4]">
+              {selected ? 'Selected' : 'Best in this data'}: {site.name}
+              <span
+                className="mx-2 inline-block size-2.5 align-middle"
+                style={{ background: scoreColor(site.score) }}
+                aria-hidden
+              />
+              <span className="num text-[#f4f0e6]">{Math.round(site.score * 100)}</span>
+              <span className="text-[#8d877c]"> / 100</span>
+            </p>
+          )}
+        </div>
+      </section>
+
+      <section aria-labelledby="places-heading">
+        <h2 id="places-heading" className="font-display text-[28px] text-[#f4f0e6]">
+          Start anywhere
+        </h2>
+        <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {PLACES.map((place) => (
+            <Link
+              key={place.to}
+              to={place.to}
+              className="box hover:border-edge-lo flex flex-col px-5 py-4 transition-colors duration-150"
+            >
+              <span className="font-display text-heading text-[22px]">{place.title}</span>
+              <span className="text-ink-muted mt-1 text-[14px] leading-snug">{place.line}</span>
+            </Link>
+          ))}
+        </div>
+      </section>
+    </div>
   );
 }
