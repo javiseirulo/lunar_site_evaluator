@@ -88,3 +88,13 @@ Sin multijugador. Esta descripción sustituye a la lista anterior de mecánicas 
 - **Imágenes generadas por IA:** marca de agua visible obligatoria y etiqueta de "ilustrativa"; sin logos, insignias ni
   identificadores de misión. Citas de astronautas reales: solo con fuente; el humor inventado no se pone en boca de personas reales.
 - **Simulación en la esfera 3D:** depende del globo de Marta (hoy placeholder); el mapa polar 2D ya existe como respaldo.
+
+## Decisiones de Manuel (2026-11-14, 4ª ronda)
+- Cinemática y misiones históricas **dentro** del alcance (lo de #51 fue un malentendido). Sitios históricos: Marta, sin urgencia.
+- Estética: se ajusta más adelante; no bloquea. El globo 3D de Marta está cerca de terminar.
+- Diálogos con astronautas: ficción humorística declarada como sátira; idioma inglés.
+- Emergencia: solo ambientación por ahora. Cuenta atrás a cero: "ran out of time" + evento catastrófico ligado a la emergencia.
+- Temperatura: derivada de los datos que ya hay (frío = horas seguidas sin Sol; calor = Sol alto mucho tiempo). Capa real descartada.
+- Ganar: llegar a un sitio apto para la misión, con mensaje de enhorabuena.
+- El registro de uso de IA lo lleva el equipo en persona.
+- Diseño completo para aprobar: `mission-design.md`.
