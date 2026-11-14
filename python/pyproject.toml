@@ -27,6 +27,8 @@ packages = ["ephem", "export"]
 [tool.ruff]
 line-length = 100
 target-version = "py312"
+# python/terrain is Pablo's package, checked by .github/workflows/terrain.yml.
+extend-exclude = ["terrain"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "B", "UP", "NPY", "RUF"]
