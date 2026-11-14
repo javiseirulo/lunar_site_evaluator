@@ -10,13 +10,12 @@ import { FastForward, Moon, SatelliteDish, Snowflake, Sun, WifiOff } from 'lucid
 import { clsx } from 'clsx';
 import { sampleAt, useAppStore, useTimeseries } from '@/core';
 import { DEFAULT_REQUIREMENTS } from '../engine/requirements';
-import type { Verdict } from '../engine/simulate';
+import { isLinkUp, type Verdict } from '../engine/simulate';
 import { useGame } from '../state/gameStore';
 import { CAUSE_HEADLINE } from './content';
 import { MissionMap } from './MissionMap';
 import {
   dayOfMission,
-  isLinkUp,
   isoAtHour,
   missionHourAt,
   missionRuns,

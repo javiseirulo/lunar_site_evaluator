@@ -1,10 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import type { Site, Timeseries } from '@lunar/contracts';
 import { DEFAULT_REQUIREMENTS } from '../engine/requirements';
-import { simulate } from '../engine/simulate';
+import { hourlyFlags, isLinkUp, simulate } from '../engine/simulate';
 import {
   dayOfMission,
-  isLinkUp,
   isoAtHour,
   missionHourAt,
   missionRuns,
@@ -104,6 +103,7 @@ describe('isLinkUp', () => {
     expect(isLinkUp(null, 5, MARGIN)).toBe(true);
     expect(isLinkUp(false, 30, MARGIN)).toBe(false);
     expect(isLinkUp(true, 1.9, MARGIN)).toBe(false);
+    expect(isLinkUp(true, undefined, MARGIN)).toBe(false);
   });
 });
 
@@ -145,6 +145,19 @@ describe('missionRuns', () => {
     expect(v.cause).toBe('blackout');
     expect(runs.blackout[v.failHour!]).toBe(DEFAULT_REQUIREMENTS.max_blackout_h.threshold + 1);
     expect(Math.max(...runs.blackout)).toBe(v.metrics.max_blackout_h);
+  });
+
+  it('treats missing earth_visible entries as visible, exactly like the engine', () => {
+    // earth_visible covers only the first 3 hours (all hidden); the rest is unknown → visible.
+    const ts = makeTs(ones(HOURS), [0, 0, 0]);
+    const v = simulate(site, ts, 0);
+    const runs = missionRuns(ts, 0, HOURS, MARGIN);
+    const { linked } = hourlyFlags(ts, 0, HOURS, MARGIN);
+    expect(v.win).toBe(true);
+    expect(v.metrics.max_blackout_h).toBe(3);
+    expect(runs.blackout.slice(0, 5)).toEqual([1, 2, 3, 0, 0]);
+    expect(Math.max(...runs.blackout)).toBe(v.metrics.max_blackout_h);
+    expect(linked.filter(Boolean).length / HOURS).toBe(v.metrics.comm_pct);
   });
 
   it('stops at the end of the series', () => {
