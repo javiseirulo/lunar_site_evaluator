@@ -12,13 +12,12 @@ import {
 import { Check, Copy, MapPinPlus, Trash2, X } from 'lucide-react';
 import type { Site } from '@lunar/contracts';
 import { formatLatLon } from '@/core';
-import { scoreColor } from '@/layers';
 import type { CustomPin } from './customPins';
 import { coordsForClipboard } from './geo';
 
 export type CardContent =
-  /** score: match score with the current requirements (null if it misses them); note: why not. */
-  | { kind: 'site'; site: Site; score: number | null; note: string | null }
+  /** rank: 1–5 in the top five; summary: "Meets X of Y requirements"; note: first unmet check. */
+  | { kind: 'site'; site: Site; rank: number | null; summary: string | null; note: string | null }
   | { kind: 'custom'; pin: CustomPin }
   | { kind: 'point'; lat: number; lon: number };
 
@@ -100,14 +99,12 @@ export function GlobeCard({
         ? content.pin.name
         : 'Point on the Moon';
   const badge =
-    content.kind === 'site' && content.score !== null ? (
-      <span className="num flex items-center gap-1 font-medium" title="Match score">
-        <span
-          className="inline-block size-2.5"
-          style={{ background: scoreColor(content.score) }}
-          aria-hidden
-        />
-        {Math.round(content.score * 100)}
+    content.kind === 'site' && content.rank !== null ? (
+      <span
+        className="num flex size-6 items-center justify-center rounded-full bg-[#f2c55c] text-[13px] font-medium text-[#1c1915]"
+        title={`Number ${content.rank} of the top five`}
+      >
+        {content.rank}
       </span>
     ) : null;
 
@@ -118,6 +115,9 @@ export function GlobeCard({
           <span className="num text-ink flex-1">{formatLatLon(lat, lon)}</span>
           <CopyButton text={coordsForClipboard(lat, lon)} />
         </div>
+        {content.kind === 'site' && content.summary && (
+          <p className="text-heading text-[12px] font-medium">{content.summary}</p>
+        )}
         {content.kind === 'site' && content.note && (
           <p className="text-bad text-[12px]">{content.note}</p>
         )}
