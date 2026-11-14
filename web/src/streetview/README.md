@@ -25,7 +25,7 @@ Do not give the browser private token-management or asset-write privileges.
 - The viewer uses `Ellipsoid.MOON` explicitly, without changing the global
   ellipsoid. Earth globe, base imagery, geocoder, atmosphere, default Sun/Moon
   and independent animation/timeline are disabled.
-- The camera is placed at the sampled mesh height + 1.7 m. It does not use
+- The camera is placed at the sampled mesh height + 5 m (shared production default). It does not use
   mock `site.elev_m` for ground placement. If the mesh cannot be sampled,
   it reports an error instead of substituting a sphere as if it were terrain.
 - Drag, touch, arrows and four buttons rotate in place. Observer height is a
@@ -73,3 +73,10 @@ Sources: [Cesium Moon](https://cesium.com/platform/cesium-ion/content/cesium-moo
 [token scopes/restrictions](https://cesium.com/learn/ion/cesium-ion-access-tokens/).
 
 Implementation assisted by OpenAI Codex from Pablo's human-authored module plan.
+
+Javi J0/J10 alignment: the default and retry observer height come from
+`config/terrain-processing.json`. The private legacy adapter is named
+`sampleSiteSky`; `skyAt(lat, lon, t)` is reserved for Javi's future `@/ephem`.
+Until that module/data exists, same-site temporal bounds still apply. No annual
+vectors or terrain horizons are fabricated. The 360-degree camera validation
+and DE421/DE440/mesh alignment remain pending.

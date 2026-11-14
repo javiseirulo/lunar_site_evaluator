@@ -1,3 +1,4 @@
+import terrainSettings from '../../../config/terrain-processing.json';
 /** Lunar local sky geometry. AI-assisted implementation: OpenAI Codex. */
 import type { Timeseries } from '@lunar/contracts';
 import { sampleAt } from '@/core/timeseries';
@@ -38,7 +39,7 @@ export function skyDirection(
 }
 
 /** Refuse clamped extrapolation and series belonging to a different observer. */
-export function skyAt(ts: Timeseries | null, siteId: string, timeUtc: string) {
+export function sampleSiteSky(ts: Timeseries | null, siteId: string, timeUtc: string) {
   if (!ts || ts.site_id !== siteId || !ts.t_utc.length) return null;
   const time = Date.parse(timeUtc);
   const first = Date.parse(ts.t_utc[0]!);
@@ -50,3 +51,6 @@ export function skyAt(ts: Timeseries | null, siteId: string, timeUtc: string) {
 export function limitLook(heading: number, pitch: number) {
   return { heading: ((heading % 360) + 360) % 360, pitch: Math.max(-85, Math.min(85, pitch)) };
 }
+
+/** Javi J0: scientific observer default; visual overrides never recalculate visibility. */
+export const DEFAULT_OBSERVER_HEIGHT_M = terrainSettings.observer_height_m;

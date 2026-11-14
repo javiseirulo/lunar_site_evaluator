@@ -1,7 +1,7 @@
 /** Lunar Street View — Pablo. Selection, data and time remain owned by @/core. */
 import { lazy, Suspense, useMemo, useState } from 'react';
 import { formatUtc, useAppStore, useData, useSelectedSite, useTimeseries } from '@/core';
-import { skyAt } from './geometry';
+import { sampleSiteSky } from './geometry';
 
 const LunarViewport = lazy(() => import('./LunarViewport'));
 
@@ -18,7 +18,10 @@ export function StreetView() {
   const [configure, setConfigure] = useState(false);
   const [accessRevision, setAccessRevision] = useState(0);
   const observer = useMemo(() => (site ? { lat: site.lat, lon: site.lon } : null), [site]);
-  const sample = useMemo(() => (site ? skyAt(series, site.id, time) : null), [site, series, time]);
+  const sample = useMemo(
+    () => (site ? sampleSiteSky(series, site.id, time) : null),
+    [site, series, time],
+  );
   if (!site || !observer) return <p className="p-4">Choose a site in Explore.</p>;
   const isMock = mockSites || !!series?.mock;
   return (

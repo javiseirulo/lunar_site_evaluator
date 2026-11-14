@@ -1,6 +1,6 @@
 /** Cesium is owned and disposed by the Street View component, never by the shared store. */
 import type { SkySample } from '@/core';
-import { limitLook, skyDirection } from './geometry';
+import { DEFAULT_OBSERVER_HEIGHT_M, limitLook, skyDirection } from './geometry';
 
 export interface Observer {
   lat: number;
@@ -91,7 +91,7 @@ export async function createLunarScene(
       throw new Error('No surface height was returned for this location.');
     }
     onGround(ground);
-    let heightAboveGround = 1.7;
+    let heightAboveGround = DEFAULT_OBSERVER_HEIGHT_M;
     let pose = { heading: 0, pitch: 0 };
     const renderPose = () => {
       viewer.camera.setView({

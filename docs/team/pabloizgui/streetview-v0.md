@@ -78,3 +78,18 @@ alturas y marco con el DEM; no aplicar automáticamente offsets de reportes ajen
 El encargo posterior de Pablo limita esta sesión a Street View. El heightmap
 polar de Marta, el diseño detallado de la web, las constelaciones y el cálculo
 de horizontes no se amplían como parte de este bloque.
+
+## Ajuste posterior a Javi J0/J10 (2026-11-14)
+
+Integrado `origin/dev` en `461507a`, conservando `a1c6216`. Valor inicial de
+cámara/reintento/escena: 5 m desde la misma configuración JSON de producción
+de terreno. El ajuste visual del usuario no recalcula visibilidad científica.
+El muestreador de series local pasa a llamarse `sampleSiteSky`, para reservar
+`skyAt(lat, lon, t)` a `@/ephem` de Javi. Este módulo y sus vectores no están
+en `dev` todavía: se mantiene el muestreo del mismo sitio/ventana, sin inventar datos.
+La prueba real anterior mostró terreno pero un giro produjo una vista gris;
+no se considera cerrada la cámara 360°, ni calibradas las alturas Cesium/LOLA.
+
+Verificado en esta rama: 26 pruebas web, TypeScript, lint y build correctos.
+El primer lint encontró un bloqueo transitorio de lectura en OneDrive; el
+reintento terminó correctamente sin cambiar dependencias ni políticas.

@@ -1,3 +1,4 @@
+import { DEFAULT_OBSERVER_HEIGHT_M } from './geometry';
 import { useEffect, useRef, useState } from 'react';
 import type { SkySample } from '@/core';
 import type { Observer, LunarScene } from './lunarScene';
@@ -18,7 +19,7 @@ export default function LunarViewport({ observer, token, sample }: Props) {
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
   const [ground, setGround] = useState<number | null>(null);
   const [retry, setRetry] = useState(0);
-  const [height, setHeight] = useState(1.7);
+  const [height, setHeight] = useState(DEFAULT_OBSERVER_HEIGHT_M);
   useEffect(() => {
     sky.current = sample;
     scene.current?.setSky(sample);
@@ -72,7 +73,7 @@ export default function LunarViewport({ observer, token, sample }: Props) {
                 className="btn"
                 onClick={() => {
                   setStatus('loading');
-                  setHeight(1.7);
+                  setHeight(DEFAULT_OBSERVER_HEIGHT_M);
                   setRetry((n) => n + 1);
                 }}
               >

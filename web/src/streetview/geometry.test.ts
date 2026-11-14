@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { Timeseries } from '@lunar/contracts';
-import { limitLook, skyAt, skyDirection } from './geometry';
+import { DEFAULT_OBSERVER_HEIGHT_M, limitLook, sampleSiteSky, skyDirection } from './geometry';
 
 describe('lunar azimuth/elevation convention', () => {
   it('maps the cardinal directions and zenith at equator / prime meridian', () => {
@@ -49,24 +49,28 @@ const ts: Timeseries = {
 };
 describe('observer and temporal coverage', () => {
   it('retains the actual sampled timestamp and unknown Earth visibility', () => {
-    const sample = skyAt(ts, 'site-a', '2027-01-01T00:30:00Z');
+    const sample = sampleSiteSky(ts, 'site-a', '2027-01-01T00:30:00Z');
     expect(sample?.t_utc).toBe(ts.t_utc[0]);
     expect(sample?.earthVisible).toBeNull();
-    expect(skyAt(ts, 'site-a', ts.t_utc[1]!)?.sun_az).toBe(90);
+    expect(sampleSiteSky(ts, 'site-a', ts.t_utc[1]!)?.sun_az).toBe(90);
   });
   it.each(['2026-12-31T23:59:59Z', '2027-01-01T01:00:01Z', 'invalid'])(
     'does not extrapolate %s',
     (time) => {
-      expect(skyAt(ts, 'site-a', time)).toBeNull();
+      expect(sampleSiteSky(ts, 'site-a', time)).toBeNull();
     },
   );
   it('rejects another site or unavailable data', () => {
-    expect(skyAt(ts, 'site-b', ts.t_utc[0]!)).toBeNull();
-    expect(skyAt(null, 'site-a', ts.t_utc[0]!)).toBeNull();
-    expect(skyAt({ ...ts, t_utc: [] }, 'site-a', ts.t_utc[0]!)).toBeNull();
+    expect(sampleSiteSky(ts, 'site-b', ts.t_utc[0]!)).toBeNull();
+    expect(sampleSiteSky(null, 'site-a', ts.t_utc[0]!)).toBeNull();
+    expect(sampleSiteSky({ ...ts, t_utc: [] }, 'site-a', ts.t_utc[0]!)).toBeNull();
   });
 });
 it('wraps a full 360 degree turn and limits pitch', () => {
   expect(limitLook(-15, 100)).toEqual({ heading: 345, pitch: 85 });
   expect(limitLook(725, -90)).toEqual({ heading: 5, pitch: -85 });
+});
+
+it('uses the shared 5 m scientific observer as the camera default', () => {
+  expect(DEFAULT_OBSERVER_HEIGHT_M).toBe(5);
 });
