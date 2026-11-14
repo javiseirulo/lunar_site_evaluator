@@ -37,10 +37,29 @@
 - Ventanas: series temporales de visibilidad Sol/Tierra → duración de luz, tiempo hasta sunset/earthset, eclipses por terreno.
 - Validación: contrastar contra Horizons web y contra mapas de iluminación publicados (Barker/LPI).
 
-## Ofertas globales (Global Offers) — PENDIENTE (requiere login)
-https://www.spaceappschallenge.org/2026/global-offers/ → **un humano del equipo, logueado, copie aquí** créditos cloud, APIs, herramientas, etc.
+## Ofertas globales 2026 (Global Offers)
+Fuente: https://www.spaceappschallenge.org/2026/global-offers/ (requiere login; copiado el 2026-11-14). Todas opcionales, "Claim Offer" en cada una.
+⚠️ Varias piden tarjeta/teléfono para verificar: lo decide cada persona, no la IA. Cualquier SI (Copilot, etc.) → anotar en `si-usage-log.md`.
+
+| Oferta | Qué da | Utilidad para nuestro reto | Enlace |
+|---|---|---|---|
+| **Microsoft Azure** | $200 de crédito 30 días + servicios gratis (algunos siempre, otros 12 meses). Pide teléfono, tarjeta no prepago y cuenta MS/GitHub | Alta: alojar backend/cálculo pesado (SPICE/horizonte) | https://azure.microsoft.com/en-us/free/ |
+| **Microsoft Planetary Computer** | Catálogo de datos + STAC API, público sin cuenta (algunos datos piden token gratis) | Media-baja: sobre todo datos terrestres; comprobar si hay algo lunar | https://planetarycomputer.microsoft.com/ |
+| Microsoft Copilot | Asistente SI gratis | Es SI → declarar | https://www.microsoft.com/en-us/microsoft-copilot |
+| GitHub Copilot (Free) | 2.000 completados/mes + chat/agente limitado, sin tarjeta | Es SI (código) → declarar | https://github.com/features/copilot |
+| Microsoft Teams Free | Reuniones ≤100 personas/60 min, chat, 5 GB | Comunicación del equipo | https://www.microsoft.com/en-us/microsoft-teams/teams-free |
+| **Google Cloud** | $300 de crédito 90 días, sin cobro automático; pide tarjeta (incluye Firebase y Google Maps API) | Alta: hosting (Firebase/Cloud Run), almacenar datos | https://cloud.google.com/free/docs/free-cloud-features#free-trial |
+| Meteomatics Weather API | 1.000 consultas/día, activo durante el hackathon; datos meteorológicos de la **Tierra** | Baja (el reto es lunar) | https://www.meteomatics.com/en/meteomatics-and-nasa-space-apps-challenge/ |
+| Miro Education | Gratis 2 años estudiantes / siempre educadores | Pizarra de equipo | https://miro.com/education-whiteboard/ |
+| Miro Business | 14 días gratis (pide tarjeta; cancelar antes) | Pizarra de equipo | https://miro.com/ |
+| **Miro Board Templates** | Plantillas Hackathon Template Board y Hackathon Project Coach Board, gratis | Útil para organizar el equipo y la ideación | https://miro.com/templates/profile/nasa-space-apps-challenge/ |
+| **Dominio gratis + hosting 1 año (GoDaddy Registry / Porkbun)** | Dominio no premium + SSL 1 año | Útil: URL pública limpia para el "Link to Final Project" (pedir clasificación FortiGuard si es web nueva) | https://www.spaceapps.earth/ |
+
+Preguntas sobre ofertas: categoría *Global Offers* en Space Apps Connect (https://github.com/nasa/spaceapps).
+Contactos de soporte: Microsoft samfal@microsoft.com · Google cloudstartupsupport@google.com · Meteomatics support@meteomatics.com · Porkbun support@porkbun.com.
 
 ## Registro de recursos añadidos
 | Fecha | Autor | Recurso | Notas |
 |---|---|---|---|
 | 2026-11-14 | claude (sesión de javiseirulo) | Tabla inicial | Investigación inicial vía Firecrawl |
+| 2026-11-14 | claude (sesión de javiseirulo) | Global Offers 2026 | Pegado por javiseirulo desde la página con login |
