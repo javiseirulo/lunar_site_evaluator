@@ -27,7 +27,7 @@
 | Tests (store, helpers, validación de `public/data`) + CI | ✅ | `web/src/core/*.test.ts`, `.github/workflows/web.yml` |
 | Globo 3D + filtros (Marta) | ⏳ hueco listo | `web/src/globe/` (placeholder + lista/ficha de sitio de arranque) |
 | Street View (Pablo) | ⏳ hueco listo | `web/src/streetview/` (placeholder que imprime Sol/Tierra az/el) |
-| Juego / misiones (Cristóbal) | ⏳ hueco listo | `web/src/game/` (placeholder) |
+| Mission / juego (Cristóbal) | ⏳ diseño descrito (#52), hueco listo | `web/src/game/` (placeholder) |
 | Pipeline Python (Javi, Pablo) | ⏳ sin empezar | `python/` (no existe aún) |
 | Deploy público | ⏳ pendiente | `web/vercel.json` listo; proyecto Vercel con raíz `web/` |
 
@@ -56,7 +56,7 @@ Contratos y mocks: **`contracts/README.md`**.
 - **Javi**: sustituir los mocks por datos reales con la misma forma (`"mock": false`); `pnpm test` en `web/` comprueba el formato.
 - **Pablo**: Street View en `web/src/streetview/StreetView.tsx` usando `useTimeseries` + `sampleAt` (ver comentario del archivo); DEM y horizontes en `python/terrain/`.
 - **Marta**: globo en `web/src/globe/GlobeView.tsx`; `loadLayerTexture(layer)` da un canvas coloreado para `THREE.CanvasTexture`; reemplazar o ampliar `SiteList.tsx`.
-- **Cristóbal**: `web/src/game/` (motor + `missions.json`), leyendo `sites` y `selectedSiteId` del store.
+- **Cristóbal**: `web/src/game/`: motor de simulación de N días + veredicto explicado (ver §5, actualizado con su descripción del módulo Mission), leyendo `sites`, timeseries y `selectedSiteId`.
 - **Javi2**: v1 = design system (shadcn), onboarding y deploy público.
 
 ---
@@ -71,7 +71,7 @@ La idea central es esta: **todo lo que pesa se calcula offline en Python y la we
  Pablo: DEM/topografía ───────────┼──► /data (JSON, PNG/COG, tiles) ──► App (Vite + React + TS)
                                   │                                     ├─ Marta: visor 3D + exploración
                                   └──► (opcional) API FastAPI           ├─ Pablo: Lunar Street View
-                                                                        ├─ Cristóbal: gamificación
+                                                                        ├─ Cristóbal: Mission (juego)
                                                                         └─ Javi2: shell, estética, layers
 ```
 
@@ -218,19 +218,28 @@ Estos cuatro campos son la única interfaz entre los módulos web (más `layerOp
   - v2: leyendas y onboarding.
   - v3: pulido, rendimiento (lazy-load de modos ✅ ya hecho) y deploy.
 
-### Cristóbal: gamificación
-- **Mecánicas propuestas:**
-  - "Elige tu base": el usuario propone un sitio y se compara con el score del algoritmo.
-  - Misiones del tipo "encuentra un punto con >80% de luz y vista a la Tierra".
-  - Logros y puntuación.
-  - Modo quiz con datos reales.
-- **Herramientas:** TypeScript puro sobre el store. Las misiones se definen en `game/missions.json` con condiciones sobre `metrics` (por ejemplo `{ "metric": "illum_pct", "op": ">", "value": 0.8 }`). Progreso en `localStorage`, confetti/sonidos con `canvas-confetti` y `howler`.
-- **No depende del 3D:** consume `selectedSiteId` y `sites.json`, así que puede desarrollarse con un selector mock.
+### Cristóbal: módulo Mission (juego)
+> Actualizado el 2026-11-14 según la descripción de @Manuelcgg165 (issue #52, `docs/team/manuelcgg165/game-module.md` en la rama
+> `Manuelcgg165/52-mission-module-notes`). **Sustituye** a las mecánicas del plan original (logros, quiz, ranking, misiones tipo "encuentra un punto con >80% de luz").
+
+- **Qué es** (mantiene la idea del equipo, `docs/ideas/javiseirulo-explore-mission.md`):
+  - Alerta tipo Mission Control: "no podemos aterrizar donde estaba previsto".
+  - Pocos requisitos y 4–5 sitios con sus parámetros, **sin indicar cuál es mejor**.
+  - El jugador elige uno, se simulan N días y un **veredicto explica por qué** salió bien o mal ("sin visibilidad de la Tierra", "te quedaste sin Sol"). Opción de reintentar.
+  - Dos variantes: **modo profesional** y **modo estudiante** (jugador único o una clase). Sin multijugador.
+- **Cómo se construye:**
+  - Carpeta `web/src/game/`, TypeScript sobre el store compartido, tests con vitest.
+  - Consume `sites.json` (métricas), `timeseries/<id>.json` (`t_utc`, `sun_el`, `earth_el`, `lit`; también `earth_visible` si viene) y del store `selectedSiteId`, `currentTimeUTC` y `mode: "game"`.
+  - Helpers ya disponibles en `@/core`: `useTimeseries`, `sampleAt`, `hoursUntilChange`, `fractionOn`.
+  - **Veredicto determinista**, calculado de la serie temporal (sin IA dentro del producto).
+  - No depende del 3D ni del cálculo real: se desarrolla con los mocks (la ventana mock de 30 días cubre simulaciones de 9 o 14 días).
+- **Necesita de los demás:** contratos de `sites.json` y `timeseries` estables (aviso si cambian) y series horarias que cubran toda la ventana simulada de los sitios del escenario.
 - **Iteraciones:**
-  - v0: motor de misiones con un JSON y tests (vitest).
-  - v1: UI de misiones y logros.
-  - v2: integración con los clics del globo y del Street View.
-  - v3: modo desafío/ranking local.
+  - v0: motor de simulación y veredicto con datos mock y tests.
+  - v1: interfaz (alerta, tarjetas de sitios, simulación, veredicto, reintentar).
+  - v2: datos reales e integración con el globo y la ficha de sitio.
+  - v3: modo estudiante y pulido.
+- **Pendiente de cerrar:** reglas de victoria y derrota · duración de la simulación (9 o 14 días) · qué diferencia el modo profesional del modo estudiante.
 
 ## 6. Cronograma (hackathon de ~48 h; escalar si tenéis más tiempo)
 
