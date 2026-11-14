@@ -53,6 +53,7 @@ Contratos y mocks: **`contracts/README.md`**.
 8. **Rutas**: `/`, `/explore`, `/streetview/:siteId`, `/game`, `/about`. En la UI, `game` se llama "Mission".
 
 ### Siguiente paso por persona
+> ➕ (@javiseirulo, 2026-11-14, #67) **Alcance = toda la Luna, con énfasis en el polo sur.** Qué tiene que cambiar cada uno: **§10**.
 - **Javi**: sustituir los mocks por datos reales con la misma forma (`"mock": false`); `pnpm test` en `web/` comprueba el formato.
 - **Pablo**: prototipo Cesium aislado en `web/src/streetview/StreetView.tsx`, con `useTimeseries` + `sampleAt` y límites explícitos; DEM/horizontes en `python/terrain/`. Acordar y exportar además el heightmap polar para Marta (ver §5 y §9).
 - **Marta**: globo en `web/src/globe/GlobeView.tsx`; `loadLayerTexture(layer)` da un canvas coloreado para `THREE.CanvasTexture`; reemplazar o ampliar `SiteList.tsx`.
@@ -204,6 +205,7 @@ Estos cuatro campos son la única interfaz entre los módulos web (más `layerOp
 | 7 | Mission | **Usa `mission_config` y el modelo de llegada (J8)** para sus escenarios. Formato y archivo detallados en el bloque de Cristóbal | Cristóbal |
 | 8 | Modo de tiempo en Explore | **Implementado en el MVP:** selector "Design" (fecha de aterrizaje) / "Mission" (fecha de lanzamiento → llegada calculada), en `web/src/scoring/` y montado en Explore | Marta, Javi2 |
 | 9 | Coordenadas arbitrarias | **Vectores en marco lunar + transformación topocéntrica con paralaje exacta de la Tierra** (`@/ephem`), que es lo que pide §9. Pablo lo usa para la cámara en cualquier punto. Detalle en su bloque | Pablo |
+| 10 | Alcance | **Toda la Luna, con énfasis en el polo sur** (2026-11-14, #67): catálogo, efemérides, métricas y score globales; terreno y capas polares; punto cualquiera con horizonte plano "no terrain". Detalle y cambios por persona en **§10** | Todos |
 
 **Por qué importa el alcance del relieve lejano (decisión 4).** En el polo sur el Sol está como mucho a ~1,5° sobre el horizonte, así que montañas lejanas lo tapan:
 - Un relieve 2 km más alto que el observador a **50 km** subtiende `atan((2000 − 50000²/(2·1737400))/50000)` ≈ **1,5°**: tapa el Sol por completo.
@@ -370,6 +372,7 @@ Los umbrales son propuestas razonables, a ajustar con referencias.
   - Resultado anotado en el PR.
 
 ### Pablo: topografía y Lunar Street View
+> ➕ (@javiseirulo, 2026-11-14, #67) **Alcance = toda la Luna, con énfasis en el polo sur.** Qué cambia para ti: **§10**.
 
 **Objetivo y alcance.** Construir una vista sintética desde la superficie lunar,
 orientable 360°, con topografía, coordenadas, altura del observador y azimut/elevación
@@ -524,6 +527,7 @@ Reconciliación solicitada por Pablo; seguimiento en **#59**.
 > - **Validación cruzada:** la que ya tienes prevista (2 sitios y fechas: render frente a `lit`/`earth_visible`) se anota en el PR (#41).
 
 ### Marta: visor 3D de la Luna y modo exploración
+> ➕ (@javiseirulo, 2026-11-14, #67) **Alcance = toda la Luna, con énfasis en el polo sur.** Qué cambia para ti: **§10**.
 > Revisado 2026-11-14 contra el código de `dev` (`contracts/types.ts`, `web/src/core`, `web/src/layers`, mocks de `public/data`).
 > Marta trabaja en `web/src/globe/`; todo lo que sea de otra carpeta o de `contracts/` va por PR con su dueño.
 
@@ -609,6 +613,7 @@ Reconciliación solicitada por Pablo; seguimiento en **#59**.
   - En móvil se queda el mapa polar 2D de Javi2 (toggle 2D/3D en `ExplorePage`). El 3D no tiene que funcionar en 375 px.
 
 ### Javi2: web, estética y layers de la página
+> ➕ (@javiseirulo, 2026-11-14, #67) **Alcance = toda la Luna, con énfasis en el polo sur.** Qué cambia para ti: **§10**.
 - **Responsable de** `src/core` (store, loader de datos, router) y del shell: layout, navegación entre modos, landing, about/datos/créditos NASA y responsive.
 - **Herramientas:** Tailwind 4, shadcn/ui, Framer Motion y React Router 7. La identidad visual se puede definir con Figma o Stitch.
 - **Layers:** gestiona el sistema de capas (registro, orden, opacidad, leyendas) con `layers.json`. Marta las pinta en 3D y Javi2 da la UI de control.
@@ -619,6 +624,7 @@ Reconciliación solicitada por Pablo; seguimiento en **#59**.
   - v3: pulido, rendimiento (lazy-load de modos ✅ ya hecho) y deploy.
 
 ### Cristóbal: módulo Mission (juego)
+> ➕ (@javiseirulo, 2026-11-14, #67) **Alcance = toda la Luna, con énfasis en el polo sur.** Qué cambia para ti: **§10**.
 > Actualizado el 2026-11-14 según la descripción de @Manuelcgg165 (issue #52, `docs/team/manuelcgg165/game-module.md` en la rama
 > `Manuelcgg165/52-mission-module-notes`). **Sustituye** a las mecánicas del plan original (logros, quiz, ranking, misiones tipo "encuentra un punto con >80% de luz").
 
@@ -720,3 +726,77 @@ fuera de rango. Un punto de cámara nuevo no recibe la serie de otro lugar.
 No se publica código ni datos crudos de Pablo con #59. El descargador/exportador
 y las notas locales se conservan para sus propios PRs. Las pruebas de adquisición
 no acreditan una escena Cesium, una predicción de horizonte ni un enlace de radio.
+
+## 10. Toda la Luna, con énfasis en el polo sur (decisión de @javiseirulo, 2026-11-14, #67)
+
+> **Qué se decide.** La app permite **seleccionar y evaluar cualquier punto de la Luna**. El polo sur sigue siendo el foco: es donde hay más datos, terreno real y la mayoría de sitios. Ya estaba en J1 ("Se puede seleccionar toda la Luna, con énfasis en el polo sur"), pero el código y los mocks se habían quedado solo en el polo (≤ −80°). Esta sección dice qué cambia y qué necesita cada uno.
+> Plan de implementación de Javi (fases, PRs, verificación): `docs/team/javiseirulo/plan-implementacion.md`.
+
+### Por qué todo estaba en el polo sur
+- Los 20 sitios mock están entre 81,5°S y 89,9°S.
+- `layers.json`, el mapa 2D y el parche 3D usan la estereográfica polar sur hasta −80°.
+- El DEM de Pablo (PGDA 81) cubre de 87°S a 90°S.
+
+Se hizo así porque el problema difícil del reto está en el polo sur: el Sol roza el horizonte (±1,5°), hay PSR con hielo y allí van las misiones Artemis. Además, el terreno y los mapas son caros. **No es una limitación técnica de la efeméride:** los vectores Sol/Tierra valen para cualquier punto.
+
+### Qué es global y qué sigue siendo polar
+| Pieza | Alcance | Notas |
+|---|---|---|
+| Efemérides (`ephem/<YYYY>.bin`, 2026–2055) y `@/ephem` (`skyAt`, `buildTimeseries`) | **Global** | Cualquier lat/lon y ventana, en el cliente |
+| Métricas, validez y score (`@/scoring`) | **Global** | Misma función para todos los sitios |
+| Catálogo curado (#48) | **Global** | ~40 sitios en el polo sur (Artemis III 2024, Barker et al. 2021) + ~15–20 en el resto (aterrizajes reales: Apollo, Luna, Chang'e, Chandrayaan-3, SLIM, IM-1, Blue Ghost; polo norte si hay fuente). Cada coordenada con su URL. Los 20 ids actuales **se mantienen** |
+| Punto cualquiera (clic en el globo o lat/lon) | **Global** | Horizonte plano etiquetado **"no terrain"** |
+| Mapa de calor | Global a 1° (equirectangular) + polar sur a 5 km | `grid/*.bin` (si da tiempo, J11) |
+| Terreno real (horizonte, pendiente, PSR) | **Polar** (sur y, si hay sitios, norte) | Fuera de los polos el horizonte plano es físicamente razonable |
+| Capas raster (`layers.json`) y parche 3D | Polar sur ≤ −80° | Pueden añadirse capas globales (ver Javi2) |
+
+Física fuera de los polos, para que nadie se sorprenda con los resultados:
+- El día y la noche duran ~14,8 días cada uno, así que `max_dark_hours` ≈ 354 h.
+- En la cara visible la Tierra está siempre a la vista; en la cara oculta, nunca (solo oscila cerca del limbo).
+- Con los requisitos por defecto (noche máxima de 100 h), un sitio ecuatorial es **no válido** para estancias largas, pero **válido** para 7 días si se aterriza al amanecer. Lo resuelve la evaluación por ventana (J6), sin casos especiales.
+- `psr_dist_km` se mide a la PSR más cercana de cualquiera de los dos polos. Lejos de los polos sale muy grande, y es correcto.
+
+### Terreno mientras llega el de Pablo
+- Se usa horizonte plano con la depresión del horizonte de un observador a 5 m (−0,137°), marcado en `Timeseries.horizon_source`.
+- `slope_deg` y `psr_dist_km` van en `Site.pending_metrics` (contrato v1.1): no cuentan para la validez ni para el score, y la UI muestra "pending terrain".
+- Cuando Pablo publique `horizon/<id>.json` y la pendiente, se vuelve a ejecutar el export y desaparecen.
+
+### Qué tiene que cambiar cada uno
+**Javi2 (core, capas, mapa 2D)**
+1. Store: nuevo campo **`selectedPoint: { lat, lon } | null`** + `setSelectedPoint`, para un punto cualquiera (clic en el globo o el mapa, o entrada lat/lon), igual que se hizo con `missionConfig`. Hay que añadirlo a `AppEvents` en `contracts/types.ts`. Mientras no exista, el panel de Javi usa una entrada propia.
+2. Mapa 2D: modo **Global (equirectangular)** además del Polar, con un helper `projectEquirect` en `@/core/projection`. Pins de todo el catálogo.
+3. `layers.json`: `projection` por capa (opcional en v1.1) para admitir capas globales además de las polares.
+4. Lista de sitios agrupada o filtrable por región (`Site.region`: `south_pole`, `north_pole`, `near_side`, `far_side`).
+5. `METRICS` y `verdictFor` (`web/src/core/metrics.ts`): no depender de 15° fijos, usar la validez de `@/scoring` y pintar "—" en las `pending_metrics`.
+6. TimeBar hasta 30 años usando `@/ephem` (J0 #5).
+
+**Marta (globo, Explore)**
+1. Pins en su lat/lon real por todo el globo. El clúster "South Pole · N sites" queda solo para el grupo polar.
+2. **Clic en cualquier punto del globo → `selectedPoint`** (raycast → lat/lon). El panel de evaluación calcula ese punto con `@/ephem` + `@/scoring` ("no terrain").
+3. Luz del globo según la fecha con `sunDirectionMoonME(t)` de `@/ephem` (vector en `MOON_ME`, vale para toda la Luna). Sustituye a sacarla de la timeseries de un sitio.
+4. Mapa de calor global sobre el globo con `grid/global_1deg.bin`: equirectangular, que coincide con las UV de la esfera. El parche polar sigue con `layers.json`.
+5. Filtro por región. Sliders sobre `missionConfig` y score importado de `@/scoring` (J0 #1).
+
+**Pablo (terreno, Street View)**
+1. Street View en **cualquier** lat/lon: Cesium Moon ya es global. Sol y Tierra con `skyAt(lat, lon, t)` (paralaje exacta, J0 #9).
+2. Horizontes con paso de 0,1° (observador a 5 m, alcance ≥ 100–150 km con curvatura) para los **sitios polares del catálogo**. La lista va en `docs/team/javiseirulo/catalog-for-pablo.md`.
+3. Sitios no polares: horizonte plano etiquetado o, si te resulta barato, el DEM global LOLA 118 m (ya registrado en `docs/04`). Decides tú y lo documentas en `source`.
+4. Polo norte: el mismo tratamiento que el sur si el catálogo tiene sitios allí (DEM polar norte de LOLA).
+5. Pendiente en los sitios del catálogo. Fuera de los polos, con el DEM global, avisando de que la línea base es más gruesa.
+6. PSR de **ambos** polos (máscara o polígonos con fuente validada) para `psr_dist_km`.
+
+**Cristóbal (Mission)**
+- Los escenarios pueden usar cualquier sitio del catálogo (`site_ids`). `computeArrival` ya modela la espera por la traza: en el polo, 0 días; en el ecuador, hasta ~13,7 días con `start_in_orbit`. Veredicto con `evaluateSite` de `@/scoring`.
+
+### Lo que entrega Javi (en este orden, PRs a `dev`)
+1. **Contrato v1.1:**
+   - `Site.region`, `kind`, `checks`, `pending_metrics`;
+   - métricas opcionales;
+   - `Timeseries.sun_frac` y `horizon_source`;
+   - schemas de `horizon`, `ephem-index`, `grid-index` y `mission_config`.
+2. **`python/` efemérides:** SPICE, vectores 2026–2055 y validación con Horizons en sitios polares, ecuatoriales y de la cara oculta.
+3. **`@/ephem` + `@/scoring`:**
+   - `skyAt`, `buildTimeseries`, `sunDirectionMoonME`;
+   - `evaluateSite`, `rankSites`, robustez, `bestDateCurve`, `paretoFront`;
+   - panel de evaluación del sitio o del punto.
+4. **Datos reales:** catálogo global, `timeseries`, `sites.json` y `manifest` con `mock: false`. Después, mapa de calor.
