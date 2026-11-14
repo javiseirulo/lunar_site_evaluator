@@ -10,232 +10,232 @@ sites:
   # SOUTH POLE (lat <= -80): the 20 existing ids first
   # ---------------------------------------------------------------------------
   - id: shackleton_rim_01
-    name: "Shackleton rim (SR1)"
+    name: 'Shackleton rim (SR1)'
     lat: -89.7755
     lon: -156.448
     region: south_pole
     kind: candidate
-    group: "ESA Lunar Lander RoI SR1 (Shackleton rim)"
-    source_url: "https://arxiv.org/abs/1208.5587"
-    source_ref: "De Rosa et al. 2012, Planet. Space Sci. 74:224-246 (doi:10.1016/j.pss.2012.08.002), Table 2, RoI SR1"
+    group: 'ESA Lunar Lander RoI SR1 (Shackleton rim)'
+    source_url: 'https://arxiv.org/abs/1208.5587'
+    source_ref: 'De Rosa et al. 2012, Planet. Space Sci. 74:224-246 (doi:10.1016/j.pss.2012.08.002), Table 2, RoI SR1'
     precision: region_representative_point
     note: "RoI centre, ME/PA DE421. Barker et al. 2021 state PGDA product 78 Site04 (5 m LOLA DEM) corresponds to SR1. The Glaser et al. 2018 illumination maximum 'Shackleton S' (-89.7849, -156.03) is ~0.3 km away."
 
   - id: shackleton_rim_02
-    name: "Shackleton rim (SR3)"
+    name: 'Shackleton rim (SR3)'
     lat: -89.812
     lon: 52.125
     region: south_pole
     kind: candidate
-    group: "ESA Lunar Lander RoI SR3 (Shackleton rim)"
-    source_url: "https://arxiv.org/abs/1208.5587"
-    source_ref: "De Rosa et al. 2012, Planet. Space Sci. 74:224-246 (doi:10.1016/j.pss.2012.08.002), Table 2, RoI SR3"
+    group: 'ESA Lunar Lander RoI SR3 (Shackleton rim)'
+    source_url: 'https://arxiv.org/abs/1208.5587'
+    source_ref: 'De Rosa et al. 2012, Planet. Space Sci. 74:224-246 (doi:10.1016/j.pss.2012.08.002), Table 2, RoI SR3'
     precision: region_representative_point
     note: "Moved: the mock 'Shackleton rim B' (-89.45, 141) had no source and is not on the rim. PGDA 78 'LM1: Shackleton Rim B' has no published coordinate, so the De Rosa SR3 RoI centre on the opposite rim is used."
 
   - id: connecting_ridge
-    name: "Connecting ridge (CR1)"
+    name: 'Connecting ridge (CR1)'
     lat: -89.4679
     lon: -137.411
     region: south_pole
     kind: candidate
-    group: "Artemis III region (2022): Connecting Ridge; ESA RoI CR1"
-    source_url: "https://arxiv.org/abs/1208.5587"
-    source_ref: "De Rosa et al. 2012, Planet. Space Sci. 74:224-246 (doi:10.1016/j.pss.2012.08.002), Table 2, RoI CR1"
+    group: 'Artemis III region (2022): Connecting Ridge; ESA RoI CR1'
+    source_url: 'https://arxiv.org/abs/1208.5587'
+    source_ref: 'De Rosa et al. 2012, Planet. Space Sci. 74:224-246 (doi:10.1016/j.pss.2012.08.002), Table 2, RoI CR1'
     precision: region_representative_point
-    note: "Barker et al. 2021: PGDA 78 Site01 = CR1. Artemis SDT site 001 (Wueller et al. 2026 Table A1: -89.466, -136.949) and Glaser et al. 2018 point C1 (-89.4505, -137.16) are both within ~0.6 km."
+    note: 'Barker et al. 2021: PGDA 78 Site01 = CR1. Artemis SDT site 001 (Wueller et al. 2026 Table A1: -89.466, -136.949) and Glaser et al. 2018 point C1 (-89.4505, -137.16) are both within ~0.6 km.'
 
   - id: de_gerlache_rim_01
-    name: "de Gerlache rim (GR1)"
+    name: 'de Gerlache rim (GR1)'
     lat: -88.6952
     lon: -68.2846
     region: south_pole
     kind: candidate
-    group: "Artemis III region (2022): de Gerlache Rim 1; ESA RoI GR1"
-    source_url: "https://arxiv.org/abs/1208.5587"
-    source_ref: "De Rosa et al. 2012, Planet. Space Sci. 74:224-246 (doi:10.1016/j.pss.2012.08.002), Table 2, RoI GR1"
+    group: 'Artemis III region (2022): de Gerlache Rim 1; ESA RoI GR1'
+    source_url: 'https://arxiv.org/abs/1208.5587'
+    source_ref: 'De Rosa et al. 2012, Planet. Space Sci. 74:224-246 (doi:10.1016/j.pss.2012.08.002), Table 2, RoI GR1'
     precision: region_representative_point
-    note: "Barker et al. 2021: PGDA 78 Site11 = GR1. Artemis SDT site 011 (Wueller et al. 2026 Table A1: -88.674, -68.228) is ~0.7 km away."
+    note: 'Barker et al. 2021: PGDA 78 Site11 = GR1. Artemis SDT site 011 (Wueller et al. 2026 Table A1: -88.674, -68.228) is ~0.7 km away.'
 
   - id: de_gerlache_rim_02
-    name: "de Gerlache Rim 2 (dGR2_K2023)"
+    name: 'de Gerlache Rim 2 (dGR2_K2023)'
     lat: -88.45
     lon: -67.859
     region: south_pole
     kind: candidate
-    group: "Artemis III region (2022, 2024): de Gerlache Rim 2"
-    source_url: "https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2025JE009434"
-    source_ref: "Wueller et al. 2026, J. Geophys. Res. Planets 131(3) e2025JE009434, Table A1, CLS dGR2_K2023"
+    group: 'Artemis III region (2022, 2024): de Gerlache Rim 2'
+    source_url: 'https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2025JE009434'
+    source_ref: 'Wueller et al. 2026, J. Geophys. Res. Planets 131(3) e2025JE009434, Table A1, CLS dGR2_K2023'
     precision: published_point
-    note: "Candidate landing site (slope < 8 deg, HLS criterion) originally suggested by Kring et al. 2023. Chosen as the dGR2 site with the most consecutive Sun+Earth days summed over the 2025-2032 midsummers (Table A2). LOLA 20 m/px LDEM basis."
+    note: 'Candidate landing site (slope < 8 deg, HLS criterion) originally suggested by Kring et al. 2023. Chosen as the dGR2 site with the most consecutive Sun+Earth days summed over the 2025-2032 midsummers (Table A2). LOLA 20 m/px LDEM basis.'
 
   - id: peak_near_shackleton
-    name: "Peak near Shackleton (SV1)"
+    name: 'Peak near Shackleton (SV1)'
     lat: -88.8247
     lon: 124.1359
     region: south_pole
     kind: candidate
-    group: "Artemis III region (2022): Peak Near Shackleton; ESA RoI SV1"
-    source_url: "https://arxiv.org/abs/1208.5587"
-    source_ref: "De Rosa et al. 2012, Planet. Space Sci. 74:224-246 (doi:10.1016/j.pss.2012.08.002), Table 2, RoI SV1"
+    group: 'Artemis III region (2022): Peak Near Shackleton; ESA RoI SV1'
+    source_url: 'https://arxiv.org/abs/1208.5587'
+    source_ref: 'De Rosa et al. 2012, Planet. Space Sci. 74:224-246 (doi:10.1016/j.pss.2012.08.002), Table 2, RoI SV1'
     precision: region_representative_point
-    note: "Barker et al. 2021: PGDA 78 Site07 = SV1. Artemis SDT site 007 (Wueller et al. 2026 Table A1: -88.811, 123.554) is ~0.6 km away."
+    note: 'Barker et al. 2021: PGDA 78 Site07 = SV1. Artemis SDT site 007 (Wueller et al. 2026 Table A1: -88.811, 123.554) is ~0.6 km away.'
 
   - id: malapert_massif
-    name: "Malapert massif (MP1)"
+    name: 'Malapert massif (MP1)'
     lat: -85.9756
     lon: -2.11241
     region: south_pole
     kind: candidate
-    group: "Artemis III region (2022, 2024): Malapert Massif; ESA RoI MP1"
-    source_url: "https://arxiv.org/abs/1208.5587"
-    source_ref: "De Rosa et al. 2012, Planet. Space Sci. 74:224-246 (doi:10.1016/j.pss.2012.08.002), Table 2, RoI MP1 (Malapert Peak)"
+    group: 'Artemis III region (2022, 2024): Malapert Massif; ESA RoI MP1'
+    source_url: 'https://arxiv.org/abs/1208.5587'
+    source_ref: 'De Rosa et al. 2012, Planet. Space Sci. 74:224-246 (doi:10.1016/j.pss.2012.08.002), Table 2, RoI MP1 (Malapert Peak)'
     precision: region_representative_point
-    note: "Wueller et al. 2026 CLS MMA03 (-85.958, -3.278) is ~2.5 km away. PGDA 78 provides a 5 m DEM for Site23 (Malapert massif); coverage of this exact point not checked."
+    note: 'Wueller et al. 2026 CLS MMA03 (-85.958, -3.278) is ~2.5 km away. PGDA 78 provides a 5 m DEM for Site23 (Malapert massif); coverage of this exact point not checked.'
 
   - id: leibnitz_beta
-    name: "Mons Mouton, former Leibnitz Beta plateau (LP1)"
+    name: 'Mons Mouton, former Leibnitz Beta plateau (LP1)'
     lat: -85.4596
     lon: 31.78053
     region: south_pole
     kind: candidate
-    group: "Artemis III region (2022: Leibnitz Beta Plateau; 2024: Mons Mouton); ESA RoI LP1"
-    source_url: "https://arxiv.org/abs/1208.5587"
-    source_ref: "De Rosa et al. 2012, Planet. Space Sci. 74:224-246 (doi:10.1016/j.pss.2012.08.002), Table 2, RoI LP1"
+    group: 'Artemis III region (2022: Leibnitz Beta Plateau; 2024: Mons Mouton); ESA RoI LP1'
+    source_url: 'https://arxiv.org/abs/1208.5587'
+    source_ref: 'De Rosa et al. 2012, Planet. Space Sci. 74:224-246 (doi:10.1016/j.pss.2012.08.002), Table 2, RoI LP1'
     precision: region_representative_point
-    note: "Leibnitz Beta was officially renamed Mons Mouton (https://svs.gsfc.nasa.gov/5074/). Wueller et al. 2026 CLS MMO10 (-85.461, 31.490) is ~0.7 km away. PGDA 78 Site20/Site20v2 = Leibnitz beta plateau DEM."
+    note: 'Leibnitz Beta was officially renamed Mons Mouton (https://svs.gsfc.nasa.gov/5074/). Wueller et al. 2026 CLS MMO10 (-85.461, 31.490) is ~0.7 km away. PGDA 78 Site20/Site20v2 = Leibnitz beta plateau DEM.'
 
   - id: haworth_rim
-    name: "Haworth (HW06)"
+    name: 'Haworth (HW06)'
     lat: -87.05
     lon: -24.24
     region: south_pole
     kind: candidate
-    group: "Artemis III region (2022, 2024): Haworth"
-    source_url: "https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2025JE009434"
-    source_ref: "Wueller et al. 2026, J. Geophys. Res. Planets 131(3) e2025JE009434, Table A1, CLS HW06"
+    group: 'Artemis III region (2022, 2024): Haworth'
+    source_url: 'https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2025JE009434'
+    source_ref: 'Wueller et al. 2026, J. Geophys. Res. Planets 131(3) e2025JE009434, Table A1, CLS HW06'
     precision: published_point
-    note: "Chosen as the HW site with the most consecutive Sun+Earth days summed over 2025-2032 (Table A2). Kring et al. 2023 site HW_K2023 (-86.990, -24.254) is ~1.8 km away. PGDA 78 has a Haworth 5 m DEM."
+    note: 'Chosen as the HW site with the most consecutive Sun+Earth days summed over 2025-2032 (Table A2). Kring et al. 2023 site HW_K2023 (-86.990, -24.254) is ~1.8 km away. PGDA 78 has a Haworth 5 m DEM.'
 
   - id: nobile_rim_01
-    name: "Nobile Rim 1 (NR101)"
+    name: 'Nobile Rim 1 (NR101)'
     lat: -85.295
     lon: 36.917
     region: south_pole
     kind: candidate
-    group: "Artemis III region (2022, 2024): Nobile Rim 1"
-    source_url: "https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2025JE009434"
-    source_ref: "Wueller et al. 2026, J. Geophys. Res. Planets 131(3) e2025JE009434, Table A1, CLS NR101"
+    group: 'Artemis III region (2022, 2024): Nobile Rim 1'
+    source_url: 'https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2025JE009434'
+    source_ref: 'Wueller et al. 2026, J. Geophys. Res. Planets 131(3) e2025JE009434, Table A1, CLS NR101'
     precision: published_point
-    note: "NR101 and NR103 tie for most Sun+Earth days (Table A2); first listed kept. PGDA 78 Site06 = Nobile rim 1 DEM."
+    note: 'NR101 and NR103 tie for most Sun+Earth days (Table A2); first listed kept. PGDA 78 Site06 = Nobile rim 1 DEM.'
 
   - id: nobile_rim_02
-    name: "Nobile Rim 2 (NR207)"
+    name: 'Nobile Rim 2 (NR207)'
     lat: -83.918
     lon: 59.326
     region: south_pole
     kind: candidate
-    group: "Artemis III region (2022, 2024): Nobile Rim 2"
-    source_url: "https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2025JE009434"
-    source_ref: "Wueller et al. 2026, J. Geophys. Res. Planets 131(3) e2025JE009434, Table A1, CLS NR207"
+    group: 'Artemis III region (2022, 2024): Nobile Rim 2'
+    source_url: 'https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2025JE009434'
+    source_ref: 'Wueller et al. 2026, J. Geophys. Res. Planets 131(3) e2025JE009434, Table A1, CLS NR207'
     precision: published_point
-    note: "Chosen as the NR2 site with the most Sun+Earth days 2025-2032 (Table A2). PGDA 78 DM2 = Nobile rim 2 DEM."
+    note: 'Chosen as the NR2 site with the most Sun+Earth days 2025-2032 (Table A2). PGDA 78 DM2 = Nobile rim 2 DEM.'
 
   - id: faustini_rim
-    name: "Faustini Rim A (FRA02)"
+    name: 'Faustini Rim A (FRA02)'
     lat: -87.749
     lon: 95.084
     region: south_pole
     kind: candidate
-    group: "Artemis III region (2022): Faustini Rim A"
-    source_url: "https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2025JE009434"
-    source_ref: "Wueller et al. 2026, J. Geophys. Res. Planets 131(3) e2025JE009434, Table A1, CLS FRA02"
+    group: 'Artemis III region (2022): Faustini Rim A'
+    source_url: 'https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2025JE009434'
+    source_ref: 'Wueller et al. 2026, J. Geophys. Res. Planets 131(3) e2025JE009434, Table A1, CLS FRA02'
     precision: published_point
-    note: "Chosen as the FRA site with the most Sun+Earth days 2025-2032 (Table A2). PGDA 78 LM7 = Faustini Rim A DEM."
+    note: 'Chosen as the FRA site with the most Sun+Earth days 2025-2032 (Table A2). PGDA 78 LM7 = Faustini Rim A DEM.'
 
   - id: amundsen_rim
-    name: "Amundsen Rim (AR05)"
+    name: 'Amundsen Rim (AR05)'
     lat: -84.229
     lon: 69.877
     region: south_pole
     kind: candidate
-    group: "Artemis III region (2022): Amundsen Rim"
-    source_url: "https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2025JE009434"
-    source_ref: "Wueller et al. 2026, J. Geophys. Res. Planets 131(3) e2025JE009434, Table A1, CLS AR05"
+    group: 'Artemis III region (2022): Amundsen Rim'
+    source_url: 'https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2025JE009434'
+    source_ref: 'Wueller et al. 2026, J. Geophys. Res. Planets 131(3) e2025JE009434, Table A1, CLS AR05'
     precision: published_point
-    note: "Chosen as the AR site with the most Sun+Earth days 2025-2032 (Table A2). PGDA 78 DM1 = Amundsen rim DEM."
+    note: 'Chosen as the AR site with the most Sun+Earth days 2025-2032 (Table A2). PGDA 78 DM1 = Amundsen rim DEM.'
 
   - id: cabeus_b
-    name: "Peak near Cabeus B (PCB04)"
+    name: 'Peak near Cabeus B (PCB04)'
     lat: -83.369
     lon: -67.665
     region: south_pole
     kind: candidate
-    group: "Artemis III region (2024): Peak near Cabeus B"
-    source_url: "https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2025JE009434"
-    source_ref: "Wueller et al. 2026, J. Geophys. Res. Planets 131(3) e2025JE009434, Table A1, CLS PCB04"
+    group: 'Artemis III region (2024): Peak near Cabeus B'
+    source_url: 'https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2025JE009434'
+    source_ref: 'Wueller et al. 2026, J. Geophys. Res. Planets 131(3) e2025JE009434, Table A1, CLS PCB04'
     precision: published_point
-    note: "Chosen as the PCB site with the most Sun+Earth days 2025-2032 (Table A2)."
+    note: 'Chosen as the PCB site with the most Sun+Earth days 2025-2032 (Table A2).'
 
   - id: shoemaker_rim
-    name: "Shoemaker-Faustini ridge"
+    name: 'Shoemaker-Faustini ridge'
     lat: -87.1
     lon: 65.4
     region: south_pole
     kind: candidate
-    group: "Luna-27 candidate site >80S (Flahaut et al. 2020), site 2 = Site A"
-    source_url: "https://hal.science/hal-02345336"
-    source_ref: "Flahaut et al. 2020, Planet. Space Sci. 180:104750 (doi:10.1016/j.pss.2019.104750), Table 2, site 2"
+    group: 'Luna-27 candidate site >80S (Flahaut et al. 2020), site 2 = Site A'
+    source_url: 'https://hal.science/hal-02345336'
+    source_ref: 'Flahaut et al. 2020, Planet. Space Sci. 180:104750 (doi:10.1016/j.pss.2019.104750), Table 2, site 2'
     precision: region_representative_point
     note: "Centre of a 191 km2 site, 0.1 deg precision; H-rich topographic high between Shoemaker and Faustini (Flahaut preferred Site A). Mock 'Shoemaker rim' (-87.0, 46) had no source; PGDA 78 Shoemaker / LM2-LM8 DEMs have no published centre coordinates. Datum not stated in the table."
 
   - id: sverdrup_rim
-    name: "North Sverdrup"
+    name: 'North Sverdrup'
     lat: -87.4
     lon: -148.2
     region: south_pole
     kind: candidate
-    group: "Luna-27 candidate site >80S (Flahaut et al. 2020), site 9"
-    source_url: "https://hal.science/hal-02345336"
-    source_ref: "Flahaut et al. 2020, Planet. Space Sci. 180:104750 (doi:10.1016/j.pss.2019.104750), Table 2, site 9"
+    group: 'Luna-27 candidate site >80S (Flahaut et al. 2020), site 9'
+    source_url: 'https://hal.science/hal-02345336'
+    source_ref: 'Flahaut et al. 2020, Planet. Space Sci. 180:104750 (doi:10.1016/j.pss.2019.104750), Table 2, site 9'
     precision: region_representative_point
-    note: "Centre of a 211 km2 site, 0.1 deg precision. Flahaut: farside-centred, Earth visibility < 30% (relay needed). Datum not stated in the table."
+    note: 'Centre of a 211 km2 site, 0.1 deg precision. Flahaut: farside-centred, Earth visibility < 30% (relay needed). Datum not stated in the table.'
 
   - id: slater_plain
-    name: "Slater Plain (SP07)"
+    name: 'Slater Plain (SP07)'
     lat: -87.131
     lon: 127.857
     region: south_pole
     kind: candidate
-    group: "Artemis III region (2024): Slater Plain"
-    source_url: "https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2025JE009434"
-    source_ref: "Wueller et al. 2026, J. Geophys. Res. Planets 131(3) e2025JE009434, Table A1, CLS SP07"
+    group: 'Artemis III region (2024): Slater Plain'
+    source_url: 'https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2025JE009434'
+    source_ref: 'Wueller et al. 2026, J. Geophys. Res. Planets 131(3) e2025JE009434, Table A1, CLS SP07'
     precision: published_point
-    note: "Chosen as the SP site with the most Sun+Earth days 2025-2032 (Table A2)."
+    note: 'Chosen as the SP site with the most Sun+Earth days 2025-2032 (Table A2).'
 
   - id: de_gerlache_kocher
-    name: "de Gerlache-Kocher massif (dGKM02)"
+    name: 'de Gerlache-Kocher massif (dGKM02)'
     lat: -85.777
     lon: -116.502
     region: south_pole
     kind: candidate
-    group: "Artemis III region (2022): de Gerlache-Kocher Massif"
-    source_url: "https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2025JE009434"
-    source_ref: "Wueller et al. 2026, J. Geophys. Res. Planets 131(3) e2025JE009434, Table A1, CLS dGKM02"
+    group: 'Artemis III region (2022): de Gerlache-Kocher Massif'
+    source_url: 'https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2025JE009434'
+    source_ref: 'Wueller et al. 2026, J. Geophys. Res. Planets 131(3) e2025JE009434, Table A1, CLS dGKM02'
     precision: published_point
-    note: "Chosen as the dGKM site with the most Sun+Earth days 2025-2032 (Table A2). PGDA 78 Site42 = de Gerlache-Kocher massif DEM."
+    note: 'Chosen as the dGKM site with the most Sun+Earth days 2025-2032 (Table A2). PGDA 78 Site42 = de Gerlache-Kocher massif DEM.'
 
   - id: mons_mouton
-    name: "Mons Mouton Plateau (MMP02)"
+    name: 'Mons Mouton Plateau (MMP02)'
     lat: -84.805
     lon: 24.887
     region: south_pole
     kind: candidate
-    group: "Artemis III region (2024): Mons Mouton Plateau"
-    source_url: "https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2025JE009434"
-    source_ref: "Wueller et al. 2026, J. Geophys. Res. Planets 131(3) e2025JE009434, Table A1, CLS MMP02"
+    group: 'Artemis III region (2024): Mons Mouton Plateau'
+    source_url: 'https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2025JE009434'
+    source_ref: 'Wueller et al. 2026, J. Geophys. Res. Planets 131(3) e2025JE009434, Table A1, CLS MMP02'
     precision: published_point
-    note: "Id kept; the mock (-84.3, 31) pointed at the plateau north of the mountain, so the Mons Mouton Plateau region is used. The mountain itself is covered by leibnitz_beta. Chosen as the MMP site with the most Sun+Earth days 2025-2032 (Table A2)."
+    note: 'Id kept; the mock (-84.3, 31) pointed at the plateau north of the mountain, so the Mons Mouton Plateau region is used. The mountain itself is covered by leibnitz_beta. Chosen as the MMP site with the most Sun+Earth days 2025-2032 (Table A2).'
 
   - id: plain_81s
     name: "South Idel'son L plains"
@@ -243,9 +243,9 @@ sites:
     lon: 115.7
     region: south_pole
     kind: candidate
-    group: "Luna-27 candidate site >80S (Flahaut et al. 2020), site 12"
-    source_url: "https://hal.science/hal-02345336"
-    source_ref: "Flahaut et al. 2020, Planet. Space Sci. 180:104750 (doi:10.1016/j.pss.2019.104750), Table 2, site 12"
+    group: 'Luna-27 candidate site >80S (Flahaut et al. 2020), site 12'
+    source_url: 'https://hal.science/hal-02345336'
+    source_ref: 'Flahaut et al. 2020, Planet. Space Sci. 180:104750 (doi:10.1016/j.pss.2019.104750), Table 2, site 12'
     precision: region_representative_point
     note: "MOVED about 3.1 deg (~95 km) from the mock 'Plain at 81S' (-81.5, 120): no published site found at 81S. This is the published plains-unit (Ntp) site closest to the mock longitude; centre of a 290 km2 site, 0.1 deg precision; farside-centred, Earth visibility < 30%. PGDA 78 also has 'NPC: Idel'son L crater 1'. Javi to confirm."
 
@@ -253,389 +253,389 @@ sites:
   # SOUTH POLE: new candidates
   # ---------------------------------------------------------------------------
   - id: connecting_ridge_extension
-    name: "Connecting Ridge Extension (CRE01)"
+    name: 'Connecting Ridge Extension (CRE01)'
     lat: -89.011
     lon: -94.61
     region: south_pole
     kind: candidate
-    group: "Artemis III region (2022): Connecting Ridge Extension"
-    source_url: "https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2025JE009434"
-    source_ref: "Wueller et al. 2026, J. Geophys. Res. Planets 131(3) e2025JE009434, Table A1, CLS CRE01"
+    group: 'Artemis III region (2022): Connecting Ridge Extension'
+    source_url: 'https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2025JE009434'
+    source_ref: 'Wueller et al. 2026, J. Geophys. Res. Planets 131(3) e2025JE009434, Table A1, CLS CRE01'
     precision: published_point
-    note: "Chosen as the CRE site with the most Sun+Earth days 2025-2032 (Table A2). About 0.15 km from De Rosa et al. 2012 RoI GR2 (-89.0073, -94.7636). PGDA 78 SL3 = Connecting ridge extension DEM."
+    note: 'Chosen as the CRE site with the most Sun+Earth days 2025-2032 (Table A2). About 0.15 km from De Rosa et al. 2012 RoI GR2 (-89.0073, -94.7636). PGDA 78 SL3 = Connecting ridge extension DEM.'
 
   - id: connecting_ridge_c2
-    name: "Connecting ridge C2 (illumination maximum)"
+    name: 'Connecting ridge C2 (illumination maximum)'
     lat: -89.3157
     lon: -114.06
     region: south_pole
     kind: candidate
-    group: "Highly illuminated point (Glaser et al. 2018)"
-    source_url: "https://ntrs.nasa.gov/citations/20170007365"
-    source_ref: "Glaser et al. 2018, Planet. Space Sci. 162:170-178 (doi:10.1016/j.pss.2017.07.006), Table 1, Connecting Ridge C2 (this study)"
+    group: 'Highly illuminated point (Glaser et al. 2018)'
+    source_url: 'https://ntrs.nasa.gov/citations/20170007365'
+    source_ref: 'Glaser et al. 2018, Planet. Space Sci. 162:170-178 (doi:10.1016/j.pss.2017.07.006), Table 1, Connecting Ridge C2 (this study)'
     precision: published_point
-    note: "Maximum 20-year average illumination at surface level (75.6%), 20 m/px LOLA DTM. Published as 245.94 E. About 0.6 km from Wueller et al. 2026 CLS CRE02 (Artemis Connecting Ridge Extension region)."
+    note: 'Maximum 20-year average illumination at surface level (75.6%), 20 m/px LOLA DTM. Published as 245.94 E. About 0.6 km from Wueller et al. 2026 CLS CRE02 (Artemis Connecting Ridge Extension region).'
 
   - id: connecting_ridge_cr05
-    name: "Connecting Ridge CR05 (PSR access)"
+    name: 'Connecting Ridge CR05 (PSR access)'
     lat: -89.421
     lon: -149.472
     region: south_pole
     kind: candidate
-    group: "Artemis III region (2022): Connecting Ridge"
-    source_url: "https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2025JE009434"
-    source_ref: "Wueller et al. 2026, J. Geophys. Res. Planets 131(3) e2025JE009434, Table A1 and Sect. 4, CLS CR05"
+    group: 'Artemis III region (2022): Connecting Ridge'
+    source_url: 'https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2025JE009434'
+    source_ref: 'Wueller et al. 2026, J. Geophys. Res. Planets 131(3) e2025JE009434, Table A1 and Sect. 4, CLS CR05'
     precision: published_point
-    note: "Highlighted by Wueller et al. for access to potentially volatile-rich PSRs within 2 km (~425 t water estimated); ~8 km from the Shackleton rim."
+    note: 'Highlighted by Wueller et al. for access to potentially volatile-rich PSRs within 2 km (~425 t water estimated); ~8 km from the Shackleton rim.'
 
   - id: peak_near_shackleton_pns02
-    name: "Peak Near Shackleton PNS02 (cold-PSR access)"
+    name: 'Peak Near Shackleton PNS02 (cold-PSR access)'
     lat: -89.061
     lon: 128.442
     region: south_pole
     kind: candidate
-    group: "Artemis III region (2022): Peak Near Shackleton"
-    source_url: "https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2025JE009434"
-    source_ref: "Wueller et al. 2026, J. Geophys. Res. Planets 131(3) e2025JE009434, Table A1 and Sect. 4, CLS PNS02"
+    group: 'Artemis III region (2022): Peak Near Shackleton'
+    source_url: 'https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2025JE009434'
+    source_ref: 'Wueller et al. 2026, J. Geophys. Res. Planets 131(3) e2025JE009434, Table A1 and Sect. 4, CLS PNS02'
     precision: published_point
-    note: "Between Shackleton and Slater craters; PSRs colder than 90 K within 2 km (Wueller et al.)."
+    note: 'Between Shackleton and Slater craters; PSRs colder than 90 K within 2 km (Wueller et al.).'
 
   - id: malapert_mp2
-    name: "Malapert peak (MP2)"
+    name: 'Malapert peak (MP2)'
     lat: -86.0265
     lon: 2.757964
     region: south_pole
     kind: candidate
-    group: "Artemis III region (2022, 2024): Malapert Massif; ESA RoI MP2"
-    source_url: "https://arxiv.org/abs/1208.5587"
-    source_ref: "De Rosa et al. 2012, Planet. Space Sci. 74:224-246 (doi:10.1016/j.pss.2012.08.002), Table 2, RoI MP2 (Malapert Peak)"
+    group: 'Artemis III region (2022, 2024): Malapert Massif; ESA RoI MP2'
+    source_url: 'https://arxiv.org/abs/1208.5587'
+    source_ref: 'De Rosa et al. 2012, Planet. Space Sci. 74:224-246 (doi:10.1016/j.pss.2012.08.002), Table 2, RoI MP2 (Malapert Peak)'
     precision: region_representative_point
-    note: "RoI centre, ME/PA DE421. About 10 km east of MP1; Wueller et al. 2026 CLS MMA02 (-86.015, 3.382) is ~1.4 km away."
+    note: 'RoI centre, ME/PA DE421. About 10 km east of MP1; Wueller et al. 2026 CLS MMA02 (-86.015, 3.382) is ~1.4 km away.'
 
   - id: south_amundsen
-    name: "South Amundsen"
+    name: 'South Amundsen'
     lat: -85.0
     lon: 90.0
     region: south_pole
     kind: candidate
-    group: "Luna-27 candidate site >80S (Flahaut et al. 2020), site 1"
-    source_url: "https://hal.science/hal-02345336"
-    source_ref: "Flahaut et al. 2020, Planet. Space Sci. 180:104750 (doi:10.1016/j.pss.2019.104750), Table 2, site 1"
+    group: 'Luna-27 candidate site >80S (Flahaut et al. 2020), site 1'
+    source_url: 'https://hal.science/hal-02345336'
+    source_ref: 'Flahaut et al. 2020, Planet. Space Sci. 180:104750 (doi:10.1016/j.pss.2019.104750), Table 2, site 1'
     precision: region_representative_point
-    note: "Centre of a 920 km2 site, 0.1 deg precision. Datum not stated in the table."
+    note: 'Centre of a 920 km2 site, 0.1 deg precision. Datum not stated in the table.'
 
   - id: shackleton_vicinity_25e
-    name: "Near Shackleton (25.5E)"
+    name: 'Near Shackleton (25.5E)'
     lat: -89.5
     lon: 25.5
     region: south_pole
     kind: candidate
-    group: "Luna-27 candidate site >80S (Flahaut et al. 2020), site 3"
-    source_url: "https://hal.science/hal-02345336"
-    source_ref: "Flahaut et al. 2020, Planet. Space Sci. 180:104750 (doi:10.1016/j.pss.2019.104750), Table 2, site 3"
+    group: 'Luna-27 candidate site >80S (Flahaut et al. 2020), site 3'
+    source_url: 'https://hal.science/hal-02345336'
+    source_ref: 'Flahaut et al. 2020, Planet. Space Sci. 180:104750 (doi:10.1016/j.pss.2019.104750), Table 2, site 3'
     precision: region_representative_point
-    note: "Centre of a 37 km2 site, 0.1 deg precision (0.1 deg of latitude = ~3 km). Datum not stated in the table."
+    note: 'Centre of a 37 km2 site, 0.1 deg precision (0.1 deg of latitude = ~3 km). Datum not stated in the table.'
 
   - id: faustini_ridge
-    name: "Faustini ridge"
+    name: 'Faustini ridge'
     lat: -87.6
     lon: 103.7
     region: south_pole
     kind: candidate
-    group: "Luna-27 candidate site >80S (Flahaut et al. 2020), site 4"
-    source_url: "https://hal.science/hal-02345336"
-    source_ref: "Flahaut et al. 2020, Planet. Space Sci. 180:104750 (doi:10.1016/j.pss.2019.104750), Table 2, site 4"
+    group: 'Luna-27 candidate site >80S (Flahaut et al. 2020), site 4'
+    source_url: 'https://hal.science/hal-02345336'
+    source_ref: 'Flahaut et al. 2020, Planet. Space Sci. 180:104750 (doi:10.1016/j.pss.2019.104750), Table 2, site 4'
     precision: region_representative_point
-    note: "Centre of a 101 km2 site, 0.1 deg precision. Datum not stated in the table."
+    note: 'Centre of a 101 km2 site, 0.1 deg precision. Datum not stated in the table.'
 
   - id: shackleton_vicinity_101e
-    name: "Near Shackleton (101.4E)"
+    name: 'Near Shackleton (101.4E)'
     lat: -88.6
     lon: 101.4
     region: south_pole
     kind: candidate
-    group: "Luna-27 candidate site >80S (Flahaut et al. 2020), site 5"
-    source_url: "https://hal.science/hal-02345336"
-    source_ref: "Flahaut et al. 2020, Planet. Space Sci. 180:104750 (doi:10.1016/j.pss.2019.104750), Table 2, site 5"
+    group: 'Luna-27 candidate site >80S (Flahaut et al. 2020), site 5'
+    source_url: 'https://hal.science/hal-02345336'
+    source_ref: 'Flahaut et al. 2020, Planet. Space Sci. 180:104750 (doi:10.1016/j.pss.2019.104750), Table 2, site 5'
     precision: region_representative_point
-    note: "Centre of an 83 km2 site, 0.1 deg precision. Datum not stated in the table."
+    note: 'Centre of an 83 km2 site, 0.1 deg precision. Datum not stated in the table.'
 
   - id: ibn_bajja_sw
-    name: "South-west Ibn Bajja plains"
+    name: 'South-west Ibn Bajja plains'
     lat: -86.4
     lon: -86.7
     region: south_pole
     kind: candidate
-    group: "Luna-27 candidate site >80S (Flahaut et al. 2020), site 6 = Site B"
-    source_url: "https://hal.science/hal-02345336"
-    source_ref: "Flahaut et al. 2020, Planet. Space Sci. 180:104750 (doi:10.1016/j.pss.2019.104750), Table 2, site 6"
+    group: 'Luna-27 candidate site >80S (Flahaut et al. 2020), site 6 = Site B'
+    source_url: 'https://hal.science/hal-02345336'
+    source_ref: 'Flahaut et al. 2020, Planet. Space Sci. 180:104750 (doi:10.1016/j.pss.2019.104750), Table 2, site 6'
     precision: region_representative_point
-    note: "Centre of a 2146 km2 site (Imbrian plain SW of Ibn Bajja), 0.1 deg precision. Datum not stated in the table."
+    note: 'Centre of a 2146 km2 site (Imbrian plain SW of Ibn Bajja), 0.1 deg precision. Datum not stated in the table.'
 
   - id: cabeus_b_south
-    name: "South of Cabeus B"
+    name: 'South of Cabeus B'
     lat: -84.0
     lon: -60.5
     region: south_pole
     kind: candidate
-    group: "Luna-27 candidate site >80S (Flahaut et al. 2020), site 7"
-    source_url: "https://hal.science/hal-02345336"
-    source_ref: "Flahaut et al. 2020, Planet. Space Sci. 180:104750 (doi:10.1016/j.pss.2019.104750), Table 2, site 7"
+    group: 'Luna-27 candidate site >80S (Flahaut et al. 2020), site 7'
+    source_url: 'https://hal.science/hal-02345336'
+    source_ref: 'Flahaut et al. 2020, Planet. Space Sci. 180:104750 (doi:10.1016/j.pss.2019.104750), Table 2, site 7'
     precision: region_representative_point
-    note: "Centre of a 75 km2 site, 0.1 deg precision. Datum not stated in the table."
+    note: 'Centre of a 75 km2 site, 0.1 deg precision. Datum not stated in the table.'
 
   - id: de_gerlache_north
-    name: "North de Gerlache"
+    name: 'North de Gerlache'
     lat: -87.9
     lon: -65.1
     region: south_pole
     kind: candidate
-    group: "Luna-27 candidate site >80S (Flahaut et al. 2020), site 8"
-    source_url: "https://hal.science/hal-02345336"
-    source_ref: "Flahaut et al. 2020, Planet. Space Sci. 180:104750 (doi:10.1016/j.pss.2019.104750), Table 2, site 8"
+    group: 'Luna-27 candidate site >80S (Flahaut et al. 2020), site 8'
+    source_url: 'https://hal.science/hal-02345336'
+    source_ref: 'Flahaut et al. 2020, Planet. Space Sci. 180:104750 (doi:10.1016/j.pss.2019.104750), Table 2, site 8'
     precision: region_representative_point
-    note: "Centre of a 30 km2 site, 0.1 deg precision. Datum not stated in the table."
+    note: 'Centre of a 30 km2 site, 0.1 deg precision. Datum not stated in the table.'
 
   - id: sverdrup_west
-    name: "West Sverdrup"
+    name: 'West Sverdrup'
     lat: -88.0
     lon: 173.2
     region: south_pole
     kind: candidate
-    group: "Luna-27 candidate site >80S (Flahaut et al. 2020), site 10"
-    source_url: "https://hal.science/hal-02345336"
-    source_ref: "Flahaut et al. 2020, Planet. Space Sci. 180:104750 (doi:10.1016/j.pss.2019.104750), Table 2, site 10"
+    group: 'Luna-27 candidate site >80S (Flahaut et al. 2020), site 10'
+    source_url: 'https://hal.science/hal-02345336'
+    source_ref: 'Flahaut et al. 2020, Planet. Space Sci. 180:104750 (doi:10.1016/j.pss.2019.104750), Table 2, site 10'
     precision: region_representative_point
-    note: "Centre of a 75 km2 site, 0.1 deg precision. Datum not stated in the table."
+    note: 'Centre of a 75 km2 site, 0.1 deg precision. Datum not stated in the table.'
 
   - id: wiechert_p_south
-    name: "South Wiechert P"
+    name: 'South Wiechert P'
     lat: -87.2
     lon: 146.7
     region: south_pole
     kind: candidate
-    group: "Luna-27 candidate site >80S (Flahaut et al. 2020), site 11"
-    source_url: "https://hal.science/hal-02345336"
-    source_ref: "Flahaut et al. 2020, Planet. Space Sci. 180:104750 (doi:10.1016/j.pss.2019.104750), Table 2, site 11"
+    group: 'Luna-27 candidate site >80S (Flahaut et al. 2020), site 11'
+    source_url: 'https://hal.science/hal-02345336'
+    source_ref: 'Flahaut et al. 2020, Planet. Space Sci. 180:104750 (doi:10.1016/j.pss.2019.104750), Table 2, site 11'
     precision: region_representative_point
-    note: "Centre of a 243 km2 site, 0.1 deg precision; farside-centred, Earth visibility < 30% (Flahaut). Datum not stated in the table."
+    note: 'Centre of a 243 km2 site, 0.1 deg precision; farside-centred, Earth visibility < 30% (Flahaut). Datum not stated in the table.'
 
   - id: amundsen_west
-    name: "West Amundsen"
+    name: 'West Amundsen'
     lat: -85.8
     lon: 112.7
     region: south_pole
     kind: candidate
-    group: "Luna-27 candidate site >80S (Flahaut et al. 2020), site 13"
-    source_url: "https://hal.science/hal-02345336"
-    source_ref: "Flahaut et al. 2020, Planet. Space Sci. 180:104750 (doi:10.1016/j.pss.2019.104750), Table 2, site 13"
+    group: 'Luna-27 candidate site >80S (Flahaut et al. 2020), site 13'
+    source_url: 'https://hal.science/hal-02345336'
+    source_ref: 'Flahaut et al. 2020, Planet. Space Sci. 180:104750 (doi:10.1016/j.pss.2019.104750), Table 2, site 13'
     precision: region_representative_point
-    note: "Centre of a 188 km2 site, 0.1 deg precision; farside-centred, Earth visibility < 30% (Flahaut). Datum not stated in the table."
+    note: 'Centre of a 188 km2 site, 0.1 deg precision; farside-centred, Earth visibility < 30% (Flahaut). Datum not stated in the table.'
 
   - id: wiechert_j_south
-    name: "South Wiechert J"
+    name: 'South Wiechert J'
     lat: -86.5
     lon: 176.6
     region: south_pole
     kind: candidate
-    group: "Luna-27 candidate site >80S (Flahaut et al. 2020), site 14"
-    source_url: "https://hal.science/hal-02345336"
-    source_ref: "Flahaut et al. 2020, Planet. Space Sci. 180:104750 (doi:10.1016/j.pss.2019.104750), Table 2, site 14"
+    group: 'Luna-27 candidate site >80S (Flahaut et al. 2020), site 14'
+    source_url: 'https://hal.science/hal-02345336'
+    source_ref: 'Flahaut et al. 2020, Planet. Space Sci. 180:104750 (doi:10.1016/j.pss.2019.104750), Table 2, site 14'
     precision: region_representative_point
-    note: "Centre of a 1691 km2 site, 0.1 deg precision; farside-centred, Earth visibility < 30% (Flahaut). Datum not stated in the table."
+    note: 'Centre of a 1691 km2 site, 0.1 deg precision; farside-centred, Earth visibility < 30% (Flahaut). Datum not stated in the table.'
 
   - id: im1_odysseus
-    name: "IM-1 Odysseus (near Malapert A)"
+    name: 'IM-1 Odysseus (near Malapert A)'
     lat: -80.13
     lon: 1.44
     region: south_pole
     kind: historic_landing
-    group: "Commercial lander (Intuitive Machines), landed 2024-02-22"
-    source_url: "https://lroc.im-ldi.com/images/1360"
+    group: 'Commercial lander (Intuitive Machines), landed 2024-02-22'
+    source_url: 'https://lroc.im-ldi.com/images/1360'
     source_ref: "LROC featured image 1360, 'Intuitive Machines IM-1 On The Moon!'"
     precision: landed_position
-    note: "Published to 0.01 deg (~0.3 km). Lander came to rest on sloped terrain inside a degraded ~1 km crater (LROC)."
+    note: 'Published to 0.01 deg (~0.3 km). Lander came to rest on sloped terrain inside a degraded ~1 km crater (LROC).'
 
   - id: im2_athena
-    name: "IM-2 Athena (Mons Mouton area)"
+    name: 'IM-2 Athena (Mons Mouton area)'
     lat: -84.7906
     lon: 29.1957
     region: south_pole
     kind: historic_landing
-    group: "Commercial lander (Intuitive Machines), landed 2025-03-06"
-    source_url: "https://lroc.im-ldi.com/images/1408"
+    group: 'Commercial lander (Intuitive Machines), landed 2025-03-06'
+    source_url: 'https://lroc.im-ldi.com/images/1408'
     source_ref: "LROC featured image 1408, 'IM-2 Athena Seen Obliquely'"
     precision: landed_position
-    note: "Lander ended on its side inside a ~20 m crater. Intended site was -84.78, 29.13 (LROC image 1401)."
+    note: 'Lander ended on its side inside a ~20 m crater. Intended site was -84.78, 29.13 (LROC image 1401).'
 
   # ---------------------------------------------------------------------------
   # NORTH POLE (lat >= 80)
   # ---------------------------------------------------------------------------
   - id: hinshelwood_rim
-    name: "Hinshelwood crater rim (H)"
+    name: 'Hinshelwood crater rim (H)'
     lat: 89.6564
     lon: -33.56
     region: north_pole
     kind: candidate
-    group: "Highly illuminated point (Glaser et al. 2018)"
-    source_url: "https://ntrs.nasa.gov/citations/20170007365"
-    source_ref: "Glaser et al. 2018, Planet. Space Sci. 162:170-178 (doi:10.1016/j.pss.2017.07.006), Table 1, Hinshelwood H (this study)"
+    group: 'Highly illuminated point (Glaser et al. 2018)'
+    source_url: 'https://ntrs.nasa.gov/citations/20170007365'
+    source_ref: 'Glaser et al. 2018, Planet. Space Sci. 162:170-178 (doi:10.1016/j.pss.2017.07.006), Table 1, Hinshelwood H (this study)'
     precision: published_point
-    note: "Maximum 20-year average illumination at surface level (72.6%), 20 m/px LOLA DTM. Published as 326.44 E."
+    note: 'Maximum 20-year average illumination at surface level (72.6%), 20 m/px LOLA DTM. Published as 326.44 E.'
 
   - id: peary_rim
-    name: "Peary crater rim (P)"
+    name: 'Peary crater rim (P)'
     lat: 89.726
     lon: 123.11
     region: north_pole
     kind: candidate
-    group: "Highly illuminated point (Glaser et al. 2018)"
-    source_url: "https://ntrs.nasa.gov/citations/20170007365"
-    source_ref: "Glaser et al. 2018, Planet. Space Sci. 162:170-178 (doi:10.1016/j.pss.2017.07.006), Table 1, Peary P (this study)"
+    group: 'Highly illuminated point (Glaser et al. 2018)'
+    source_url: 'https://ntrs.nasa.gov/citations/20170007365'
+    source_ref: 'Glaser et al. 2018, Planet. Space Sci. 162:170-178 (doi:10.1016/j.pss.2017.07.006), Table 1, Peary P (this study)'
     precision: published_point
-    note: "Maximum 20-year average illumination at surface level (69.5%), 20 m/px LOLA DTM."
+    note: 'Maximum 20-year average illumination at surface level (69.5%), 20 m/px LOLA DTM.'
 
   - id: whipple_rim
-    name: "Whipple crater rim (W)"
+    name: 'Whipple crater rim (W)'
     lat: 89.3766
     lon: 126.48
     region: north_pole
     kind: candidate
-    group: "Highly illuminated point (Glaser et al. 2018)"
-    source_url: "https://ntrs.nasa.gov/citations/20170007365"
-    source_ref: "Glaser et al. 2018, Planet. Space Sci. 162:170-178 (doi:10.1016/j.pss.2017.07.006), Table 1, Whipple W (this study)"
+    group: 'Highly illuminated point (Glaser et al. 2018)'
+    source_url: 'https://ntrs.nasa.gov/citations/20170007365'
+    source_ref: 'Glaser et al. 2018, Planet. Space Sci. 162:170-178 (doi:10.1016/j.pss.2017.07.006), Table 1, Whipple W (this study)'
     precision: published_point
-    note: "Maximum 20-year average illumination at surface level (82.9%, the highest in that study), 20 m/px LOLA DTM."
+    note: 'Maximum 20-year average illumination at surface level (82.9%, the highest in that study), 20 m/px LOLA DTM.'
 
   # ---------------------------------------------------------------------------
   # NEAR SIDE (|lon| <= 90): historic landings
   # LROC 2016 table (Wagner et al. 2017) lists 0..360 E longitudes, ME frame.
   # ---------------------------------------------------------------------------
   - id: apollo_11
-    name: "Apollo 11 LM (Tranquility Base)"
+    name: 'Apollo 11 LM (Tranquility Base)'
     lat: 0.67416
     lon: 23.47314
     region: near_side
     kind: historic_landing
-    group: "Apollo crewed landing, 1969"
-    source_url: "https://lroc.im-ldi.com/images/938"
-    source_ref: "Wagner et al. 2017, Icarus 283:92-103 (doi:10.1016/j.icarus.2016.05.011); LROC 2016 coordinate table, Apollo 11 LM"
+    group: 'Apollo crewed landing, 1969'
+    source_url: 'https://lroc.im-ldi.com/images/938'
+    source_ref: 'Wagner et al. 2017, Icarus 283:92-103 (doi:10.1016/j.icarus.2016.05.011); LROC 2016 coordinate table, Apollo 11 LM'
     precision: landed_position
-    note: "Mean of several NAC images; stated uncertainty 0.3 m."
+    note: 'Mean of several NAC images; stated uncertainty 0.3 m.'
 
   - id: apollo_12
-    name: "Apollo 12 LM"
+    name: 'Apollo 12 LM'
     lat: -3.0128
     lon: -23.4219
     region: near_side
     kind: historic_landing
-    group: "Apollo crewed landing, 1969"
-    source_url: "https://lroc.im-ldi.com/images/938"
-    source_ref: "Wagner et al. 2017, Icarus 283:92-103 (doi:10.1016/j.icarus.2016.05.011); LROC 2016 coordinate table, Apollo 12 LM"
+    group: 'Apollo crewed landing, 1969'
+    source_url: 'https://lroc.im-ldi.com/images/938'
+    source_ref: 'Wagner et al. 2017, Icarus 283:92-103 (doi:10.1016/j.icarus.2016.05.011); LROC 2016 coordinate table, Apollo 12 LM'
     precision: landed_position
-    note: "Published as 336.5781 E. Surveyor 3 (-3.0162, 336.5820 E) is ~0.2 km away, so it is not listed separately."
+    note: 'Published as 336.5781 E. Surveyor 3 (-3.0162, 336.5820 E) is ~0.2 km away, so it is not listed separately.'
 
   - id: apollo_14
-    name: "Apollo 14 LM"
+    name: 'Apollo 14 LM'
     lat: -3.64589
     lon: -17.47194
     region: near_side
     kind: historic_landing
-    group: "Apollo crewed landing, 1971"
-    source_url: "https://lroc.im-ldi.com/images/938"
-    source_ref: "Wagner et al. 2017, Icarus 283:92-103 (doi:10.1016/j.icarus.2016.05.011); LROC 2016 coordinate table, Apollo 14 LM"
+    group: 'Apollo crewed landing, 1971'
+    source_url: 'https://lroc.im-ldi.com/images/938'
+    source_ref: 'Wagner et al. 2017, Icarus 283:92-103 (doi:10.1016/j.icarus.2016.05.011); LROC 2016 coordinate table, Apollo 14 LM'
     precision: landed_position
-    note: "Published as 342.52806 E."
+    note: 'Published as 342.52806 E.'
 
   - id: apollo_15
-    name: "Apollo 15 LM (Hadley-Apennine)"
+    name: 'Apollo 15 LM (Hadley-Apennine)'
     lat: 26.13239
     lon: 3.6333
     region: near_side
     kind: historic_landing
-    group: "Apollo crewed landing, 1971"
-    source_url: "https://lroc.im-ldi.com/images/938"
-    source_ref: "Wagner et al. 2017, Icarus 283:92-103 (doi:10.1016/j.icarus.2016.05.011); LROC 2016 coordinate table, Apollo 15 LM"
+    group: 'Apollo crewed landing, 1971'
+    source_url: 'https://lroc.im-ldi.com/images/938'
+    source_ref: 'Wagner et al. 2017, Icarus 283:92-103 (doi:10.1016/j.icarus.2016.05.011); LROC 2016 coordinate table, Apollo 15 LM'
     precision: landed_position
 
   - id: apollo_16
-    name: "Apollo 16 LM (Descartes highlands)"
+    name: 'Apollo 16 LM (Descartes highlands)'
     lat: -8.9734
     lon: 15.5011
     region: near_side
     kind: historic_landing
-    group: "Apollo crewed landing, 1972"
-    source_url: "https://lroc.im-ldi.com/images/938"
-    source_ref: "Wagner et al. 2017, Icarus 283:92-103 (doi:10.1016/j.icarus.2016.05.011); LROC 2016 coordinate table, Apollo 16 LM"
+    group: 'Apollo crewed landing, 1972'
+    source_url: 'https://lroc.im-ldi.com/images/938'
+    source_ref: 'Wagner et al. 2017, Icarus 283:92-103 (doi:10.1016/j.icarus.2016.05.011); LROC 2016 coordinate table, Apollo 16 LM'
     precision: landed_position
 
   - id: apollo_17
-    name: "Apollo 17 LM (Taurus-Littrow)"
+    name: 'Apollo 17 LM (Taurus-Littrow)'
     lat: 20.1911
     lon: 30.7723
     region: near_side
     kind: historic_landing
-    group: "Apollo crewed landing, 1972"
-    source_url: "https://lroc.im-ldi.com/images/938"
-    source_ref: "Wagner et al. 2017, Icarus 283:92-103 (doi:10.1016/j.icarus.2016.05.011); LROC 2016 coordinate table, Apollo 17 LM"
+    group: 'Apollo crewed landing, 1972'
+    source_url: 'https://lroc.im-ldi.com/images/938'
+    source_ref: 'Wagner et al. 2017, Icarus 283:92-103 (doi:10.1016/j.icarus.2016.05.011); LROC 2016 coordinate table, Apollo 17 LM'
     precision: landed_position
 
   - id: surveyor_1
-    name: "Surveyor 1"
+    name: 'Surveyor 1'
     lat: -2.4745
     lon: -43.3398
     region: near_side
     kind: historic_landing
-    group: "Surveyor robotic landing, 1966"
-    source_url: "https://lroc.im-ldi.com/images/938"
-    source_ref: "Wagner et al. 2017, Icarus 283:92-103 (doi:10.1016/j.icarus.2016.05.011); LROC 2016 coordinate table, Surveyor 1"
+    group: 'Surveyor robotic landing, 1966'
+    source_url: 'https://lroc.im-ldi.com/images/938'
+    source_ref: 'Wagner et al. 2017, Icarus 283:92-103 (doi:10.1016/j.icarus.2016.05.011); LROC 2016 coordinate table, Surveyor 1'
     precision: landed_position
-    note: "Published as 316.6602 E."
+    note: 'Published as 316.6602 E.'
 
   - id: luna_16
-    name: "Luna 16 (Mare Fecunditatis)"
+    name: 'Luna 16 (Mare Fecunditatis)'
     lat: -0.5137
     lon: 56.3638
     region: near_side
     kind: historic_landing
-    group: "Luna robotic sample return, 1970"
-    source_url: "https://lroc.im-ldi.com/images/938"
-    source_ref: "Wagner et al. 2017, Icarus 283:92-103 (doi:10.1016/j.icarus.2016.05.011); LROC 2016 coordinate table, Luna 16"
+    group: 'Luna robotic sample return, 1970'
+    source_url: 'https://lroc.im-ldi.com/images/938'
+    source_ref: 'Wagner et al. 2017, Icarus 283:92-103 (doi:10.1016/j.icarus.2016.05.011); LROC 2016 coordinate table, Luna 16'
     precision: landed_position
 
   - id: luna_17
-    name: "Luna 17 lander (Lunokhod 1)"
+    name: 'Luna 17 lander (Lunokhod 1)'
     lat: 38.23764
     lon: -35.00163
     region: near_side
     kind: historic_landing
-    group: "Luna robotic landing with rover, 1970"
-    source_url: "https://lroc.im-ldi.com/images/938"
-    source_ref: "Wagner et al. 2017, Icarus 283:92-103 (doi:10.1016/j.icarus.2016.05.011); LROC 2016 coordinate table, Luna 17"
+    group: 'Luna robotic landing with rover, 1970'
+    source_url: 'https://lroc.im-ldi.com/images/938'
+    source_ref: 'Wagner et al. 2017, Icarus 283:92-103 (doi:10.1016/j.icarus.2016.05.011); LROC 2016 coordinate table, Luna 17'
     precision: landed_position
-    note: "Lander position (published as 324.99837 E); Lunokhod 1 rover rests at 38.3150, 324.9919 E."
+    note: 'Lander position (published as 324.99837 E); Lunokhod 1 rover rests at 38.3150, 324.9919 E.'
 
   - id: luna_21
-    name: "Luna 21 lander (Lunokhod 2)"
+    name: 'Luna 21 lander (Lunokhod 2)'
     lat: 25.9994
     lon: 30.4076
     region: near_side
     kind: historic_landing
-    group: "Luna robotic landing with rover, 1973"
-    source_url: "https://lroc.im-ldi.com/images/938"
-    source_ref: "Wagner et al. 2017, Icarus 283:92-103 (doi:10.1016/j.icarus.2016.05.011); LROC 2016 coordinate table, Luna 21"
+    group: 'Luna robotic landing with rover, 1973'
+    source_url: 'https://lroc.im-ldi.com/images/938'
+    source_ref: 'Wagner et al. 2017, Icarus 283:92-103 (doi:10.1016/j.icarus.2016.05.011); LROC 2016 coordinate table, Luna 21'
     precision: landed_position
-    note: "Lander position; stated uncertainty 13.4 m."
+    note: 'Lander position; stated uncertainty 13.4 m.'
 
   - id: luna_24
-    name: "Luna 24 (Mare Crisium)"
+    name: 'Luna 24 (Mare Crisium)'
     lat: 12.7142
     lon: 62.2129
     region: near_side
     kind: historic_landing
-    group: "Luna robotic sample return, 1976"
-    source_url: "https://lroc.im-ldi.com/images/938"
-    source_ref: "Wagner et al. 2017, Icarus 283:92-103 (doi:10.1016/j.icarus.2016.05.011); LROC 2016 coordinate table, Luna 24"
+    group: 'Luna robotic sample return, 1976'
+    source_url: 'https://lroc.im-ldi.com/images/938'
+    source_ref: 'Wagner et al. 2017, Icarus 283:92-103 (doi:10.1016/j.icarus.2016.05.011); LROC 2016 coordinate table, Luna 24'
     precision: landed_position
 
   - id: change_3
@@ -645,10 +645,10 @@ sites:
     region: near_side
     kind: historic_landing
     group: "Chang'e robotic landing, 2013"
-    source_url: "https://lroc.im-ldi.com/images/938"
+    source_url: 'https://lroc.im-ldi.com/images/938'
     source_ref: "Wagner et al. 2017, Icarus 283:92-103 (doi:10.1016/j.icarus.2016.05.011); LROC 2016 coordinate table, Chang'e 3"
     precision: landed_position
-    note: "Published as 340.4883 E."
+    note: 'Published as 340.4883 E.'
 
   - id: change_5
     name: "Chang'e 5 (near Mons Rumker)"
@@ -657,45 +657,45 @@ sites:
     region: near_side
     kind: historic_landing
     group: "Chang'e robotic sample return, 2020"
-    source_url: "https://lroc.im-ldi.com/images/1172"
+    source_url: 'https://lroc.im-ldi.com/images/1172'
     source_ref: "LROC featured image 1172, 'First Look: Chang'e 5'"
     precision: landed_position
-    note: "Published as 308.0839 E, accuracy +/-20 m."
+    note: 'Published as 308.0839 E, accuracy +/-20 m.'
 
   - id: chandrayaan_3
-    name: "Chandrayaan-3 Vikram (Shiv Shakti point)"
+    name: 'Chandrayaan-3 Vikram (Shiv Shakti point)'
     lat: -69.3741
     lon: 32.32
     region: near_side
     kind: historic_landing
-    group: "ISRO robotic landing, 2023"
-    source_url: "https://lroc.im-ldi.com/images/1314"
+    group: 'ISRO robotic landing, 2023'
+    source_url: 'https://lroc.im-ldi.com/images/1314'
     source_ref: "LROC featured image 1314, 'Chandrayaan-3 Landing Site'"
     precision: landed_position
-    note: "High southern latitude (~600 km from the pole) but north of 80S, so classed near_side."
+    note: 'High southern latitude (~600 km from the pole) but north of 80S, so classed near_side.'
 
   - id: slim
-    name: "SLIM (near Shioli crater)"
+    name: 'SLIM (near Shioli crater)'
     lat: -13.316
     lon: 25.251
     region: near_side
     kind: historic_landing
-    group: "JAXA robotic landing, 2024"
-    source_url: "https://lroc.im-ldi.com/images/1358"
+    group: 'JAXA robotic landing, 2024'
+    source_url: 'https://lroc.im-ldi.com/images/1358'
     source_ref: "LROC featured image 1358, 'JAXA SLIM Landing'"
     precision: landed_position
 
   - id: blue_ghost_m1
-    name: "Blue Ghost Mission 1 (Mare Crisium)"
+    name: 'Blue Ghost Mission 1 (Mare Crisium)'
     lat: 18.5623
     lon: 61.8103
     region: near_side
     kind: historic_landing
-    group: "Commercial lander (Firefly), landed 2025-03-02"
-    source_url: "https://lroc.im-ldi.com/images/1407"
+    group: 'Commercial lander (Firefly), landed 2025-03-02'
+    source_url: 'https://lroc.im-ldi.com/images/1407'
     source_ref: "LROC featured image 1407, 'Blue Ghost Lunar Lander Seen From Above'"
     precision: landed_position
-    note: "Near Mons Latreille."
+    note: 'Near Mons Latreille.'
 
   # ---------------------------------------------------------------------------
   # FAR SIDE (|lon| > 90)
@@ -707,10 +707,10 @@ sites:
     region: far_side
     kind: historic_landing
     group: "Chang'e robotic landing, 2019"
-    source_url: "https://lroc.im-ldi.com/images/1087"
+    source_url: 'https://lroc.im-ldi.com/images/1087'
     source_ref: "LROC featured image 1087, 'Chang'e 4 Lander Coordinates'"
     precision: landed_position
-    note: "Accuracy +/-20 m (LROC)."
+    note: 'Accuracy +/-20 m (LROC).'
 
   - id: change_6
     name: "Chang'e 6 (Apollo basin)"
@@ -719,7 +719,7 @@ sites:
     region: far_side
     kind: historic_landing
     group: "Chang'e robotic sample return, 2024"
-    source_url: "https://lroc.im-ldi.com/images/1374"
+    source_url: 'https://lroc.im-ldi.com/images/1374'
     source_ref: "LROC featured image 1374, 'First Look: Chang'e 6'"
     precision: landed_position
-    note: "Published as 206.0148 E, accuracy +/-30 m."
+    note: 'Published as 206.0148 E, accuracy +/-30 m.'
