@@ -11,6 +11,7 @@ export const CARD_BACK = gameAsset('card-back.png');
 export const MENU_BG = gameAsset('menu-bg.png');
 export const MODE_SOUTH_POLE = gameAsset('mode-south-pole.png');
 export const MODE_HISTORICAL = gameAsset('mode-historical.png');
+export const LANDER_ICON = gameAsset('lander/lander-icon.png');
 
 export type Terrain = 'rim' | 'cliff' | 'ridge' | 'peak' | 'massif' | 'mons' | 'plateau' | 'crater';
 

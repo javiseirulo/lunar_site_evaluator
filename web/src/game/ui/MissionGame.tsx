@@ -6,7 +6,9 @@ import { useGame } from '../state/gameStore';
 import { AlertScreen } from './AlertScreen';
 import { MenuScreen } from './MenuScreen';
 import { MissionFx } from './MissionFx';
+import { TimelapseScreen } from './TimelapseScreen';
 import { TimeoutScreen } from './TimeoutScreen';
+import { TravelScreen } from './TravelScreen';
 import { useDealHand } from './useDealHand';
 import { VerdictScreen } from './VerdictScreen';
 
@@ -32,10 +34,8 @@ function AutoAdvance({
   );
 }
 
-// Stable callbacks so AutoAdvance's effect does not restart on re-render.
+// Stable callback so AutoAdvance's effect does not restart on re-render.
 const skipIntro = () => useGame.getState().skipIntro();
-const landed = () => useGame.getState().landed();
-const finish = () => useGame.getState().finish();
 
 export function MissionGame() {
   const phase = useGame((s) => s.phase);
@@ -58,26 +58,10 @@ export function MissionGame() {
       screen = <AlertScreen dealStatus={dealStatus} />;
       break;
     case 'travel':
-      // Replaced in Task 5 (travel + timelapse).
-      screen = (
-        <AutoAdvance
-          key="travel"
-          label="Flying to the landing site…"
-          delayMs={1000}
-          onDone={landed}
-        />
-      );
+      screen = <TravelScreen />;
       break;
     case 'timelapse':
-      // Replaced in Task 5 (travel + timelapse).
-      screen = (
-        <AutoAdvance
-          key="timelapse"
-          label="Simulating the mission…"
-          delayMs={1000}
-          onDone={finish}
-        />
-      );
+      screen = <TimelapseScreen />;
       break;
     case 'verdict':
       screen = <VerdictScreen />;
