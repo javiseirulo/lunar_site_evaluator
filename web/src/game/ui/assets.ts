@@ -93,7 +93,7 @@ export function verdictImage(scene: VerdictScene): string {
   return gameAsset(`verdicts/${file}.png`);
 }
 
-export type Mood = 'alarm' | 'happy' | 'sad';
+export type Mood = 'neutral' | 'talk' | 'alarm' | 'happy' | 'sad';
 
 export function scientistImage(mood: Mood): string {
   return gameAsset(`characters/dr-regolith-${mood}.png`);
