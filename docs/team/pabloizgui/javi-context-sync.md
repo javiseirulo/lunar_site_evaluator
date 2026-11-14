@@ -120,6 +120,8 @@ La rama #46 también incorpora `461507a` mediante merge `6e0e23f`. Commit
 el adaptador local se llama `sampleSiteSky`, separado del futuro `@/ephem.skyAt`.
 Verificación de esa rama: 26 pruebas web, TypeScript, lint y build correctos.
 La entrega de datos permanece en #37 para no acoplarla a las dependencias Cesium.
+La rama #46 incorpora también el shell/store de `bd0880d` mediante `c8b1bce`;
+se repiten correctamente 26 pruebas, TypeScript, lint y build tras ese merge.
 
 Verificación de datos: 24 pruebas Python, 13 web, TypeScript, lint, build y lector
 JS del binario correctos. Comprobados byte a byte contra `958b1a4` todos los
