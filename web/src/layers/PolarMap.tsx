@@ -56,7 +56,7 @@ export function PolarMap({ className }: { className?: string }) {
 
   return (
     <div className={cn('relative aspect-square select-none', className)}>
-      <div className="bg-space-850 border-line absolute inset-0 overflow-hidden rounded-full border">
+      <div className="border-edge-hi/40 absolute inset-0 overflow-hidden rounded-full border bg-[#0d1424]">
         <canvas
           ref={canvasRef}
           className="size-full [image-rendering:auto]"
@@ -81,7 +81,7 @@ export function PolarMap({ className }: { className?: string }) {
           onSelect={() => selectSite(s.id === selectedSiteId ? null : s.id)}
         />
       ))}
-      <div className="text-ink-faint pointer-events-none absolute bottom-1 left-1 font-mono text-[10px]">
+      <div className="text-ink-muted num pointer-events-none absolute bottom-0 left-0 bg-black/70 px-1 text-[10px]">
         {hover
           ? formatLatLon(hover[0], hover[1])
           : `South pole · to ${Math.abs(manifest.lat_limit)}°S`}
@@ -170,15 +170,15 @@ function Pin({
     >
       <span
         className={cn(
-          'block size-2.5 rounded-full ring-2 transition-transform group-hover:scale-150',
-          selected ? 'ring-ink scale-150' : 'ring-space-950/80',
+          'block size-[9px] rotate-45 border group-hover:scale-125',
+          selected ? 'scale-150 border-white outline outline-1 outline-black' : 'border-black',
           !site.valid && 'opacity-50',
         )}
         style={{ background: scoreColor(site.score) }}
       />
       <span
         className={cn(
-          'bg-space-950/90 border-line pointer-events-none absolute top-1/2 left-full ml-1 -translate-y-1/2 rounded border px-1.5 py-0.5 text-[11px] whitespace-nowrap',
+          'pointer-events-none absolute top-1/2 left-full z-10 ml-1 -translate-y-1/2 border border-black bg-[#ffffe1] px-1 py-px text-[11px] whitespace-nowrap text-black shadow-[2px_2px_0_#00000080]',
           selected ? 'block' : 'hidden group-hover:block',
         )}
       >

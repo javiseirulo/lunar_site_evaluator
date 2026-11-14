@@ -18,3 +18,5 @@
 - PR #53 mergeado en `main` (squash). Creada la rama `dev` como integración; PR #54 cambia CLAUDE.md, protocolo, README, plantilla de PR, `sync-docs.sh` y CI para trabajar contra `dev`.
 - El plan técnico pasa de mi carpeta a `docs/10-plan-tecnico.md`, con una sección 0 de estado real y las diferencias entre el código y el plan, para que las IAs de los demás lo lean al empezar.
 - Corrección: el CI sí corre en los PR antes de mergear (en el #53 pasó).
+- Rediseño del front: estilo portal de los 2000 (referencia: portadas web institucionales 2003–2007), cabecera con buscador "Find a site", pestañas, barra de estado, portada tipo portal (sitio destacado, datos rápidos, boletines), Explore y About rehechos, fuentes del sistema. Rama `javocruz/portal-redesign`.
+- Rediseño v2 (petición: menos apretado y más claramente "portal de los 2000"): más espacio y texto algo mayor; pestañas nuevas Sites, Compare y Learn; barra de públicos y franja EVENTS; portada con rejilla de temas (las de mapa abren Explore con esa capa activada). Pendiente: el texto de Learn lo debería revisar alguien del equipo.
