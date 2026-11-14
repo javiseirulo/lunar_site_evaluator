@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "sites.schema.json",
-  "title": "sites.json — candidate landing sites (see types.ts SitesFile)",
+  "title": "sites.json — candidate landing sites (see types.ts SitesFile). v1.1 adds optional region, kind, group, checks, pending_metrics and extra metrics.",
   "type": "object",
   "required": ["version", "mock", "generated_utc", "weights", "sites"],
   "properties": {
@@ -40,11 +40,60 @@
               "earth_vis_pct": { "type": "number", "minimum": 0, "maximum": 1 },
               "slope_deg": { "type": "number", "minimum": 0, "maximum": 90 },
               "max_dark_hours": { "type": "number", "minimum": 0 },
-              "psr_dist_km": { "type": "number", "minimum": 0 }
+              "psr_dist_km": { "type": "number", "minimum": 0 },
+              "sun_el_mean_deg": { "type": "number", "minimum": 0, "maximum": 90 },
+              "max_blackout_hours": { "type": "number", "minimum": 0 },
+              "sun_earth_pct": { "type": "number", "minimum": 0, "maximum": 1 }
             }
           },
           "reasons": { "type": "array", "items": { "type": "string" } },
-          "source": { "type": "string" }
+          "source": { "type": "string" },
+          "region": { "enum": ["south_pole", "north_pole", "near_side", "far_side"] },
+          "kind": { "enum": ["candidate", "historic_landing"] },
+          "group": { "type": "string" },
+          "checks": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["key", "ok", "value", "threshold", "margin"],
+              "properties": {
+                "key": {
+                  "enum": [
+                    "illum_pct",
+                    "earth_vis_pct",
+                    "slope_deg",
+                    "max_dark_hours",
+                    "psr_dist_km",
+                    "sun_el_mean_deg",
+                    "max_blackout_hours",
+                    "sun_earth_pct"
+                  ]
+                },
+                "ok": { "type": "boolean" },
+                "value": { "type": ["number", "null"] },
+                "threshold": { "type": "number" },
+                "objective": { "type": "number" },
+                "margin": { "type": ["number", "null"] },
+                "pending": { "type": "boolean" }
+              }
+            }
+          },
+          "pending_metrics": {
+            "type": "array",
+            "items": {
+              "enum": [
+                "illum_pct",
+                "earth_vis_pct",
+                "slope_deg",
+                "max_dark_hours",
+                "psr_dist_km",
+                "sun_el_mean_deg",
+                "max_blackout_hours",
+                "sun_earth_pct"
+              ]
+            },
+            "uniqueItems": true
+          }
         }
       }
     }

@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ephem-index.schema.json",
+  "title": "ephem/index.json — hourly Sun/Earth vectors in MOON_ME, one Float32-LE .bin per year (see types.ts EphemIndex)",
+  "type": "object",
+  "required": [
+    "version",
+    "frame",
+    "spice_frame",
+    "observer",
+    "abcorr",
+    "start_utc",
+    "end_utc",
+    "step_s",
+    "layout",
+    "dtype",
+    "years",
+    "kernels",
+    "generated_utc",
+    "generator"
+  ],
+  "properties": {
+    "version": { "const": 1 },
+    "frame": { "const": "MOON_ME" },
+    "spice_frame": { "type": "string" },
+    "observer": { "const": "MOON" },
+    "abcorr": { "type": "string" },
+    "start_utc": { "type": "string", "format": "date-time" },
+    "end_utc": { "type": "string", "format": "date-time" },
+    "step_s": { "const": 3600 },
+    "layout": { "const": ["sun_ux", "sun_uy", "sun_uz", "earth_x_km", "earth_y_km", "earth_z_km"] },
+    "dtype": { "const": "float32-le" },
+    "years": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["year", "file", "start_utc", "n"],
+        "properties": {
+          "year": { "type": "integer" },
+          "file": { "type": "string", "pattern": "^[0-9]{4}\\.bin$" },
+          "start_utc": { "type": "string", "format": "date-time" },
+          "n": { "enum": [8760, 8784] }
+        }
+      }
+    },
+    "kernels": { "type": "array", "items": { "type": "string" } },
+    "generated_utc": { "type": "string", "format": "date-time" },
+    "generator": { "type": "string" }
+  }
+}

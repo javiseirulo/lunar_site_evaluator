@@ -27,7 +27,20 @@ describe('public/data follows contracts/types.ts', () => {
     expect(new Set(ids).size).toBe(ids.length);
     for (const s of sites.sites) {
       expect(s.lat).toBeGreaterThanOrEqual(-90);
-      expect(s.lat).toBeLessThanOrEqual(0);
+      // Whole Moon (docs/10 §10): any latitude.
+      expect(s.lat).toBeLessThanOrEqual(90);
+      // v1.1: region, when present, follows the documented rule (contracts/types.ts SiteRegion).
+      if (s.region) {
+        const expected =
+          s.lat <= -80
+            ? 'south_pole'
+            : s.lat >= 80
+              ? 'north_pole'
+              : Math.abs(s.lon) <= 90
+                ? 'near_side'
+                : 'far_side';
+        expect(s.region, `${s.id} region`).toBe(expected);
+      }
       expect(Math.abs(s.lon)).toBeLessThanOrEqual(180);
       expect(s.score).toBeGreaterThanOrEqual(0);
       expect(s.score).toBeLessThanOrEqual(1);
@@ -49,7 +62,17 @@ describe('public/data follows contracts/types.ts', () => {
       for (const key of ['sun_az', 'sun_el', 'earth_az', 'earth_el', 'lit'] as const) {
         expect(ts[key].length, `${s.id}.${key}`).toBe(n);
       }
+      // Real data must include earth_visible (contracts/README.md v1.1).
+      if (!ts.mock) expect(ts.earth_visible, `${s.id}.earth_visible`).toBeDefined();
       if (ts.earth_visible) expect(ts.earth_visible.length).toBe(n);
+      // v1.1: sun_frac has the same length and lit = sun_frac >= 0.5.
+      if (ts.sun_frac) {
+        expect(ts.sun_frac.length, `${s.id}.sun_frac`).toBe(n);
+        ts.sun_frac.forEach((f, i) => {
+          expect(f >= 0 && f <= 1, `${s.id} sun_frac[${i}]`).toBe(true);
+          expect(ts.lit[i], `${s.id} lit[${i}] vs sun_frac`).toBe(f >= 0.5 ? 1 : 0);
+        });
+      }
       expect(ts.t_utc[0]).toBe(manifest.time_range.start_utc);
     }
   });
@@ -57,8 +80,12 @@ describe('public/data follows contracts/types.ts', () => {
   it("site metrics agree with that site's timeseries (same time window)", () => {
     for (const s of sites.sites) {
       const ts = read<Timeseries>(`timeseries/${s.id}.json`);
-      const frac = (f: (0 | 1)[]) => f.reduce<number>((a, b) => a + b, 0) / f.length;
-      expect(s.metrics.illum_pct, `${s.id} illum_pct vs lit[]`).toBeCloseTo(frac(ts.lit), 1);
+      const frac = (f: number[]) => f.reduce<number>((a, b) => a + b, 0) / f.length;
+      // v1.1: illum_pct = mean(sun_frac) when the file has it, else mean(lit).
+      expect(s.metrics.illum_pct, `${s.id} illum_pct vs sun_frac[]/lit[]`).toBeCloseTo(
+        frac(ts.sun_frac ?? ts.lit),
+        ts.sun_frac ? 2 : 1,
+      );
       if (ts.earth_visible) {
         expect(s.metrics.earth_vis_pct, `${s.id} earth_vis_pct vs earth_visible[]`).toBeCloseTo(
           frac(ts.earth_visible),
