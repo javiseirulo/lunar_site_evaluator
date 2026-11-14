@@ -1,19 +1,26 @@
 /**
- * PLACEHOLDER — owner: Marta (src/globe). Replace with the R3F globe.
+ * 3D Moon globe entry point — owner: Marta (src/globe).
  *
- * Read from the store: selectedSiteId, activeLayers, layerOpacity, currentTimeUTC.
- * Write: selectSite(id) on pin click, setMode('streetview') to enter Street View.
- * Layer textures: `loadLayerTexture(layerDef)` from '@/core' returns a colorized canvas
- * (wrap it in THREE.CanvasTexture). Pin positions: `latLonToUv` / `projectSouthPolar`.
+ * Lazy-loads the R3F canvas so three.js is only downloaded when the user switches to 3D.
+ * The scene itself lives in GlobeCanvas.tsx.
  */
-import { Globe2 } from 'lucide-react';
+import { lazy, Suspense } from 'react';
+
+const GlobeCanvas = lazy(() => import('./GlobeCanvas'));
 
 export function GlobeView() {
   return (
-    <div className="border-line-strong text-ink-faint flex aspect-square w-full flex-col items-center justify-center gap-2 rounded-full border border-dashed text-center">
-      <Globe2 className="size-8" aria-hidden />
-      <p className="text-sm">3D globe goes here</p>
-      <p className="font-mono text-[11px]">src/globe · Marta</p>
-    </div>
+    <Suspense
+      fallback={
+        <div
+          role="status"
+          className="text-ink-muted flex size-full items-center justify-center bg-black text-[11px]"
+        >
+          Loading 3D globe…
+        </div>
+      }
+    >
+      <GlobeCanvas />
+    </Suspense>
   );
 }

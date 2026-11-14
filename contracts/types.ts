@@ -228,6 +228,49 @@ export interface LayersManifest {
 }
 
 // ---------------------------------------------------------------------------
+// terrain/heightmap.json — proposed additive terrain delivery (Pablo → Marta)
+// Binary paths are relative to data/, as with LayerDef.file. No core loader change.
+// ---------------------------------------------------------------------------
+export interface PolarHeightmap {
+  version: 1;
+  mock: boolean;
+  projection: string;
+  radius_m: number;
+  /** Mesh VERTEX bounds, endpoints included; not the outer pixel edges of a GeoTIFF. */
+  bounds_m: [number, number, number, number];
+  lat_limit: number;
+  frame: 'MOON_ME_DE421';
+  width_px: number;
+  height_px: number;
+  registration: 'vertices';
+  sample_0_0_m: [number, number];
+  sample_step_col_m: [number, number];
+  sample_step_row_m: [number, number];
+  row_order: 'max_y_to_min_y';
+  resampling: 'bilinear';
+  source_pixel_spacing_m: number;
+  height_unit: 'm';
+  height_reference_radius_m: number;
+  height_reference_note: string;
+  heights: {
+    file: string;
+    encoding: 'float32-le';
+    order: 'row-major';
+    scale: 1;
+    offset: 0;
+    nodata: 'NaN';
+  };
+  mask: { file: string; encoding: 'uint8'; valid: 1; nodata: 0 };
+  height_range_m: [number, number];
+  valid_samples: number;
+  total_samples: number;
+  source: string;
+  provenance_file: string;
+  /** Local output-file fingerprints, keyed by filename relative to terrain/. */
+  sha256: Record<string, string>;
+}
+
+// ---------------------------------------------------------------------------
 // Front-end store contract — the ONLY interface between web modules
 // ---------------------------------------------------------------------------
 export type AppMode = 'explore' | 'streetview' | 'game';

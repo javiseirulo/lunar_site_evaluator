@@ -1,0 +1,154 @@
+{
+  "version": 1,
+  "context_commit": "461507a",
+  "heightmap": {
+    "status": "ready",
+    "file": "terrain/heightmap.json",
+    "sha256": "b09b383e1a1884e598c4f37342c596dde149615a32c1d9f4f366a82b5e8565f7",
+    "observer_offset_applied": false
+  },
+  "layers": {
+    "status": "ready",
+    "file": "terrain/layers.json"
+  },
+  "site_terrain": {
+    "status": "ready",
+    "file": "terrain/site-terrain.json",
+    "input_sites_mock": true,
+    "valid_sites": 20
+  },
+  "production_settings": {
+    "file": "terrain/processing.json",
+    "sha256": "9d506ddf166460d9339e61078bd107d019e8a15dc5b3700104599acf6b9400b5"
+  },
+  "horizon": {
+    "output_pattern": "horizon/<id>.json",
+    "azimuth_origin": "local_lunar_north",
+    "azimuth_direction": "clockwise",
+    "azimuth_endpoint": "exclude_360",
+    "curated": {
+      "az_step_deg": 0.1,
+      "sample_count": 3600
+    },
+    "heatmap": {
+      "az_step_deg": 1,
+      "sample_count": 360,
+      "cell_size_m": 5000
+    },
+    "max_range_km": 300,
+    "validation_ranges_km": [
+      150,
+      200,
+      300,
+      310
+    ],
+    "convergence_target_deg": 0.05,
+    "curvature": "spherical_geometry",
+    "refraction": false,
+    "missing_terrain": "unknown_never_zero",
+    "validation_required_before_publish": true,
+    "source_rings": [
+      {
+        "from_km": 0,
+        "to_km": 5,
+        "preferred_source": "lola-south-pole-5m",
+        "fallback_source": "lola-south-pole-80m"
+      },
+      {
+        "from_km": 5,
+        "to_km": 80,
+        "preferred_source": "lola-south-pole-80m",
+        "fallback_source": "lola-south-pole-far-240m"
+      },
+      {
+        "from_km": 80,
+        "to_km": 310,
+        "preferred_source": "lola-south-pole-far-240m",
+        "fallback_source": null
+      }
+    ],
+    "observer_height_m": 5,
+    "status": "pending_computation_and_validation",
+    "ready_profiles": 0,
+    "catalogue_issue": 48,
+    "candidate_fixture_ids": [
+      "shackleton_rim_01",
+      "shackleton_rim_02",
+      "connecting_ridge",
+      "de_gerlache_rim_01",
+      "de_gerlache_rim_02",
+      "peak_near_shackleton",
+      "malapert_massif",
+      "leibnitz_beta",
+      "haworth_rim",
+      "nobile_rim_01",
+      "nobile_rim_02",
+      "faustini_rim",
+      "amundsen_rim",
+      "cabeus_b",
+      "shoemaker_rim",
+      "sverdrup_rim",
+      "slater_plain",
+      "de_gerlache_kocher",
+      "mons_mouton",
+      "plain_81s"
+    ]
+  },
+  "sources": [
+    {
+      "id": "lola-south-pole-far-240m",
+      "source": "https://pgda.gsfc.nasa.gov/data/LOLA_20mpp/LDEM_60S_240MPP_ADJ.TIF",
+      "pixel_spacing_m": 240,
+      "coverage": "60 to 90 degrees south; extends beyond the visual patch",
+      "available_locally": true,
+      "sha256_local": "3f9663257b63022f2b0d5a623482ff3cadddceb91594a4e4ca14a94d8cec8b34"
+    },
+    {
+      "id": "lola-south-pole-5m",
+      "source": "https://pgda.gsfc.nasa.gov/data/LOLA_5mpp/87S/ldem_87s_5mpp.tif",
+      "pixel_spacing_m": 5,
+      "coverage": "87 to 90 degrees south; not global",
+      "available_locally": true,
+      "sha256_local": "417a85715406c346e2ecb2fc3abc93d3717121466e3d4950e1a6b977f207b881"
+    },
+    {
+      "id": "lola-south-pole-80m",
+      "source": "https://pgda.gsfc.nasa.gov/data/LOLA_20mpp/LDEM_80S_80MPP_ADJ.TIF",
+      "pixel_spacing_m": 80,
+      "coverage": "80 to 90 degrees south; not global",
+      "available_locally": true,
+      "sha256_local": "82030dcbdd7c4bb0c7d858e9b4b293b9f2cda5a543ba31ec0f42784bd6beee5a"
+    }
+  ],
+  "ephemerides": {
+    "owner": "Javi",
+    "module": "@/ephem",
+    "index_file": "ephem/index.json",
+    "annual_file_pattern": "ephem/<YYYY>.bin",
+    "start_utc": "2026-01-01T00:00:00Z",
+    "end_exclusive_utc": "2056-01-01T00:00:00Z",
+    "step_s": 3600,
+    "encoding": "float32-le",
+    "values_per_sample": 6,
+    "layout": [
+      "sun_unit_x",
+      "sun_unit_y",
+      "sun_unit_z",
+      "earth_km_x",
+      "earth_km_y",
+      "earth_km_z"
+    ],
+    "earth_origin": "moon_center",
+    "earth_parallax": "subtract_observer_position_km_before_ENU_rotation",
+    "frame_realization_confirmation_required": true,
+    "fallback_without_horizon": "geometric_sky_label_no_terrain",
+    "legacy_timeseries": "same_site_and_available_time_window_only",
+    "status": "pending_Javi_contract_and_data",
+    "legacy_mock_timeseries_are_not_30_year_ephemerides": true
+  },
+  "limitations": [
+    "Source availability does not prove full ray coverage or validated horizons",
+    "The catalogue is decided by product issue #48; fixture coordinates are not curated landing sites",
+    "MOON_ME DE421 versus DE440 alignment must be confirmed before combining real data"
+  ]
+}

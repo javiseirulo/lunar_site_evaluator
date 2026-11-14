@@ -83,7 +83,7 @@ New optional fields:
 - **Validity:** a site is valid for a mission window when every requirement in `MissionConfig.requirements` that is not in `pending_metrics` passes its threshold. A requirement whose metric is missing counts as pending (`ok: true`, `value: null`, `margin: null`, `pending: true`); never NaN. JSON is written without NaN (`null`).
   - "Less is better" metrics fail above the threshold: `slope_deg`, `max_dark_hours`, `max_blackout_hours`, `psr_dist_km`.
   - All other metrics fail below it.
-  - **At exactly the threshold the requirement passes** (`value ≥ threshold`, or `value ≤ threshold` for less-is-better), so `margin = 0` passes. Python and TypeScript compare unrounded values.
+  - **At exactly the threshold the requirement passes** (`value ≥ threshold`, or `value ≤ threshold` for less-is-better), so `margin = 0` passes. Python and TypeScript compare the published (2-decimal) values.
 - **Utility per criterion:**
   - u = 0 at the threshold and 1 at the objective, linear in between, clamped to [0, 1];
   - inverted for "less is better" metrics;
@@ -91,3 +91,15 @@ New optional fields:
   - There is no min-max normalisation, so a site's score does not depend on the other sites.
 - **Score:** `score = Σ wᵢ·uᵢ / Σ wᵢ` over the weighted, non-pending criteria. If Σ wᵢ = 0 (no weights, or every weighted criterion pending), `score = 0`, never NaN. The ranking only lets valid sites compete (J7): `rankSites` puts every valid site first and orders by score. Invalid sites keep their number so the UI can show how far they are, but they are always labelled "not valid".
 - **Margins:** `checks[].margin` is relative and signed (≥ 0 passes; with threshold 0 the margin is absolute). The UI turns it into text such as "longest night 142 h > 100 h".
+
+## Additive terrain handoff proposal (#37)
+
+`PolarHeightmap` / `heightmap.schema.json` describe `terrain/heightmap.json` and
+the Float32 little-endian mesh plus byte mask produced by Pablo. This proposal
+does not change the existing loaders. Mesh endpoints match `layers.json.bounds_m`;
+row zero is max Y. The 1025 samples span 1024 intervals. Raster layer pixels,
+in contrast, are sampled at pixel centres within the same outer bounds.
+
+See [Pablo's handoff guide](../docs/team/pabloizgui/terrain-handoff.md) for decoding,
+NoData, source/frame, regeneration and the separate real elevation/slope layers.
+Marta/Javi2 must review this addition before integration in `dev`.
