@@ -48,4 +48,13 @@ describe('app store', () => {
     useAppStore.getState().setLayerOpacity('slope', 3);
     expect(useAppStore.getState().layerOpacity.slope).toBe(1);
   });
+
+  it('merges mission config patches', () => {
+    const s = useAppStore.getState();
+    s.setMissionConfig({ time_mode: 'mission', surface_days: 9 });
+    const cfg = useAppStore.getState().missionConfig;
+    expect(cfg.time_mode).toBe('mission');
+    expect(cfg.surface_days).toBe(9);
+    expect(cfg.trajectory).toBe(s.missionConfig.trajectory);
+  });
 });

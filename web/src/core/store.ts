@@ -10,7 +10,8 @@
  * Outside React: useAppStore.getState().setTime(iso)
  */
 import { create } from 'zustand';
-import type { AppEvents, AppMode, LayersManifest } from '@lunar/contracts';
+import type { AppEvents, AppMode, LayersManifest, MissionConfig } from '@lunar/contracts';
+import { DEFAULT_MISSION_CONFIG } from '@/scoring/defaults';
 
 export const DEFAULT_TIME_UTC = '2027-01-01T00:00:00Z';
 
@@ -21,6 +22,11 @@ export interface AppState extends AppEvents {
   layersInitialised: boolean;
   /** Pro mode: technical names, UTC times, coordinates and fine layer controls. Off = student view. */
   proMode: boolean;
+  /**
+   * Mission timing + requirements shared by Explore (sliders, time mode) and Mission (scenarios).
+   * Fifth shared field, agreed by the team (docs/10 §5 Javi, J0 #2). Defaults: `@/scoring`.
+   */
+  missionConfig: MissionConfig;
 
   selectSite: (id: string | null) => void;
   setTime: (isoUtc: string) => void;
@@ -32,6 +38,8 @@ export interface AppState extends AppEvents {
   setLayerOpacity: (id: string, opacity: number) => void;
   initLayers: (manifest: LayersManifest) => void;
   setProMode: (on: boolean) => void;
+  /** Shallow merge; `requirements` / `weights`, if given, replace the whole object. */
+  setMissionConfig: (patch: Partial<MissionConfig>) => void;
 }
 
 const PRO_KEY = 'lse.proMode';
@@ -51,6 +59,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
   layerOpacity: {},
   layersInitialised: false,
   proMode: readPro(),
+  missionConfig: DEFAULT_MISSION_CONFIG,
 
   selectSite: (id) => set({ selectedSiteId: id }),
   setTime: (isoUtc) => set({ currentTimeUTC: isoUtc }),
@@ -100,4 +109,6 @@ export const useAppStore = create<AppState>()((set, get) => ({
         layerOpacity: Object.fromEntries(manifest.layers.map((l) => [l.id, l.default_opacity])),
       };
     }),
+
+  setMissionConfig: (patch) => set((s) => ({ missionConfig: { ...s.missionConfig, ...patch } })),
 }));
