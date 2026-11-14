@@ -10,6 +10,7 @@ import {
   missionStats,
   resolveWindow,
   sortEvaluations,
+  topRanks,
   type MissionStats,
   type ResolvedWindow,
   type SiteEvaluation,
@@ -48,11 +49,13 @@ export function useCandidates(): Candidates {
   const sortBy = useRequirements((s) => s.sortBy);
   // Inputs stay responsive while the list re-evaluates.
   const req = useDeferredValue(liveReq);
-  const active = activeChecks(liveReq).length > 0;
+  // Same requirements for the flag and the evaluation (no flash of "0 of N" while deferring).
+  const active = activeChecks(req).length > 0;
+  const wantData = activeChecks(liveReq).length > 0;
 
   useEffect(() => {
-    if (active && sites) for (const s of sites) void loadTimeseries(s.id);
-  }, [active, sites]);
+    if (wantData && sites) for (const s of sites) void loadTimeseries(s.id);
+  }, [wantData, sites]);
 
   return useMemo(() => {
     const total = sites?.length ?? 0;
@@ -76,7 +79,7 @@ export function useCandidates(): Candidates {
     });
     const evaluations = sortEvaluations(evals, sortBy, req);
     const candidates = evaluations.filter((e) => e.candidate);
-    const topRank = new Map(candidates.slice(0, 5).map((e, i) => [e.site.id, i + 1]));
+    const topRank = topRanks(evaluations, sortBy, req);
     return { active, loading, failed, total, evaluations, candidates, topRank, window };
   }, [active, sites, timeseries, tsErrors, window, req, sortBy]);
 }

@@ -5,7 +5,7 @@
  * "Sort by" and the live list of candidate sites. No score, weights or `valid` from sites.json.
  * SiteDetail: the selected site's sheet: requirement checks, "Now" (Mission Clock) and window stats.
  */
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Plus, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
@@ -23,6 +23,7 @@ import {
 import {
   autonomyH,
   evaluateSite,
+  isValidValue,
   meanPowerW,
   meetsText,
   siteSlope,
@@ -92,11 +93,15 @@ const ASSUMPTION =
 
 const mark = (c: Check) => (c.status === 'pass' ? '✔' : c.status === 'fail' ? '✖' : '?');
 const markTone = (c: Check) =>
-  c.status === 'pass' ? 'text-good' : c.status === 'fail' ? 'text-bad' : 'text-ink-faint';
+  c.status === 'pass' ? 'text-good' : c.status === 'fail' ? 'text-bad' : 'text-ink-muted';
 
 /** 'YYYY-MM-DDTHH:mm' for <input type="datetime-local">, read as UTC. */
 const toInput = (isoUtc: string) => isoUtc.slice(0, 16);
-const fromInput = (v: string) => (v ? new Date(`${v}:00Z`).toISOString() : null);
+const fromInput = (v: string) => {
+  if (!v) return null;
+  const ms = Date.parse(`${v.slice(0, 16)}:00Z`);
+  return Number.isNaN(ms) ? null : new Date(ms).toISOString();
+};
 
 // ---------------------------------------------------------------------------
 // Sidebar
@@ -130,6 +135,28 @@ function RequirementFields() {
   const removeField = useRequirements((s) => s.removeField);
   const setValue = useRequirements((s) => s.setValue);
   const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLUListElement>(null);
+
+  // Close the "Add requirement" list with Escape or a click outside it.
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setMenuOpen(false);
+    const onDown = (e: PointerEvent) => {
+      const el = menuRef.current;
+      if (
+        el &&
+        !el.contains(e.target as Node) &&
+        !(e.target as Element).closest?.('[aria-controls="add-requirement-list"]')
+      )
+        setMenuOpen(false);
+    };
+    document.addEventListener('keydown', onKey);
+    document.addEventListener('pointerdown', onDown);
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.removeEventListener('pointerdown', onDown);
+    };
+  }, [menuOpen]);
   const available = FIELDS.filter((f) => !added.includes(f.field));
   const auto = autonomyH(req);
 
@@ -138,11 +165,15 @@ function RequirementFields() {
       {added.map((field) => {
         const def = FIELDS.find((f) => f.field === field)!;
         const id = `req-${field}`;
+        const invalid = req[field] !== undefined && !isValidValue(field, req[field]);
         return (
-          <div key={field} title={def.help}>
+          <div key={field}>
             <label htmlFor={id} className="label">
               {def.label}
             </label>
+            <p id={`${id}-help`} className="sr-only">
+              {def.help}
+            </p>
             <div className="mt-1 flex items-center gap-1.5">
               <div className="relative min-w-0 flex-1">
                 <input
@@ -152,12 +183,14 @@ function RequirementFields() {
                   min={0}
                   className="field w-full pr-9"
                   placeholder={def.placeholder}
+                  aria-describedby={`${id}-help${invalid ? ` ${id}-error` : ''}`}
+                  aria-invalid={invalid || undefined}
                   value={req[field] ?? ''}
                   onChange={(e) =>
                     setValue(field, e.target.value === '' ? undefined : Number(e.target.value))
                   }
                 />
-                <span className="text-ink-faint pointer-events-none absolute top-1/2 right-2 -translate-y-1/2 text-[13px]">
+                <span className="text-ink-muted pointer-events-none absolute top-1/2 right-2 -translate-y-1/2 text-[13px]">
                   {def.unit}
                 </span>
               </div>
@@ -171,16 +204,23 @@ function RequirementFields() {
                 <X className="size-4" aria-hidden />
               </button>
             </div>
+            {invalid && (
+              <p id={`${id}-error`} className="text-bad mt-1 text-[12px]">
+                {field === 'maxCommGapH' || field === 'maxSlopeDeg'
+                  ? 'Must be 0 or more. Not applied.'
+                  : 'Must be greater than 0. Not applied.'}
+              </p>
+            )}
           </div>
         );
       })}
 
-      {added.includes('batteryWh') && req.loadW === undefined && (
+      {added.includes('batteryWh') && !isValidValue('loadW', req.loadW) && (
         <p className="text-ink-muted text-[12px]">
           Add <strong>Power draw</strong> to compare the longest night with battery autonomy.
         </p>
       )}
-      {added.includes('panelW') && req.loadW === undefined && (
+      {added.includes('panelW') && !isValidValue('loadW', req.loadW) && (
         <p className="text-ink-muted text-[12px]">
           Add <strong>Power draw</strong> to compare solar power with consumption.
         </p>
@@ -198,23 +238,28 @@ function RequirementFields() {
             className="btn"
             onClick={() => setMenuOpen((v) => !v)}
             aria-expanded={menuOpen}
+            aria-controls="add-requirement-list"
           >
             <Plus className="size-4" aria-hidden /> Add requirement
           </button>
           {menuOpen && (
-            <ul className="border-edge mt-1 rounded-[2px] border" role="menu">
+            <ul
+              id="add-requirement-list"
+              ref={menuRef}
+              className="border-edge mt-1 rounded-[2px] border"
+              aria-label="Requirements you can add"
+            >
               {available.map((f) => (
                 <li key={f.field}>
                   <button
                     type="button"
-                    role="menuitem"
                     className="hover:bg-panel-2 flex w-full items-baseline justify-between px-3 py-1.5 text-left text-[14px]"
                     onClick={() => {
                       addField(f.field);
                       setMenuOpen(false);
                     }}
                   >
-                    {f.label} <span className="text-ink-faint text-[12px]">{f.unit}</span>
+                    {f.label} <span className="text-ink-muted text-[12px]">{f.unit}</span>
                   </button>
                 </li>
               ))}
@@ -240,7 +285,7 @@ function MissionWindowFields() {
     <fieldset className="border-edge flex flex-col gap-2 border-t px-5 pt-3 pb-3">
       <legend className="sr-only">Mission window</legend>
       <p className="text-heading text-[14px] font-medium">Mission window</p>
-      <div className="grid grid-cols-[1fr_88px] gap-2">
+      <div className="grid grid-cols-1 gap-2">
         <div>
           <label htmlFor="win-start" className="label">
             Landing (UTC)
@@ -274,9 +319,9 @@ function MissionWindowFields() {
           />
         </div>
       </div>
-      <p className="text-ink-faint text-[12px]">
+      <p className="text-ink-muted text-[12px]">
         {resolved.isFullRange
-          ? `No landing date: using all data, ${formatUtc(range.start_utc)} – ${formatUtc(range.end_utc)}.`
+          ? `No landing date: using all data, ${formatUtc(range.start_utc)} – ${formatUtc(range.end_utc)}${input.durationDays ? '. Days apply once a landing date is set.' : '.'}`
           : `${formatUtc(resolved.startUtc)} – ${formatUtc(resolved.endUtc)}${resolved.clamped ? ' (cut to the available data).' : '.'}`}
       </p>
     </fieldset>
@@ -315,10 +360,10 @@ function Results() {
           className={cn(
             'grid w-full grid-cols-[22px_1fr_auto] items-baseline gap-x-1 rounded-[4px] px-3 py-[7px] text-left text-[14px] transition-colors duration-100',
             selected ? 'bg-violet text-white' : 'hover:bg-panel-2',
-            !e.candidate && !selected && 'text-ink-faint',
+            !e.candidate && !selected && 'text-ink-muted',
           )}
         >
-          <span className={cn('num text-[12px]', selected ? 'text-white/70' : 'text-ink-faint')}>
+          <span className={cn('num text-[12px]', selected ? 'text-white/70' : 'text-ink-muted')}>
             {rank ?? '·'}
           </span>
           <span className="truncate">{e.site.name}</span>
@@ -329,11 +374,21 @@ function Results() {
               </span>
             ))}
           </span>
-          {!e.candidate && firstMiss && (
+          {!e.candidate && e.noData && (
             <span
               className={cn(
                 'col-start-2 col-end-4 truncate text-[12px]',
-                selected ? 'text-white/80' : firstMiss.status === 'fail' ? 'text-bad' : '',
+                selected ? 'text-white/80' : 'text-ink-muted',
+              )}
+            >
+              {meetsText(e)}
+            </span>
+          )}
+          {!e.candidate && !e.noData && firstMiss && (
+            <span
+              className={cn(
+                'col-start-2 col-end-4 truncate text-[12px]',
+                selected ? 'text-white/80' : 'text-bad',
               )}
             >
               {firstMiss.text}
@@ -401,7 +456,7 @@ function Results() {
         <ul className="mt-1 px-2">{others.map(row)}</ul>
       )}
 
-      <p className="text-ink-faint px-5 pt-3 text-[12px]">{ASSUMPTION}</p>
+      <p className="text-ink-muted px-5 pt-3 text-[12px]">{ASSUMPTION}</p>
     </div>
   );
 }
@@ -416,6 +471,7 @@ export function SiteDetail({ className }: { className?: string }) {
   const proMode = useAppStore((s) => s.proMode);
   const req = useRequirements((s) => s.req);
   const stats = useSiteStats(site?.id ?? null);
+  const loadError = useData((s) => (site ? s.timeseriesErrors[site.id] : undefined));
   const window = useMissionWindow();
 
   if (!site) {
@@ -438,7 +494,7 @@ export function SiteDetail({ className }: { className?: string }) {
     <section className={cn('box p-5', className)} aria-label={`${site.name} details`}>
       <h2 className="text-[24px] leading-tight">{site.name}</h2>
       {proMode && (
-        <p className="text-ink-faint num mt-1 text-[12px]">
+        <p className="text-ink-muted num mt-1 text-[12px]">
           {formatLatLon(site.lat, site.lon)}, {site.elev_m.toLocaleString('en')} m
         </p>
       )}
@@ -462,10 +518,12 @@ export function SiteDetail({ className }: { className?: string }) {
         <p className="text-heading text-[15px] font-medium">
           {window?.isFullRange ? 'Over all available data' : 'In your mission window'}
         </p>
-        {stats === null ? (
-          <p className="text-ink-faint mt-1 text-[13px]">Loading…</p>
+        {loadError ? (
+          <p className="text-bad mt-1 text-[13px]">Could not load this site's data.</p>
+        ) : stats === null ? (
+          <p className="text-ink-muted mt-1 text-[13px]">Loading…</p>
         ) : stats.samples === 0 ? (
-          <p className="text-ink-faint mt-1 text-[13px]">No data in this window.</p>
+          <p className="text-ink-muted mt-1 text-[13px]">No data in this window.</p>
         ) : (
           <dl className="rows border-edge mt-2 border-t text-[14px]">
             <Row
@@ -494,7 +552,7 @@ export function SiteDetail({ className }: { className?: string }) {
           </dl>
         )}
         {req.panelW !== undefined && (
-          <p className="text-ink-faint mt-2 text-[12px]">{ASSUMPTION}</p>
+          <p className="text-ink-muted mt-2 text-[12px]">{ASSUMPTION}</p>
         )}
       </div>
 
@@ -507,17 +565,20 @@ export function SiteDetail({ className }: { className?: string }) {
 
 function NowSection({ siteId }: { siteId: string }) {
   const ts = useTimeseries(siteId);
+  const loadError = useData((s) => s.timeseriesErrors[siteId]);
   const now = useAppStore((s) => s.currentTimeUTC);
   const sky = ts ? sampleAt(ts, now) : null;
 
   return (
     <div className="mt-4">
       <p className="text-heading text-[15px] font-medium">Now (Mission Clock)</p>
-      <p className="text-ink-faint text-[12px]">
+      <p className="text-ink-muted text-[12px]">
         {formatUtc(now)}. Countdowns start at this time, not at the start of the window.
       </p>
-      {!ts || !sky ? (
-        <p className="text-ink-faint mt-1 text-[13px]">Loading…</p>
+      {loadError ? (
+        <p className="text-bad mt-1 text-[13px]">Could not load this site's data.</p>
+      ) : !ts || !sky ? (
+        <p className="text-ink-muted mt-1 text-[13px]">Loading…</p>
       ) : (
         <dl className="rows border-edge mt-2 border-t text-[14px]">
           <Row label="Sun elevation" value={`${sky.sun_el.toFixed(1)}°`} />

@@ -12,6 +12,7 @@ import {
   resolveWindow,
   sliceIndices,
   sortEvaluations,
+  topRanks,
   type MissionStats,
   type Requirements,
 } from './missionStats';
@@ -228,6 +229,61 @@ describe('sortEvaluations', () => {
   });
 });
 
+describe('missing data (review D1)', () => {
+  const req: Requirements = { batteryWh: 3000, loadW: 50 };
+
+  it('is not a candidate while its timeseries is missing (loading or failed)', () => {
+    const e = evaluateSite(site('X', 1), null, req);
+    expect(e.checks[0]!.status).toBe('unknown');
+    expect(e.candidate).toBe(false);
+    expect(meetsText(e)).toBe('No data for this site in the mission window');
+  });
+
+  it('is not a candidate when the window has no samples', () => {
+    const range = { start_utc: at(0), end_utc: at(9), step_s: 3600 };
+    const w = resolveWindow(range, { startUtc: at(50), durationDays: 1 });
+    const s = missionStats(series('1111000011'), w);
+    expect(s.samples).toBe(0);
+    expect(evaluateSite(site('X', 1), s, req).candidate).toBe(false);
+  });
+
+  it('still lets pending terrain alone not count (Javi rule)', () => {
+    const e = evaluateSite(
+      site('Y', 3, { pending_metrics: ['slope_deg'] } as Partial<Site>),
+      null,
+      { maxSlopeDeg: 8 },
+    );
+    expect(e.candidate).toBe(true);
+  });
+});
+
+describe('invalid values and ranks (review D2)', () => {
+  it('ignores non-positive battery, load and panel and negative limits', () => {
+    expect(activeChecks({ batteryWh: 3000, loadW: 0 })).toEqual([]);
+    expect(activeChecks({ batteryWh: -1, loadW: 50 })).toEqual([]);
+    expect(activeChecks({ panelW: 120, loadW: -5 })).toEqual([]);
+    expect(activeChecks({ maxCommGapH: -1, maxSlopeDeg: -2 })).toEqual([]);
+    expect(activeChecks({ maxCommGapH: 0, maxSlopeDeg: 0 })).toEqual(['comms', 'slope']);
+  });
+
+  it('numbers the top five only when the sort key has data', () => {
+    const pending = (n: string) => site(n, 1, { pending_metrics: ['slope_deg'] } as Partial<Site>);
+    const evals = ['b', 'a', 'c'].map((n) =>
+      evaluateSite(pending(n), stats({}), { maxSlopeDeg: 8 }),
+    );
+    const sorted = sortEvaluations(evals, 'flattest', { maxSlopeDeg: 8 });
+    expect(topRanks(sorted, 'flattest', { maxSlopeDeg: 8 }).size).toBe(0);
+    const ranked = topRanks(sorted, 'sunlight', { maxSlopeDeg: 8 });
+    expect(ranked.size).toBe(3);
+  });
+});
+
+describe('comm gap at the start of the window (synthetic)', () => {
+  it('counts a gap that starts at the first sample', () => {
+    expect(missionStats(series('1111', '0001'), win(0, 4)).longestCommGapH).toBe(3);
+  });
+});
+
 describe('real data: shackleton_rim_01 over the whole manifest range', () => {
   const DATA = join(__dirname, '..', '..', 'public', 'data');
   const read = <T>(p: string): T => JSON.parse(readFileSync(join(DATA, p), 'utf8')) as T;
@@ -235,10 +291,10 @@ describe('real data: shackleton_rim_01 over the whole manifest range', () => {
   const ts = read<Timeseries>('timeseries/shackleton_rim_01.json');
   const window = resolveWindow(manifest.time_range, { startUtc: null, durationDays: null });
 
-  it('counts the comm gap that starts at hour 0 (266 h) and no night', () => {
+  it('uses every sample and finds a comm gap (values change when the data is regenerated)', () => {
     const s = missionStats(ts, window);
     expect(s.samples).toBe(ts.t_utc.length);
-    expect(s.longestCommGapH).toBe(266);
-    expect(s.longestNightH).toBe(0);
+    expect(s.longestCommGapH).not.toBeNull();
+    expect(s.longestNightH).not.toBeNull();
   });
 });

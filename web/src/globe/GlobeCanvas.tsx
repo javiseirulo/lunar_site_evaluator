@@ -299,7 +299,7 @@ function Pins({
   onSiteClick: (id: string) => void;
   onCustomClick: (id: string) => void;
 }) {
-  const { evaluations, topRank } = useCandidates();
+  const { evaluations, topRank, loading } = useCandidates();
   const showNonMatching = useRequirements((s) => s.showNonMatching);
   const pins = useCustomPins((s) => s.pins);
   const selectedSiteId = useAppStore((s) => s.selectedSiteId);
@@ -337,7 +337,8 @@ function Pins({
   return (
     <group>
       {evaluations
-        ?.filter((e) => e.candidate || showNonMatching)
+        // Wait for every timeseries: no gold flash of sites that have not been checked yet.
+        ?.filter((e) => !loading && (e.candidate || showNonMatching))
         .map(({ site, candidate }) => (
           <Pin
             key={site.id}
@@ -541,11 +542,11 @@ function CardAnchor({
 }
 
 function PoleMarker({ flightRef }: { flightRef: FlightRef }) {
-  const { active, candidates } = useCandidates();
+  const { active, loading, candidates } = useCandidates();
   const wrapper = useRef<HTMLDivElement>(null);
   const position = useMemo(() => new Vector3(...latLonToVec3(-90, 0, 1.02)), []);
   // With no requirement no sites are shown, so the marker just says "South Pole".
-  const matching = active ? candidates.filter((e) => e.site.lat <= -80).length : null;
+  const matching = active && !loading ? candidates.filter((e) => e.site.lat <= -80).length : null;
 
   useFrame(({ camera }) => {
     if (!wrapper.current) return;

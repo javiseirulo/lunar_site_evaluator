@@ -48,7 +48,7 @@ const iso = (ms: number) => new Date(ms).toISOString();
 export function resolveWindow(range: TimeRange, input: WindowInput): ResolvedWindow {
   const r0 = Date.parse(range.start_utc);
   const r1 = Date.parse(range.end_utc) + range.step_s * 1000; // last sample covers one step
-  if (!input.startUtc) {
+  if (!input.startUtc || Number.isNaN(Date.parse(input.startUtc))) {
     return { startUtc: iso(r0), endUtc: iso(r1), isFullRange: true, clamped: false };
   }
   const s = Date.parse(input.startUtc);
@@ -156,9 +156,18 @@ export type RequirementField = keyof Requirements;
 
 /** Battery autonomy in hours, or null if battery or load is missing / not positive. */
 export function autonomyH(req: Requirements): number | null {
-  return req.batteryWh !== undefined && req.loadW !== undefined && req.loadW > 0
-    ? req.batteryWh / req.loadW
+  return isValidValue('batteryWh', req.batteryWh) && isValidValue('loadW', req.loadW)
+    ? req.batteryWh! / req.loadW!
     : null;
+}
+
+/**
+ * Battery, load and panel must be > 0; comm gap and slope limits must be ≥ 0.
+ * An invalid value is kept in the form (so the user can fix it) but checks nothing.
+ */
+export function isValidValue(field: RequirementField, v: number | undefined): boolean {
+  if (v === undefined || !Number.isFinite(v)) return false;
+  return field === 'maxCommGapH' || field === 'maxSlopeDeg' ? v >= 0 : v > 0;
 }
 
 /** Mean solar power over the window (vertical-panel assumption). */
@@ -189,7 +198,13 @@ export interface SiteEvaluation {
   passed: number;
   /** Checks with no data (pending): shown, but they do not count. */
   pending: number;
-  /** No active check fails. Pending checks are ignored, like `@/scoring`. */
+  /**
+   * The site has no timeseries for the window (still loading, failed to load, or the window has
+   * no samples) while a time-based requirement is active. Unlike pending terrain, this is not
+   * ignored: such a site is never a candidate.
+   */
+  noData: boolean;
+  /** No active check fails and the site has data. Pending checks are ignored, like `@/scoring`. */
   candidate: boolean;
 }
 
@@ -229,9 +244,9 @@ export function siteSlope(site: Site): number | null {
 export function activeChecks(req: Requirements): CheckId[] {
   const ids: CheckId[] = [];
   if (autonomyH(req) !== null) ids.push('night');
-  if (req.panelW !== undefined && req.loadW !== undefined) ids.push('energy');
-  if (req.maxCommGapH !== undefined) ids.push('comms');
-  if (req.maxSlopeDeg !== undefined) ids.push('slope');
+  if (isValidValue('panelW', req.panelW) && isValidValue('loadW', req.loadW)) ids.push('energy');
+  if (isValidValue('maxCommGapH', req.maxCommGapH)) ids.push('comms');
+  if (isValidValue('maxSlopeDeg', req.maxSlopeDeg)) ids.push('slope');
   return ids;
 }
 
@@ -297,11 +312,23 @@ export function evaluateSite(
   const passed = checks.filter((c) => c.status === 'pass').length;
   const pending = checks.filter((c) => c.status === 'unknown').length;
   const failed = checks.length - passed - pending;
-  return { site, stats, checks, passed, pending, candidate: checks.length > 0 && failed === 0 };
+  const noData = s === null && checks.some((c) => c.id !== 'slope');
+  return {
+    site,
+    stats,
+    checks,
+    passed,
+    pending,
+    noData,
+    candidate: checks.length > 0 && failed === 0 && !noData,
+  };
 }
 
 /** "Meets 2 of 2 requirements · 1 pending (no data)" */
-export function meetsText(e: Pick<SiteEvaluation, 'checks' | 'passed' | 'pending'>): string {
+export function meetsText(
+  e: Pick<SiteEvaluation, 'checks' | 'passed' | 'pending'> & { noData?: boolean },
+): string {
+  if (e.noData) return 'No data for this site in the mission window';
   const counted = e.checks.length - e.pending;
   const base =
     counted > 0
@@ -317,7 +344,7 @@ export function meetsText(e: Pick<SiteEvaluation, 'checks' | 'passed' | 'pending
 export type SortBy = 'battery_margin' | 'comms' | 'flattest' | 'sunlight';
 
 /** Sort key, lower = better; null sorts last. */
-function sortKey(e: SiteEvaluation, by: SortBy, req: Requirements): number | null {
+export function sortKey(e: SiteEvaluation, by: SortBy, req: Requirements): number | null {
   const s = e.stats;
   switch (by) {
     case 'battery_margin': {
@@ -350,3 +377,16 @@ export function sortEvaluations(
     return a.site.name.localeCompare(b.site.name);
   });
 }
+
+/** Site id → 1…5 for the first five candidates whose sort key has data (no alphabetical ranks). */
+export function topRanks(
+  sorted: SiteEvaluation[],
+  by: SortBy,
+  req: Requirements,
+): Map<string, number> {
+  const ranked = sorted.filter((e) => e.candidate && sortKey(e, by, req) !== null).slice(0, TOP_N);
+  return new Map(ranked.map((e, i) => [e.site.id, i + 1]));
+}
+
+/** How many candidates get a numbered badge. */
+export const TOP_N = 5;
