@@ -142,31 +142,44 @@ export function TimelapseScreen() {
   const [ended, setEnded] = useState(false);
   const skipRef = useRef(false);
   const finishedRef = useRef(false);
+  const settledRef = useRef(false);
 
   const landingUtc = hand?.landingUtc;
   const stop = card ? stopHourFor(card.verdict.failHour, MISSION_HOURS) : 0;
+  // The deal loaded every dealt site's series, so this is normally true on the first render.
+  const ready = ts !== null;
 
   useEffect(() => {
+    const finishOnce = () => {
+      if (finishedRef.current) return;
+      finishedRef.current = true;
+      useGame.getState().finish();
+    };
     // Nothing to play (should not happen): go straight to the verdict screen.
     if (!landingUtc || !card) {
-      useGame.getState().finish();
+      finishOnce();
       return;
     }
+    if (!ready) return;
     let raf = 0;
     let hold = 0;
-    const t0 = performance.now();
 
     const settle = () => {
+      settledRef.current = true;
       useAppStore.getState().setTime(isoAtHour(landingUtc, stop));
       setHour(stop);
       setEnded(true);
-      hold = window.setTimeout(() => {
-        if (finishedRef.current) return;
-        finishedRef.current = true;
-        useGame.getState().finish();
-      }, HOLD_MS);
+      hold = window.setTimeout(finishOnce, HOLD_MS);
     };
 
+    // Already played (a dependency changed afterwards, e.g. reduced motion toggled): do not
+    // replay, only re-arm the hand-over to the verdict that the cleanup cancelled.
+    if (settledRef.current) {
+      hold = window.setTimeout(finishOnce, HOLD_MS);
+      return () => window.clearTimeout(hold);
+    }
+
+    const t0 = performance.now();
     const tick = (now: number) => {
       // Reduced motion: no playback, show the end state straight away.
       const h =
@@ -187,7 +200,7 @@ export function TimelapseScreen() {
       cancelAnimationFrame(raf);
       window.clearTimeout(hold);
     };
-  }, [landingUtc, card, stop, reduced]);
+  }, [landingUtc, card, stop, reduced, ready]);
 
   const runs = useMemo(
     () =>
@@ -228,7 +241,8 @@ export function TimelapseScreen() {
             Day {day} of {DAYS}
           </p>
           <p className="text-ink-muted font-mono text-[11px] uppercase">
-            Hour {hour} of {MISSION_HOURS}
+            {/* Hours count from 0; a completed mission has lived through all of them. */}
+            Hour {ended && card.verdict.win ? MISSION_HOURS : hour} of {MISSION_HOURS}
           </p>
           <div className="mt-1 h-2 border-2 border-black bg-black/60">
             <div

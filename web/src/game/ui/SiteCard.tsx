@@ -78,11 +78,10 @@ export function SiteCard(props: SiteCardProps) {
             state === 'picked' && 'border-warn',
           )}
         >
-          <div className="flex items-center justify-between gap-2 border-b-2 border-black pb-1">
+          <div className="border-b-2 border-black pb-1">
             <span className="text-warn font-mono text-[13px] font-bold tracking-wider uppercase">
               {label}
             </span>
-            <span className="font-mono text-[10px] text-ink-faint">#{card.slot}</span>
           </div>
           <GameImage
             src={image}
