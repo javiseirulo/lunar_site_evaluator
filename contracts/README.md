@@ -36,10 +36,21 @@ New optional fields:
 - `Site.metrics`: `sun_el_mean_deg`, `max_blackout_hours`, `sun_earth_pct`.
 - `Timeseries`: `sun_frac`, `horizon_source`.
 
+### Notes for consumers
+- **Real data (`mock: false`) always includes `earth_visible`.** All Earth metrics depend on it.
+- **`region`** follows lat/lon: `south_pole` if lat ≤ −80, `north_pole` if lat ≥ 80, otherwise `near_side` if |lon| ≤ 90, else `far_side` (checked by `web/src/core/contracts.test.ts`).
+- **`antenna_margin_deg`** in a timeseries/grid is the margin baked into `earth_visible`. If the user changes the margin, `@/scoring` rebuilds the window with `@/ephem` instead of reusing the static file.
+- **Mission scenarios** (Cristóbal) are partial overrides. Merge them onto `DEFAULT_MISSION_CONFIG` first, then validate the result against `mission_config.schema.json`.
+- **Historic landings:**
+  - in `sites.json` they are sites like any other (`kind: "historic_landing"`), so they can be evaluated and compared;
+  - Marta's planned `historic_sites.json` (display layer with agency, date and outcome) can reuse the same `id`s so both link.
+- **`grid/*.bin` replaces the `grid_metrics.bin` sketched in docs/10 (Marta's block).** It is Float32 instead of uint8, and the time dimension is optional (`n_times`, `time_step_s`; e.g. per day for an animated heat map).
+
 ### Binary formats
 - `ephem/<YYYY>.bin`: Float32 little-endian, 6 values per hour starting at Jan 1 00:00 UTC.
   - Columns: `sun_ux, sun_uy, sun_uz` (unit vector Moon→Sun) and `earth_x_km, earth_y_km, earth_z_km` (Moon centre→Earth).
   - Frame `MOON_ME`, SPICE aberration `LT+S`. About 210 KB per year.
+- `horizon/<id>.json`: `elev_deg.length × az_step_deg = 360` exactly (3600 values at 0.1°, 360 at 1°), and `site_id` matches the file name and a site in `sites.json`.
 - `grid/*.bin`: Float32 little-endian, one plane of `width × height` per metric, in `metrics` order.
   - Row 0 is north. Equirectangular grids go lon −180→180 and lat 90→−90, values at cell centres.
   - `NaN` means no data.
@@ -69,10 +80,11 @@ New optional fields:
 - **Validity:** a site is valid for a mission window when every requirement in `MissionConfig.requirements` that is not in `pending_metrics` passes its threshold.
   - "Less is better" metrics fail above the threshold: `slope_deg`, `max_dark_hours`, `max_blackout_hours`, `psr_dist_km`.
   - All other metrics fail below it.
+  - **At exactly the threshold the requirement passes** (`value ≥ threshold`, or `value ≤ threshold` for less-is-better), so `margin = 0` passes. Python and TypeScript compare unrounded values.
 - **Utility per criterion:**
   - u = 0 at the threshold and 1 at the objective, linear in between, clamped to [0, 1];
   - inverted for "less is better" metrics;
   - without an objective, u = 1 when the requirement passes.
   - There is no min-max normalisation, so a site's score does not depend on the other sites.
-- **Score:** `score = Σ wᵢ·uᵢ / Σ wᵢ` over the weighted, non-pending criteria. A site that is not valid still gets a score, and the UI shows it as not valid.
+- **Score:** `score = Σ wᵢ·uᵢ / Σ wᵢ` over the weighted, non-pending criteria. If Σ wᵢ = 0 (no weights, or every weighted criterion pending), `score = 0`, never NaN. The ranking only lets valid sites compete (J7): `rankSites` puts every valid site first and orders by score. Invalid sites keep their number so the UI can show how far they are, but they are always labelled "not valid".
 - **Margins:** `checks[].margin` is relative and signed (> 0 passes). The UI turns it into text such as "longest night 142 h > 100 h".

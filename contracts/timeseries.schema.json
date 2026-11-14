@@ -34,6 +34,7 @@
     "lit": { "type": "array", "items": { "enum": [0, 1] } },
     "earth_visible": { "type": "array", "items": { "enum": [0, 1] } },
     "sun_frac": { "type": "array", "items": { "type": "number", "minimum": 0, "maximum": 1 } },
-    "horizon_source": { "type": "string" }
+    "horizon_source": { "type": "string" },
+    "antenna_margin_deg": { "type": "number", "minimum": 0 }
   }
 }
