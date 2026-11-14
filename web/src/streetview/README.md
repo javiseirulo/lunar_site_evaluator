@@ -36,7 +36,9 @@ Do not give the browser private token-management or asset-write privileges.
 - The camera is placed at the sampled mesh height + 5 m (shared production default). It does not use
   mock `site.elev_m` for ground placement. If the mesh cannot be sampled,
   it reports an error instead of substituting a sphere as if it were terrain.
-- Drag, touch, arrows and four buttons rotate in place. Observer height is a
+- Left drag / one finger looks around; wheel / pinch zooms. Keyboard arrows
+  remain, with no on-screen arrow buttons. Click/tap nearby ground to move
+  1–200 m; explicit coordinates allow global relocation. Observer height is a
   local visual setting (0.5–20 m); it does not recompute pipeline visibility.
 - Sun/Earth are labeled direction markers, not photometric disks. Positions use
   local north-clockwise azimuth and geometric elevation from the site's series.
@@ -45,12 +47,12 @@ Do not give the browser private token-management or asset-write privileges.
 - Mesh textures can have baked-in shadows; rendered imagery is not evidence of
   lighting at the selected time. Visibility flags are from the pipeline/fixtures.
 - Loading errors are generic to avoid displaying token-bearing URLs. Retry
-  recreates the scene. Loading has a 60-second timeout; unmount/site change
+  recreates the scene. Setup has a 90-second timeout, surface queries 45 seconds; unmount/site change
   cancels setup, disposes GPU resources, listeners and ResizeObserver.
 
-All current sky/site fixtures are synthetic and labeled MOCK. A real ion token
-and independent frame/height validation are still required before claiming the
-first real terrain scene or scientific agreement with the DEM. Stellar catalogs,
+All current sky/site fixtures are synthetic and labeled MOCK. Real Cesium terrain
+has been verified with Pablo's local token; independent frame/height validation
+is still required before claiming scientific agreement with the DEM. Stellar catalogs,
 constellation geometry, physically sized/phased bodies and arbitrary-coordinate
 ephemerides are later work, not implemented here.
 
@@ -71,10 +73,13 @@ scripts were not enabled; installation completed with `--ignore-scripts`.
 
 `pnpm --filter web typecheck`, `test`, `lint`, `build`. Geometry tests cover lunar
 ENU directions including the pole, unit vectors/elevation, observer identity,
-sampling boundaries and camera angle limits. Browser verification without a token
-covers local access setup, mock labels, shared time updates and mobile layout.
-It does not establish real Cesium Moon rendering, touch camera motion, surface
-height calibration or terrain/DEM agreement; those require the real-asset run.
+sampling boundaries and camera angle limits, mouse/touch gestures, movement bounds,
+lighting states and label placement. Native checks pass: 62 web tests, types,
+lint and build; 31 Python tests and the terrain delivery checker pass too.
+Browser QA with real Cesium verifies touch drag/pinch/tap, explicit global jumps,
+series invalidation, expanded mobile view, the Mons Pico label and the complete
+90/180/270/0 degree turn at the southern fixture. It does not establish physical
+phone support, photometric accuracy, surface calibration or terrain/DEM agreement.
 
 Sources: [Cesium Moon](https://cesium.com/platform/cesium-ion/content/cesium-moon/),
 [Vite integration](https://cesium.com/blog/2024/02/13/configuring-vite-or-webpack-for-cesiumjs/),
@@ -86,8 +91,8 @@ Javi J0/J10 alignment: the default and retry observer height come from
 `config/terrain-processing.json`. The private legacy adapter is named
 `sampleSiteSky`; `skyAt(lat, lon, t)` is reserved for Javi's future `@/ephem`.
 Until that module/data exists, same-site temporal bounds still apply. No annual
-vectors or terrain horizons are fabricated. The 360-degree camera validation
-and DE421/DE440/mesh alignment remain pending.
+vectors or production terrain horizons are fabricated. The local 360-degree turn
+is verified; broader device/location QA and DE421/DE440/mesh alignment remain pending.
 
 ## Navegación v1 (2026-11-14)
 

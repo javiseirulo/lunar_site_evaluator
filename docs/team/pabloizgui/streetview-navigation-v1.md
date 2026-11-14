@@ -148,3 +148,12 @@ pruebas web, tipos, ESLint y build. Python pasa 31/31; entrega de Marta verifica
 Formato del árbol candidato de Git comprobado con LF: correcto. Inspección
 exacta de los 206 archivos del candidato: el token local no aparece. Se vuelve
 a arrancar Vite en 127.0.0.1:5173 para revisión de Pablo. No se publica el bloque.
+
+Última comprobación sobre el código del commit `e5d7209`: el giro del fixture
+sur completa 90°→180°→270°→0°, sin error de renderer, con capturas por orientación
+y sin botones de flecha. Esta comprobación complementa el giro de 90° en la
+cara oculta; no implica haber revisado todos los puntos de la Luna. Quedan
+pequeñas costuras/huecos temporales durante el refinamiento de algunas teselas;
+no se ocultan como si fueran terreno medido ni se aplica relleno científico.
+La copia temporal inicial se eliminó después de retirar sus enlaces; las
+fuentes originales, dependencias y notas locales siguen conservadas.
