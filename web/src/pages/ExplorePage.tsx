@@ -4,7 +4,7 @@ import { useAppStore } from '@/core';
 import { TimeBar } from '@/core/shell/TimeBar';
 import { LayersPanel, PolarMap } from '@/layers';
 import { GlobeView, SiteDetail, SiteList } from '@/globe';
-import { MissionTimingPanel } from '@/scoring';
+import { MissionTimingPanel, SiteCheckPanel } from '@/scoring';
 
 type View = '2d' | '3d';
 
@@ -60,8 +60,10 @@ export default function ExplorePage() {
       </section>
 
       {/* Right: site card */}
-      <aside className="order-2 md:order-3 md:col-span-2 lg:col-span-1">
+      <aside className="order-2 flex flex-col gap-4 md:order-3 md:col-span-2 lg:col-span-1">
         <SiteDetail />
+        {/* Validity for the current mission window (Javi, @/scoring; docs/10 J6–J7). */}
+        <SiteCheckPanel />
       </aside>
     </div>
   );

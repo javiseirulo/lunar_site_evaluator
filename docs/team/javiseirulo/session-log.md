@@ -26,3 +26,4 @@
 - Plan de implementación (4 PRs: contrato v1.1 → `python/` efemérides → `@/ephem` + `@/scoring` → datos reales) en `docs/team/javiseirulo/plan-implementacion.md`. Se trabaja en paralelo con subagentes en worktrees.
 - 2026-11-14 noche: mergeados #70, #77, #78 en dev (CI verde). Catálogo #48 con plain_81s reubicado (OK de Javi). Documento de diseño para el equipo.
 - 2026-11-14: `uv run python -m export.all` sustituye los mocks por datos reales (59 sitios × 8760 h 2027, horizonte plano, ~29 MB). Validez/score sobre la ventana del manifest (año entero): 0/59 válidos por umbrales de 7 días; slope/PSR pendientes de terreno.
+- 2026-11-15: SiteCheckPanel colocado en Explore (columna derecha, bajo la ficha); estilo con etiquetas legibles. Cambio de 1 línea en pages/ExplorePage.tsx (página de Marta), avisada en el PR.
