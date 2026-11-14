@@ -10,9 +10,12 @@ const LOW_MS = 30_000;
 
 export function Countdown() {
   const deadline = useGame((s) => s.deadline);
+  // A locked-in pick freezes the clock (the store also ignores timeUp then).
+  const locked = useGame((s) => s.pendingSlot !== null);
   const [now, setNow] = useState(() => Date.now());
 
   useEffect(() => {
+    if (locked) return;
     let fired = false;
     const id = window.setInterval(() => {
       const t = Date.now();
@@ -24,7 +27,7 @@ export function Countdown() {
       }
     }, TICK_MS);
     return () => window.clearInterval(id);
-  }, [deadline]);
+  }, [deadline, locked]);
 
   const left = Math.max(0, deadline - now);
   const low = left <= LOW_MS;

@@ -23,7 +23,9 @@ export function CardTable() {
 
   // Deal animation only if the table mounted while dealing (retry shows cards face-up).
   const [dealt] = useState(() => phase === 'dealing');
-  const [picked, setPicked] = useState<number | null>(null);
+  // The pick lives in the store so the countdown cannot expire during the pick animation.
+  const picked = useGame((s) => s.pendingSlot);
+  const pick = useGame((s) => s.pick);
 
   const cards = useMemo(() => hand?.cards ?? [], [hand]);
   const images = useMemo(() => handSiteImages(cards, seed), [cards, seed]);
@@ -39,8 +41,7 @@ export function CardTable() {
     if (picked === null || !hand) return;
     const id = window.setTimeout(
       () => {
-        const game = useGame.getState();
-        game.choose(picked);
+        useGame.getState().choose(picked);
         const after = useGame.getState();
         if (after.phase !== 'travel' || after.chosenSlot !== picked) return;
         const card = hand.cards.find((c) => c.slot === picked);
@@ -79,7 +80,7 @@ export function CardTable() {
             timeline={timeline}
             state={picked === null ? 'idle' : picked === card.slot ? 'picked' : 'dismissed'}
             clickable={choosing}
-            onPick={setPicked}
+            onPick={pick}
           />
         ))}
       </div>
