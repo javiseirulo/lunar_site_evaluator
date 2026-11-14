@@ -26,7 +26,7 @@
 | Landing, About (fuentes, declaración IA, sin branding NASA) | ✅ v0 | `web/src/pages/` |
 | Tests (store, helpers, validación de `public/data`) + CI | ✅ | `web/src/core/*.test.ts`, `.github/workflows/web.yml` |
 | Globo 3D + filtros (Marta) | ⏳ hueco listo | `web/src/globe/` (placeholder + lista/ficha de sitio de arranque) |
-| Street View (Pablo) | v0 en rama local #46; terreno ion visible, giro completo pendiente de corregir/validar | `pabloizgui/46-lunar-streetview`, commit `a1c6216`; `dev` aún tiene placeholder |
+| Street View (Pablo) | v0 en rama local #46; valor inicial 5 m según J0, terreno ion visible; giro completo pendiente | `pabloizgui/46-lunar-streetview`, commit `24e3250`; `dev` aún tiene placeholder |
 | Mission / juego (Cristóbal) | ⏳ diseño descrito (#52), hueco listo | `web/src/game/` (placeholder) |
 | Pipeline Python (Javi, Pablo) | Entrega polar real generada en rama #37; revisión/integración pendientes | `python/terrain/`, `web/public/data/terrain/`: heightmap 1025², máscara, elevación/pendiente y tabla de 20 sitios; horizonte/efemérides aún pendientes |
 | Deploy público | ⏳ pendiente | `web/vercel.json` listo; proyecto Vercel con raíz `web/` |

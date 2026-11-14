@@ -1,6 +1,9 @@
 # Ajuste de Pablo al contexto de Javi — 2026-11-14
 
-Base integrada: `origin/dev` en `461507a` (PR #64). Se conserva el commit de
+Decisiones de Javi: `461507a` (PR #64). Se integra además la última base
+`origin/dev` en `bd0880d` (shell/store de Javi2, PR #63). `context_commit` en
+la configuración identifica las decisiones J0, no el último cambio visual.
+Se conserva el commit de
 datos `958b1a4` y el visor en su rama #46. El PR #66 de Design/Mission sigue
 abierto: se ha leído, pero no se incorpora una rama ajena pendiente de revisión.
 
@@ -30,7 +33,10 @@ registrando los cambios de resolución por sitio/azimut:
 2. 5–80 km: PGDA 90 de 80 m; respaldo de 240 m si se sale del producto polar.
 3. 80–310 km: `LDEM_60S_240MPP_ADJ.TIF` de PGDA 90, hasta −60°S.
 
-El último producto permite salir del parche visual para los sitios cercanos a
+El último producto ya está descargado: 218961039 bytes; raster 7760² a 240 m,
+límites ±931200 m y tres ventanas decodificadas. SHA-256 local:
+`3f9663257b63022f2b0d5a623482ff3cadddceb91594a4e4ca14a94d8cec8b34`.
+Permite salir del parche visual para los sitios cercanos a
 −80°S. Los límites de Marta siguen intactos. La disponibilidad del archivo,
 su extensión y su máscara no prueban que todos los rayos estén completos.
 No se usa la malla reducida de ~594 m para producir el horizonte científico.
@@ -103,6 +109,24 @@ lote aprobado en #48. El mapa de calor completo no bloquea esta entrega.
 Antes de integrar se crearon `backup/pablo-terrain-before-javi-20261114` y
 `backup/pablo-streetview-before-javi-20261114`. Las siete notas/cambios locales
 sin commit se guardaron en el stash `c04ac6210f0768787660f8ede496aefa8a5e6108`
-para restaurarlos al finalizar. No se reescribieron commits ni se borraron stashes,
+restaurado al finalizar (se conserva también el stash). No se reescribieron commits ni se borraron stashes,
 datos brutos o credenciales. El conflicto append-only de `si-usage-log.md` se
 resolvió conservando ambas entradas. Merge de contexto: `692dc65`.
+La integración final de `bd0880d` es `99edec4`, conservando también todas las
+entradas de recursos y uso de IA del equipo.
+
+La rama #46 también incorpora `461507a` mediante merge `6e0e23f`. Commit
+`24e3250`: cámara/escena/reintento leen el valor 5 m de la configuración común;
+el adaptador local se llama `sampleSiteSky`, separado del futuro `@/ephem.skyAt`.
+Verificación de esa rama: 26 pruebas web, TypeScript, lint y build correctos.
+La entrega de datos permanece en #37 para no acoplarla a las dependencias Cesium.
+
+Verificación de datos: 24 pruebas Python, 13 web, TypeScript, lint, build y lector
+JS del binario correctos. Comprobados byte a byte contra `958b1a4` todos los
+archivos originales de terreno: no cambian. El wrapper gstack sigue fallando con
+exit 127 en Windows; no se declara READY_FOR_SHIP ni CI remoto ejecutado.
+
+Sobre la extensión consultada por Pablo: −80°S procede de la ventana que requiere
+Marta en `layers.json`, no es un límite de Cesium Moon. El Street View usa la
+malla visual global; los DEM propios y perfiles científicos tienen sus propias
+coberturas. La selección libre de coordenadas sigue pendiente en el prototipo.

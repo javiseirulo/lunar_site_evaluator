@@ -17,7 +17,8 @@ explicitly reports **zero computed horizon profiles** and ephemerides pending Ja
 The observer height is not added to Marta's surface heights. Sun/Earth vectors
 are owned by Javi; frame realization and DE421/DE440 alignment remain required.
 
-`origin/dev` at `461507a` is merged without rewriting local progress. PR #66 is
+`origin/dev` at `bd0880d` is merged without rewriting local progress; J0/J10
+come from `461507a`. PR #66 is
 read for compatibility but is not merged into this branch. Street View changes
 remain in Pablo's separate #46 branch, keeping the terrain delivery independent.
 

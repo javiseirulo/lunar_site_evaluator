@@ -7,7 +7,8 @@ Seguimiento completo: [tasks.md](tasks.md).
 
 ## Archivos y destinatarios
 
-Actualizado tras integrar `origin/dev` en `461507a` (Javi, J0/J10).
+Actualizado tras integrar `origin/dev` en `bd0880d`; decisiones de Javi J0/J10
+publicadas en `461507a`.
 El nuevo ZIP es `data/exports/lunar-terrain-team-v2.zip`; se conserva el v1.
 Los binarios de altura/máscara y las capas previas no cambian.
 Se añaden `terrain/processing.json` (5 m, azimut 0,1°/1°, base 300 km) y
@@ -169,6 +170,12 @@ sin descargar los DEM grandes; todavía no se ha ejecutado en GitHub.
   la IA ha asistido en el código de transformación y la documentación.
 
 ## Comprobación de esta entrega
+
+Tras el ajuste a Javi: 24 pruebas Python, 13 web, tipos/lint/build y lectura JS
+correctos; fuentes 5 m, 80 m y 240 m disponibles localmente. Los nuevos archivos
+de entrega describen 0 horizontes listos y efemérides pendientes, sin fabricar datos.
+El visor #46 se verifica por separado con 26 pruebas y valor inicial 5 m en
+`24e3250`. La comprobación original de los productos de terreno se conserva abajo.
 
 - Fuentes completas, longitud esperada, cabecera TIFF y SHA-256 local. GeoTIFF
   7600×7600, Float32, 80 m, NoData NaN, escala 1 y offset 0, CRS lunar esperado.
