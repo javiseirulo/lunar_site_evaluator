@@ -16,10 +16,10 @@ export function AppShell() {
   }, []);
 
   return (
-    <div className="flex min-h-full flex-col px-2 pt-2 sm:px-3 sm:pt-3">
+    <div className="flex min-h-full flex-col px-4 pt-4 sm:px-6 sm:pt-5">
       <ModeSync />
       <Masthead />
-      <main className="portal mt-4 flex-1">
+      <main className="portal mt-3 flex-1">
         {status === 'error' ? (
           <div className="box">
             <div className="box-head">Data failed to load</div>

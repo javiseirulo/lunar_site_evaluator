@@ -9,12 +9,13 @@ import { useAppStore } from '../store';
 import { useData, useTimeseries } from '../data';
 import { formatHours, formatUtc } from '../format';
 import { hoursUntilChange, sampleAt } from '../timeseries';
+import { dayOfWindow, friendlyHours } from '../metrics';
 import { EARTH_BAND, SUN_BAND, windowsGradient } from '../timeline';
 
 const SPEEDS = [
-  { label: '1 h/s', hoursPerSec: 1 },
-  { label: '6 h/s', hoursPerSec: 6 },
-  { label: '1 d/s', hoursPerSec: 24 },
+  { label: '1 hour / sec', pro: '1 h/s', hoursPerSec: 1 },
+  { label: '6 hours / sec', pro: '6 h/s', hoursPerSec: 6 },
+  { label: '1 day / sec', pro: '1 d/s', hoursPerSec: 24 },
 ];
 
 export function TimeBar({ className }: { className?: string }) {
@@ -23,6 +24,7 @@ export function TimeBar({ className }: { className?: string }) {
   const setTime = useAppStore((s) => s.setTime);
   const siteId = useAppStore((s) => s.selectedSiteId);
   const ts = useTimeseries(siteId);
+  const proMode = useAppStore((s) => s.proMode);
   const [playing, setPlaying] = useState(false);
   const [speed, setSpeed] = useState(1);
 
@@ -65,132 +67,110 @@ export function TimeBar({ className }: { className?: string }) {
 
   if (!range) return null;
   const pct = t1 > t0 ? ((Math.min(t1, Math.max(t0, now)) - t0) / (t1 - t0)) * 100 : 0;
+  const day = dayOfWindow(currentTimeUTC, range.start_utc, range.end_utc);
+  const when = (h: number | null) =>
+    h === null ? 'not in this window' : proMode ? formatHours(h) : friendlyHours(h);
 
   return (
-    <section className={cn('box', className)} aria-label="Mission clock">
-      <div className="box-head">
-        Mission Clock
-        <span className="num ml-auto font-sans font-normal tracking-normal normal-case">
-          {formatUtc(currentTimeUTC)}
+    <section className={cn('box px-4 py-3', className)} aria-label="Mission clock">
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+        <h2 className="text-heading text-[17px] font-medium">Mission Clock</h2>
+        <span className="num text-ink-muted text-[13px]">
+          {proMode ? formatUtc(currentTimeUTC) : `Day ${day.day} of ${day.total}`}
         </span>
-      </div>
-      <div className="box-body flex flex-col gap-2">
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
-          <div className="flex items-center gap-1">
+        <span className="ml-auto flex items-center gap-2">
+          {proMode && (
             <button
               type="button"
-              className="btn w-7 px-0"
+              className="btn btn-quiet w-[32px] px-0"
               onClick={() => {
                 setPlaying(false);
                 setTime(range.start_utc);
               }}
-              aria-label="Back to start"
-              title="Back to start"
+              aria-label="Back to day 1"
+              title="Back to day 1"
             >
-              <SkipBack className="size-3" />
+              <SkipBack className="size-3.5" />
             </button>
-            <button
-              type="button"
-              className="btn btn-go w-16"
-              onClick={() => setPlaying((p) => !p)}
-              aria-label={playing ? 'Pause' : 'Play'}
-            >
-              {playing ? <Pause className="size-3" /> : <Play className="size-3" />}
-              {playing ? 'Pause' : 'Play'}
-            </button>
-          </div>
-          <label className="flex items-center gap-1.5">
-            <span className="label">Speed</span>
-            <select
-              className="field"
-              value={speed}
-              onChange={(e) => setSpeed(Number(e.target.value))}
-            >
-              {SPEEDS.map((s, i) => (
-                <option key={s.label} value={i}>
-                  {s.label}
-                </option>
-              ))}
-            </select>
-          </label>
-          {sample && (
-            <div className="ml-auto flex flex-wrap items-center gap-x-4 gap-y-1">
-              <span className="flex items-center gap-1.5">
-                <span
-                  className={cn(
-                    'size-2 border border-black',
-                    sample.lit ? 'bg-sun' : 'bg-navy-600',
-                  )}
-                />
-                {sample.lit ? 'Sunset in' : 'Sunrise in'}{' '}
-                <b className="num text-ink">
-                  {toSunChange === null ? 'after this window' : formatHours(toSunChange)}
-                </b>
-              </span>
-              {sample.earthVisible !== null && (
-                <span className="flex items-center gap-1.5">
-                  <span
-                    className={cn(
-                      'size-2 border border-black',
-                      sample.earthVisible ? 'bg-earth' : 'bg-navy-600',
-                    )}
-                  />
-                  {sample.earthVisible ? 'Earthset in' : 'Earthrise in'}{' '}
-                  <b className="num text-ink">
-                    {toEarthChange === null ? 'after this window' : formatHours(toEarthChange)}
-                  </b>
-                </span>
-              )}
-            </div>
           )}
-        </div>
+          <button
+            type="button"
+            className="btn btn-go w-[88px]"
+            onClick={() => setPlaying((p) => !p)}
+            aria-label={playing ? 'Pause' : 'Play'}
+          >
+            {playing ? <Pause className="size-3.5" /> : <Play className="size-3.5" />}
+            {playing ? 'Pause' : 'Play'}
+          </button>
+          <select
+            className="field"
+            value={speed}
+            onChange={(e) => setSpeed(Number(e.target.value))}
+            aria-label="Speed"
+          >
+            {SPEEDS.map((s, i) => (
+              <option key={s.label} value={i}>
+                {proMode ? s.pro : s.label}
+              </option>
+            ))}
+          </select>
+        </span>
+      </div>
 
-        {/* Timeline: sunlit / Earth-in-view bands under a draggable slider. */}
-        <div className="border-edge-lo bg-navy-950 relative border px-1 pt-1 pb-0.5">
-          <div className="pointer-events-none mx-[4px]" aria-hidden>
-            <div className="h-[6px]" style={{ background: sun ?? 'transparent' }} />
-            <div className="h-[6px]" style={{ background: earth ?? 'transparent' }} />
-          </div>
-          <div
-            className="bg-accent pointer-events-none absolute top-0 bottom-0 w-px"
-            style={{ left: `calc(4px + ${pct / 100} * (100% - 8px))` }}
-            aria-hidden
-          />
-          <input
-            type="range"
-            className="range relative"
-            min={t0}
-            max={t1}
-            step={3_600_000}
-            value={Math.min(t1, Math.max(t0, now))}
-            onChange={(e) => {
-              setPlaying(false);
-              setTime(new Date(Number(e.target.value)).toISOString());
-            }}
-            aria-label="Time"
-            aria-valuetext={formatUtc(currentTimeUTC)}
-          />
+      {/* Timeline: sunlit (orange) / Earth in view (blue) bands under the slider. */}
+      <div className="relative mt-3">
+        <div className="pointer-events-none mx-[8px] overflow-hidden rounded-full" aria-hidden>
+          <div className="h-[5px] bg-white/5" style={{ background: sun ?? undefined }} />
+          <div className="mt-[2px] h-[5px] bg-white/5" style={{ background: earth ?? undefined }} />
         </div>
-        <div className="text-ink-faint flex justify-between text-[10px]">
-          <span className="num">{range.start_utc.slice(0, 10)}</span>
-          {ts ? (
-            <span className="flex gap-3">
+        <div
+          className="bg-heading pointer-events-none absolute -top-1 -bottom-1 w-[2px]"
+          style={{ left: `calc(8px + ${pct / 100} * (100% - 16px))` }}
+          aria-hidden
+        />
+        <input
+          type="range"
+          className="range relative -mt-1"
+          min={t0}
+          max={t1}
+          step={3_600_000}
+          value={Math.min(t1, Math.max(t0, now))}
+          onChange={(e) => {
+            setPlaying(false);
+            setTime(new Date(Number(e.target.value)).toISOString());
+          }}
+          aria-label="Time"
+          aria-valuetext={proMode ? formatUtc(currentTimeUTC) : `Day ${day.day} of ${day.total}`}
+        />
+      </div>
+      <div className="text-ink-faint mt-1 flex flex-wrap items-center justify-between gap-x-3 text-[12px]">
+        {ts ? (
+          <span className="flex items-center gap-3">
+            <span>
+              <span className="text-sun">●</span> sunny
+            </span>
+            {ts.earth_visible && (
               <span>
-                <span className="text-sun">■</span> sunlit
+                <span className="text-earth">●</span> Earth in view
               </span>
-              {ts.earth_visible && (
-                <span>
-                  <span className="text-earth">■</span> Earth in view
-                </span>
-              )}
-            </span>
-          ) : (
-            <span className="hidden sm:inline">
-              Select a site to see its sunlight and Earth windows
-            </span>
-          )}
-          <span className="num">{range.end_utc.slice(0, 10)}</span>
-        </div>
+            )}
+          </span>
+        ) : (
+          <span>Pick a site to see when it gets sun and sees Earth</span>
+        )}
+        {proMode && sample && (
+          <span>
+            {sample.lit ? 'Sunset' : 'Sunrise'} in{' '}
+            <b className="text-heading">{when(toSunChange)}</b>
+            {sample.earthVisible !== null && (
+              <>
+                {', '}
+                {sample.earthVisible ? 'Earthset' : 'Earthrise'} in{' '}
+                <b className="text-heading">{when(toEarthChange)}</b>
+              </>
+            )}
+          </span>
+        )}
       </div>
     </section>
   );

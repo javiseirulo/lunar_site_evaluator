@@ -1,57 +1,104 @@
 @import 'tailwindcss';
 
 /*
- * Design system (owner: Javi2) — "2000s science portal".
- * Inspired by the era of dense, fixed-width institutional portals (c. 2003–2008): deep navy page on a
- * starfield, glossy blue panel title bars, uppercase tab navigation, square corners, 1px bevelled
- * borders, small Verdana text, underlined links. Our own identity: no agency logos or insignia.
+ * Design system (owner: Javi2) — "night plate".
+ * The page is a warm night. Reading happens on cream survey sheets. The Moon is the only
+ * photograph, set in true black. Navigation is a line of words on the night, with an amber
+ * rule under the current page. Ink (near-black) is selection and the one action per screen.
+ * Amber is sunlight and "now". Steel blue is Earth in view. No agency colours, insignia,
+ * or logotype (CLAUDE.md §3).
  *
- * Use the component classes below (.portal, .box, .box-head, .tab, .btn, .field, .lnk, .chip) and the
- * colour tokens (bg-navy-900, text-ink-muted, border-edge, text-sun, ...). Avoid rounded corners,
- * blur and soft drop shadows: they break the look.
+ * Type: Iowan Old Style / Palatino for titles, system sans for controls and body.
+ * Scale 12 / 14 / 18 / 24 / 40. Sentence case.
+ *
+ * Deliberately avoided: a filled tab bar, neon on black, identical shadowed cards,
+ * all-caps labels, arrows on buttons, one coloured word in a headline.
+ *
+ * Component classes: .portal .box .box-head .box-body .tab .btn .btn-go .btn-quiet .field .lnk
+ * .chip .label .num .rows .hint .switch .range .space .meter. Token names violet/pink are kept
+ * so existing modules keep working: violet = ink selection, pink = ink action.
  */
 @theme {
-  --font-sans: Verdana, Tahoma, 'DejaVu Sans', Geneva, sans-serif;
-  --font-head: 'Trebuchet MS', 'Lucida Grande', Tahoma, sans-serif;
-  --font-mono: 'Lucida Console', Monaco, 'Courier New', monospace;
+  --font-sans: 'Avenir Next', 'Segoe UI', sans-serif;
+  --font-head: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
+  --font-display: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
+  --font-mono: 'SF Mono', ui-monospace, Menlo, Consolas, monospace;
 
-  /* Page and panel blues */
-  --color-navy-950: #02050c;
-  --color-navy-900: #061022;
-  --color-navy-850: #0a1830;
-  --color-navy-800: #0e2040;
-  --color-navy-700: #15305c;
-  --color-navy-600: #1e4380;
-  --color-navy-500: #2a5aa6;
-  --color-edge: #24406e;
-  --color-edge-hi: #4c74b4;
-  --color-edge-lo: #050b18;
+  /* Night page. Sheets are warm paper; ink is for text on those sheets. */
+  --color-void: #101114;
+  --color-panel: #f4f0e6;
+  --color-panel-2: #ebe4d6;
+  --color-panel-3: #e2dac8;
+  --color-pale: #faf7f1;
+  --color-edge: #d9d0c0;
+  --color-edge-hi: #b7ad9c;
+  --color-edge-lo: #6e675c;
+  --color-heading: #1c1915;
+  --color-ink: #2c2822;
+  --color-ink-muted: #6a6256;
+  --color-ink-faint: #8a8174;
+  --color-night: #07080b;
 
-  --color-ink: #e6edf7;
-  --color-ink-muted: #9fb2d0;
-  --color-ink-faint: #6a7fa3;
-  --color-link: #8cc4ff;
-  --color-link-hover: #ffd27a;
+  /* violet = selection ink, pink = action ink */
+  --color-violet: #1c1915;
+  --color-violet-dark: #000000;
+  --color-violet-light: #3a342c;
+  --color-pink: #1c1915;
+  --color-pink-dark: #000000;
+  --color-glow: #1c1915;
 
-  /* Semantic colours shared by all modules: keep Sun/Earth/PSR consistent everywhere. */
-  --color-sun: #ffb43c;
-  --color-earth: #5ab4ff;
-  --color-psr: #9a8cff;
-  --color-good: #8fe39a;
-  --color-warn: #ffcc4d;
-  --color-bad: #ff7a6b;
-  --color-accent: #ff9b2f;
+  --color-link: #1c1915;
+  --color-link-hover: #8a5a10;
 
-  /* Legacy aliases so module placeholders keep working (space-*, line, ...). */
-  --color-space-950: var(--color-navy-950);
-  --color-space-900: var(--color-navy-900);
-  --color-space-850: var(--color-navy-850);
-  --color-space-800: var(--color-navy-800);
-  --color-space-700: var(--color-navy-700);
-  --color-space-600: var(--color-navy-600);
+  /* Data colours, dark enough to read on paper. */
+  --color-sun: #a86f00;
+  --color-earth: #2d6eae;
+  --color-psr: #5c6a90;
+  --color-good: #2a7a40;
+  --color-warn: #8a5a10;
+  --color-bad: #9c2f1a;
+  --color-accent: #a86f00;
+
+  /* Legacy aliases used by older panels. */
+  --color-navy-950: var(--color-panel-2);
+  --color-navy-900: var(--color-panel);
+  --color-navy-850: var(--color-panel-2);
+  --color-navy-800: var(--color-panel-3);
+  --color-navy-700: var(--color-panel-3);
+  --color-navy-600: var(--color-violet);
+  --color-navy-500: var(--color-violet);
+  --color-space-950: var(--color-night);
+  --color-space-900: var(--color-panel);
+  --color-space-850: var(--color-panel-2);
+  --color-space-800: var(--color-panel-3);
+  --color-space-700: var(--color-panel-3);
+  --color-space-600: var(--color-edge);
   --color-line: var(--color-edge);
   --color-line-strong: var(--color-edge-hi);
-  --radius-panel: 0px;
+  --radius-panel: 2px;
+
+  --shadow-card: none;
+  --shadow-lift: 0 6px 18px -10px #00000040;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+
+  --animate-enter: enter 220ms var(--ease-out) both;
+  @keyframes enter {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  --animate-pop: pop 260ms var(--ease-out) both;
+  @keyframes pop {
+    0% {
+      transform: scale(0.6);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
 }
 
 @layer base {
@@ -61,163 +108,233 @@
     height: 100%;
   }
   body {
-    @apply bg-navy-950 text-ink font-sans text-[12.5px] leading-[1.6];
-    background-image:
-      radial-gradient(1px 1px at 12% 18%, #ffffff99 50%, transparent 51%),
-      radial-gradient(1px 1px at 72% 12%, #ffffff77 50%, transparent 51%),
-      radial-gradient(1.5px 1.5px at 38% 64%, #ffffff88 50%, transparent 51%),
-      radial-gradient(1px 1px at 88% 52%, #ffffff66 50%, transparent 51%),
-      radial-gradient(1px 1px at 22% 86%, #ffffff55 50%, transparent 51%),
-      radial-gradient(1px 1px at 58% 32%, #ffffff66 50%, transparent 51%),
-      radial-gradient(ellipse 120% 60% at 50% 0%, #0d2147 0%, transparent 70%);
-    background-size:
-      380px 380px,
-      380px 380px,
-      380px 380px,
-      380px 380px,
-      380px 380px,
-      380px 380px,
-      100% 100%;
-    background-attachment: fixed;
+    @apply bg-void text-ink font-sans text-[14px] leading-[1.55];
+    -webkit-font-smoothing: antialiased;
   }
   ::selection {
-    background: #2a5aa6;
-    color: #fff;
+    background: #1c1915;
+    color: #f4f0e6;
   }
   :focus-visible {
-    outline: 1px dotted var(--color-link-hover);
-    outline-offset: 1px;
+    outline: 2px solid #a86f00;
+    outline-offset: 2px;
   }
   h1,
   h2,
   h3 {
-    font-family: var(--font-head);
+    color: var(--color-heading);
+    font-family: var(--font-display);
+    font-weight: 500;
+    letter-spacing: -0.015em;
   }
 }
 
 @layer components {
-  /* Fixed-width centred column, like the portals of the time. */
   .portal {
-    @apply mx-auto w-full max-w-[1004px];
+    @apply mx-auto w-full max-w-[1180px];
   }
 
-  /* Bevelled box with a glossy title bar. */
+  /* A survey sheet on the night page. Square corners, a hairline, no shadow. */
   .box {
-    @apply border-edge bg-navy-900 border;
-    box-shadow:
-      inset 1px 1px 0 #ffffff12,
-      inset -1px -1px 0 #00000060;
+    @apply bg-panel border-edge rounded-[2px] border;
   }
-  .box-head {
-    @apply font-head flex h-[26px] items-center gap-2 px-3 text-[11.5px] font-bold tracking-[0.07em] text-white uppercase;
-    background: linear-gradient(#4a7cc6 0%, #2d5ea9 48%, #1f4b90 52%, #1a3f7a 100%);
-    border-bottom: 1px solid var(--color-edge-lo);
-    text-shadow: 0 1px 0 #00000080;
-  }
+  .box-head,
   .box-head-dark {
-    @apply font-head flex h-[26px] items-center gap-2 px-3 text-[11.5px] font-bold tracking-[0.07em] text-white uppercase;
-    background: linear-gradient(#3a3f4b 0%, #23272f 50%, #15181e 51%, #0c0e12 100%);
-    border-bottom: 1px solid #000;
+    @apply text-heading flex min-h-[40px] items-center gap-2 px-5 pt-4 text-[18px] font-medium;
+  }
+  .box-head :is(h1, h2, h3),
+  .box-head-dark :is(h1, h2, h3) {
+    color: inherit;
+    font-size: inherit;
+    font-weight: inherit;
   }
   .box-body {
-    @apply p-4;
+    @apply p-5;
+  }
+  /* Kept for older markup; intentionally no hover motion. */
+  .lift {
+    transition: background-color 150ms var(--ease-out);
   }
 
-  /* Top navigation tabs. */
+  /* Header buttons on the night. The current page is a cream button. */
   .tab {
-    @apply font-head flex h-full items-center border-r border-black/70 px-4 text-[12px] font-bold tracking-[0.08em] whitespace-nowrap text-white uppercase;
-    background: linear-gradient(#2b2f38 0%, #191c22 50%, #0b0d10 51%, #050608 100%);
-    box-shadow: inset 1px 0 0 #ffffff14;
+    @apply flex h-8 items-center rounded-[2px] border border-transparent px-3 text-[14px] font-medium whitespace-nowrap text-[#d9d3c7];
+    transition:
+      background-color 120ms var(--ease-out),
+      color 120ms var(--ease-out),
+      border-color 120ms var(--ease-out);
   }
   .tab:hover {
-    background: linear-gradient(#3b414e 0%, #262a33 50%, #14171c 51%, #0b0d10 100%);
+    @apply border-[#3a3834] text-[#f4f0e6];
   }
   .tab[aria-current='page'],
   .tab.active {
-    background: linear-gradient(#5b8fd8 0%, #3567b4 48%, #24529a 52%, #1d4583 100%);
+    @apply border-[#f4f0e6] bg-[#f4f0e6] text-[#1c1915];
   }
 
-  /* Bevelled button. */
+  /* Footer and other night-page links that should read as buttons. */
+  .nav-btn {
+    @apply inline-flex h-8 items-center rounded-[2px] border border-[#3a3834] px-3 text-[13px] text-[#f4f0e6];
+    transition:
+      background-color 120ms var(--ease-out),
+      color 120ms var(--ease-out);
+  }
+  .nav-btn:hover {
+    @apply bg-[#f4f0e6] text-[#1c1915];
+  }
+
+  /* Buttons: quiet by default; .btn-go (ink) for the one main action on a screen. */
   .btn {
-    @apply font-head inline-flex h-[22px] cursor-pointer items-center justify-center gap-1.5 border px-2.5 text-[11px] font-bold tracking-[0.04em] text-white uppercase;
-    border-color: #6f97d4 #0b1a33 #0b1a33 #6f97d4;
-    background: linear-gradient(#3f70bb 0%, #2a5aa3 50%, #1f4a8d 51%, #1a3e77 100%);
+    @apply border-edge-hi text-ink inline-flex h-[34px] cursor-pointer items-center justify-center gap-1.5 rounded-[2px] border bg-pale px-3.5 text-[14px] font-medium;
+    transition:
+      background-color 120ms var(--ease-out),
+      border-color 120ms var(--ease-out);
   }
   .btn:hover {
-    background: linear-gradient(#5585cf 0%, #366ab7 50%, #2a5aa3 51%, #224d8d 100%);
+    @apply bg-panel-2 border-edge-lo;
   }
   .btn:active {
-    border-color: #0b1a33 #6f97d4 #6f97d4 #0b1a33;
+    @apply bg-panel-3;
   }
   .btn:disabled {
     @apply cursor-default opacity-40;
   }
   .btn-go {
-    border-color: #ffc27a #6b3500 #6b3500 #ffc27a;
-    background: linear-gradient(#ffb04d 0%, #f08a1d 50%, #d97006 51%, #b95c00 100%);
-    text-shadow: 0 1px 0 #00000060;
+    @apply bg-pink border-pink text-white;
   }
   .btn-go:hover {
-    background: linear-gradient(#ffc06b 0%, #ff9b2f 50%, #e57a0c 51%, #c86500 100%);
+    @apply bg-pink-dark border-pink-dark;
+  }
+  .btn-go:active {
+    @apply bg-pink-dark;
+  }
+  .btn-quiet {
+    @apply text-ink;
   }
 
-  /* Inset form field. */
   .field {
-    @apply h-[20px] border bg-white px-1.5 text-[11px] text-black;
-    border-color: #0b1a33 #8aa9d6 #8aa9d6 #0b1a33;
+    @apply border-edge-hi text-ink h-[34px] rounded-[2px] border bg-pale px-2 text-[14px];
+  }
+  .field:hover {
+    @apply border-edge-lo;
   }
 
   .lnk {
-    @apply text-link cursor-pointer underline underline-offset-2;
+    @apply text-link cursor-pointer underline decoration-1 underline-offset-[3px];
   }
   .lnk:hover {
     @apply text-link-hover;
   }
-  /* "› Read more" style link. */
-  .more::before {
-    content: '› ';
-    @apply text-accent no-underline;
+  /* Older markup used .more for an arrow suffix; arrows are gone, the class is now a no-op. */
+  .more {
   }
 
   .chip {
-    @apply font-head inline-flex items-center gap-1 border px-1.5 py-px text-[10px] font-bold tracking-[0.05em] uppercase;
+    @apply inline-flex items-center gap-1 rounded-[2px] border px-2 py-0.5 text-[12px] font-medium;
   }
-
   .num {
     @apply tabular-nums;
   }
   .label {
-    @apply text-ink-faint text-[10px] font-bold tracking-[0.08em] uppercase;
+    @apply text-ink-muted text-[13px];
   }
-
-  /* Dotted rule between list items, as in old news lists. */
+  .display {
+    font-family: var(--font-display);
+    font-weight: 500;
+  }
   .rows > * + * {
-    border-top: 1px dotted var(--color-edge);
+    border-top: 1px solid var(--color-edge);
   }
 
-  /* Range input: square thumb on a sunken track. */
+  /* "?" help bubble: hover, tap or keyboard focus shows a short explanation. */
+  .hint {
+    @apply bg-panel-3 text-ink-muted relative inline-flex size-[18px] shrink-0 cursor-help items-center justify-center rounded-full align-middle text-[12px] font-medium;
+  }
+  .hint > span {
+    @apply pointer-events-none absolute bottom-[calc(100%+8px)] left-1/2 z-30 w-60 max-w-[80vw] -translate-x-1/2 rounded-[2px] bg-black px-3 py-2 text-left text-[13px] leading-snug font-normal text-white opacity-0;
+    transition: opacity 120ms var(--ease-out);
+  }
+  .hint[data-align='left'] > span {
+    left: -4px;
+    transform: none;
+  }
+  .hint[data-align='right'] > span {
+    left: auto;
+    right: -4px;
+    transform: none;
+  }
+  .hint:hover > span,
+  .hint:focus > span,
+  .hint:focus-visible > span {
+    @apply opacity-100;
+  }
+
+  /* On/off switch. */
+  .switch {
+    @apply bg-edge-hi relative inline-flex h-[18px] w-[32px] shrink-0 cursor-pointer rounded-full;
+    transition: background-color 150ms var(--ease-out);
+  }
+  .switch::after {
+    content: '';
+    @apply absolute top-[2px] left-[2px] size-[14px] rounded-full bg-white;
+    transition: transform 160ms var(--ease-out);
+  }
+  .switch[aria-checked='true'],
+  .switch[data-on='true'] {
+    background: #e2b15a;
+  }
+  .switch[aria-checked='true']::after,
+  .switch[data-on='true']::after {
+    transform: translateX(14px);
+  }
+
+  /* Range input. */
   .range {
-    @apply h-4 w-full cursor-pointer appearance-none bg-transparent;
+    @apply h-5 w-full cursor-pointer appearance-none bg-transparent;
   }
   .range::-webkit-slider-runnable-track {
-    @apply h-[5px] border;
-    border-color: #050b18 #3a5c94 #3a5c94 #050b18;
-    background: #0a1428;
+    @apply bg-edge h-[4px] rounded-full;
   }
   .range::-moz-range-track {
-    @apply h-[5px] border;
-    border-color: #050b18 #3a5c94 #3a5c94 #050b18;
-    background: #0a1428;
+    @apply bg-edge h-[4px] rounded-full;
   }
   .range::-webkit-slider-thumb {
-    @apply -mt-[5px] h-[13px] w-[9px] appearance-none border;
-    border-color: #ffffff #2a3f66 #2a3f66 #ffffff;
-    background: linear-gradient(#f2f5fa, #b8c6dc);
+    @apply bg-heading -mt-[6px] size-[16px] appearance-none rounded-full border-2 border-[#f4f0e6];
+    box-shadow: 0 0 0 1px #1c1915;
   }
   .range::-moz-range-thumb {
-    @apply h-[13px] w-[9px] rounded-none border;
-    border-color: #ffffff #2a3f66 #2a3f66 #ffffff;
-    background: linear-gradient(#f2f5fa, #b8c6dc);
+    @apply bg-pink size-[14px] rounded-full border-2 border-white;
+  }
+
+  /* The window into space: black with a sparse starfield. Text tokens flip to light inside. */
+  .space {
+    @apply relative isolate overflow-hidden;
+    --color-heading: #ffffff;
+    --color-ink: #e6e8ec;
+    --color-ink-muted: #a6abb5;
+    --color-ink-faint: #7d828c;
+    --color-edge: #ffffff26;
+    --color-line: #ffffff26;
+    --color-line-strong: #ffffff40;
+    color: var(--color-ink);
+    background-color: #000;
+    background-image:
+      radial-gradient(1px 1px at 12% 18%, #ffffffb0 50%, transparent 52%),
+      radial-gradient(1px 1px at 72% 9%, #ffffff90 50%, transparent 52%),
+      radial-gradient(1px 1px at 38% 34%, #ffffff90 50%, transparent 52%),
+      radial-gradient(1px 1px at 88% 42%, #ffffff70 50%, transparent 52%),
+      radial-gradient(1px 1px at 22% 66%, #ffffff60 50%, transparent 52%),
+      radial-gradient(1px 1px at 58% 82%, #ffffff70 50%, transparent 52%);
+    background-size: 260px 260px;
+  }
+
+  /* Thin data bar. */
+  .meter {
+    @apply bg-panel-3 h-[4px] overflow-hidden rounded-full;
+  }
+  .meter > span {
+    @apply block h-full rounded-full;
+    transition: width 300ms var(--ease-out);
   }
 }
 
@@ -226,6 +343,7 @@
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
 }

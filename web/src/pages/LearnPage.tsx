@@ -37,7 +37,7 @@ function H({ id, children }: { id: string; children: React.ReactNode }) {
   return (
     <h2
       id={id}
-      className="border-edge mb-1.5 scroll-mt-4 border-b pb-0.5 text-[14px] font-bold text-white"
+      className="border-edge mb-1.5 scroll-mt-4 border-b pb-0.5 text-[14px] font-bold text-heading"
     >
       {children}
     </h2>
@@ -67,7 +67,7 @@ export default function LearnPage() {
       </nav>
 
       <article className="box">
-        <div className="box-head">Learn · Light and Line of Sight at the Lunar South Pole</div>
+        <div className="box-head">Light and line of sight at the lunar south pole</div>
         <div className="box-body max-w-[72ch] space-y-6">
           <p className="text-ink-muted text-[13px]">
             Two questions decide whether a landing site near the lunar south pole can work: will the
@@ -163,7 +163,7 @@ export default function LearnPage() {
               <tbody>
                 {GLOSSARY.map(([term, def], i) => (
                   <tr key={term} className={i % 2 ? 'bg-navy-850' : 'bg-navy-900'}>
-                    <th className="border-edge w-40 border-r px-3 py-2 text-left align-top text-white">
+                    <th className="border-edge w-40 border-r px-3 py-2 text-left align-top text-heading">
                       {term}
                     </th>
                     <td className="text-ink-muted px-3 py-2">{def}</td>
