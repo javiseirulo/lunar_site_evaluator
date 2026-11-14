@@ -72,9 +72,20 @@ def test_spice_path_agrees_with_horizons(kernels):
     assert max(float(np.abs(x).max()) for x in d.values()) < 1e-5
 
 
+def _close(a, b) -> bool:
+    if isinstance(a, dict):
+        return isinstance(b, dict) and a.keys() == b.keys() and all(_close(a[k], b[k]) for k in a)
+    if isinstance(a, list):
+        return isinstance(b, list) and len(a) == len(b) and all(map(_close, a, b))
+    if isinstance(a, float) or isinstance(b, float):
+        return abs(a - b) <= 1e-9 * max(1.0, abs(a))
+    return a == b
+
+
 def test_golden_fixture_is_up_to_date():
     stored = json.loads(golden.GOLDEN_PATH.read_text())
-    assert stored == golden.build_golden(), "run: uv run python -m ephem.golden"
+    # Values may differ in the last ulp across platforms (macOS vs Linux libm).
+    assert _close(stored, golden.build_golden()), "run: uv run python -m ephem.golden"
     assert golden.GOLDEN_PATH.read_text() == jsonfmt.dumps(stored)  # Prettier-style layout
 
 
