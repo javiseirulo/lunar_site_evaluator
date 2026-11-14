@@ -16,3 +16,34 @@ export {
 } from './arrival';
 export type { Arrival, SiteLocation } from './arrival';
 export { MissionTimingPanel } from './MissionTimingPanel';
+export type { ArrivalOptions } from './arrival';
+export { LESS_IS_BETTER, lessIsBetter, passes, margin, utility } from './utility';
+export {
+  evaluateSite,
+  evaluateWindow,
+  windowMetrics,
+  windowSlice,
+  timeseriesCovers,
+  rankSites,
+  reasonFor,
+  mergeMissionConfig,
+  WINDOW_KEYS,
+  REASON_CODES,
+} from './evaluate';
+export type {
+  MetricValues,
+  ScoringConfig,
+  Contribution,
+  SiteEvaluation,
+  WindowSpan,
+  WindowMetricKey,
+  WindowMetrics,
+  EvaluableSite,
+  WindowEvaluation,
+  DeepPartialConfig,
+} from './evaluate';
+export { temporalRobustness, robustnessRange, shiftWindow } from './robustness';
+export type { Robustness, RobustnessShift } from './robustness';
+export { bestDateCurve, paretoFront } from './curves';
+export type { DatePoint, ParetoPoint } from './curves';
+export { SiteCheckPanel } from './SiteCheckPanel';

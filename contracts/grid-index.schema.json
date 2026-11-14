@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "grid-index.schema.json",
+  "title": "grid/index.json — heat-map metrics, one Float32-LE plane of width×height per metric (see types.ts GridIndex)",
+  "type": "object",
+  "required": ["version", "mock", "generated_utc", "window", "dtype", "grids"],
+  "properties": {
+    "version": { "const": 1 },
+    "mock": { "type": "boolean" },
+    "generated_utc": { "type": "string", "format": "date-time" },
+    "window": {
+      "type": "object",
+      "required": ["start_utc", "end_utc", "step_s"],
+      "properties": {
+        "start_utc": { "type": "string", "format": "date-time" },
+        "end_utc": { "type": "string", "format": "date-time" },
+        "step_s": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "dtype": { "const": "float32-le" },
+    "grids": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "file", "projection", "width", "height", "metrics", "horizon_source"],
+        "properties": {
+          "id": { "type": "string" },
+          "file": { "type": "string" },
+          "projection": { "enum": ["equirectangular", "south_polar_stereographic"] },
+          "width": { "type": "integer", "minimum": 1 },
+          "height": { "type": "integer", "minimum": 1 },
+          "bounds_m": {
+            "type": "array",
+            "items": { "type": "number" },
+            "minItems": 4,
+            "maxItems": 4
+          },
+          "radius_m": { "type": "number" },
+          "lat_limit": { "type": "number" },
+          "metrics": {
+            "type": "array",
+            "items": {
+              "enum": [
+                "illum_pct",
+                "earth_vis_pct",
+                "slope_deg",
+                "max_dark_hours",
+                "psr_dist_km",
+                "sun_el_mean_deg",
+                "max_blackout_hours",
+                "sun_earth_pct"
+              ]
+            },
+            "minItems": 1,
+            "uniqueItems": true
+          },
+          "horizon_source": { "type": "string" },
+          "n_times": { "type": "integer", "minimum": 1 },
+          "time_step_s": { "type": "integer", "minimum": 1 },
+          "antenna_margin_deg": { "type": "number", "minimum": 0 }
+        },
+        "if": { "properties": { "projection": { "const": "south_polar_stereographic" } } },
+        "then": { "required": ["bounds_m", "radius_m", "lat_limit"] }
+      },
+      "minItems": 1
+    }
+  }
+}
