@@ -1,57 +1,104 @@
 @import 'tailwindcss';
 
 /*
- * Design system (owner: Javi2) — "2000s science portal".
- * Inspired by the era of dense, fixed-width institutional portals (c. 2003–2008): deep navy page on a
- * starfield, glossy blue panel title bars, uppercase tab navigation, square corners, 1px bevelled
- * borders, small Verdana text, underlined links. Our own identity: no agency logos or insignia.
+ * Design system (owner: Javi2) — "synthwave mission planner".
+ * Dark starfield, deep purple panels, electric violet + neon pink + orange glow, and a glowing
+ * magenta perspective grid, on the same portal layout (fixed ~1000px column, panels with title
+ * bars, tab bar, events strip). Gentle 4–6px corners, glow shadows, short purposeful motion
+ * (150–250ms, ease-out). Student-friendly by default; Pro mode reveals technical detail.
+ * No agency logos or insignia, and no copyrighted characters or lettering from references.
  *
- * Use the component classes below (.portal, .box, .box-head, .tab, .btn, .field, .lnk, .chip) and the
- * colour tokens (bg-navy-900, text-ink-muted, border-edge, text-sun, ...). Avoid rounded corners,
- * blur and soft drop shadows: they break the look.
+ * Component classes: .portal .box .box-head .box-head-dark .box-body .lift .tab .btn .btn-go
+ * .btn-quiet .field .lnk .more .chip .label .num .display .rows .hint .switch .range .space
+ * .neon-text .meter. Colour tokens generate utilities (bg-panel, text-ink, text-heading, bg-violet,
+ * bg-pink, text-glow, text-sun, border-edge, ...).
  */
 @theme {
-  --font-sans: Verdana, Tahoma, 'DejaVu Sans', Geneva, sans-serif;
-  --font-head: 'Trebuchet MS', 'Lucida Grande', Tahoma, sans-serif;
-  --font-mono: 'Lucida Console', Monaco, 'Courier New', monospace;
+  --font-sans: 'Nunito Variable', 'Trebuchet MS', 'Segoe UI', sans-serif;
+  --font-head: 'Nunito Variable', 'Trebuchet MS', sans-serif;
+  --font-display: 'Audiowide', 'Arial Black', sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
 
-  /* Page and panel blues */
-  --color-navy-950: #02050c;
-  --color-navy-900: #061022;
-  --color-navy-850: #0a1830;
-  --color-navy-800: #0e2040;
-  --color-navy-700: #15305c;
-  --color-navy-600: #1e4380;
-  --color-navy-500: #2a5aa6;
-  --color-edge: #24406e;
-  --color-edge-hi: #4c74b4;
-  --color-edge-lo: #050b18;
+  /* Panels and ink (dark synthwave) */
+  --color-panel: #130b25;
+  --color-panel-2: #1b1033;
+  --color-panel-3: #251644;
+  --color-pale: #efe6ff;
+  --color-edge: #3b2766;
+  --color-edge-hi: #6447b3;
+  --color-edge-lo: #1d1238;
+  --color-heading: #ffffff;
+  --color-ink: #ebe2ff;
+  --color-ink-muted: #b9a8dc;
+  --color-ink-faint: #8a7bb0;
+  --color-night: #05030b;
+  --color-void: #07040f;
 
-  --color-ink: #e6edf7;
-  --color-ink-muted: #9fb2d0;
-  --color-ink-faint: #6a7fa3;
-  --color-link: #8cc4ff;
-  --color-link-hover: #ffd27a;
+  /* Neon roles: violet = primary, pink = call to action, glow = highlight */
+  --color-violet: #7b4dff;
+  --color-violet-dark: #5631d6;
+  --color-violet-light: #b394ff;
+  --color-pink: #ff3fa4;
+  --color-pink-dark: #c81f7c;
+  --color-glow: #ff8a3d;
 
-  /* Semantic colours shared by all modules: keep Sun/Earth/PSR consistent everywhere. */
-  --color-sun: #ffb43c;
-  --color-earth: #5ab4ff;
-  --color-psr: #9a8cff;
-  --color-good: #8fe39a;
-  --color-warn: #ffcc4d;
-  --color-bad: #ff7a6b;
-  --color-accent: #ff9b2f;
+  --color-link: #c7a6ff;
+  --color-link-hover: #ff7cc4;
 
-  /* Legacy aliases so module placeholders keep working (space-*, line, ...). */
-  --color-space-950: var(--color-navy-950);
-  --color-space-900: var(--color-navy-900);
-  --color-space-850: var(--color-navy-850);
-  --color-space-800: var(--color-navy-800);
-  --color-space-700: var(--color-navy-700);
-  --color-space-600: var(--color-navy-600);
+  /* Semantic colours shared by all modules (tuned for dark backgrounds). */
+  --color-sun: #ffb84d;
+  --color-earth: #5cc8ff;
+  --color-psr: #b894ff;
+  --color-good: #4fdc8a;
+  --color-warn: #ffcf5c;
+  --color-bad: #ff5f73;
+  --color-accent: #ff3fa4;
+
+  /* Legacy aliases: earlier panels used navy-* / space-* / line. */
+  --color-navy-950: var(--color-panel-2);
+  --color-navy-900: var(--color-panel);
+  --color-navy-850: var(--color-panel-2);
+  --color-navy-800: var(--color-panel-3);
+  --color-navy-700: var(--color-panel-3);
+  --color-navy-600: var(--color-violet);
+  --color-navy-500: var(--color-violet);
+  --color-space-950: var(--color-void);
+  --color-space-900: var(--color-panel);
+  --color-space-850: var(--color-panel-2);
+  --color-space-800: var(--color-panel-3);
+  --color-space-700: var(--color-panel-3);
+  --color-space-600: var(--color-edge);
   --color-line: var(--color-edge);
   --color-line-strong: var(--color-edge-hi);
-  --radius-panel: 0px;
+  --radius-panel: 6px;
+
+  --shadow-card: 0 1px 0 #ffffff0d inset, 0 12px 28px -14px #000000e0, 0 0 26px -12px #9b5cff70;
+  --shadow-lift: 0 1px 0 #ffffff14 inset, 0 16px 34px -14px #000000f0, 0 0 30px -8px #ff3fa480;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+
+  --animate-enter: enter 260ms var(--ease-out) both;
+  @keyframes enter {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  --animate-pop: pop 320ms var(--ease-out) both;
+  @keyframes pop {
+    0% {
+      transform: scale(0.6);
+    }
+    60% {
+      transform: scale(1.15);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
 }
 
 @layer base {
@@ -61,163 +108,370 @@
     height: 100%;
   }
   body {
-    @apply bg-navy-950 text-ink font-sans text-[12.5px] leading-[1.6];
+    @apply text-ink font-sans text-[14px] leading-[1.6];
+    background-color: var(--color-void);
     background-image:
-      radial-gradient(1px 1px at 12% 18%, #ffffff99 50%, transparent 51%),
-      radial-gradient(1px 1px at 72% 12%, #ffffff77 50%, transparent 51%),
-      radial-gradient(1.5px 1.5px at 38% 64%, #ffffff88 50%, transparent 51%),
-      radial-gradient(1px 1px at 88% 52%, #ffffff66 50%, transparent 51%),
-      radial-gradient(1px 1px at 22% 86%, #ffffff55 50%, transparent 51%),
-      radial-gradient(1px 1px at 58% 32%, #ffffff66 50%, transparent 51%),
-      radial-gradient(ellipse 120% 60% at 50% 0%, #0d2147 0%, transparent 70%);
+      radial-gradient(1px 1px at 12% 18%, #ffffffaa 50%, transparent 52%),
+      radial-gradient(1px 1px at 72% 9%, #ffffff88 50%, transparent 52%),
+      radial-gradient(1.5px 1.5px at 38% 64%, #ffffff99 50%, transparent 52%),
+      radial-gradient(1px 1px at 88% 42%, #ffffff77 50%, transparent 52%),
+      radial-gradient(1px 1px at 22% 86%, #ffffff66 50%, transparent 52%),
+      radial-gradient(1.5px 1.5px at 58% 32%, #ffd1ec88 50%, transparent 52%),
+      radial-gradient(ellipse 70% 40% at 50% 100%, #7b4dff30 0%, transparent 70%);
     background-size:
-      380px 380px,
-      380px 380px,
-      380px 380px,
-      380px 380px,
-      380px 380px,
-      380px 380px,
+      300px 300px,
+      300px 300px,
+      300px 300px,
+      300px 300px,
+      300px 300px,
+      300px 300px,
       100% 100%;
     background-attachment: fixed;
   }
+  /* Neon floor grid fixed at the bottom of the viewport, behind everything. */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: auto -50% 0 -50%;
+    height: 34vh;
+    z-index: -1;
+    pointer-events: none;
+    background-image:
+      linear-gradient(#ff3fa480 1px, transparent 1px),
+      linear-gradient(90deg, #ff3fa480 1px, transparent 1px);
+    background-size: 60px 40px;
+    background-position: center bottom;
+    transform: perspective(300px) rotateX(60deg);
+    transform-origin: bottom;
+    mask-image: linear-gradient(transparent, #000 60%);
+    opacity: 0.55;
+  }
   ::selection {
-    background: #2a5aa6;
+    background: var(--color-pink);
     color: #fff;
   }
   :focus-visible {
-    outline: 1px dotted var(--color-link-hover);
-    outline-offset: 1px;
+    outline: 2px solid var(--color-glow);
+    outline-offset: 2px;
   }
   h1,
   h2,
   h3 {
-    font-family: var(--font-head);
+    color: var(--color-heading);
   }
 }
 
 @layer components {
-  /* Fixed-width centred column, like the portals of the time. */
   .portal {
     @apply mx-auto w-full max-w-[1004px];
   }
 
-  /* Bevelled box with a glossy title bar. */
+  /* Panel with a title bar. */
   .box {
-    @apply border-edge bg-navy-900 border;
-    box-shadow:
-      inset 1px 1px 0 #ffffff12,
-      inset -1px -1px 0 #00000060;
+    @apply border-edge bg-panel rounded-[6px] border;
+    box-shadow: var(--shadow-card);
   }
   .box-head {
-    @apply font-head flex h-[26px] items-center gap-2 px-3 text-[11.5px] font-bold tracking-[0.07em] text-white uppercase;
-    background: linear-gradient(#4a7cc6 0%, #2d5ea9 48%, #1f4b90 52%, #1a3f7a 100%);
-    border-bottom: 1px solid var(--color-edge-lo);
-    text-shadow: 0 1px 0 #00000080;
+    @apply font-head flex min-h-[30px] items-center gap-2 rounded-t-[5px] px-3.5 text-[12px] font-extrabold tracking-[0.08em] text-white uppercase;
+    background: linear-gradient(90deg, #5631d6, #7b4dff 55%, #a04dff);
+    border-bottom: 1px solid #ff3fa4;
+    box-shadow: 0 1px 0 #ffffff30 inset;
   }
   .box-head-dark {
-    @apply font-head flex h-[26px] items-center gap-2 px-3 text-[11.5px] font-bold tracking-[0.07em] text-white uppercase;
-    background: linear-gradient(#3a3f4b 0%, #23272f 50%, #15181e 51%, #0c0e12 100%);
-    border-bottom: 1px solid #000;
+    @apply font-head flex min-h-[30px] items-center gap-2 rounded-t-[5px] px-3.5 text-[12px] font-extrabold tracking-[0.08em] text-white uppercase;
+    background: linear-gradient(90deg, #c81f7c, #ff3fa4 60%, #ff8a3d);
+    border-bottom: 1px solid #ffb37a;
+    box-shadow: 0 1px 0 #ffffff40 inset;
   }
   .box-body {
     @apply p-4;
   }
+  .box-head :is(h1, h2, h3),
+  .box-head-dark :is(h1, h2, h3) {
+    color: inherit;
+  }
+
+  /* Clickable card: lifts on hover, settles on press. */
+  .lift {
+    transition:
+      transform 160ms var(--ease-out),
+      box-shadow 160ms var(--ease-out),
+      border-color 160ms var(--ease-out);
+  }
+  .lift:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lift);
+    border-color: var(--color-edge-hi);
+  }
+  .lift:active {
+    transform: translateY(0);
+    transition-duration: 60ms;
+  }
 
   /* Top navigation tabs. */
   .tab {
-    @apply font-head flex h-full items-center border-r border-black/70 px-4 text-[12px] font-bold tracking-[0.08em] whitespace-nowrap text-white uppercase;
-    background: linear-gradient(#2b2f38 0%, #191c22 50%, #0b0d10 51%, #050608 100%);
-    box-shadow: inset 1px 0 0 #ffffff14;
+    @apply font-head text-pale flex h-full items-center px-4 text-[12.5px] font-extrabold tracking-[0.07em] whitespace-nowrap uppercase;
+    transition:
+      background-color 150ms var(--ease-out),
+      color 150ms var(--ease-out);
   }
   .tab:hover {
-    background: linear-gradient(#3b414e 0%, #262a33 50%, #14171c 51%, #0b0d10 100%);
+    @apply bg-violet-dark text-white;
   }
   .tab[aria-current='page'],
   .tab.active {
-    background: linear-gradient(#5b8fd8 0%, #3567b4 48%, #24529a 52%, #1d4583 100%);
+    @apply bg-pink text-white;
+    box-shadow:
+      0 -3px 0 var(--color-glow) inset,
+      0 0 18px -2px #ff3fa4;
+    text-shadow: 0 0 8px #ffffffa0;
   }
 
-  /* Bevelled button. */
+  /* Buttons: solid fill with a short "pressed" shadow. */
   .btn {
-    @apply font-head inline-flex h-[22px] cursor-pointer items-center justify-center gap-1.5 border px-2.5 text-[11px] font-bold tracking-[0.04em] text-white uppercase;
-    border-color: #6f97d4 #0b1a33 #0b1a33 #6f97d4;
-    background: linear-gradient(#3f70bb 0%, #2a5aa3 50%, #1f4a8d 51%, #1a3e77 100%);
+    @apply font-head bg-violet inline-flex h-[30px] cursor-pointer items-center justify-center gap-1.5 rounded-[4px] px-3 text-[12px] font-extrabold tracking-[0.04em] text-white uppercase;
+    box-shadow:
+      0 1px 0 #ffffff40 inset,
+      0 2px 0 var(--color-violet-dark),
+      0 0 14px -4px #7b4dffaa;
+    transition:
+      transform 120ms var(--ease-out),
+      box-shadow 120ms var(--ease-out),
+      background-color 150ms var(--ease-out);
   }
   .btn:hover {
-    background: linear-gradient(#5585cf 0%, #366ab7 50%, #2a5aa3 51%, #224d8d 100%);
+    @apply bg-violet-dark;
   }
   .btn:active {
-    border-color: #0b1a33 #6f97d4 #6f97d4 #0b1a33;
+    transform: translateY(2px);
+    box-shadow:
+      0 1px 0 #ffffff30 inset,
+      0 0 0 var(--color-violet-dark);
   }
   .btn:disabled {
-    @apply cursor-default opacity-40;
+    @apply cursor-default opacity-45;
+    transform: none;
   }
   .btn-go {
-    border-color: #ffc27a #6b3500 #6b3500 #ffc27a;
-    background: linear-gradient(#ffb04d 0%, #f08a1d 50%, #d97006 51%, #b95c00 100%);
-    text-shadow: 0 1px 0 #00000060;
+    @apply bg-pink;
+    box-shadow:
+      0 1px 0 #ffffff50 inset,
+      0 2px 0 var(--color-pink-dark),
+      0 0 16px -3px #ff3fa4cc;
   }
   .btn-go:hover {
-    background: linear-gradient(#ffc06b 0%, #ff9b2f 50%, #e57a0c 51%, #c86500 100%);
+    @apply bg-pink-dark;
+  }
+  .btn-go:active {
+    box-shadow: 0 0 0 var(--color-pink-dark);
+  }
+  .btn-quiet {
+    @apply text-violet-light border-edge-hi bg-panel-2 border;
+    box-shadow: 0 0 10px -4px #7b4dff90;
+  }
+  .btn-quiet:hover {
+    @apply bg-panel-3 text-white;
   }
 
-  /* Inset form field. */
+  /* Form field. */
   .field {
-    @apply h-[20px] border bg-white px-1.5 text-[11px] text-black;
-    border-color: #0b1a33 #8aa9d6 #8aa9d6 #0b1a33;
+    @apply border-edge-hi text-ink h-[30px] rounded-[4px] border bg-[#0c0719] px-2 text-[13px];
+    box-shadow: 0 1px 3px #00000080 inset;
+    transition: border-color 150ms var(--ease-out);
+  }
+  .field:hover {
+    @apply border-violet-light;
   }
 
   .lnk {
-    @apply text-link cursor-pointer underline underline-offset-2;
+    @apply text-link cursor-pointer font-bold underline decoration-[1.5px] underline-offset-2;
+    transition: color 120ms var(--ease-out);
   }
   .lnk:hover {
     @apply text-link-hover;
   }
-  /* "› Read more" style link. */
-  .more::before {
-    content: '› ';
-    @apply text-accent no-underline;
+  .more::after {
+    content: ' →';
+    @apply inline-block no-underline;
+    transition: transform 150ms var(--ease-out);
+  }
+  .more:hover::after {
+    transform: translateX(3px);
   }
 
   .chip {
-    @apply font-head inline-flex items-center gap-1 border px-1.5 py-px text-[10px] font-bold tracking-[0.05em] uppercase;
+    @apply font-head inline-flex items-center gap-1 rounded-[4px] border px-2 py-0.5 text-[11px] font-extrabold tracking-[0.04em] uppercase;
   }
-
   .num {
     @apply tabular-nums;
   }
   .label {
-    @apply text-ink-faint text-[10px] font-bold tracking-[0.08em] uppercase;
+    @apply text-ink-faint text-[11px] font-extrabold tracking-[0.08em] uppercase;
   }
-
-  /* Dotted rule between list items, as in old news lists. */
+  .display {
+    font-family: var(--font-display);
+    font-weight: 400;
+    letter-spacing: 0.01em;
+  }
   .rows > * + * {
-    border-top: 1px dotted var(--color-edge);
+    border-top: 1px solid var(--color-edge);
   }
 
-  /* Range input: square thumb on a sunken track. */
+  /* "?" help bubble: hover or focus shows a short explanation. */
+  .hint {
+    @apply bg-panel-3 text-violet-light relative inline-flex size-[17px] shrink-0 cursor-help items-center justify-center rounded-full align-middle text-[11px] font-extrabold;
+  }
+  .hint > span {
+    @apply bg-night pointer-events-none absolute bottom-[calc(100%+8px)] left-1/2 z-30 w-56 max-w-[80vw] -translate-x-1/2 rounded-[4px] px-2.5 py-2 text-left text-[12px] leading-snug font-semibold tracking-normal text-white normal-case opacity-0;
+    box-shadow: var(--shadow-lift);
+    transform: translate(-50%, 4px);
+    transition:
+      opacity 150ms var(--ease-out),
+      transform 150ms var(--ease-out);
+  }
+  .hint[data-align='left'] > span {
+    left: -4px;
+    transform: translate(0, 4px);
+  }
+  .hint[data-align='right'] > span {
+    left: auto;
+    right: -4px;
+    transform: translate(0, 4px);
+  }
+  .hint:hover > span,
+  .hint:focus > span,
+  .hint:focus-visible > span {
+    @apply opacity-100;
+    transform: translate(-50%, 0);
+  }
+  .hint[data-align='left']:is(:hover, :focus, :focus-visible) > span,
+  .hint[data-align='right']:is(:hover, :focus, :focus-visible) > span {
+    transform: translate(0, 0);
+  }
+
+  /* On/off switch. */
+  .switch {
+    @apply bg-edge-hi relative inline-flex h-[18px] w-[32px] shrink-0 cursor-pointer rounded-full;
+    box-shadow: 0 1px 3px #000000a0 inset;
+    transition: background-color 180ms var(--ease-out);
+  }
+  .switch::after {
+    content: '';
+    @apply absolute top-[2px] left-[2px] size-[14px] rounded-full bg-white;
+    box-shadow: 0 1px 2px #17333660;
+    transition: transform 220ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .switch[aria-checked='true'],
+  .switch[data-on='true'] {
+    @apply bg-pink;
+  }
+  .switch[aria-checked='true']::after,
+  .switch[data-on='true']::after {
+    transform: translateX(14px);
+  }
+
+  /* Range input. */
   .range {
-    @apply h-4 w-full cursor-pointer appearance-none bg-transparent;
+    @apply h-5 w-full cursor-pointer appearance-none bg-transparent;
   }
   .range::-webkit-slider-runnable-track {
-    @apply h-[5px] border;
-    border-color: #050b18 #3a5c94 #3a5c94 #050b18;
-    background: #0a1428;
+    @apply bg-panel-3 border-edge-hi h-[6px] rounded-full border;
   }
   .range::-moz-range-track {
-    @apply h-[5px] border;
-    border-color: #050b18 #3a5c94 #3a5c94 #050b18;
-    background: #0a1428;
+    @apply bg-panel-3 border-edge-hi h-[6px] rounded-full border;
   }
   .range::-webkit-slider-thumb {
-    @apply -mt-[5px] h-[13px] w-[9px] appearance-none border;
-    border-color: #ffffff #2a3f66 #2a3f66 #ffffff;
-    background: linear-gradient(#f2f5fa, #b8c6dc);
+    @apply bg-pink -mt-[6px] size-[16px] appearance-none rounded-full border-2 border-white;
+    box-shadow: 0 1px 3px #17333680;
+    transition: transform 120ms var(--ease-out);
+  }
+  .range::-webkit-slider-thumb:hover {
+    transform: scale(1.15);
   }
   .range::-moz-range-thumb {
-    @apply h-[13px] w-[9px] rounded-none border;
-    border-color: #ffffff #2a3f66 #2a3f66 #ffffff;
-    background: linear-gradient(#f2f5fa, #b8c6dc);
+    @apply bg-pink size-[14px] rounded-full border-2 border-white;
+    box-shadow: 0 1px 3px #17333680;
+  }
+
+  /*
+   * Space window: black starfield with a glowing magenta perspective grid along the bottom
+   * (synthwave). Use for views that show the Moon itself (map, Street View, Mission, banner).
+   */
+  .space {
+    @apply relative isolate overflow-hidden;
+    background-color: var(--color-void);
+    background-image:
+      radial-gradient(1px 1px at 12% 18%, #ffffffcc 50%, transparent 52%),
+      radial-gradient(1px 1px at 72% 9%, #ffffffaa 50%, transparent 52%),
+      radial-gradient(1.5px 1.5px at 38% 34%, #ffffffbb 50%, transparent 52%),
+      radial-gradient(1px 1px at 88% 42%, #ffffff99 50%, transparent 52%),
+      radial-gradient(1px 1px at 22% 56%, #ffffff88 50%, transparent 52%),
+      radial-gradient(1px 1px at 58% 22%, #ffffff99 50%, transparent 52%),
+      radial-gradient(1.5px 1.5px at 93% 15%, #ffd1ecaa 50%, transparent 52%),
+      radial-gradient(ellipse 80% 45% at 50% 100%, #9b5cff40 0%, transparent 70%);
+    background-size:
+      230px 230px,
+      230px 230px,
+      230px 230px,
+      230px 230px,
+      230px 230px,
+      230px 230px,
+      230px 230px,
+      100% 100%;
+    box-shadow:
+      0 0 0 1px #9b5cff50 inset,
+      0 0 24px -6px #ff3fa460 inset;
+  }
+  /* Inside a space window, text and hairline tokens flip to light so any content stays readable. */
+  .space {
+    --color-heading: #ffffff;
+    --color-ink: #f1e6ff;
+    --color-ink-muted: #cbb8ec;
+    --color-ink-faint: #9f8fc4;
+    --color-edge: #9b5cff66;
+    --color-line: #9b5cff66;
+    --color-line-strong: #c79bffaa;
+    color: var(--color-ink);
+  }
+  .space::before {
+    content: '';
+    @apply pointer-events-none absolute inset-x-[-50%] bottom-[-2px] -z-10 h-[38%];
+    background-image:
+      linear-gradient(#ff3fa4cc 1.5px, transparent 1.5px),
+      linear-gradient(90deg, #ff3fa4cc 1.5px, transparent 1.5px);
+    background-size: 44px 30px;
+    background-position: center bottom;
+    transform: perspective(240px) rotateX(58deg);
+    transform-origin: bottom;
+    filter: drop-shadow(0 0 3px #ff3fa4);
+    mask-image: linear-gradient(transparent, #000 45%);
+    animation: grid-drift 6s linear infinite;
+  }
+  .space::after {
+    content: '';
+    @apply pointer-events-none absolute inset-x-0 bottom-[38%] -z-10 h-px;
+    background: linear-gradient(90deg, transparent, #ff8a3d, #ff3fa4, #9b5cff, transparent);
+    box-shadow: 0 0 10px 1px #ff3fa4;
+  }
+  @keyframes grid-drift {
+    to {
+      background-position: center calc(100% + 30px);
+    }
+  }
+  .neon-text {
+    color: #ffe3f3;
+    text-shadow:
+      0 0 6px #ff3fa4,
+      0 0 14px #9b5cff;
+  }
+
+  /* Horizontal meter used for friendly metric bars. */
+  .meter {
+    @apply bg-panel-3 border-edge h-[9px] overflow-hidden rounded-full border;
+  }
+  .meter > span {
+    @apply block h-full rounded-full;
+    transition: width 400ms var(--ease-out);
   }
 }
 
@@ -226,6 +480,7 @@
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
 }

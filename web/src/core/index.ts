@@ -9,3 +9,6 @@ export { windowsGradient, SUN_BAND, EARTH_BAND } from './timeline';
 export { latLonToUv, uvToLatLon, projectSouthPolar } from './projection';
 export { loadLayerTexture, colorizeGray, paletteCss, samplePalette } from './raster';
 export * from './format';
+export { METRICS, verdictFor, friendlyHours, dayOfWindow } from './metrics';
+export type { MetricDef, Verdict } from './metrics';
+export { Hint } from './shell/Hint';

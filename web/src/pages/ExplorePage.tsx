@@ -41,7 +41,7 @@ export default function ExplorePage() {
               ))}
             </span>
           </div>
-          <div className="bg-black p-2">
+          <div className="space p-3">
             <div className="mx-auto aspect-square w-full max-w-[470px]">
               {view === '2d' ? <PolarMap className="size-full" /> : <GlobeView />}
             </div>

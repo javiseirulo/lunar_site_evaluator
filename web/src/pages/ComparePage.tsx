@@ -9,11 +9,13 @@ import type { Site } from '@lunar/contracts';
 import { cn } from '@/lib/utils';
 import {
   EARTH_BAND,
+  Hint,
+  METRICS,
+  friendlyHours,
   SUN_BAND,
   formatHours,
   formatLatLon,
   hoursUntilChange,
-  pct,
   sampleAt,
   useAppStore,
   useData,
@@ -24,63 +26,51 @@ import { TimeBar } from '@/core/shell/TimeBar';
 import { scoreColor } from '@/layers';
 
 type Better = 'high' | 'low' | null;
-const ROWS: {
+interface Row {
   label: string;
   value: (s: Site) => number;
   fmt: (s: Site) => string;
   better: Better;
   tone?: string;
-}[] = [
-  {
-    label: 'Score',
-    value: (s) => s.score,
-    fmt: (s) => String(Math.round(s.score * 100)),
-    better: 'high',
-  },
-  {
-    label: 'Sunlight',
-    value: (s) => s.metrics.illum_pct,
-    fmt: (s) => pct(s.metrics.illum_pct),
-    better: 'high',
-    tone: 'text-sun',
-  },
-  {
-    label: 'Earth in view',
-    value: (s) => s.metrics.earth_vis_pct,
-    fmt: (s) => pct(s.metrics.earth_vis_pct),
-    better: 'high',
-    tone: 'text-earth',
-  },
-  {
-    label: 'Longest night',
-    value: (s) => s.metrics.max_dark_hours,
-    fmt: (s) => `${s.metrics.max_dark_hours} h`,
-    better: 'low',
-  },
-  {
-    label: 'Slope',
-    value: (s) => s.metrics.slope_deg,
-    fmt: (s) => `${s.metrics.slope_deg.toFixed(1)}°`,
-    better: 'low',
-  },
-  {
-    label: 'To shadowed crater',
-    value: (s) => s.metrics.psr_dist_km,
-    fmt: (s) => `${s.metrics.psr_dist_km} km`,
-    better: null,
-    tone: 'text-psr',
-  },
-  {
-    label: 'Elevation',
-    value: (s) => s.elev_m,
-    fmt: (s) => `${s.elev_m.toLocaleString('en')} m`,
-    better: null,
-  },
-];
+  help?: string;
+}
+
+/** Score + the shared metric definitions (plain names for students, technical in Pro mode). */
+function buildRows(pro: boolean): Row[] {
+  return [
+    {
+      label: 'Score',
+      value: (s) => s.score,
+      fmt: (s) => String(Math.round(s.score * 100)),
+      better: 'high',
+      help: 'Overall rating from 0 to 100 using the default weights.',
+    },
+    ...METRICS.map((m) => ({
+      label: pro ? m.proLabel : m.label,
+      value: (s: Site) => s.metrics[m.key],
+      fmt: (s: Site) => m.format(s.metrics, pro),
+      better: m.better,
+      tone: m.tone,
+      help: m.help,
+    })),
+    ...(pro
+      ? [
+          {
+            label: 'Elevation',
+            value: (s: Site) => s.elev_m,
+            fmt: (s: Site) => `${s.elev_m.toLocaleString('en')} m`,
+            better: null,
+          } as Row,
+        ]
+      : []),
+  ];
+}
 
 export default function ComparePage() {
   const sites = useData((s) => s.sites);
   const selectedSiteId = useAppStore((s) => s.selectedSiteId);
+  const proMode = useAppStore((s) => s.proMode);
+  const rows = useMemo(() => buildRows(proMode), [proMode]);
   const [params, setParams] = useSearchParams();
 
   const ids = useMemo(() => {
@@ -105,7 +95,7 @@ export default function ComparePage() {
     setParams({ ids: [...new Set(next.filter(Boolean))].join(',') }, { replace: true });
   };
 
-  const best = (row: (typeof ROWS)[number]) => {
+  const best = (row: Row) => {
     if (!row.better || chosen.length < 2) return null;
     const values = chosen.map(row.value);
     const target = row.better === 'high' ? Math.max(...values) : Math.min(...values);
@@ -119,7 +109,7 @@ export default function ComparePage() {
         <div className="box-body">
           <p className="text-ink-muted mb-3 max-w-[75ch]">
             A mission slips and you need an alternative nearby? Put up to three sites side by side.
-            The best value in each row is marked <b className="text-accent">★</b>. Drag the Mission
+            The best value in each row gets a <b className="text-accent">★</b>. Drag the Mission
             Clock below to see which site has the Sun and Earth up at any moment.
           </p>
           <div className="mb-4 flex flex-wrap gap-3">
@@ -155,7 +145,9 @@ export default function ComparePage() {
                     <th className="w-40 px-3 py-2" />
                     {chosen.map((s) => (
                       <th key={s.id} className="px-3 py-2 text-left">
-                        <span className="block text-[13px] text-white">{s.name}</span>
+                        <span className="block text-[14px] text-heading font-extrabold">
+                          {s.name}
+                        </span>
                         <span className="text-ink-faint num block text-[10px] font-normal">
                           {formatLatLon(s.lat, s.lon)}
                         </span>
@@ -164,7 +156,7 @@ export default function ComparePage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {ROWS.map((row, i) => {
+                  {rows.map((row, i) => {
                     const target = best(row);
                     return (
                       <tr
@@ -175,7 +167,10 @@ export default function ComparePage() {
                         )}
                       >
                         <th className="text-ink-muted px-3 py-2 text-left font-normal">
-                          {row.label}
+                          <span className="inline-flex items-center gap-1.5">
+                            {row.label}
+                            {row.help && <Hint text={row.help} />}
+                          </span>
                         </th>
                         {chosen.map((s) => {
                           const isBest = target !== null && row.value(s) === target;
@@ -257,11 +252,13 @@ function TimelineRow({ site }: { site: Site }) {
   const t0 = range ? Date.parse(range.start_utc) : 0;
   const t1 = range ? Date.parse(range.end_utc) : 1;
   const pos = Math.min(1, Math.max(0, (Date.parse(currentTimeUTC) - t0) / (t1 - t0 || 1)));
-  const when = (h: number | null) => (h === null ? 'after this window' : formatHours(h));
+  const proMode = useAppStore((s) => s.proMode);
+  const when = (h: number | null) =>
+    h === null ? 'not in this window' : proMode ? formatHours(h) : friendlyHours(h);
 
   return (
     <div className="grid items-center gap-x-3 gap-y-1 sm:grid-cols-[150px_minmax(0,1fr)_210px]">
-      <span className="font-bold text-white">{site.name}</span>
+      <span className="font-bold text-heading">{site.name}</span>
       <div className="border-edge-lo bg-navy-950 relative border p-[3px]">
         <div className="h-[8px]" style={{ background: sun ?? 'transparent' }} />
         <div className="mt-px h-[8px]" style={{ background: earth ?? 'transparent' }} />

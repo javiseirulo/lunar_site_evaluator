@@ -16,7 +16,7 @@ export default function StreetViewPage() {
             </span>
           )}
         </div>
-        <div className="h-[460px] bg-black p-2">
+        <div className="space h-[460px] p-3">
           {site ? (
             <StreetView />
           ) : (

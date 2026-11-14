@@ -6,7 +6,7 @@
 import { useState } from 'react';
 import type { LayerDef } from '@lunar/contracts';
 import { cn } from '@/lib/utils';
-import { useAppStore, useData } from '@/core';
+import { Hint, useAppStore, useData } from '@/core';
 import { LegendBar } from './Legend';
 
 export function LayersPanel({ className }: { className?: string }) {
@@ -65,43 +65,38 @@ function LayerRow({
   const toggleLayer = useAppStore((s) => s.toggleLayer);
   const moveLayer = useAppStore((s) => s.moveLayer);
   const setLayerOpacity = useAppStore((s) => s.setLayerOpacity);
-  const [showInfo, setShowInfo] = useState(false);
+  const proMode = useAppStore((s) => s.proMode);
   const id = `layer-${layer.id}`;
 
   return (
-    <li className={cn('px-3 py-2', active && 'bg-navy-850')}>
-      <div className="flex items-center gap-1.5">
+    <li className={cn('px-3.5 py-2.5 transition-colors', active && 'bg-panel-2')}>
+      <div className="flex items-center gap-2">
         <input
           id={id}
           type="checkbox"
           checked={active}
           onChange={() => toggleLayer(layer.id)}
-          className="accent-navy-500 size-3.5"
+          className="accent-pink size-4 cursor-pointer"
           aria-label={`${active ? 'Hide' : 'Show'} ${layer.label}`}
         />
         <label
           htmlFor={id}
-          className={cn('cursor-pointer', active ? 'text-ink font-bold' : 'text-ink-muted')}
+          className={cn(
+            'cursor-pointer',
+            active ? 'text-heading font-extrabold' : 'text-ink-muted font-bold',
+          )}
         >
           {layer.label}
         </label>
-        <button
-          type="button"
-          onClick={() => setShowInfo((v) => !v)}
-          className="lnk text-[10px]"
-          aria-label={`About ${layer.label}`}
-          aria-expanded={showInfo}
-        >
-          [?]
-        </button>
-        {active && (
-          <span className="ml-auto flex gap-px">
+        <Hint text={proMode ? `${layer.description} Source: ${layer.source}` : layer.description} />
+        {active && proMode && (
+          <span className="ml-auto flex gap-1">
             {/* "Up" in this list = drawn on top = later in activeLayers. */}
             <button
               type="button"
               disabled={!canUp}
               onClick={() => moveLayer(layer.id, 1)}
-              className="btn h-[16px] w-[18px] px-0 text-[9px]"
+              className="btn btn-quiet h-[20px] w-[22px] px-0 text-[9px]"
               aria-label={`Move ${layer.label} up`}
             >
               ▲
@@ -110,7 +105,7 @@ function LayerRow({
               type="button"
               disabled={!canDown}
               onClick={() => moveLayer(layer.id, -1)}
-              className="btn h-[16px] w-[18px] px-0 text-[9px]"
+              className="btn btn-quiet h-[20px] w-[22px] px-0 text-[9px]"
               aria-label={`Move ${layer.label} down`}
             >
               ▼
@@ -118,31 +113,27 @@ function LayerRow({
           </span>
         )}
       </div>
-      {showInfo && (
-        <p className="text-ink-muted mt-1 pl-5 text-[11px]">
-          {layer.description}
-          <span className="text-ink-faint mt-0.5 block text-[10px]">Source: {layer.source}</span>
-        </p>
-      )}
       {active && (
-        <div className="mt-1.5 space-y-1 pl-5">
+        <div className="animate-enter mt-2 space-y-1.5 pl-6">
           <LegendBar layer={layer} />
-          <label className="flex items-center gap-2">
-            <span className="label w-12">Opacity</span>
-            <input
-              type="range"
-              className="range"
-              min={0}
-              max={1}
-              step={0.05}
-              value={opacity}
-              onChange={(e) => setLayerOpacity(layer.id, Number(e.target.value))}
-              aria-label={`${layer.label} opacity`}
-            />
-            <span className="num text-ink-muted w-8 text-right text-[10px]">
-              {Math.round(opacity * 100)}%
-            </span>
-          </label>
+          {proMode && (
+            <label className="flex items-center gap-2">
+              <span className="label w-14">Opacity</span>
+              <input
+                type="range"
+                className="range"
+                min={0}
+                max={1}
+                step={0.05}
+                value={opacity}
+                onChange={(e) => setLayerOpacity(layer.id, Number(e.target.value))}
+                aria-label={`${layer.label} opacity`}
+              />
+              <span className="num text-ink-muted w-9 text-right text-[11px]">
+                {Math.round(opacity * 100)}%
+              </span>
+            </label>
+          )}
         </div>
       )}
     </li>

@@ -27,7 +27,9 @@ export function AppShell() {
           </div>
         ) : (
           <Suspense fallback={<Loading />} key={pathname.split('/')[1]}>
-            <Outlet />
+            <div key={pathname} className="animate-enter">
+              <Outlet />
+            </div>
           </Suspense>
         )}
       </main>
