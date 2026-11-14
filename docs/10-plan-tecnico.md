@@ -28,7 +28,7 @@
 | Globo 3D + filtros (Marta) | ⏳ hueco listo | `web/src/globe/` (placeholder + lista/ficha de sitio de arranque) |
 | Street View (Pablo) | ⏳ hueco listo | `web/src/streetview/` (placeholder que imprime Sol/Tierra az/el) |
 | Mission / juego (Cristóbal) | ⏳ diseño descrito (#52), hueco listo | `web/src/game/` (placeholder) |
-| Pipeline Python (Javi, Pablo) | ⏳ sin empezar | `python/` (no existe aún) |
+| Pipeline Python (Javi, Pablo) | ⏳ no integrado; Pablo tiene adquisición/exportación local | `python/terrain/` local, pendiente de PR; efemérides y horizonte real aún no publicados |
 | Deploy público | ⏳ pendiente | `web/vercel.json` listo; proyecto Vercel con raíz `web/` |
 
 ### Cómo arrancar (cualquiera)
@@ -54,7 +54,7 @@ Contratos y mocks: **`contracts/README.md`**.
 
 ### Siguiente paso por persona
 - **Javi**: sustituir los mocks por datos reales con la misma forma (`"mock": false`); `pnpm test` en `web/` comprueba el formato.
-- **Pablo**: Street View en `web/src/streetview/StreetView.tsx` usando `useTimeseries` + `sampleAt` (ver comentario del archivo); DEM y horizontes en `python/terrain/`.
+- **Pablo**: prototipo Cesium aislado en `web/src/streetview/StreetView.tsx`, con `useTimeseries` + `sampleAt` y límites explícitos; DEM/horizontes en `python/terrain/`. Acordar y exportar además el heightmap polar para Marta (ver §5 y §9).
 - **Marta**: globo en `web/src/globe/GlobeView.tsx`; `loadLayerTexture(layer)` da un canvas coloreado para `THREE.CanvasTexture`; reemplazar o ampliar `SiteList.tsx`.
 - **Cristóbal**: `web/src/game/`: motor de simulación de N días + veredicto explicado (ver §5, actualizado con su descripción del módulo Mission), leyendo `sites`, timeseries y `selectedSiteId`.
 - **Javi2**: v1 = design system (shadcn), onboarding y deploy público.
@@ -63,7 +63,11 @@ Contratos y mocks: **`contracts/README.md`**.
 
 ## 1. Cómo encaja todo
 
-La idea central es esta: **todo lo que pesa se calcula offline en Python y la web solo consume archivos estáticos.** Así nadie depende de un servidor que funcione en tiempo real y cada persona puede trabajar con datos de prueba desde el primer día.
+La ciencia y el cálculo pesado se hacen **offline en Python** y la web consume
+sus resultados estáticos. Street View puede usar **streaming visual de Cesium
+Moon vía ion**: el despliegue sigue siendo estático, pero esa malla necesita
+red. No se requiere una API de cálculo en tiempo real. Cada consumidor puede
+desarrollar con mocks desde el primer día.
 
 ```
  [Python / backend offline]                  [Frontend web]
@@ -91,7 +95,12 @@ La idea central es esta: **todo lo que pesa se calcula offline en Python y la we
 
 Las versiones exactas se fijan en `pnpm-lock.yaml` y `uv.lock` el primer día, y no se actualizan durante el hackathon.
 
-**Alternativa a three.js:** CesiumJS tiene un elipsoide lunar y streaming de terreno. Es más rápido si queréis precisión geodésica, pero cuesta más integrarlo con el Street View y personalizar el estilo. La recomendación es three.js.
+**Motores por módulo:** Marta mantiene three.js/R3F para el globo y Explore.
+Pablo prioriza CesiumJS + Cesium Moon en Street View, sujeto a una prueba de
+viabilidad. Se monta en un componente separado, con el mismo store/reloj.
+Cesium aún no está en el lockfile: dependencia y configuración de build/asset
+requieren PR coordinado con Javi2; no actualizar el stack común. Si el prototipo
+falla, se usa la contingencia local three.js del bloque de Pablo.
 
 ## 3. Estructura del repo
 
@@ -180,20 +189,144 @@ Estos cuatro campos son la única interfaz entre los módulos web (más `layerOp
 - **Dependencia con Pablo:** el DEM y la máscara de horizonte. Acordad pronto un formato tipo `horizon/<id>.npy` con 360 elevaciones.
 
 ### Pablo: topografía y Lunar Street View
-- **Datos:** DEM de LOLA (LRO), con los mosaicos polares de 5–20 m/px para los polos y el global de 118 m/px. Las PSR salen de los productos LOLA/Diviner. Se procesan con `rasterio` 1.4, `GDAL` 3.9 y `pyproj`.
-- **Backend:** recortes locales del DEM alrededor de cada sitio (por ejemplo 20×20 km) exportados como heightmap PNG de 16 bits, y la máscara de horizonte para Javi.
-- **Street View (three.js):**
-  - Terreno: `PlaneGeometry` desplazado con el heightmap y LOD sencillo.
-  - Cámara: en primera persona a 1,7 m del suelo.
-  - Cielo: estrellas del catálogo Hipparcos/Yale BSC (en JSON, hasta magnitud ~6,5).
-  - Sol y Tierra: colocados con `sun_az/el` y `earth_az/el` de la timeseries de Javi.
-  - Fase de la Tierra visible y sombras con `DirectionalLight` + shadow map.
-  - Etiquetas al estilo Stellarium y slider de tiempo compartido con el store (✅ ya existe: `<TimeBar />`).
-- **Iteraciones:**
-  - v0: terreno procedural y Sol fijo.
-  - v1: heightmap real de un sitio.
-  - v2: cielo con estrellas, Sol y Tierra animados en el tiempo.
-  - v3: horizonte y sombras coherentes con el cálculo de Javi, que sirve también de validación cruzada.
+
+**Objetivo y alcance.** Construir una vista sintética desde la superficie lunar,
+orientable 360°, con topografía, coordenadas, altura del observador y azimut/elevación
+del Sol y la Tierra. La arquitectura debe admitir cualquier ubicación; el primer
+recorrido validado usa sitios del equipo. La cobertura visual global no implica
+disponer de efemérides, horizonte científico o resolución de 5 m para cada punto.
+El módulo aporta a Explore y al posterior modo educativo sin convertirse en una
+segunda aplicación ni modificar las responsabilidades de los compañeros.
+
+**Arquitectura visual recomendada.** CesiumJS + Cesium Moon (3D Tiles, asset de
+referencia `2684829`) dentro de `web/src/streetview/`. Se reutilizan geometría global,
+curvatura y niveles de detalle; no se construye un motor global de terreno desde
+`PlaneGeometry`. El asset publica terreno ~5 m entre 87,5°S y 90°S, con distinta
+resolución fuera del polo. Configurar elipsoide lunar y desactivar globo, atmósfera,
+geocodificación y cuerpos celestes configurados por defecto para la Tierra.
+La cuenta ion ya existe según Pablo; el acceso efectivo al asset y su rendimiento
+se comprueban en el primer prototipo. Community es la opción inicial recomendada
+para evaluación no comercial, dentro de sus condiciones y cuotas; sin contratar
+un plan de pago como requisito de arranque.
+
+**Compatibilidad con el equipo.** Conservar React, TypeScript, rutas y store de
+Javi2. El shell de Javi2 (PR #53, ya integrado en `main` y `dev`) reserva `StreetView.tsx` y ya proporciona `useSelectedSite`,
+`useTimeseries`, `sampleAt` y el `TimeBar`. El componente Cesium se monta por separado
+del canvas R3F de Marta, se carga al entrar y libera visor, recursos y listeners
+al salir. Esto mantiene el globo/Explore de Marta y la gamificación de Cristóbal.
+Añadir la dependencia/configuración de Cesium mediante PR coordinado; no migrar
+el stack de otros módulos ni crear otro store o reloj.
+
+**Datos científicos independientes.** Pablo mantiene el pipeline offline en
+`python/terrain/`: adquirir DEM, revisar marcos/unidades, recortar, generar altitud,
+pendiente y perfiles de horizonte. Base inicial: LOLA PGDA producto 81,
+`ldem_87s_5mpp.tif`, 87–90°S a 5 m/píxel, en MOON_ME de DE421 según el productor.
+Ampliar con un producto polar/global de menor resolución únicamente donde el
+alcance científico lo requiera. Los datos crudos siguen fuera de Git y del bundle.
+Validar la referencia vertical y su transformación al marco de Javi; el nombre
+genérico `MOON_ME` o un CRS lunar no garantizan por sí solos la misma realización.
+
+**Entregable adicional para Marta (prioritario).** Exportar un heightmap polar
+sobre la misma proyección, radio, `bounds_m`, orientación y ventana hasta −80°
+de `layers.json` (§5 Marta). Objetivo inicial: rejilla 1025×1025 en Float32
+little-endian con máscara y manifest; Int16 es una opción solo si rango,
+NoData y cuantización quedan acordados. Registrar altura, referencia vertical,
+CRS/marco, dimensiones, orden de filas, escala y cobertura. El DEM PGDA 81 de
+87–90°S y el recorte local de 1,28 km no cubren todo el parche: hace falta
+seleccionar y validar un DEM de menor resolución para la ventana completa
+(el candidato de Marta sigue pendiente de verificar). No rellenar las zonas
+ausentes con datos inventados; publicar un mock explícito hasta disponer del
+producto real. El esquema y el loader se acuerdan con Marta/Javi2 mediante
+PR a `contracts/`; no reinterpretar `elevation.png` gray8 como altura precisa.
+
+**Entregables de terreno y horizonte.** Reutilizar el exportador existente de
+GeoTIFF, heightmap PNG16, máscara y Float32 little-endian con manifest. El PNG16
+es un formato de intercambio; para alturas en web se necesita un decodificador
+adecuado o Float32, no una lectura de Canvas que reduzca los datos a 8 bits.
+Preparar para Javi perfiles con azimut desde norte lunar local, sentido horario,
+elevación en grados, altura del observador, fuente/marco/resolución y cobertura.
+360 azimuts son una resolución inicial declarada, no una precisión garantizada.
+Curvatura y relieve lejano forman parte del horizonte; un recorte de 20×20 km no
+garantiza cobertura suficiente. Distinguir norte de cuadrícula polar de norte
+local. Exportar incertidumbres o azimuts sin cobertura como desconocidos.
+Los perfiles offline pueden intercambiarse en NPY; su representación web y las
+capas de altitud/pendiente deben añadirse al contrato común mediante PR.
+Iluminación, visibilidad temporal y score siguen siendo responsabilidad de Javi;
+los productos PSR son una ampliación con fuente validada, no un entregable inicial.
+
+**Observador y tiempo.** Cámara a 1,7 m sobre la malla visible como valor inicial
+configurable; altura científica del DEM y altura visual se conservan por separado.
+Control de orientación con ratón y táctil, sin exigir sensores del móvil. Consumir
+`selectedSiteId`, `currentTimeUTC`, `mode` y el control temporal existente. Para los
+sitios del catálogo, conservar `sites.json` y `timeseries/<id>.json`; el muestreo
+real lo indican los datos, sin imponer un año de series horarias. Mostrar la hora
+de la muestra usada y el rango disponible: `sampleAt` actualmente toma la muestra
+anterior y limita los extremos, por lo que no debe presentarse como extrapolación
+válida fuera del rango. Mantener visibles las etiquetas `mock` cuando proceda.
+
+**Coordenadas personalizadas y crecimiento global.** La selección manual puede
+mover la cámara visualmente. Si cambia el observador respecto al sitio seleccionado,
+no reutilizar sus series como si correspondieran al nuevo lugar. La primera entrega
+señala qué resultados no están disponibles. Para ciencia en ubicaciones arbitrarias,
+acordar con Javi una representación de vectores/posiciones en marco lunar y
+tiempo explícitos, más una transformación topocéntrica validada. No se exige
+un archivo nuevo al MVP: primero evaluar los datos existentes y la precisión
+necesaria; para la Tierra no asumir paralaje nulo en resultados científicos; esto permite
+reutilizar datos temporales sin precalcular una serie por cada punto de la Luna.
+Requiere contrato y validación propios, igual que el horizonte fuera de los sitios
+precalculados. La extensión compartida de ubicación se acuerda con Javi2; las
+coordenadas locales del visor no sobrescriben silenciosamente `selectedSiteId`.
+
+**Cielo y validez visual.** Posicionar Sol/Tierra desde los resultados de Javi,
+mostrar azimut/elevación y distinguir horizonte geométrico de ocultación por relieve.
+Añadir estrellas y constelaciones después del recorrido de terreno + Sol/Tierra,
+con catálogo y transformación inercial→lunar documentados. La fase de la Tierra
+requiere geometría e información adicionales a azimut/elevación; no se presupone
+resuelta por los arrays existentes. Las sombras de imágenes compuestas de Cesium
+Moon no representan necesariamente la fecha del usuario; sombreado dinámico y
+perfil numérico se distinguen explícitamente. No aplicar un offset vertical fijo
+Cesium/LOLA a partir de un reporte ajeno: comparar varios puntos, marcos y niveles
+de detalle y documentar las diferencias antes de calibrar.
+
+**Orden de implementación.**
+
+1. Conservar descarga/exportador y hacer un prototipo Cesium aislado: acceso al
+   asset, elipsoide correcto, cámara sobre la malla, giro 360°, controles táctiles
+   y carga/limpieza dentro del shell. Fijar aceptación con una escena real antes
+   de ampliar: un sitio del equipo en escritorio y móvil, sin enterramiento de
+   cámara ni uso de configuraciones terrestres.
+2. Integrar catálogo, selección y tiempo del shell; mostrar Sol/Tierra de las
+   series con sus límites. Reutilizar los mocks existentes solo como mocks.
+3. En paralelo al visor, acordar/exportar el heightmap polar que desbloquea a
+   Marta y completar/validar el DEM propio. Entregar recortes, altitud/pendiente
+   y perfiles de horizonte de los sitios prioritarios a Javi; son productos
+   diferentes, con cobertura/resolución declaradas.
+4. Contrastar dos sitios y fechas entre renderer, DEM y cálculo de Javi; probar
+   cambio de modo, red interrumpida, ausencia de datos y latencias de carga. La
+   precisión de las métricas se fija con la resolución y los casos de referencia,
+   no con los decimales mostrados.
+5. Ampliar coordenadas arbitrarias con datos compatibles; después estrellas y
+   constelaciones. QR de instantánea es una ampliación educativa posterior al
+   recorrido integrado; sincronización de clase en directo queda fuera del MVP.
+
+**Contingencia acotada.** Si el primer prototipo demuestra que acceso, rendimiento
+o georreferenciación hacen inviable Cesium para la entrega, usar los recortes reales
+ya exportados en three.js/R3F dentro del mismo componente y limitar explícitamente
+la cobertura. No desarrollar ambos renderers en paralelo. Esa alternativa debe
+incluir curvatura/horizonte y procedencia, no presentar un plano local como cobertura
+global. La elección no cambia los contratos de selección, tiempo o series.
+
+**Estado real y límites.** Existen descargador, inspección y exportador offline;
+un primer recorte real de 1,28×1,28 km y doce pruebas correctas de esas herramientas.
+El recorte se eligió por disponibilidad de teselas recibidas, no es un sitio de
+misión validado. La descarga completa sigue pendiente. La escena Cesium, los
+perfiles de horizonte, las capas para el frontend, la integración web y el cielo
+estelar todavía no están implementados. El trabajo hecho sirve a la base científica
+y a la contingencia local; no obliga a construir la geometría visual global propia.
+
+**Fuentes del bloque:** [Cesium Moon](https://cesium.com/platform/cesium-ion/content/cesium-moon/),
+[PGDA 81](https://pgda.gsfc.nasa.gov/products/81), contratos y helpers en `dev`.
+Reconciliación solicitada por Pablo; seguimiento en **#59**.
 
 ### Marta: visor 3D de la Luna y modo exploración
 > Revisado 2026-11-14 contra el código de `dev` (`contracts/types.ts`, `web/src/core`, `web/src/layers`, mocks de `public/data`).
@@ -335,3 +468,27 @@ Estos cuatro campos son la única interfaz entre los módulos web (más `layerOp
 - **Texturas pesadas en web:** usar KTX2/WebP y no pasar de 8k.
 - **Precisión vs. tiempo:** v1 sin horizonte ya da una demo funcional, y v2 la mejora.
 - **Mocks ≠ resultados:** los datos actuales son inventados (badge "Mock data" en la UI). No usarlos en capturas de la entrega.
+
+## 9. Coordinación de Pablo con los módulos actuales (#59)
+
+Actualización de Pablo, 2026-11-14, contrastada con `dev` en `3cc91ef` y con
+el plan revisado del chat «Proponer enfoques educativos lunares». Se conserva el
+texto completo de los bloques de Marta, Javi, Javi2 y Cristóbal de esa revisión.
+Lo propuesto aquí se publica para revisión compartida; no atribuye un OK a los demás.
+
+| Con quién | Interfaz que se mantiene | Lo que hay que acordar antes de implementar |
+| --- | --- | --- |
+| Javi | `sites.json`, `timeseries/<id>.json`, azimut/elevación y visibilidad del pipeline | Perfil de horizonte (marco, altura, resolución y cobertura) y ampliación futura para coordenadas arbitrarias |
+| Marta | Globo R3F, helpers de proyección, `layers.json`, `activeLayers`, `layerOpacity` | Heightmap polar Float32 + máscara/manifest sobre la ventana completa; el DEM de 87–90°S no basta para llegar a −80° |
+| Javi2 | Componente React Street View, rutas, selección, reloj y loaders de `@/core` | Dependencia/build Cesium, carga diferida y limpieza; altura del observador y coordenadas propias solo con extensión de contrato revisada |
+| Cristóbal | `mode: "game"`, selección y series del mismo pipeline; veredicto determinista | No introducir dependencia del renderer Cesium para jugar; respetar cobertura temporal y valores desconocidos |
+
+Los PNG gray8 de las capas actuales son para visualización. El heightmap de Marta
+y los perfiles de horizonte son productos nuevos, pendientes de PR de contrato;
+este cambio documental no los crea ni cambia los esquemas v1. `sampleAt` toma la
+muestra anterior y limita extremos: mostrar el instante usado y detectar el
+fuera de rango. Un punto de cámara nuevo no recibe la serie de otro lugar.
+
+No se publica código ni datos crudos de Pablo con #59. El descargador/exportador
+y las notas locales se conservan para sus propios PRs. Las pruebas de adquisición
+no acreditan una escena Cesium, una predicción de horizonte ni un enlace de radio.
