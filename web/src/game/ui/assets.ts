@@ -89,7 +89,8 @@ export function emergencyImage(id: string | null): string | null {
 export type VerdictScene = FailCause | 'win' | 'timeout';
 
 export function verdictImage(scene: VerdictScene): string {
-  const file = scene === 'win' || scene === 'timeout' ? scene : `lose-${scene.replace('_', '-')}`;
+  const file =
+    scene === 'win' || scene === 'timeout' ? scene : `lose-${scene.replaceAll('_', '-')}`;
   return gameAsset(`verdicts/${file}.png`);
 }
 
