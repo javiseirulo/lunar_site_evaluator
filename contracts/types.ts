@@ -9,6 +9,12 @@
  *   sites.json               -> SitesFile
  *   timeseries/<site_id>.json -> Timeseries
  *   layers.json              -> LayersManifest (+ the PNGs it points to under layers/)
+ *
+ * v1.1 (additive, nothing from v1 renamed; docs/10 J10 + §10 "whole Moon"):
+ *   horizon/<site_id>.json   -> HorizonProfile   (terrain horizon, owner: Pablo)
+ *   ephem/index.json         -> EphemIndex       (+ ephem/<YYYY>.bin Sun/Earth vectors, owner: Javi)
+ *   grid/index.json          -> GridIndex        (+ grid/*.bin heat-map metrics, owner: Javi)
+ *   MissionConfig            -> mission_config.schema.json (store `missionConfig`, Mission scenarios)
  */
 
 // ---------------------------------------------------------------------------
@@ -41,6 +47,42 @@ export interface SiteMetrics {
   psr_dist_km: number;
 }
 
+/**
+ * v1.1 window metrics, optional (docs/10 J5). Same window as the core metrics.
+ * Kept apart from `SiteMetrics` so `keyof SiteMetrics` stays the five v1 keys.
+ */
+export interface SiteMetricsExtra {
+  /** Mean of sun_frac · max(0, sun_el) over the window, degrees (energy proxy; 0 at night). */
+  sun_el_mean_deg?: number;
+  /** Longest continuous period without the Earth above horizon + antenna margin, hours. */
+  max_blackout_hours?: number;
+  /** Fraction of time with the Sun lit AND the Earth visible, 0–1. */
+  sun_earth_pct?: number;
+}
+
+/** Where on the Moon a site is (docs/10 §10). south_pole: lat ≤ −80; north_pole: lat ≥ 80; else by |lon| ≤ 90. */
+export type SiteRegion = 'south_pole' | 'north_pole' | 'near_side' | 'far_side';
+
+/** Planning candidate vs. a place where a lander actually touched down. */
+export type SiteKind = 'candidate' | 'historic_landing';
+
+/**
+ * One mission requirement evaluated on one site and window (docs/10 J6).
+ * `margin` is relative and signed so that > 0 passes and < 0 fails:
+ * (value − threshold)/|threshold| when more is better, (threshold − value)/|threshold| when less is better
+ * (plain difference if the threshold is 0). `null` value/margin = metric not available (see `pending`).
+ */
+export interface RequirementCheck {
+  key: RequirementKey;
+  ok: boolean;
+  value: number | null;
+  threshold: number;
+  objective?: number;
+  margin: number | null;
+  /** The metric is pending (e.g. terrain not published yet): not used for validity or score. */
+  pending?: boolean;
+}
+
 /** Machine-readable reasons; the UI maps them to human text. */
 export type SiteReason =
   | 'slope_ok'
@@ -65,10 +107,23 @@ export interface Site {
   valid: boolean;
   /** Weighted score 0–1 with the default weights. */
   score: number;
-  metrics: SiteMetrics;
+  metrics: SiteMetrics & SiteMetricsExtra;
   reasons: SiteReason[];
   /** Where the coordinates come from (paper, mission page, "custom", "mock"). */
   source?: string;
+  // ---- v1.1, optional ----
+  region?: SiteRegion;
+  kind?: SiteKind;
+  /** Free-text grouping, e.g. "Artemis III region (2024): Haworth". */
+  group?: string;
+  /** Requirement-by-requirement result with margins, for the default mission config. */
+  checks?: RequirementCheck[];
+  /**
+   * Metrics whose value is a placeholder until their source exists (e.g. slope_deg / psr_dist_km
+   * before the terrain is published). They do not count for validity or score; the UI shows
+   * "pending terrain" instead of the number.
+   */
+  pending_metrics?: RequirementKey[];
 }
 
 export interface SitesFile {
@@ -101,6 +156,14 @@ export interface Timeseries {
   lit: (0 | 1)[];
   /** 1 if the Earth clears the terrain horizon at that sample, else 0. Optional in v1. */
   earth_visible?: (0 | 1)[];
+  // ---- v1.1, optional ----
+  /**
+   * Visible fraction of the solar disc (radius 0.2666°) above the horizon, 0–1 (0.5 = centre on the
+   * horizon). Only used for `illum_pct`; `lit` = sun_frac ≥ 0.5. Sunset/Earthset keep using lit/earth_visible.
+   */
+  sun_frac?: number[];
+  /** Horizon used for lit/earth_visible: "flat (no terrain)" or the HorizonProfile source. */
+  horizon_source?: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -172,8 +235,7 @@ export type TimeMode = 'design' | 'mission';
 export type Trajectory = 'hohmann' | 'fast' | 'low_energy';
 
 /** Metrics a mission can put requirements and weights on. */
-export type RequirementKey =
-  keyof SiteMetrics | 'sun_el_mean_deg' | 'max_blackout_hours' | 'sun_earth_pct';
+export type RequirementKey = keyof SiteMetrics | keyof SiteMetricsExtra;
 
 /**
  * Threshold/objective requirement. The threshold is the hard limit (fail below it, or above it for
@@ -203,4 +265,91 @@ export interface MissionConfig {
   antenna_margin_deg: number;
   requirements: Partial<Record<RequirementKey, Requirement>>;
   weights: Partial<Record<RequirementKey, number>>;
+}
+
+// ---------------------------------------------------------------------------
+// horizon/<site_id>.json — terrain horizon profile (owner: Pablo; used by Javi, Street View). v1.1
+// ---------------------------------------------------------------------------
+export interface HorizonProfile {
+  version: 1;
+  site_id: string;
+  lat: number;
+  lon: number;
+  /** Observer height above the terrain, metres (team decision: 5). */
+  observer_height_m: number;
+  /** Azimuth step, degrees (0.1 for curated sites → 3600 values; 1 for 5 km grid cells). */
+  az_step_deg: number;
+  /**
+   * Horizon elevation, degrees, curvature (d²/2R) included. Index i = azimuth i·az_step_deg,
+   * clockwise from local north. Linear interpolation with wrap-around between samples.
+   */
+  elev_deg: number[];
+  /** How far terrain was considered, km (≥ 100–150 recommended at the poles). */
+  max_range_km: number;
+  /** DEM product + version + method. */
+  source: string;
+}
+
+// ---------------------------------------------------------------------------
+// ephem/index.json + ephem/<YYYY>.bin — hourly Sun/Earth vectors 2026–2055 (owner: Javi). v1.1
+// Each .bin: Float32 little-endian, row-major, 6 values per hour from Jan 1 00:00 UTC of that year:
+// sun_ux, sun_uy, sun_uz (unit vector Moon → Sun), earth_x_km, earth_y_km, earth_z_km (Moon centre →
+// Earth, km, for exact topocentric parallax). Frame MOON_ME, aberration LT+S (SPICE).
+// The web turns them into az/el for any lat/lon with `@/ephem` (skyAt, buildTimeseries).
+// ---------------------------------------------------------------------------
+export interface EphemYear {
+  year: number;
+  file: string;
+  start_utc: string;
+  /** Number of hourly rows (8760 or 8784). */
+  n: number;
+}
+
+export interface EphemIndex {
+  version: 1;
+  frame: 'MOON_ME';
+  /** Exact SPICE frame name used (e.g. "MOON_ME" or "MOON_ME_DE440"). */
+  spice_frame: string;
+  observer: 'MOON';
+  abcorr: string;
+  start_utc: string;
+  end_utc: string;
+  step_s: number;
+  layout: ['sun_ux', 'sun_uy', 'sun_uz', 'earth_x_km', 'earth_y_km', 'earth_z_km'];
+  dtype: 'float32-le';
+  years: EphemYear[];
+  kernels: string[];
+  generated_utc: string;
+  generator: string;
+}
+
+// ---------------------------------------------------------------------------
+// grid/index.json + grid/*.bin — heat-map metrics on a grid (owner: Javi; painted by Marta/Javi2). v1.1
+// Each .bin: Float32 little-endian, one plane of width × height values per metric, in `metrics` order.
+// Row 0 = north (equirectangular: lat +90 edge; polar: max_y). NaN = no data.
+// ---------------------------------------------------------------------------
+export interface GridDef {
+  id: string;
+  file: string;
+  /** "equirectangular": lon −180→180 west→east, lat 90→−90; cell centres. "south_polar_stereographic": as layers.json. */
+  projection: 'equirectangular' | 'south_polar_stereographic';
+  width: number;
+  height: number;
+  /** Polar grids only: same meaning as LayersManifest.bounds_m / radius_m / lat_limit. */
+  bounds_m?: [number, number, number, number];
+  radius_m?: number;
+  lat_limit?: number;
+  metrics: RequirementKey[];
+  /** "flat (no terrain)" or the horizon source used. */
+  horizon_source: string;
+}
+
+export interface GridIndex {
+  version: 1;
+  mock: boolean;
+  generated_utc: string;
+  /** Window the metrics are measured over. */
+  window: { start_utc: string; end_utc: string; step_s: number };
+  dtype: 'float32-le';
+  grids: GridDef[];
 }
