@@ -17,11 +17,14 @@ El equipo trabaja por defecto con la suite de skills **gstack** (`/office-hours`
 
 1. `bash scripts/sync-docs.sh` (`git fetch`, activa hooks, muestra cambios de `docs/` en `origin/dev` y PRs abiertos; si no hay red, avisa al usuario).
 2. Lee **todo** `docs/` (empieza por `docs/README.md`), especialmente:
+   - **`docs/10-plan-tecnico.md` (plan vigente de la app: arquitectura, reparto por persona y §0 "Estado real": qué está hecho y qué falta)**
    - `docs/00-protocol.md` (cómo trabajamos)
    - `docs/01-hackathon-rules.md` y `docs/02-judging-playbook.md` (cómo se gana)
    - `docs/team/*/` (ideas y notas de TODOS los compañeros, no solo del usuario actual)
    - `docs/decisions/log.md` (decisiones ya tomadas; no las reabras sin motivo)
 3. Resume al usuario en pocas líneas qué hay nuevo desde su última sesión.
+4. Si vas a tocar la web (`web/`) o los datos (`contracts/`, `web/public/data`), lee también `web/README.md` y `contracts/README.md`:
+   cada persona tiene su carpeta, los módulos solo se comunican por el store (`@/core`) y los datos siguen `contracts/types.ts`.
 
 ## 2. Mientras trabajas: todo lo pensado va a Markdown
 

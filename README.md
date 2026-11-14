@@ -28,7 +28,7 @@ Este repo es la memoria compartida del equipo. Cada persona usa su propia IA (Cl
 ## 📚 Índice de conocimiento
 
 Empieza por [`docs/README.md`](docs/README.md):
-reglas ([01](docs/01-hackathon-rules.md)) · cómo ganar ([02](docs/02-judging-playbook.md)) ·
+**plan técnico y estado actual ([10](docs/10-plan-tecnico.md))** · reglas ([01](docs/01-hackathon-rules.md)) · cómo ganar ([02](docs/02-judging-playbook.md)) ·
 el reto ([03](docs/03-challenge-brief.md)) · datos y recursos ([04](docs/04-resources-data.md)) ·
 prior art ([05](docs/05-prior-art.md)) · flujo gstack ([06](docs/06-gstack-workflow.md)) ·
 ideas ([`docs/ideas/`](docs/ideas/)) · decisiones ([`docs/decisions/log.md`](docs/decisions/log.md)).
