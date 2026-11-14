@@ -39,7 +39,7 @@ export default function AboutPage() {
   const isMock = useData((s) => s.isMock);
 
   return (
-    <div className="grid gap-2 md:grid-cols-[180px_minmax(0,1fr)]">
+    <div className="grid gap-3 md:grid-cols-[180px_minmax(0,1fr)]">
       <nav className="box self-start" aria-label="On this page">
         <div className="box-head-dark">On this page</div>
         <ul className="box-body space-y-1 text-[11px]">

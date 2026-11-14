@@ -69,7 +69,7 @@ function LayerRow({
   const id = `layer-${layer.id}`;
 
   return (
-    <li className={cn('px-2.5 py-1.5', active && 'bg-navy-850')}>
+    <li className={cn('px-3 py-2', active && 'bg-navy-850')}>
       <div className="flex items-center gap-1.5">
         <input
           id={id}

@@ -6,7 +6,7 @@ import { StreetView } from '@/streetview/StreetView';
 export default function StreetViewPage() {
   const site = useSelectedSite();
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-3">
       <section className="box">
         <div className="box-head">
           Street View

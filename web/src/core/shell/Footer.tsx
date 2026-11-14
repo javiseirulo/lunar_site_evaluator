@@ -1,13 +1,8 @@
 import { Link } from 'react-router';
 import { useData } from '../data';
+import { TABS } from '../navigation';
 
-const LINKS = [
-  { to: '/', label: 'Home' },
-  { to: '/explore', label: 'Explore' },
-  { to: '/streetview', label: 'Street View' },
-  { to: '/game', label: 'Mission' },
-  { to: '/about', label: 'Data & Method' },
-];
+const LINKS = TABS.map((t) => ({ to: t.path, label: t.label }));
 
 export function Footer() {
   const manifest = useData((s) => s.manifest);

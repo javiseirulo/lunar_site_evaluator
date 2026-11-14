@@ -61,7 +61,7 @@
     height: 100%;
   }
   body {
-    @apply bg-navy-950 text-ink font-sans text-[12px] leading-[1.45];
+    @apply bg-navy-950 text-ink font-sans text-[12.5px] leading-[1.6];
     background-image:
       radial-gradient(1px 1px at 12% 18%, #ffffff99 50%, transparent 51%),
       radial-gradient(1px 1px at 72% 12%, #ffffff77 50%, transparent 51%),
@@ -109,18 +109,18 @@
       inset -1px -1px 0 #00000060;
   }
   .box-head {
-    @apply font-head flex h-[22px] items-center gap-2 px-2 text-[11px] font-bold tracking-[0.06em] text-white uppercase;
+    @apply font-head flex h-[26px] items-center gap-2 px-3 text-[11.5px] font-bold tracking-[0.07em] text-white uppercase;
     background: linear-gradient(#4a7cc6 0%, #2d5ea9 48%, #1f4b90 52%, #1a3f7a 100%);
     border-bottom: 1px solid var(--color-edge-lo);
     text-shadow: 0 1px 0 #00000080;
   }
   .box-head-dark {
-    @apply font-head flex h-[22px] items-center gap-2 px-2 text-[11px] font-bold tracking-[0.06em] text-white uppercase;
+    @apply font-head flex h-[26px] items-center gap-2 px-3 text-[11.5px] font-bold tracking-[0.07em] text-white uppercase;
     background: linear-gradient(#3a3f4b 0%, #23272f 50%, #15181e 51%, #0c0e12 100%);
     border-bottom: 1px solid #000;
   }
   .box-body {
-    @apply p-2.5;
+    @apply p-4;
   }
 
   /* Top navigation tabs. */

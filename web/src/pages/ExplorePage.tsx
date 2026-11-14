@@ -10,15 +10,15 @@ export default function ExplorePage() {
   const [view, setView] = useState<View>('2d');
 
   return (
-    <div className="grid grid-cols-1 gap-2 md:grid-cols-[236px_minmax(0,1fr)] lg:grid-cols-[236px_minmax(0,1fr)_252px]">
+    <div className="grid grid-cols-1 gap-3 md:grid-cols-[236px_minmax(0,1fr)] lg:grid-cols-[236px_minmax(0,1fr)_252px]">
       {/* Left: sites + layers */}
-      <aside className="order-3 flex flex-col gap-2 md:order-1">
+      <aside className="order-3 flex flex-col gap-3 md:order-1">
         <SiteList className="max-h-[330px]" />
         <LayersPanel />
       </aside>
 
       {/* Centre: map + clock */}
-      <section className="order-1 flex flex-col gap-2 md:order-2">
+      <section className="order-1 flex flex-col gap-3 md:order-2">
         <div className="box">
           <div className="box-head">
             South Polar Map

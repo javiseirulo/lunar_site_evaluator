@@ -9,31 +9,13 @@ import { useAppStore } from '../store';
 import { useData, useTimeseries } from '../data';
 import { formatHours, formatUtc } from '../format';
 import { hoursUntilChange, sampleAt } from '../timeseries';
+import { EARTH_BAND, SUN_BAND, windowsGradient } from '../timeline';
 
 const SPEEDS = [
   { label: '1 h/s', hoursPerSec: 1 },
   { label: '6 h/s', hoursPerSec: 6 },
   { label: '1 d/s', hoursPerSec: 24 },
 ];
-
-/** CSS gradient with a solid band wherever `flags` is 1. */
-function windowsGradient(flags: (0 | 1)[], color: string): string {
-  const n = flags.length;
-  if (n === 0) return 'transparent';
-  const stops: string[] = [];
-  let start = -1;
-  for (let i = 0; i <= n; i++) {
-    const on = i < n && flags[i] === 1;
-    if (on && start < 0) start = i;
-    if (!on && start >= 0) {
-      const a = (start / n) * 100;
-      const b = (i / n) * 100;
-      stops.push(`transparent ${a}%`, `${color} ${a}%`, `${color} ${b}%`, `transparent ${b}%`);
-      start = -1;
-    }
-  }
-  return stops.length ? `linear-gradient(to right, ${stops.join(', ')})` : 'transparent';
-}
 
 export function TimeBar({ className }: { className?: string }) {
   const range = useData((s) => s.manifest?.time_range);
@@ -70,9 +52,9 @@ export function TimeBar({ className }: { className?: string }) {
     return () => cancelAnimationFrame(raf.current);
   }, [playing, speed, range, t1]);
 
-  const sun = useMemo(() => (ts ? windowsGradient(ts.lit, 'rgb(255 180 60 / 0.85)') : null), [ts]);
+  const sun = useMemo(() => (ts ? windowsGradient(ts.lit, SUN_BAND) : null), [ts]);
   const earth = useMemo(
-    () => (ts?.earth_visible ? windowsGradient(ts.earth_visible, 'rgb(90 180 255 / 0.8)') : null),
+    () => (ts?.earth_visible ? windowsGradient(ts.earth_visible, EARTH_BAND) : null),
     [ts],
   );
   const sample = ts ? sampleAt(ts, currentTimeUTC) : null;

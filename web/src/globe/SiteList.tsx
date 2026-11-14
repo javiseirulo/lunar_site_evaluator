@@ -35,9 +35,9 @@ export function SiteList({ className }: { className?: string }) {
         <table className="w-full border-collapse text-[11px]">
           <thead className="bg-navy-800 sticky top-0">
             <tr className="text-ink-faint text-left">
-              <th className="label w-6 px-1.5 py-1 text-right">#</th>
-              <th className="label px-1.5 py-1">Site</th>
-              <th className="label px-1.5 py-1 text-right">Score</th>
+              <th className="label w-7 px-2 py-1.5 text-right">#</th>
+              <th className="label px-2 py-1.5">Site</th>
+              <th className="label px-2 py-1.5 text-right">Score</th>
             </tr>
           </thead>
           <tbody>
@@ -53,8 +53,8 @@ export function SiteList({ className }: { className?: string }) {
                   )}
                   onClick={() => selectSite(s.id)}
                 >
-                  <td className="num px-1.5 py-[3px] text-right">{i + 1}</td>
-                  <td className="px-1.5 py-[3px]">
+                  <td className="num px-2 py-[5px] text-right">{i + 1}</td>
+                  <td className="px-2 py-[5px]">
                     <button
                       type="button"
                       className={cn(
@@ -69,7 +69,7 @@ export function SiteList({ className }: { className?: string }) {
                       {s.name}
                     </button>
                   </td>
-                  <td className="px-1.5 py-[3px] text-right">
+                  <td className="px-2 py-[5px] text-right">
                     <span className="num inline-flex items-center gap-1">
                       <span
                         className="inline-block size-[7px] rotate-45 border border-black"
@@ -155,8 +155,8 @@ function Metrics({ site }: { site: Site }) {
       <tbody>
         {rows.map((r, i) => (
           <tr key={r.label} className={i % 2 ? 'bg-navy-850' : 'bg-navy-950'}>
-            <th className="text-ink-muted px-1.5 py-[3px] text-left font-normal">{r.label}</th>
-            <td className={cn('num px-1.5 py-[3px] text-right font-bold', r.tone || 'text-ink')}>
+            <th className="text-ink-muted px-2 py-[5px] text-left font-normal">{r.label}</th>
+            <td className={cn('num px-2 py-[5px] text-right font-bold', r.tone || 'text-ink')}>
               {r.value}
             </td>
           </tr>
