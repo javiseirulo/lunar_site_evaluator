@@ -390,7 +390,10 @@ function reasonsFor(m) {
   ];
 }
 
-const sites = SITE_SEEDS.map(([id, name, lat, lon]) => {
+// Raster values at each site are only *targets* that shape the toy horizon. The published
+// metrics are then measured from the generated timeseries, so sites.json, the timeseries and
+// the UI (detail card, time bar, game) always agree — as the contract defines them.
+const seeds = SITE_SEEDS.map(([id, name, lat, lon]) => {
   const [i, j] = toPixel(lat, lon);
   const k = j * N + i;
   let best = Infinity;
@@ -398,41 +401,18 @@ const sites = SITE_SEEDS.map(([id, name, lat, lon]) => {
     const d = Math.hypot((p % N) - i, Math.floor(p / N) - j);
     if (d < best) best = d;
   }
-  const illum_pct = round(illum[k]);
-  const metrics = {
-    illum_pct,
-    earth_vis_pct: round(earthVisAt(k, lat, lon)),
-    slope_deg: round(slope[k], 1),
-    max_dark_hours: Math.round(40 + (1 - illum_pct) * 420),
-    psr_dist_km: round((best * PX) / 1000, 1),
-  };
-  const s =
-    WEIGHTS.illum_pct * metrics.illum_pct +
-    WEIGHTS.earth_vis_pct * metrics.earth_vis_pct +
-    WEIGHTS.slope_deg * clamp(1 - metrics.slope_deg / 20) +
-    WEIGHTS.max_dark_hours * clamp(1 - metrics.max_dark_hours / 500);
   return {
     id,
     name,
     lat,
     lon,
     elev_m: Math.round(elev[k]),
-    valid: metrics.slope_deg <= 15 && metrics.illum_pct >= 0.3,
-    score: round(s),
-    metrics,
-    reasons: reasonsFor(metrics),
-    source: 'mock',
+    slope_deg: round(slope[k], 1),
+    psr_dist_km: round((best * PX) / 1000, 1),
+    targetSun: illum[k],
+    targetEarth: earthVisAt(k, lat, lon),
   };
 });
-
-writeFileSync(
-  join(OUT, 'sites.json'),
-  JSON.stringify(
-    { version: 1, mock: true, generated_utc: GENERATED, weights: WEIGHTS, sites },
-    null,
-    2,
-  ),
-);
 
 // ----------------------------------------------------------------- timeseries
 // Toy geometry: for a near-pole observer at colatitude c, a body over longitude L and
@@ -446,11 +426,25 @@ const LIB_LAT = 27.212221 * 86400;
 const YEAR = 365.25 * 86400;
 const wrap = (a) => ((a % 360) + 360) % 360;
 
-for (const [idx, site] of sites.entries()) {
-  const c = 90 + site.lat;
-  // Brighter (higher) mock sites get a lower horizon so `lit` roughly agrees with illum_pct.
-  const il = site.metrics.illum_pct;
-  const horizon = (az) => (1 - il) * (0.5 + 2.5 * fbm(az / 30 + idx * 3, idx)) - 1.8 * il;
+/** Longest run of zeros, in hours. */
+function longestDarkHours(flags) {
+  let best = 0;
+  let run = 0;
+  for (const f of flags) {
+    run = f ? 0 : run + 1;
+    if (run > best) best = run;
+  }
+  return (best * STEP_S) / 3600;
+}
+
+const sites = [];
+for (const [idx, seed] of seeds.entries()) {
+  const c = 90 + seed.lat;
+  // Higher "target" → lower toy horizon, so brighter terrain is lit more often.
+  const horizonFor = (target, salt) => (az) =>
+    (1 - target) * (0.5 + 2.5 * fbm(az / 30 + idx * 3 + salt, idx)) - 1.8 * target;
+  const sunHorizon = horizonFor(seed.targetSun, 0);
+  const earthHorizon = horizonFor(seed.targetEarth, 11);
   const ts = {
     t_utc: [],
     sun_az: [],
@@ -464,25 +458,60 @@ for (const [idx, site] of sites.entries()) {
     const t = n * STEP_S;
     const subSolarLon = 180 - (360 * t) / SYNODIC;
     const subSolarLat = 1.54 * Math.sin((2 * Math.PI * t) / YEAR + Math.PI);
-    const sunAz = wrap(subSolarLon - site.lon);
+    const sunAz = wrap(subSolarLon - seed.lon);
     const sunEl = c * Math.cos(sunAz * DEG) - subSolarLat;
     const subEarthLon = 7.9 * Math.sin((2 * Math.PI * t) / LIB_LON);
     const subEarthLat = 6.7 * Math.sin((2 * Math.PI * t) / LIB_LAT + 0.6);
-    const earthAz = wrap(subEarthLon - site.lon);
+    const earthAz = wrap(subEarthLon - seed.lon);
     const earthEl = c * Math.cos(earthAz * DEG) - subEarthLat;
     ts.t_utc.push(new Date(START + t * 1000).toISOString().replace('.000Z', 'Z'));
     ts.sun_az.push(round(sunAz));
     ts.sun_el.push(round(sunEl));
     ts.earth_az.push(round(earthAz));
     ts.earth_el.push(round(earthEl));
-    ts.lit.push(sunEl > horizon(sunAz) ? 1 : 0);
-    ts.earth_visible.push(earthEl > horizon(earthAz) ? 1 : 0);
+    ts.lit.push(sunEl > sunHorizon(sunAz) ? 1 : 0);
+    ts.earth_visible.push(earthEl > earthHorizon(earthAz) ? 1 : 0);
   }
   writeFileSync(
-    join(OUT, 'timeseries', `${site.id}.json`),
-    JSON.stringify({ version: 1, mock: true, site_id: site.id, step_s: STEP_S, ...ts }),
+    join(OUT, 'timeseries', `${seed.id}.json`),
+    JSON.stringify({ version: 1, mock: true, site_id: seed.id, step_s: STEP_S, ...ts }),
   );
+
+  const frac = (flags) => flags.reduce((a, b) => a + b, 0) / flags.length;
+  const metrics = {
+    illum_pct: round(frac(ts.lit)),
+    earth_vis_pct: round(frac(ts.earth_visible)),
+    slope_deg: seed.slope_deg,
+    max_dark_hours: longestDarkHours(ts.lit),
+    psr_dist_km: seed.psr_dist_km,
+  };
+  const s =
+    WEIGHTS.illum_pct * metrics.illum_pct +
+    WEIGHTS.earth_vis_pct * metrics.earth_vis_pct +
+    WEIGHTS.slope_deg * clamp(1 - metrics.slope_deg / 20) +
+    WEIGHTS.max_dark_hours * clamp(1 - metrics.max_dark_hours / 500);
+  sites.push({
+    id: seed.id,
+    name: seed.name,
+    lat: seed.lat,
+    lon: seed.lon,
+    elev_m: seed.elev_m,
+    valid: metrics.slope_deg <= 15 && metrics.illum_pct >= 0.3,
+    score: round(s),
+    metrics,
+    reasons: reasonsFor(metrics),
+    source: 'mock',
+  });
 }
+
+writeFileSync(
+  join(OUT, 'sites.json'),
+  JSON.stringify(
+    { version: 1, mock: true, generated_utc: GENERATED, weights: WEIGHTS, sites },
+    null,
+    2,
+  ),
+);
 
 writeFileSync(
   join(OUT, 'manifest.json'),
