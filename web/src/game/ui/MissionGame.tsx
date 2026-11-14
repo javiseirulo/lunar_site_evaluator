@@ -1,9 +1,9 @@
 /** The Mission mini-game: one screen per phase of `useGame`. */
-import { useEffect, type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { MotionConfig } from 'motion/react';
-import { Loader2 } from 'lucide-react';
 import { useGame } from '../state/gameStore';
 import { AlertScreen } from './AlertScreen';
+import { IntroScreen } from './IntroScreen';
 import { MenuScreen } from './MenuScreen';
 import { MissionFx } from './MissionFx';
 import { TimelapseScreen } from './TimelapseScreen';
@@ -11,31 +11,6 @@ import { TimeoutScreen } from './TimeoutScreen';
 import { TravelScreen } from './TravelScreen';
 import { useDealHand } from './useDealHand';
 import { VerdictScreen } from './VerdictScreen';
-
-/** Temporary stand-in for a phase whose real screen is not built yet: shows a label and moves on. */
-function AutoAdvance({
-  label,
-  delayMs,
-  onDone,
-}: {
-  label: string;
-  delayMs: number;
-  onDone: () => void;
-}) {
-  useEffect(() => {
-    const id = window.setTimeout(onDone, delayMs);
-    return () => window.clearTimeout(id);
-  }, [delayMs, onDone]);
-  return (
-    <div className="flex flex-1 items-center justify-center gap-2 font-mono text-[12px] tracking-widest text-ink-muted uppercase">
-      <Loader2 className="size-4 animate-spin motion-reduce:animate-none" aria-hidden />
-      {label}
-    </div>
-  );
-}
-
-// Stable callback so AutoAdvance's effect does not restart on re-render.
-const skipIntro = () => useGame.getState().skipIntro();
 
 export function MissionGame() {
   const phase = useGame((s) => s.phase);
@@ -47,10 +22,7 @@ export function MissionGame() {
       screen = <MenuScreen />;
       break;
     case 'intro':
-      // Replaced in Task 6 (pixel scientist intro).
-      screen = (
-        <AutoAdvance key="intro" label="Incoming transmission…" delayMs={0} onDone={skipIntro} />
-      );
+      screen = <IntroScreen />;
       break;
     case 'alert':
     case 'dealing':
