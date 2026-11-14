@@ -32,3 +32,17 @@ Sin multijugador. Esta descripción sustituye a la lista anterior de mecánicas 
 - Reglas de victoria y derrota.
 - Duración de la simulación (se habló de 9 o 14 días).
 - Qué diferencia el modo profesional del modo estudiante.
+
+## Avances (2026-11-14, 2ª ronda) — palabras de @Manuelcgg165
+- **Reglas de victoria/derrota:** "hay que pensarlas bien". Candidatas que propone Manuel:
+  - Quedarse **demasiado frío o demasiado caliente**. ⚠️ Hay que corroborar con una fuente el rango de temperaturas
+    alcanzables en la superficie lunar antes de usarlo (posible dataset: LRO Diviner, por verificar).
+  - **No tener ángulo de visión suficiente**, tipo elevación mínima sobre el horizonte. La capa de elevación mínima la hace **Javi**.
+- **Duración (9 o 14 días):** sin decidir; Manuel quiere hablarlo con calma.
+- **Estilos de juego** (sustituye a la pregunta "profesional vs. estudiante", aún por encajar con esos nombres):
+  1. Misión con las reglas de victoria/derrota.
+  2. **Recrear misiones históricas**: además de las reglas, el veredicto dice si elegiste el mismo sitio que se eligió
+     históricamente, con un umbral de cercanía **bastante amplio**.
+- Siguiente paso: describir entera cómo se imagina una partida antes de redactar los módulos.
+- Issues: #49 actualizado al plan vigente (`web/src/game/`, base `dev`) y asignado a Manuel. #48 (catálogo curado) es de Javi.
+  #50 (entrega) queda sin dueño por ahora.
