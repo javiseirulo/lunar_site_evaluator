@@ -1,19 +1,27 @@
 #!/usr/bin/env bash
-# Trae lo último del repo y lista qué cambió en docs/ desde el último pull.
+# Trae lo último de origin/main y muestra qué cambió en docs/. No toca main directamente.
 set -u
 cd "$(git rev-parse --show-toplevel)" || exit 1
-before=$(git rev-parse HEAD 2>/dev/null || echo "")
-if ! git pull --rebase --autostash; then
-  echo "ERROR: git pull falló. Resuelve conflictos o revisa la red." >&2
-  exit 1
+bash scripts/setup.sh >/dev/null
+if ! git fetch origin --prune; then
+  echo "ERROR: git fetch falló (¿red/permisos?)." >&2; exit 1
 fi
-after=$(git rev-parse HEAD 2>/dev/null || echo "")
-if [ -n "$before" ] && [ "$before" != "$after" ]; then
-  echo "== Cambios nuevos en docs/ =="
-  git diff --stat "$before" "$after" -- docs/
-  git log --format='%h %an: %s' "$before..$after" -- docs/
+branch=$(git rev-parse --abbrev-ref HEAD)
+base=$(git merge-base HEAD origin/main)
+echo "== Rama actual: $branch =="
+if [ "$base" != "$(git rev-parse origin/main)" ]; then
+  echo "== Cambios nuevos en origin/main (docs/) =="
+  git diff --stat "$base" origin/main -- docs/
+  git log --format='%h %an: %s' "$base..origin/main" -- docs/
+  if [ "$branch" = "main" ]; then
+    git merge --ff-only origin/main
+  else
+    echo "Tu rama está desactualizada: ejecuta 'git rebase origin/main' (o merge) cuando te convenga."
+  fi
 else
-  echo "docs/ ya estaba al día."
+  echo "Al día con origin/main."
 fi
-echo "== Archivos en docs/ =="
-find docs -type f -name '*.md' | sort
+echo "== Lee docs/ en origin/main (puede diferir de tu rama) =="
+git ls-tree -r --name-only origin/main docs | sort
+echo "== PRs abiertos (contexto de lo que hacen los demás) =="
+gh pr list --state open 2>/dev/null || echo "(gh no disponible)"
