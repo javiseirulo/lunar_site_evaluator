@@ -6,7 +6,7 @@ Closes #<!-- número del issue -->
 <!-- Capturas, comparación con Horizons, tests, /review, /qa... -->
 
 ## Checklist
-- [ ] Rama `<handle>/<issue>-<slug>` desde `main` actualizado
+- [ ] Rama `<handle>/<issue>-<slug>` desde `dev` actualizado y PR con base `dev` (salvo PRs de integración `dev` → `main`)
 - [ ] Docs actualizados en `docs/` (decisiones, recursos nuevos en `04-resources-data.md`)
 - [ ] Uso de IA anotado en `docs/si-usage-log.md`
 - [ ] Recursos/código externo listados en `docs/04-resources-data.md` (para References)
