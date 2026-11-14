@@ -1,14 +1,14 @@
 /** Title screen: pick a mode (South Pole now, Historical later) and the difficulty. */
 import { Lock, Play } from 'lucide-react';
 import { clsx } from 'clsx';
-import type { Difficulty } from '../engine/bars';
+import { difficultyHint, type Difficulty } from '../engine/bars';
 import { useGame } from '../state/gameStore';
 import { MENU_BG, MODE_HISTORICAL, MODE_SOUTH_POLE } from './assets';
 import { GameImage } from './GameImage';
 
-const DIFFICULTIES: { id: Difficulty; label: string; hint: string }[] = [
-  { id: 'normal', label: 'Normal', hint: '3 bars: sunlight, Earth view, slope' },
-  { id: 'expert', label: 'Expert', hint: '5 bars: adds longest dark and icy craters' },
+const DIFFICULTIES: { id: Difficulty; label: string }[] = [
+  { id: 'normal', label: 'Normal' },
+  { id: 'expert', label: 'Expert' },
 ];
 
 export function MenuScreen() {
@@ -111,9 +111,7 @@ export function MenuScreen() {
             </button>
           ))}
         </div>
-        <p className="text-ink-muted font-mono text-[11px]">
-          {DIFFICULTIES.find((d) => d.id === difficulty)?.hint}
-        </p>
+        <p className="text-ink-muted font-mono text-[11px]">{difficultyHint(difficulty)}</p>
       </div>
     </div>
   );

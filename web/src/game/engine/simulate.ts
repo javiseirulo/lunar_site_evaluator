@@ -22,8 +22,12 @@ export interface Verdict {
   detail: string;
 }
 
-/** 0 at the threshold, 1 at the objective, clamped; works whichever side is "better". */
+/**
+ * 0 at the threshold, 1 at the objective, clamped; works whichever side is "better".
+ * A degenerate criterion (threshold === objective) gives 1: meeting it is the objective.
+ */
 export function utility(value: number, c: Criterion): number {
+  if (c.objective === c.threshold) return 1;
   const u = (value - c.threshold) / (c.objective - c.threshold);
   return Math.min(1, Math.max(0, u));
 }
@@ -41,7 +45,8 @@ function runs(flags: boolean[], limit: number): { longest: number; exceedsAt: nu
   return { longest, exceedsAt };
 }
 
-function starsFor(score: number): 1 | 2 | 3 {
+/** Stars for a winning score: < 1/3 → 1, < 2/3 → 2, otherwise 3. */
+export function starsFor(score: number): 1 | 2 | 3 {
   return score < 1 / 3 ? 1 : score < 2 / 3 ? 2 : 3;
 }
 
@@ -144,14 +149,14 @@ export function simulate(
     candidates.push({
       cause: 'cold',
       at: cold.exceedsAt,
-      detail: `Longest night ${metrics.max_dark_h} h > ${req.max_dark_h.threshold} h`,
+      detail: `Night lasted over ${req.max_dark_h.threshold} h (failed at hour ${cold.exceedsAt})`,
     });
   }
   if (blackout.exceedsAt !== null) {
     candidates.push({
       cause: 'blackout',
       at: blackout.exceedsAt,
-      detail: `Longest comms blackout ${metrics.max_blackout_h} h > ${req.max_blackout_h.threshold} h`,
+      detail: `Comms blackout lasted over ${req.max_blackout_h.threshold} h (failed at hour ${blackout.exceedsAt})`,
     });
   }
   if (candidates.length > 0) {

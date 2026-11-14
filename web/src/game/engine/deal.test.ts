@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import type { Site, SitesFile, Timeseries } from '@lunar/contracts';
-import { barColor, qualityBars } from './bars';
+import { BAR_LABELS, barColor, difficultyHint, qualityBars } from './bars';
 import { deal } from './deal';
 import { DEFAULT_REQUIREMENTS } from './requirements';
 import { mulberry32, shuffle } from './random';
@@ -80,10 +80,14 @@ describe('deal', () => {
   });
 
   it('skips sites without a series', () => {
+    // Keep only the series of a known-valid hand's four sites: deal must still find a hand,
+    // and only with those sites.
+    const full = deal(sites, series, 3)!;
     const partial: Record<string, Timeseries> = {};
-    for (const s of sites.slice(0, 8)) partial[s.id] = series[s.id]!;
+    for (const c of full.cards) partial[c.siteId] = series[c.siteId]!;
     const hand = deal(sites, partial, 3);
-    if (hand) hand.cards.forEach((c) => expect(partial[c.siteId]).toBeDefined());
+    expect(hand).not.toBeNull();
+    expect(new Set(hand!.cards.map((c) => c.siteId))).toEqual(new Set(Object.keys(partial)));
   });
 });
 
@@ -91,6 +95,13 @@ describe('qualityBars', () => {
   const site = (slope: number): Site => ({
     ...sites[0]!,
     metrics: { ...sites[0]!.metrics, slope_deg: slope },
+  });
+
+  it('BAR_LABELS and the menu hint match qualityBars', () => {
+    for (const d of ['normal', 'expert'] as const) {
+      expect(qualityBars(sites[0]!, d).map((b) => b.label)).toEqual(BAR_LABELS[d]);
+      expect(difficultyHint(d)).toBe(`${BAR_LABELS[d].length} bars: ${BAR_LABELS[d].join(', ')}`);
+    }
   });
 
   it('normal and expert keys', () => {

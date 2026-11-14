@@ -10,6 +10,18 @@ export interface Bar {
   text: string;
 }
 
+/** Bar labels per difficulty, in display order (kept in sync with `qualityBars` by a test). */
+export const BAR_LABELS: Record<Difficulty, readonly string[]> = {
+  normal: ['Sunlight', 'Earth view', 'Slope'],
+  expert: ['Sunlight', 'Earth view', 'Slope', 'Longest dark', 'Icy craters'],
+};
+
+/** Short help text for a difficulty, e.g. "3 bars: Sunlight, Earth view, Slope". */
+export function difficultyHint(difficulty: Difficulty): string {
+  const labels = BAR_LABELS[difficulty];
+  return `${labels.length} bars: ${labels.join(', ')}`;
+}
+
 const clamp100 = (v: number): number => Math.min(100, Math.max(0, v));
 
 export function qualityBars(site: Site, difficulty: Difficulty): Bar[] {

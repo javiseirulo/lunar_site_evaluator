@@ -3,7 +3,7 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import type { Site, SitesFile, Timeseries } from '@lunar/contracts';
 import { DEFAULT_REQUIREMENTS } from './requirements';
-import { simulate, utility } from './simulate';
+import { simulate, starsFor, utility } from './simulate';
 
 const DATA = join(__dirname, '..', '..', '..', 'public', 'data');
 const read = <T>(p: string): T => JSON.parse(readFileSync(join(DATA, p), 'utf8')) as T;
@@ -131,5 +131,27 @@ describe('utility', () => {
     expect(utility(0.5, k)).toBe(0);
     expect(utility(0.2, k)).toBe(0);
     expect(utility(1, k)).toBe(1);
+  });
+});
+
+describe('review fixes', () => {
+  it('utility is 1, not NaN, when threshold equals objective', () => {
+    expect(utility(5, { threshold: 3, objective: 3 })).toBe(1);
+  });
+
+  it('star boundaries sit at 1/3 and 2/3', () => {
+    expect(starsFor(0)).toBe(1);
+    expect(starsFor(1 / 3 - 1e-9)).toBe(1);
+    expect(starsFor(1 / 3)).toBe(2);
+    expect(starsFor(2 / 3 - 1e-9)).toBe(2);
+    expect(starsFor(2 / 3)).toBe(3);
+    expect(starsFor(1)).toBe(3);
+  });
+
+  it('a run failure reports the limit and the failing hour, not the longest run', () => {
+    // Always dark: the run exceeds 100 h at hour 100 even though the longest run is 168 h.
+    const v = simulate(makeSite(1), makeTs(new Array(HOURS).fill(0), new Array(HOURS).fill(1)), 0);
+    expect(v).toMatchObject({ win: false, cause: 'cold', failHour: 100 });
+    expect(v.detail).toBe('Night lasted over 100 h (failed at hour 100)');
   });
 });
