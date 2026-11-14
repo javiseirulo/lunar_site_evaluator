@@ -1,0 +1,22 @@
+{
+  "name": "lunar-site-evaluator",
+  "private": true,
+  "packageManager": "pnpm@9.15.9",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "pnpm --filter web dev",
+    "build": "pnpm --filter web build",
+    "preview": "pnpm --filter web preview",
+    "lint": "pnpm -r lint",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "mocks": "node contracts/scripts/gen-mocks.mjs"
+  },
+  "devDependencies": {
+    "prettier": "^3.10.1"
+  }
+}

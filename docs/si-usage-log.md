@@ -8,3 +8,4 @@ La **idea** no puede venir de la IA.
 |---|---|---|---|---|
 | 2026-11-14 | javiseirulo | Claude Code (Sonnet 5.5) + Firecrawl | Investigación de reglas/recursos y redacción de la documentación base de `docs/` | Solo documentación interna |
 | 2026-11-14 | javiseirulo | Claude Code (Sonnet 5.5) | Estructurar y cuestionar (riesgos, recorte de alcance) la idea surgida de la tormenta de ideas del equipo; el concepto es humano | Solo documentación interna (`docs/ideas/javiseirulo-explore-mission.md`) |
+| 2026-11-14 | javocruz | Claude Code (Opus 5.5) | Esqueleto de la web (`web/`), contratos (`contracts/`), generador de datos mock y CI; la arquitectura viene del plan técnico del equipo | Código de `web/`, `contracts/`, `.github/workflows/web.yml` (declarar como código asistido por IA) |

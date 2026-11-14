@@ -1,0 +1,474 @@
+{
+  "version": 1,
+  "mock": true,
+  "generated_utc": "2026-11-14T00:00:00Z",
+  "weights": {
+    "illum_pct": 0.4,
+    "earth_vis_pct": 0.3,
+    "slope_deg": 0.2,
+    "max_dark_hours": 0.1,
+    "psr_dist_km": 0
+  },
+  "sites": [
+    {
+      "id": "shackleton_rim_01",
+      "name": "Shackleton rim A",
+      "lat": -89.9,
+      "lon": 0,
+      "elev_m": 649,
+      "valid": false,
+      "score": 0.46,
+      "metrics": {
+        "illum_pct": 0.64,
+        "earth_vis_pct": 0.49,
+        "slope_deg": 37.2,
+        "max_dark_hours": 191,
+        "psr_dist_km": 5
+      },
+      "reasons": [
+        "slope_high",
+        "illum_ok",
+        "earth_low",
+        "dark_ok"
+      ],
+      "source": "mock"
+    },
+    {
+      "id": "shackleton_rim_02",
+      "name": "Shackleton rim B",
+      "lat": -89.45,
+      "lon": 141,
+      "elev_m": -2763,
+      "valid": false,
+      "score": 0.09,
+      "metrics": {
+        "illum_pct": 0.09,
+        "earth_vis_pct": 0.13,
+        "slope_deg": 74.7,
+        "max_dark_hours": 422,
+        "psr_dist_km": 0
+      },
+      "reasons": [
+        "slope_high",
+        "illum_low",
+        "earth_low",
+        "dark_long"
+      ],
+      "source": "mock"
+    },
+    {
+      "id": "connecting_ridge",
+      "name": "Connecting ridge",
+      "lat": -89.45,
+      "lon": -137,
+      "elev_m": -52,
+      "valid": true,
+      "score": 0.48,
+      "metrics": {
+        "illum_pct": 0.51,
+        "earth_vis_pct": 0.44,
+        "slope_deg": 10.3,
+        "max_dark_hours": 246,
+        "psr_dist_km": 12.4
+      },
+      "reasons": [
+        "slope_ok",
+        "illum_ok",
+        "earth_low",
+        "dark_long"
+      ],
+      "source": "mock"
+    },
+    {
+      "id": "de_gerlache_rim_01",
+      "name": "de Gerlache rim A",
+      "lat": -88.7,
+      "lon": -68,
+      "elev_m": 192,
+      "valid": false,
+      "score": 0.16,
+      "metrics": {
+        "illum_pct": 0.19,
+        "earth_vis_pct": 0.2,
+        "slope_deg": 62.3,
+        "max_dark_hours": 380,
+        "psr_dist_km": 5.3
+      },
+      "reasons": [
+        "slope_high",
+        "illum_low",
+        "earth_low",
+        "dark_long"
+      ],
+      "source": "mock"
+    },
+    {
+      "id": "de_gerlache_rim_02",
+      "name": "de Gerlache rim B",
+      "lat": -88.25,
+      "lon": -95,
+      "elev_m": -2043,
+      "valid": false,
+      "score": 0.1,
+      "metrics": {
+        "illum_pct": 0.1,
+        "earth_vis_pct": 0.15,
+        "slope_deg": 61.5,
+        "max_dark_hours": 418,
+        "psr_dist_km": 0
+      },
+      "reasons": [
+        "slope_high",
+        "illum_low",
+        "earth_low",
+        "dark_long"
+      ],
+      "source": "mock"
+    },
+    {
+      "id": "peak_near_shackleton",
+      "name": "Peak near Shackleton",
+      "lat": -88.8,
+      "lon": 124,
+      "elev_m": -514,
+      "valid": true,
+      "score": 0.5,
+      "metrics": {
+        "illum_pct": 0.46,
+        "earth_vis_pct": 0.41,
+        "slope_deg": 5.1,
+        "max_dark_hours": 267,
+        "psr_dist_km": 18.8
+      },
+      "reasons": [
+        "slope_ok",
+        "illum_low",
+        "earth_low",
+        "dark_long"
+      ],
+      "source": "mock"
+    },
+    {
+      "id": "malapert_massif",
+      "name": "Malapert massif",
+      "lat": -85.99,
+      "lon": -0.1,
+      "elev_m": 3786,
+      "valid": true,
+      "score": 0.78,
+      "metrics": {
+        "illum_pct": 1,
+        "earth_vis_pct": 0.78,
+        "slope_deg": 14.5,
+        "max_dark_hours": 40,
+        "psr_dist_km": 29.7
+      },
+      "reasons": [
+        "slope_ok",
+        "illum_ok",
+        "earth_ok",
+        "dark_ok"
+      ],
+      "source": "mock"
+    },
+    {
+      "id": "leibnitz_beta",
+      "name": "Leibnitz beta plateau",
+      "lat": -85.4,
+      "lon": 31.7,
+      "elev_m": 3782,
+      "valid": false,
+      "score": 0.73,
+      "metrics": {
+        "illum_pct": 1,
+        "earth_vis_pct": 0.78,
+        "slope_deg": 23.9,
+        "max_dark_hours": 40,
+        "psr_dist_km": 26.1
+      },
+      "reasons": [
+        "slope_high",
+        "illum_ok",
+        "earth_ok",
+        "dark_ok"
+      ],
+      "source": "mock"
+    },
+    {
+      "id": "haworth_rim",
+      "name": "Haworth rim",
+      "lat": -86.6,
+      "lon": -15,
+      "elev_m": 259,
+      "valid": false,
+      "score": 0.45,
+      "metrics": {
+        "illum_pct": 0.53,
+        "earth_vis_pct": 0.6,
+        "slope_deg": 19.5,
+        "max_dark_hours": 237,
+        "psr_dist_km": 10.1
+      },
+      "reasons": [
+        "slope_high",
+        "illum_ok",
+        "earth_ok",
+        "dark_long"
+      ],
+      "source": "mock"
+    },
+    {
+      "id": "nobile_rim_01",
+      "name": "Nobile rim A",
+      "lat": -84.4,
+      "lon": 63,
+      "elev_m": 1506,
+      "valid": false,
+      "score": 0.2,
+      "metrics": {
+        "illum_pct": 0.24,
+        "earth_vis_pct": 0.25,
+        "slope_deg": 41.9,
+        "max_dark_hours": 359,
+        "psr_dist_km": 13.3
+      },
+      "reasons": [
+        "slope_high",
+        "illum_low",
+        "earth_low",
+        "dark_long"
+      ],
+      "source": "mock"
+    },
+    {
+      "id": "nobile_rim_02",
+      "name": "Nobile rim B",
+      "lat": -85.7,
+      "lon": 41,
+      "elev_m": 411,
+      "valid": false,
+      "score": 0.17,
+      "metrics": {
+        "illum_pct": 0.18,
+        "earth_vis_pct": 0.24,
+        "slope_deg": 56.2,
+        "max_dark_hours": 384,
+        "psr_dist_km": 6.1
+      },
+      "reasons": [
+        "slope_high",
+        "illum_low",
+        "earth_low",
+        "dark_long"
+      ],
+      "source": "mock"
+    },
+    {
+      "id": "faustini_rim",
+      "name": "Faustini rim",
+      "lat": -86.4,
+      "lon": 82,
+      "elev_m": 330,
+      "valid": true,
+      "score": 0.53,
+      "metrics": {
+        "illum_pct": 0.54,
+        "earth_vis_pct": 0.5,
+        "slope_deg": 9.3,
+        "max_dark_hours": 233,
+        "psr_dist_km": 16.6
+      },
+      "reasons": [
+        "slope_ok",
+        "illum_ok",
+        "earth_ok",
+        "dark_long"
+      ],
+      "source": "mock"
+    },
+    {
+      "id": "amundsen_rim",
+      "name": "Amundsen rim",
+      "lat": -83.6,
+      "lon": 80,
+      "elev_m": -1808,
+      "valid": false,
+      "score": 0.1,
+      "metrics": {
+        "illum_pct": 0.09,
+        "earth_vis_pct": 0.17,
+        "slope_deg": 27.4,
+        "max_dark_hours": 422,
+        "psr_dist_km": 0
+      },
+      "reasons": [
+        "slope_high",
+        "illum_low",
+        "earth_low",
+        "dark_long"
+      ],
+      "source": "mock"
+    },
+    {
+      "id": "cabeus_b",
+      "name": "Cabeus B",
+      "lat": -82.2,
+      "lon": -55,
+      "elev_m": -525,
+      "valid": true,
+      "score": 0.51,
+      "metrics": {
+        "illum_pct": 0.37,
+        "earth_vis_pct": 0.62,
+        "slope_deg": 6.2,
+        "max_dark_hours": 305,
+        "psr_dist_km": 62
+      },
+      "reasons": [
+        "slope_ok",
+        "illum_low",
+        "earth_ok",
+        "dark_long"
+      ],
+      "source": "mock"
+    },
+    {
+      "id": "shoemaker_rim",
+      "name": "Shoemaker rim",
+      "lat": -87,
+      "lon": 46,
+      "elev_m": 370,
+      "valid": true,
+      "score": 0.54,
+      "metrics": {
+        "illum_pct": 0.55,
+        "earth_vis_pct": 0.56,
+        "slope_deg": 9.8,
+        "max_dark_hours": 229,
+        "psr_dist_km": 16.8
+      },
+      "reasons": [
+        "slope_ok",
+        "illum_ok",
+        "earth_ok",
+        "dark_long"
+      ],
+      "source": "mock"
+    },
+    {
+      "id": "sverdrup_rim",
+      "name": "Sverdrup rim",
+      "lat": -87.6,
+      "lon": -150,
+      "elev_m": 263,
+      "valid": false,
+      "score": 0.39,
+      "metrics": {
+        "illum_pct": 0.54,
+        "earth_vis_pct": 0.39,
+        "slope_deg": 30.1,
+        "max_dark_hours": 233,
+        "psr_dist_km": 12.2
+      },
+      "reasons": [
+        "slope_high",
+        "illum_ok",
+        "earth_low",
+        "dark_long"
+      ],
+      "source": "mock"
+    },
+    {
+      "id": "slater_plain",
+      "name": "Slater plain",
+      "lat": -87.6,
+      "lon": -112,
+      "elev_m": 74,
+      "valid": false,
+      "score": 0.4,
+      "metrics": {
+        "illum_pct": 0.54,
+        "earth_vis_pct": 0.43,
+        "slope_deg": 24,
+        "max_dark_hours": 233,
+        "psr_dist_km": 9.3
+      },
+      "reasons": [
+        "slope_high",
+        "illum_ok",
+        "earth_low",
+        "dark_long"
+      ],
+      "source": "mock"
+    },
+    {
+      "id": "de_gerlache_kocher",
+      "name": "de Gerlache–Kocher massif",
+      "lat": -84.9,
+      "lon": -95,
+      "elev_m": 2422,
+      "valid": true,
+      "score": 0.74,
+      "metrics": {
+        "illum_pct": 0.82,
+        "earth_vis_pct": 0.55,
+        "slope_deg": 3.2,
+        "max_dark_hours": 116,
+        "psr_dist_km": 93.8
+      },
+      "reasons": [
+        "slope_ok",
+        "illum_ok",
+        "earth_ok",
+        "dark_ok"
+      ],
+      "source": "mock"
+    },
+    {
+      "id": "mons_mouton",
+      "name": "Mons Mouton",
+      "lat": -84.3,
+      "lon": 31,
+      "elev_m": 3486,
+      "valid": true,
+      "score": 0.83,
+      "metrics": {
+        "illum_pct": 0.97,
+        "earth_vis_pct": 0.81,
+        "slope_deg": 8.6,
+        "max_dark_hours": 53,
+        "psr_dist_km": 38.8
+      },
+      "reasons": [
+        "slope_ok",
+        "illum_ok",
+        "earth_ok",
+        "dark_ok"
+      ],
+      "source": "mock"
+    },
+    {
+      "id": "plain_81s",
+      "name": "Plain at 81°S",
+      "lat": -81.5,
+      "lon": 120,
+      "elev_m": -788,
+      "valid": true,
+      "score": 0.39,
+      "metrics": {
+        "illum_pct": 0.35,
+        "earth_vis_pct": 0.26,
+        "slope_deg": 6.7,
+        "max_dark_hours": 313,
+        "psr_dist_km": 119.5
+      },
+      "reasons": [
+        "slope_ok",
+        "illum_low",
+        "earth_low",
+        "dark_long"
+      ],
+      "source": "mock"
+    }
+  ]
+}

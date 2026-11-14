@@ -1,0 +1,11 @@
+{
+  "name": "@lunar/contracts",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "types": "./types.ts",
+  "exports": {
+    ".": "./types.ts",
+    "./*.schema.json": "./*.schema.json"
+  }
+}

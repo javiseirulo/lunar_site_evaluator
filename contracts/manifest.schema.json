@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "manifest.schema.json",
+  "title": "manifest.json — what was generated and for which time window (see types.ts DataManifest)",
+  "type": "object",
+  "required": ["version", "mock", "generated_utc", "time_range", "sources"],
+  "properties": {
+    "version": { "const": 1 },
+    "mock": { "type": "boolean" },
+    "generated_utc": { "type": "string", "format": "date-time" },
+    "time_range": {
+      "type": "object",
+      "required": ["start_utc", "end_utc", "step_s"],
+      "properties": {
+        "start_utc": { "type": "string", "format": "date-time" },
+        "end_utc": { "type": "string", "format": "date-time" },
+        "step_s": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "sources": { "type": "array", "items": { "type": "string" } }
+  }
+}
