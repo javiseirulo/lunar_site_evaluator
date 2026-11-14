@@ -196,17 +196,85 @@ Estos cuatro campos son la única interfaz entre los módulos web (más `layerOp
   - v3: horizonte y sombras coherentes con el cálculo de Javi, que sirve también de validación cruzada.
 
 ### Marta: visor 3D de la Luna y modo exploración
-- **Herramientas:** R3F + drei (`OrbitControls`, `Html` para etiquetas), con texturas LROC WAC (color) y LOLA (relieve/normal map) a 4k–8k en KTX2/WebP.
+> Revisado 2026-11-14 contra el código de `dev` (`contracts/types.ts`, `web/src/core`, `web/src/layers`, mocks de `public/data`).
+> Marta trabaja en `web/src/globe/`; todo lo que sea de otra carpeta o de `contracts/` va por PR con su dueño.
+
+- **Herramientas:**
+  - R3F + drei (ya instalados: three 0.187, R3F 9.8, drei 10.7). `OrbitControls`; `Html` **solo** para la etiqueta del pin seleccionado o bajo el ratón.
+  - Estado: el compartido es el store de `@/core` (Javi2), con sus 4 campos de contrato (`selectedSiteId`, `currentTimeUTC`, `activeLayers`, `mode`) + `layerOpacity`.
+    No se crea otro store global. Los pesos y el rango de fechas son estado **local** de `src/globe` (un `create()` de zustand propio o `useState`);
+    si otro módulo los necesita (p. ej. el juego), PR a `src/core` con Javi2.
+  - Globo: textura de color LROC WAC global y normal map derivado de LOLA, en JPG/WebP (sin KTX2). **4k por defecto**; 8k solo si el rendimiento lo aguanta (riesgo §8).
+    ⚠️ Fuente y versión exactas de cada textura → `docs/04-resources-data.md` antes de subirlas (aún no están registradas).
+  - Terreno polar real a partir de un DEM LOLA del polo sur. Candidato: `LDEM_80S_80MPP_ADJ` (80 m/px).
+    ⚠️ **Confirmar autoría, producto y versión al descargarlo** y registrarlo en `04-resources`; lo que hay registrado de Barker et al. 2021 es otro producto (PGDA 78: DEM de 5 m por sitio).
+    El recorte y la exportación los hace **Pablo** (dueño del DEM en `python/terrain/`); Marta consume el archivo exportado.
+
 - **Funciones:**
-  - Globo lunar con pins de `sites.json`, coloreados por score (`scoreColor` en `@/layers` para usar los mismos colores que el mapa 2D).
-  - Overlays de las capas raster (`loadLayerTexture` en `@/core`; orden y opacidad en el store).
-  - Barra lateral con filtros: sliders de los pesos del score que recalculan en el cliente (sin backend), y rango de fechas.
-  - Clic en un pin → `selectedSiteId` → panel de detalle → botón "Entrar en Street View" (✅ en el arranque: `setMode('streetview')`).
+  - **Globo lunar con pins** de `sites.json` (`useData((s) => s.sites)`), coloreados con `scoreColor` de `@/layers` (mismos colores que el mapa 2D y la lista).
+    Con ~20 sitios basta un `<mesh>` por pin; `instancedMesh` si se pasa de ~200. Los sitios con `valid: false` se pintan atenuados.
+    Todos los candidatos actuales están entre 81,5°S y 89,9°S, así que en vista de globo se agrupan en un marcador **"South Pole · N sites"** que lanza el zoom al parche polar.
+  - **Parche polar 3D** con terreno real:
+    - **Ventana = la de `layers.json`** (estereográfica polar sur hasta −80°, ±304 km), no 85°S–90°S: con 85°S quedarían fuera 6 de los 20 sitios
+      (Nobile A, Amundsen, Cabeus B, de Gerlache–Kocher, Mons Mouton, Plain at 81°S). Así las capas se pegan sin recortar PNGs.
+    - Malla construida con las alturas (no `displacementMap`): cada vértice se coloca **sobre la esfera real** (`(R + h)` en la dirección radial de su lat/lon).
+      La curvatura sale sola y es grande: ~27 km de caída en el borde del parche.
+    - Exageración vertical ×2 indicada en pantalla.
+    - Posición de cada sitio con `projectSouthPolar` / `latLonToUv` de `@/core`. **No hace falta añadir `px`/`py` a `sites.json`.**
+    - **Iluminación según la fecha** (`currentTimeUTC` de la barra temporal): la dirección del Sol en el sistema fijo a la Luna es la misma en todo el parche
+      (paralaje despreciable). Se obtiene de la timeseries de cualquier sitio: (`sun_az`, `sun_el`) en su lat/lon → vector en los ejes del parche → `DirectionalLight`.
+      **No hace falta un archivo nuevo de "vector Sol"**; lo mismo vale para la Tierra.
+    - Las sombras del shadow map son **ilustrativas**: se calculan sin la exageración ×2 (con ella serían más largas de lo real) y con ~0,6–1,2 km por celda.
+      La cifra oficial de luz es `lit` / `illum_pct` del pipeline de Javi, no el render. Rótulo: "Illustrative shading".
+    - Textura del parche: albedo neutro o mosaico polar LROC, con la luz en tiempo real. **Nada de hillshade precalculado**: sumaría una segunda luz fija que contradice la fecha.
+  - **Barra lateral de filtros** (sustituye o amplía el `SiteList` de arranque):
+    - Sliders de pesos con los valores por defecto de `sites.json.weights`.
+    - Score en cliente: `score = Σ wᵢ·nᵢ / Σ wᵢ`, con `nᵢ` la métrica normalizada a 0–1 **en la dirección "más es mejor"**
+      (pendiente, noche más larga y distancia a PSR se invierten o acotan). El mock usa `1 − slope/20` y `1 − dark_h/500`.
+      ⚠️ La normalización real la define **Javi**; hay que acordarla y escribirla en el contrato (PR a `contracts/`), para que `score.ts` reproduzca `site.score` con los pesos por defecto.
+      Un test lo comprueba.
+    - Los filtros duros (`valid`) no cambian con los pesos: un sitio no válido nunca sube al top.
+    - **Rango de fechas**: `illum_pct`, `earth_vis_pct` y `max_dark_hours` se recalculan para ese rango a partir de las timeseries
+      (`lit`, `earth_visible`; `fractionOn` en `@/core`; 20 archivos, ~1,4 MB en mock). `slope_deg` y `psr_dist_km` no dependen de la fecha.
+      El rango es local y distinto de `currentTimeUTC`: la barra temporal es el instante y el rango es el filtro.
+    - Una sola función `score.ts` en `src/globe/` (el repo es TypeScript), compartida por pins, lista y mapa de calor.
+  - **Clic en un pin** → `selectSite(id)` → `SiteDetail` (ya existe en el arranque) → "Stand here in Street View" = `setMode('streetview')`, que navega a `/streetview/:siteId`.
+    La transición animada (vuelo de cámara hasta el sitio) va **antes** de `setMode`; la vista de Street View es de Pablo.
+  - **Capas:**
+    - Las capas raster (pendiente, sombra permanente, iluminación, score, elevación) **ya vienen en `layers.json`**. Las produce el pipeline (Pablo/Javi); hoy son mock.
+      Marta no descarga productos LDSM/LPSR por su cuenta.
+    - La UI para activarlas, ordenarlas y cambiar su opacidad es `LayersPanel` (Javi2). Marta solo las **pinta** en el parche:
+      lee `activeLayers` (orden de abajo arriba) y `layerOpacity` del store, y usa `loadLayerTexture(layer)` → `THREE.CanvasTexture` mapeada con `latLonToUv`.
+    - **Misiones pasadas** (globo): marcadores de alunizajes históricos desde `historic_sites.json`.
+      Clic → tarjeta con nombre, agencia/país, fecha, coordenadas, resultado y una línea de contexto, más la fuente de las coordenadas.
+      Solo texto, sin logotipos, parches ni banderas (CLAUDE.md §3). Interruptor local en `src/globe`, porque no es una capa raster.
+      Cubre la "lista curada (Apollo, CLPS, otros países)" que pide el reto (`07-mvp-plan.md`).
+    - **Mapa de calor de idoneidad** (parche, experimental): celdas de 5 km coloreadas en 3 clases (excelente / regular / no cumple), recalculadas en cliente con los sliders y la misma `score.ts`.
+      Se suavizan, se eliminan las regiones pequeñas y solo las grandes llevan etiqueta, con el nombre del accidente más cercano.
+      Leyenda "Indicative, 5 km cells".
+
+- **Depende de:**
+  - **Ya disponible en `dev`:** `sites.json`, `timeseries/<id>.json`, `layers.json` + PNG (todo mock), el store, `TimeBar`, `LayersPanel`, `SiteDetail`,
+    y los helpers `loadLayerTexture`, `projectSouthPolar`, `latLonToUv`, `sampleAt`, `fractionOn` y `scoreColor`.
+  - **Nuevo, requiere PR a `contracts/` y avisar al equipo** (regla §7.3). Hasta que llegue lo real, Marta añade un mock en `gen-mocks.mjs` y trabaja con él:
+    1. **Heightmap del parche** (dueño: Pablo). Rejilla cuadrada sobre `bounds_m` de `layers.json`, p. ej. 1025×1025 en `Int16` de metros
+       (~2 MB; ~0,6 km/celda) o `Float32`, con su cabecera (`bounds_m`, tamaño, unidades) en `layers.json` o en un JSON propio.
+       No sirve un PNG de 16 bits: el canvas del navegador lo decodifica a 8 bits. Tampoco la capa `elevation.png` actual: con 8 bits son escalones de ~33 m.
+    2. **Normalización del score** en `sites.json` (dueño: Javi): rango y sentido de cada métrica.
+    3. **`historic_sites.json`** (dueña: Marta; puede reutilizarlo Cristóbal en Mission): tipo `HistoricSite` en `contracts/types.ts`
+       (`id`, `name`, `agency`, `country`, `date_utc`, `lat`, `lon`, `outcome`, `note`, `source`) y archivo en `public/data/`.
+       Cada coordenada con fuente en `04-resources`.
+    4. **`grid_metrics.bin`** (solo para el mapa de calor; dueños: Javi y Pablo): métricas por celda de 5 km y día sobre la misma ventana.
+       ~120×120 celdas × 30 días × 3 métricas en `uint8` ≈ 1,3 MB. Necesita el cálculo de horizontes por celda: es lo más caro del pipeline.
+       Si no llega, el mapa de calor se descarta sin bloquear nada.
+
 - **Iteraciones:**
-  - v0: esfera texturizada con pins mock.
-  - v1: capas conmutables y sidebar.
-  - v2: recálculo del score con sliders y zoom a los polos.
-  - v3: transición animada al Street View.
+  - v0: esfera texturizada en `GlobeView.tsx` con pins de `sites.json` (mock), marcador del polo y clic → `selectSite`. Detalle con el `SiteDetail` existente.
+  - v1: barra lateral con sliders de pesos y rango de fechas, `score.ts` con test (reproduce `site.score`) y lista reordenada en vivo. Con esto, Explore queda completo.
+  - v2: parche polar con heightmap (mock primero, luego el de Pablo), curvatura real, luz según `currentTimeUTC`, capas de `layers.json` pintadas encima y transición animada al Street View.
+  - v3: capa de misiones pasadas con `historic_sites.json`.
+  - v4 (experimental): mapa de calor de idoneidad. Se decide con el primer render: si sale fragmentado tras el suavizado, o si `grid_metrics.bin` no llega, se descarta.
+  - En móvil se queda el mapa polar 2D de Javi2 (toggle 2D/3D en `ExplorePage`). El 3D no tiene que funcionar en 375 px.
 
 ### Javi2: web, estética y layers de la página
 - **Responsable de** `src/core` (store, loader de datos, router) y del shell: layout, navegación entre modos, landing, about/datos/créditos NASA y responsive.
