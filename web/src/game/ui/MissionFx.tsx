@@ -3,6 +3,33 @@
  * game does not depend on the (still changing) global stylesheet. React hoists and dedupes it.
  */
 const CSS = `
+/* Mission keeps its own dark arcade palette: the site theme redefines these tokens (light paper). */
+.mission-root {
+  --color-navy-950: #02050c;
+  --color-navy-900: #061022;
+  --color-navy-850: #0a1830;
+  --color-navy-800: #0e2040;
+  --color-navy-700: #15305c;
+  --color-heading: #ffffff;
+  --color-ink: #e6edf7;
+  --color-ink-muted: #9fb2d0;
+  --color-ink-faint: #6a7fa3;
+  --color-edge: #24406e;
+  --color-good: #8fe39a;
+  --color-warn: #ffcc4d;
+  --color-bad: #ff7a6b;
+  --color-sun: #ffb43c;
+  --color-earth: #5ab4ff;
+  /* Global .btn / .btn-go read these: dark buttons, orange main action. */
+  --color-pale: #15305c;
+  --color-panel-2: #1e4380;
+  --color-panel-3: #0e2040;
+  --color-edge-hi: #4c74b4;
+  --color-edge-lo: #8cc4ff;
+  --color-pink: #f08a1d;
+  --color-pink-dark: #c86500;
+  color: var(--color-ink);
+}
 @keyframes mission-alarm-frame {
   0%, 100% { border-color: #ff3b30; box-shadow: inset 0 0 28px #ff3b3060; }
   50% { border-color: #5a0f0f; box-shadow: inset 0 0 0 transparent; }
