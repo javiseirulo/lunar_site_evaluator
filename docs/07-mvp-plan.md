@@ -23,8 +23,15 @@ rango y paso temporal (ej. ventana de 1 año a paso horario/diario), formato (Ge
 Validación: contrastar puntos de prueba con Horizons y con mapas Barker/LPI; anotarlo en el PR.
 
 ## Esquema borrador de las 7 diapositivas (a decidir por el equipo)
-1. Problema (en una imagen) · 2. Usuario y por qué las herramientas actuales no sirven · 3. Explore: filtros → mapa en vivo · 4. Ficha de sitio + horizonte 360° (Sol/Tierra)
+**El límite es ≤7 incluyendo la portada** (pasarse = no elegible para jurado global).
+1. Portada + problema en una frase · 2. Usuario y por qué las herramientas actuales no sirven · 3. Explore: filtros → mapa en vivo + comparación lado a lado · 4. Ficha de sitio: horizonte 360° Sol/Tierra, Sunset/Earthset
 5. Mission (modo profesional y estudiante) con veredicto explicado · 6. Datos NASA y validación (Horizons/LOLA) + referencias · 7. Impacto/siguiente paso + enlace/QR del proyecto.
+Los enlaces de demo y proyecto deben ser **públicos sin login**; probarlos en ventana privada. Si la web es nueva, pedir clasificación FortiGuard.
+
+## Métricas obligatorias en la salida del precompute (del brief del reto)
+Elevación solar (métrica clave de energía), duración de luz continua, ventanas de visibilidad de la Tierra, tiempo restante hasta Sunset/Earthset.
+Horizonte: terreno LOLA + limbo esférico lunar (sin refracción); libración vía SPICE/Horizons; tratar pendientes fuertes y cráteres profundos.
+Extras de comparación: lista curada (Apollo, CLPS, otros países) + coordenadas personalizadas; comparar 2-3 sitios/fechas lado a lado.
 
 ## Reglas recordatorio
 Todo recurso en `docs/04-resources-data.md`; todo uso de SI en `docs/si-usage-log.md` (código incluido); sin branding NASA; sin menores en el demo; entrega en inglés.

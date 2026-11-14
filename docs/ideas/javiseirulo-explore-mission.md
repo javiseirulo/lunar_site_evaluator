@@ -44,10 +44,24 @@ Un único **pipeline de cálculo** (Sol/Tierra sobre el horizonte con terreno, a
 Contrastar visibilidad Sol/Tierra de puntos de prueba con Horizons web, y la iluminación con mapas publicados (Barker/LPI). Anotar en cada PR de cálculo.
 
 ## Alcance mínimo para el demo (≤ 1 día) — recorte propuesto (decide el equipo)
-- **Núcleo (sí o sí):** precompute del polo sur → Explore con 2-3 sliders + barra temporal + top 5 + ficha de sitio con horizonte 360° Sol/Tierra.
+- **Núcleo (sí o sí):** precompute del polo sur → Explore con 2-3 sliders + barra temporal + top 5 + ficha de sitio con horizonte 360° Sol/Tierra,
+  **+ comparación lado a lado de 2-3 sitios/fechas + coordenadas personalizadas + lista curada (Apollo/CLPS/otros)** (añadido 2026-11-14 tras contrastar con el brief del reto: es el verbo central del reto y es barato porque reutiliza el pipeline).
+  La ficha debe mostrar las métricas que pide el reto: elevación solar, duración de luz, ventanas de visibilidad de la Tierra y **tiempo restante hasta Sunset/Earthset**.
 - **Capa fina:** modo juego mínimo (3-4 sitios, simulación N días, veredicto con motivo determinista).
 - **Si sobra tiempo:** misiones históricas (lista estática), nombres de "barrios", modo avanzado.
 - **V2 / fuera:** chatbot con Gemini (open text), Genie 3 / generativo, capa de minerales, dificultad pro del juego.
+
+## Cobertura del reto (contraste con `docs/03-challenge-brief.md`, 2026-11-14)
+| Pide el reto | Estado en nuestra idea |
+|---|---|
+| Comparar sitios **y fechas** rápido (misión que se retrasa) | ⚠️ faltaba la comparación lado a lado explícita → añadida al núcleo. Mission = el escenario "se retrasa/falla" |
+| Lista curada (Apollo, CLPS, otros países) + coordenadas propias | ⚠️ estaba como extra → sube al núcleo (lista corta) |
+| Fecha/hora, días y estaciones lunares | ✅ barra temporal; ⚠️ falta decir el rango (ver `07-mvp-plan.md`) |
+| Sol y Tierra sobre el horizonte; tiempo hasta Sunset/Earthset | ✅ horizonte 360°; ⚠️ añadir cuenta atrás Sunset/Earthset |
+| Métricas: elevación solar (clave), duración de luz, ventanas de Tierra | ⚠️ los sliders solo hablaban de % de iluminación/visibilidad → incluir estas métricas |
+| Horizonte = terreno LOLA + limbo esférico, sin refracción; libración; pendientes y cráteres | ✅ en el pipeline (SPICE da libración); ⚠️ hay que implementar la curvatura lunar en el horizonte |
+| Hacer evidente por qué un pequeño cambio de lugar/fecha importa | ✅ el veredicto explicado del juego y la comparación lo cubren |
+| Experto **y** público/educadores | ✅ modo avanzado + modo estudiante. Cuidado: el reto nombra a educadores y público; no quitar el modo estudiante |
 
 ## Riesgos / lo que no sabemos
 1. **Sliders en vivo ⇒ hay que precalcular** rasters/tiles (iluminación y visibilidad Tierra por celda y ventana temporal). Ray-marching por clic no escala. Decisión técnica clave: resolución de malla, rango de fechas, paso temporal.
