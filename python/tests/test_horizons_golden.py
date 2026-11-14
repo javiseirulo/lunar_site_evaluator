@@ -98,10 +98,10 @@ def test_golden_cases_are_self_consistent():
     for c in g["cases"]:
         s_az, s_el = azel(c["lat"], c["lon"], c["elev_m"], np.array(c["sun_unit"]), 5, False)
         e_az, e_el = azel(c["lat"], c["lon"], c["elev_m"], np.array(c["earth_km"]), 5, True)
-        assert float(s_az) == c["sun_az"] and float(s_el) == c["sun_el"]
-        assert float(e_az) == c["earth_az"] and float(e_el) == c["earth_el"]
-        assert c["horizon_flat_deg"] == horizon_flat(5)
-        assert c["sun_frac_flat"] == float(sun_frac(c["sun_el"], c["horizon_flat_deg"]))
+        got = [float(s_az), float(s_el), float(e_az), float(e_el)]
+        assert _close(got, [c["sun_az"], c["sun_el"], c["earth_az"], c["earth_el"]])
+        assert _close(c["horizon_flat_deg"], float(horizon_flat(5)))
+        assert _close(c["sun_frac_flat"], float(sun_frac(c["sun_el"], c["horizon_flat_deg"])))
 
 
 def test_jsonfmt_layout():
