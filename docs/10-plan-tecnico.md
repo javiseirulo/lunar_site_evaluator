@@ -26,7 +26,7 @@
 | Landing, About (fuentes, declaración IA, sin branding NASA) | ✅ v0 | `web/src/pages/` |
 | Tests (store, helpers, validación de `public/data`) + CI | ✅ | `web/src/core/*.test.ts`, `.github/workflows/web.yml` |
 | Globo 3D + filtros (Marta) | ⏳ hueco listo | `web/src/globe/` (placeholder + lista/ficha de sitio de arranque) |
-| Street View (Pablo) | ⏳ hueco listo | `web/src/streetview/` (placeholder que imprime Sol/Tierra az/el) |
+| Street View (Pablo) | v0 implementado en rama #46; validación de terreno ion pendiente de token | `web/src/streetview/`: Cesium diferido, cámara, marcadores Sol/Tierra y tiempo compartido; fixtures aún mock |
 | Mission / juego (Cristóbal) | ⏳ diseño descrito (#52), hueco listo | `web/src/game/` (placeholder) |
 | Pipeline Python (Javi, Pablo) | ⏳ no integrado; Pablo tiene adquisición/exportación local | `python/terrain/` local, pendiente de PR; efemérides y horizonte real aún no publicados |
 | Deploy público | ⏳ pendiente | `web/vercel.json` listo; proyecto Vercel con raíz `web/` |
@@ -319,9 +319,13 @@ global. La elección no cambia los contratos de selección, tiempo o series.
 **Estado real y límites.** Existen descargador, inspección y exportador offline;
 un primer recorte real de 1,28×1,28 km y doce pruebas correctas de esas herramientas.
 El recorte se eligió por disponibilidad de teselas recibidas, no es un sitio de
-misión validado. La descarga completa sigue pendiente. La escena Cesium, los
-perfiles de horizonte, las capas para el frontend, la integración web y el cielo
-estelar todavía no están implementados. El trabajo hecho sirve a la base científica
+  misión validado. El DEM completo ya está descargado y se han decodificado tres
+  ventanas de referencia; eso no valida todos los píxeles ni la geodesia. En la
+  rama de #46 se implementa el primer motor Cesium con cámara, marcadores de
+  dirección y reloj compartido: tipos, lint, 25 pruebas y build correctos. La
+  prueba del terreno real en ion sigue pendiente del token; no se afirma que
+  cámara/touch/alturas ya estén verificados con el asset. Perfiles de horizonte,
+  capas para el frontend y cielo estelar siguen pendientes. El trabajo sirve a la base científica
 y a la contingencia local; no obliga a construir la geometría visual global propia.
 
 **Fuentes del bloque:** [Cesium Moon](https://cesium.com/platform/cesium-ion/content/cesium-moon/),
