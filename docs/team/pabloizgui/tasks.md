@@ -8,11 +8,12 @@ entregar los datos que necesitan los demás módulos antes de continuar el visor
 Entrega unificada en `pabloizgui/46-lunar-streetview`: incluye el terreno de #37
 y el visor. Índice por destinatario, puesta en marcha con la cuenta de Pablo y
 dependencias concretas: [team-handoff.md](team-handoff.md). El push se está
-preparando; no se considera publicado ni integrado en `dev`.
+preparando como PR borrador por autorización expresa de Pablo; no se considera
+integrado en `dev` hasta revisión y merge.
 
 | Prioridad | Tarea | Estado / criterio de cierre |
 |---|---|---|
-| P0 | Publicación de la entrega unificada | Commit y descripción de PR preparados; 24 pruebas Python y 37 web correctas. Falta resolver/decidir sobre el gate gstack (exit 127 y mapeo) y ejecutar CI remoto; sin merge automático |
+| P0 | Entrega unificada y revisión | Publicación manual como PR borrador autorizada por Pablo con pruebas nativas (24 Python / 37 web). Pendientes CI remoto y revisión del contrato; gate gstack (exit 127 y mapeo) documentado, sin merge automático |
 | P0 | Adquirir DEM LOLA 5 m de 87–90°S | Hecho localmente: 3 465 285 714 bytes, SHA-256, metadatos y tres ventanas decodificadas; no validación de todos los píxeles |
 | P0 | Exportar recortes científicos | Hecho: herramientas, primer recorte y entrega polar; 24 pruebas Python y verificación JS del producto tras el ajuste J0 |
 | P1 | Heightmap polar para Marta hasta −80° | Hecho en rama #37: 1025×1025 Float32 LE + máscara + manifest sobre `layers.json`; producto real PGDA 90 de 80 m |

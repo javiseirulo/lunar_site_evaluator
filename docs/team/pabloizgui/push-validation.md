@@ -47,6 +47,11 @@ de configuración local/entorno. No se ha publicado el token.
 
 ## Antes de publicar o integrar
 
+Pablo autorizó expresamente publicar la rama y abrir un PR borrador contra `dev`
+con las verificaciones nativas, sin exigir completar el flujo automático gstack.
+Se mantiene el bloqueo documentado del wrapper; no se inventa un recibo verde.
+La autorización no incluye merge ni sustituye la revisión del equipo o el CI remoto.
+
 - Publicar como borrador solo con decisión explícita sobre el flujo automático
   pendiente, o reparar su runner/mapeo y repetirlo.
 - Ejecutar CI remoto sobre el commit publicado.
