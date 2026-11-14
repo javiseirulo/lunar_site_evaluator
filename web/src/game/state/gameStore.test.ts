@@ -153,4 +153,15 @@ describe('useGame phase machine', () => {
     useGame.getState().setDifficulty('expert');
     expect(useGame.getState().difficulty).toBe('expert');
   });
+
+  it('quit returns to menu from any phase, dropping the hand but keeping difficulty', () => {
+    useGame.setState({ phase: 'choosing', hand, chosenSlot: 2, difficulty: 'expert' });
+    useGame.getState().quit();
+    const s = useGame.getState();
+    expect(s.phase).toBe('menu');
+    expect(s.hand).toBeNull();
+    expect(s.chosenSlot).toBeNull();
+    expect(s.emergencyId).toBeNull();
+    expect(s.difficulty).toBe('expert');
+  });
 });
