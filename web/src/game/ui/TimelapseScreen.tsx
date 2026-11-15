@@ -15,6 +15,7 @@ import { isLinkUp } from '../engine/simulate';
 import { sfx } from '../audio/sfx';
 import { useGame } from '../state/gameStore';
 import { siteTerrain } from './assets';
+import { CAUSE_HEADLINE } from './content';
 import { CockpitView } from './cockpit/CockpitView';
 import { MapView } from './cockpit/MapView';
 import {
@@ -161,12 +162,13 @@ export function TimelapseScreen() {
         <p className="text-warn font-mono text-[11px] font-bold tracking-widest uppercase">
           Landing site {card.slot} · surface mission
         </p>
-        <div role="group" aria-label="View" className="flex border-2 border-black">
+        <div role="tablist" aria-label="View" className="flex border-2 border-black">
           {VIEWS.map(({ id, label, icon: Icon }) => (
             <button
               key={id}
               type="button"
-              aria-pressed={view === id}
+              role="tab"
+              aria-selected={view === id}
               onClick={() => setView(id)}
               className={clsx(
                 'flex min-h-10 cursor-pointer items-center gap-1 px-2.5 font-mono text-[11px] font-bold tracking-wider uppercase',
@@ -179,6 +181,13 @@ export function TimelapseScreen() {
           ))}
         </div>
       </header>
+      <p className="sr-only" aria-live="polite">
+        {ended
+          ? card.verdict.win
+            ? `Mission complete: ${DAYS} days survived.`
+            : `Day ${day}: ${card.verdict.cause ? CAUSE_HEADLINE[card.verdict.cause] : 'mission failed.'}`
+          : `Day ${day} of ${DAYS}`}
+      </p>
 
       {view === 'cockpit' && !ts ? (
         <p className="text-ink-muted flex flex-1 items-center justify-center font-mono text-[11px] tracking-widest uppercase">

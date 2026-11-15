@@ -3,7 +3,7 @@
  * surface (`orbit-bg.png`, slowly zooming in) onto the chosen landing site's marker, then calls
  * `landed()`. The real site name stays hidden.
  */
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
 import { MapPin } from 'lucide-react';
 import { useAppStore } from '@/core';
@@ -43,6 +43,12 @@ export function TravelScreen() {
   const chosenSlot = useGame((s) => s.chosenSlot);
   const reduced = useReducedMotion() ?? false;
   const landingUtc = hand?.landingUtc;
+  // "Touchdown!" enters the DOM (and the status region) only at touchdown.
+  const [down, setDown] = useState(false);
+  useEffect(() => {
+    const id = window.setTimeout(() => setDown(true), reduced ? 0 : FLIGHT_S * 1000);
+    return () => window.clearTimeout(id);
+  }, [reduced]);
 
   // The pick already shared the landing time; only write if something else changed it since.
   // The site is not selected in the shared store until the verdict (its name would leak).
@@ -127,15 +133,21 @@ export function TravelScreen() {
           />
         )}
       </div>
-      <motion.p
+      <p
         role="status"
-        className="text-center font-mono text-[13px] font-bold tracking-widest text-white uppercase"
-        initial={{ opacity: reduced ? 1 : 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: reduced ? 0 : FLIGHT_S, duration: 0.2 }}
+        className="min-h-[1.5em] text-center font-mono text-[13px] font-bold tracking-widest text-white uppercase"
       >
-        Touchdown!
-      </motion.p>
+        {down && (
+          <motion.span
+            className="inline-block"
+            initial={{ opacity: reduced ? 1 : 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.2 }}
+          >
+            Touchdown!
+          </motion.span>
+        )}
+      </p>
     </div>
   );
 }

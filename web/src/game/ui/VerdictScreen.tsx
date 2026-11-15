@@ -3,7 +3,7 @@
  * The chosen card's bars come back with the deciding one highlighted, and a loss names the
  * landing sites that would have survived.
  */
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
 import { Star } from 'lucide-react';
 import { clsx } from 'clsx';
@@ -120,6 +120,9 @@ export function VerdictScreen() {
   const hand = useGame((s) => s.hand);
   const chosenSlot = useGame((s) => s.chosenSlot);
   const sites = useData((s) => s.sites);
+  // Focus the result heading on arrival so keyboard and screen-reader users start there.
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  useEffect(() => headingRef.current?.focus({ preventScroll: true }), []);
   const difficulty = useGame((s) => s.difficulty);
   const card = hand?.cards.find((c) => c.slot === chosenSlot);
   const site = sites?.find((s) => s.id === card?.siteId);
@@ -170,9 +173,11 @@ export function VerdictScreen() {
       </div>
       <div className="flex min-w-0 flex-1 flex-col gap-3">
         <h2
+          ref={headingRef}
+          tabIndex={-1}
           aria-live="polite"
           className={clsx(
-            'font-mono text-2xl font-bold tracking-widest uppercase',
+            'font-mono text-2xl font-bold tracking-widest uppercase outline-none',
             v.win ? 'text-good' : 'text-bad',
           )}
         >

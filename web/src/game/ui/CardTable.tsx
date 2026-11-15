@@ -2,7 +2,7 @@
  * The table of landing-site cards during `dealing` and `choosing`. Runs the deal animation
  * (then `revealed()`), and on a pick fades the other cards before calling `choose(slot)`.
  */
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useReducedMotion } from 'motion/react';
 import { useAppStore, useData } from '@/core';
 import { sfx } from '../audio/sfx';
@@ -63,6 +63,15 @@ export function CardTable() {
 
   const choosing = phase === 'choosing' && picked === null;
 
+  // When the cards become pickable, move keyboard focus to the first one.
+  const gridRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!choosing || document.querySelector('dialog[open]')) return;
+    gridRef.current?.querySelector<HTMLButtonElement>('button:not([disabled])')?.focus({
+      preventScroll: true,
+    });
+  }, [choosing]);
+
   // Number keys 1–4 pick the matching landing site (ignored while the exit dialog is open).
   useEffect(() => {
     if (!choosing) return;
@@ -94,7 +103,7 @@ export function CardTable() {
           Fuller and greener is safer.
         </p>
       )}
-      <div className="grid grid-cols-2 gap-3 px-1 pt-5 pb-2 md:grid-cols-4">
+      <div ref={gridRef} className="grid grid-cols-2 gap-3 px-1 pt-5 pb-2 md:grid-cols-4">
         {cards.map((card, i) => (
           <SiteCard
             key={card.slot}

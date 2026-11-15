@@ -98,6 +98,11 @@ export function DialogueBox({ lines, speaker, onDone, onSkip, className }: Dialo
 
   return (
     <div className={clsx('flex w-full flex-col gap-2', className)}>
+      {/* Screen readers get the whole line at once; the typed copy is visual only. Outside the
+          role=button, whose children are presentational and would not be announced. */}
+      <p className="sr-only" aria-live="polite">
+        {`${speaker}: ${line}`}
+      </p>
       <div
         ref={boxRef}
         role="button"
@@ -112,10 +117,6 @@ export function DialogueBox({ lines, speaker, onDone, onSkip, className }: Dialo
         <div className="mb-2 inline-block bg-white px-2 py-0.5 font-mono text-[11px] font-bold tracking-widest text-black uppercase">
           {speaker}
         </div>
-        {/* Screen readers get the whole line at once; the typed copy is visual only. */}
-        <p className="sr-only" aria-live="polite">
-          {line}
-        </p>
         <p
           aria-hidden
           className="grid min-h-[4.5em] font-mono text-[13px] leading-relaxed text-white"
@@ -150,7 +151,7 @@ export function DialogueBox({ lines, speaker, onDone, onSkip, className }: Dialo
       </div>
       <div className="flex items-center justify-between font-mono text-[10px] tracking-widest text-ink-faint uppercase">
         <span>
-          {index + 1} / {lines.length} · Click, Enter or Space
+          {index + 1} / {lines.length} · Tap or press Enter to continue
         </span>
         {onSkip && (
           <button

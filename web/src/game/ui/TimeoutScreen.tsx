@@ -1,4 +1,5 @@
 /** The countdown hit zero before a site was chosen: the emergency's catastrophe plays out. */
+import { useEffect, useRef } from 'react';
 import { motion } from 'motion/react';
 import { useGame } from '../state/gameStore';
 import { verdictImage } from './assets';
@@ -8,6 +9,8 @@ import { GameImage } from './GameImage';
 
 export function TimeoutScreen() {
   const emergency = emergencyById(useGame((s) => s.emergencyId));
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  useEffect(() => headingRef.current?.focus({ preventScroll: true }), []);
 
   return (
     <motion.div
@@ -16,8 +19,10 @@ export function TimeoutScreen() {
       className="mission-scan flex flex-1 flex-col items-center justify-center gap-4 border-4 border-bad bg-[#14060a] p-6 text-center"
     >
       <h2
+        ref={headingRef}
+        tabIndex={-1}
         role="alert"
-        className="text-bad font-mono text-4xl font-bold tracking-[0.2em] [text-shadow:4px_4px_0_#000]"
+        className="text-bad font-mono text-3xl outline-none font-bold tracking-[0.15em] [text-shadow:4px_4px_0_#000] sm:text-4xl sm:tracking-[0.2em]"
       >
         OUT OF TIME
       </h2>
