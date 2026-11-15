@@ -2,38 +2,27 @@
  * Info card shown next to what was clicked on the globe — owner: Marta (src/globe).
  * Pure DOM content; GlobeCanvas places it in the 3D scene with a drei <Html>.
  */
-import {
-  useEffect,
-  useState,
-  type CSSProperties,
-  type FormEventHandler,
-  type ReactNode,
-} from 'react';
+import { useEffect, useState, type FormEventHandler, type ReactNode } from 'react';
 import { Check, Copy, MapPinPlus, Trash2, X } from 'lucide-react';
-import type { Site } from '@lunar/contracts';
+import type { HistoricSite, Site } from '@lunar/contracts';
 import { formatLatLon } from '@/core';
 import type { CustomPin } from './customPins';
 import { coordsForClipboard } from './geo';
+import { KIND_LABELS, OUTCOME_COLORS, OUTCOME_LABELS } from './historicSites';
+import { PAPER } from './paper';
 
 export type CardContent =
   /** rank: 1–5 in the top five; summary: "Meets X of Y requirements"; note: first unmet check. */
   | { kind: 'site'; site: Site; rank: number | null; summary: string | null; note: string | null }
   | { kind: 'custom'; pin: CustomPin }
+  /** A past landing or impact (not a candidate: it never selects a site). */
+  | { kind: 'historic'; site: HistoricSite }
   | { kind: 'point'; lat: number; lon: number };
 
 /**
  * The globe sits inside `.space`, which flips text tokens to light colours. Cards and forms over
  * it are paper sheets, so they reset the tokens to the page's light theme.
  */
-const PAPER: CSSProperties = {
-  ['--color-heading' as string]: '#1c1915',
-  ['--color-ink' as string]: '#2c2822',
-  ['--color-ink-muted' as string]: '#6a6256',
-  ['--color-ink-faint' as string]: '#8a8174',
-  ['--color-edge' as string]: '#d9d0c0',
-  ['--color-line' as string]: '#d9d0c0',
-  color: '#2c2822',
-};
 
 /** Small paper sheet with a title row and a close button (card and pin form). */
 export function Sheet({
@@ -91,9 +80,13 @@ export function GlobeCard({
   onDeletePin: (id: string) => void;
 }) {
   const { lat, lon } =
-    content.kind === 'site' ? content.site : content.kind === 'custom' ? content.pin : content;
+    content.kind === 'site' || content.kind === 'historic'
+      ? content.site
+      : content.kind === 'custom'
+        ? content.pin
+        : content;
   const title =
-    content.kind === 'site'
+    content.kind === 'site' || content.kind === 'historic'
       ? content.site.name
       : content.kind === 'custom'
         ? content.pin.name
@@ -124,6 +117,7 @@ export function GlobeCard({
         {content.kind === 'site' && (
           <p className="text-ink-faint text-[12px]">Full details in the site sheet.</p>
         )}
+        {content.kind === 'historic' && <HistoricDetails site={content.site} />}
         {content.kind === 'custom' && (
           <>
             <p className="text-ink-faint text-[12px]">
@@ -185,5 +179,34 @@ function CopyButton({ text }: { text: string }) {
       )}
       {state === 'copied' ? 'Copied' : state === 'failed' ? 'Failed' : 'Copy'}
     </button>
+  );
+}
+
+/** Text-only facts about a past landing: no logos, patches or flags (CLAUDE.md §3). */
+function HistoricDetails({ site }: { site: HistoricSite }) {
+  return (
+    <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-[12px]">
+      <dt className="text-ink-muted">Agency</dt>
+      <dd>
+        {site.agency} · {site.country}
+      </dd>
+      <dt className="text-ink-muted">Date</dt>
+      <dd className="num">{site.date_utc.slice(0, 10)}</dd>
+      <dt className="text-ink-muted">Outcome</dt>
+      <dd className="flex items-center gap-1.5">
+        <span
+          className="inline-block size-2.5 rounded-full"
+          style={{ background: OUTCOME_COLORS[site.outcome] }}
+          aria-hidden
+        />
+        {OUTCOME_LABELS[site.outcome]} · {KIND_LABELS[site.kind]}
+      </dd>
+      <dd className="text-ink col-span-2 mt-1">{site.note}</dd>
+      <dd className="col-span-2">
+        <a className="lnk" href={site.source} target="_blank" rel="noopener noreferrer">
+          Source
+        </a>
+      </dd>
+    </dl>
   );
 }
