@@ -10,7 +10,7 @@ import { buildPatchArrays } from './terrain';
 import {
   PATCH_PREFETCH_DISTANCE,
   loadTerrain,
-  nextPatchShown,
+  patchShownAt,
   patchOn,
   useTerrain,
 } from './terrainStore';
@@ -129,7 +129,7 @@ export function PatchTrigger() {
   useFrame(({ camera }) => {
     const s = useTerrain.getState();
     const p = camera.position;
-    const shown = nextPatchShown([p.x, p.y, p.z], s.shown);
+    const shown = patchShownAt([p.x, p.y, p.z]);
     if (shown !== s.shown) s.setShown(shown);
     if (s.status === 'idle' && p.length() < PATCH_PREFETCH_DISTANCE && p.y / p.length() < -0.85)
       void loadTerrain();

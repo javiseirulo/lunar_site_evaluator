@@ -49,16 +49,11 @@ import { useCustomPins } from './customPins';
 import { latLonToVec3, vec3ToLatLon } from './geo';
 import { HistoricControls } from './HistoricControls';
 import { useSunDirection } from './sunLight';
+import { NIGHT_FILL, useNightLayer } from './nightLayer';
+import { NightControls, Terminator } from './DayNight';
 import { PatchTrigger, PolarPatch, SunLight } from './PolarPatch';
 import { EXAGGERATION_LABEL, PatchControls } from './PatchControls';
-import {
-  PATCH_SHOW_DISTANCE,
-  loadTerrain,
-  patchOn,
-  useTerrain,
-  useTerrainLift,
-  type LiftFn,
-} from './terrainStore';
+import { loadTerrain, patchOn, useTerrain, useTerrainLift, type LiftFn } from './terrainStore';
 import { OUTCOME_COLORS, loadHistoricSites, useHistoric } from './historicSites';
 import { useRequirements } from './requirementsStore';
 import { useCandidates } from './useCandidates';
@@ -81,8 +76,7 @@ const MISS_PIN_COLOR = new Color('#9aa0aa');
 /** Sites that meet every requirement. */
 const CANDIDATE_PIN_COLOR = new Color('#f2c55c');
 const POLE_MARKER_MIN_DISTANCE = 2;
-/** The polar terrain patch shows from this distance in (see terrainStore). */
-const POLE_VIEW = { lat: -89, distance: PATCH_SHOW_DISTANCE };
+const POLE_VIEW = { lat: -89, distance: 1.3 };
 /** Camera distance from the Moon's centre after flying to a pin added by coordinates. */
 const PIN_VIEW_DISTANCE = 1.4;
 const INITIAL_CAMERA = latLonToVec3(-30, 0, 3);
@@ -121,6 +115,7 @@ export default function GlobeCanvas() {
   const now = useAppStore((s) => s.currentTimeUTC);
   const sun = useSunDirection(now);
   const sunDir = sun.dir;
+  const nightOn = useNightLayer((s) => s.on);
   const exaggerated = useTerrain((s) => patchOn(s) && s.exaggeration === 2);
 
   const sites = useData((s) => s.sites);
@@ -222,8 +217,13 @@ export default function GlobeCanvas() {
         shadows
       >
         <color attach="background" args={['#000000']} />
-        {/* No atmosphere: almost no fill light, so the night side is dark. */}
-        <ambientLight intensity={sunDir ? 0.04 : 0.35} />
+        {/* No atmosphere: almost no fill light, so the night side is dark (unless the Day / night layer is on). */}
+        {nightOn ? (
+          <ambientLight color={NIGHT_FILL.color} intensity={NIGHT_FILL.intensity} />
+        ) : (
+          <ambientLight intensity={sunDir ? 0.04 : 0.35} />
+        )}
+        <Terminator sun={sunDir} />
         <SunLight direction={sunDir ?? FIXED_LIGHT_DIR} intensity={sunDir ? 2.6 : 2} />
         <Stars radius={60} depth={30} count={3000} factor={3} saturation={0} fade />
         <Suspense fallback={<PlaceholderMoon />}>
@@ -276,6 +276,7 @@ export default function GlobeCanvas() {
           }}
         />
         <HistoricControls />
+        <NightControls hasSun={!!sunDir} />
         <PatchControls />
       </div>
       {exaggerated && (

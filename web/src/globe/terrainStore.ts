@@ -44,26 +44,21 @@ export function patchOn(s: Pick<TerrainState, 'status' | 'shown'>): boolean {
   return s.status === 'ready' && s.shown;
 }
 
-/** Camera distance (Moon centre, R = 1) set by the "South pole" button; the patch shows from here in. */
-export const PATCH_SHOW_DISTANCE = 1.3;
-/** Hide again only a bit farther out, so it does not flicker at the threshold. */
-const PATCH_HIDE_DISTANCE = 1.45;
-/** Camera direction's y (−1 = straight over the south pole): show below, hide above the second. */
-const PATCH_SHOW_SOUTH = -0.85;
-const PATCH_HIDE_SOUTH = -0.75;
+/**
+ * The patch shows within this camera distance (Moon centre, R = 1) — a little farther out than
+ * the "South pole" button view (1.3), so it is already there when that flight arrives — and
+ * hides beyond it. Same threshold both ways.
+ */
+export const PATCH_SHOW_DISTANCE = 1.45;
+/** …while looking at the south polar region (camera direction's y at or below this). */
+const PATCH_SHOW_SOUTH = -0.75;
 /** Start downloading a little before the patch is due, so it is ready when it shows. */
 export const PATCH_PREFETCH_DISTANCE = 1.8;
 
-/** Whether the patch should be drawn for this camera position (with hysteresis). */
-export function nextPatchShown(
-  camera: readonly [number, number, number],
-  wasShown: boolean,
-): boolean {
+/** Whether the patch should be drawn for this camera position. */
+export function patchShownAt(camera: readonly [number, number, number]): boolean {
   const d = Math.hypot(camera[0], camera[1], camera[2]);
-  const south = camera[1] / d;
-  return wasShown
-    ? d <= PATCH_HIDE_DISTANCE && south <= PATCH_HIDE_SOUTH
-    : d <= PATCH_SHOW_DISTANCE + 0.005 && south <= PATCH_SHOW_SOUTH;
+  return d <= PATCH_SHOW_DISTANCE && camera[1] / d <= PATCH_SHOW_SOUTH;
 }
 
 let inflight: Promise<void> | null = null;
