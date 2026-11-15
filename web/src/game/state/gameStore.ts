@@ -145,7 +145,7 @@ export interface GameState {
   quit: () => void;
 }
 
-function pickEmergency(seed: number): string {
+export function pickEmergency(seed: number): string {
   // Decorrelated from deal()'s first draw on the same seed.
   const i = Math.floor(mulberry32((seed ^ 0xa5a5a5a5) >>> 0)() * emergencies.length);
   return emergencies[i]!.id;

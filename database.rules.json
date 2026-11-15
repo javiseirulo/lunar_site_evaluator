@@ -1,0 +1,30 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "classes": {
+      "$token": {
+        ".validate": "$token.matches(/^[A-Z0-9]{5,8}$/)",
+        ".read": true,
+        "state": {
+          ".write": true,
+          ".validate": "newData.hasChildren(['phase','q','shownAt'])"
+        },
+        "players": {
+          "$sid": {
+            ".write": "!data.exists() || !newData.exists() || data.child('name').val() === newData.child('name').val()",
+            ".validate": "newData.hasChildren(['name']) && newData.child('name').isString() && newData.child('name').val().length <= 20"
+          }
+        },
+        "answers": {
+          "$q": {
+            "$sid": {
+              ".write": "!data.exists()",
+              ".validate": "newData.hasChildren(['choice','t']) && newData.child('choice').isNumber() && newData.child('choice').val() >= 0 && newData.child('choice').val() <= 4"
+            }
+          }
+        }
+      }
+    }
+  }
+}
