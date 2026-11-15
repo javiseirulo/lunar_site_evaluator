@@ -212,16 +212,18 @@ export default function IntroPage() {
           />
 
           <figure className="relative z-20 max-w-3xl text-center">
-            <blockquote>
+            {/* In Spanish on purpose: the team is from the Madrid event. */}
+            <blockquote lang="es">
               <p className="lp-quote-shadow text-xl leading-[1.3] font-medium tracking-[-0.03em] text-white sm:text-2xl md:text-[28px] lg:text-[32px]">
-                &ldquo;Near the pole the Sun skims the horizon, so a hill a few kilometres away can
-                hide it for days. We built this to show which landing sites keep their power and
-                their line home, so that when a launch slips you can find the next best place in
-                minutes.&rdquo;
+                &ldquo;En el polo, una colina puede dejarte sin sol durante días. Te ayudamos a
+                elegir dónde no.&rdquo;
               </p>
             </blockquote>
-            <figcaption className="mt-5 text-sm tracking-wide text-white/80 md:mt-6 md:text-base">
-              The {BRAND} team
+            <figcaption
+              lang="es"
+              className="mt-5 text-sm tracking-wide text-white/80 md:mt-6 md:text-base"
+            >
+              El equipo de {BRAND}
             </figcaption>
             <div className="mt-7 flex flex-wrap items-center justify-center gap-x-8 gap-y-4 md:mt-8">
               <Link to="/home" className={`${PILL} inline-flex px-8 py-3.5`}>
