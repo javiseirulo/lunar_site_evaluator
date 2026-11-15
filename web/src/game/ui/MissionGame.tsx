@@ -44,7 +44,7 @@ const EXIT_PHASES: readonly Phase[] = [
 ];
 
 /** Phases whose screen lets the globe show through (darkened a little for readable text). */
-const DIM_PHASES: readonly Phase[] = ['menu', 'intro'];
+const DIM_PHASES: readonly Phase[] = ['menu'];
 
 /**
  * Phases whose globe lighting follows the hand's landing time (the Sun as it will be on landing
@@ -162,7 +162,13 @@ export function MissionGame() {
         className="mission-root bg-navy-950 text-ink relative flex min-h-[544px] w-full flex-col overflow-hidden font-sans"
       >
         {shot && (
-          <div className="absolute inset-0">
+          <div
+            className={clsx(
+              'absolute inset-0 transition-transform duration-700 ease-out motion-reduce:transition-none',
+              // The intro's cabin window is in the upper part of the screen: lift the Moon into it.
+              phase === 'intro' && '-translate-y-[16%]',
+            )}
+          >
             <GameGlobe
               shot={shot}
               onShotDone={onShotDone}
@@ -190,7 +196,13 @@ export function MissionGame() {
             )}
           </div>
         )}
-        <div className="relative flex min-h-10 items-center justify-between gap-2 pb-1.5">
+        <div
+          className={clsx(
+            'relative flex min-h-10 items-center justify-between gap-2 pb-1.5',
+            // Inside the cabin (intro) the top bar is part of the cabin wall.
+            phase === 'intro' && 'bg-[#0b0f1a]',
+          )}
+        >
           <span className="text-ink-faint min-w-0 truncate font-mono text-[10px] tracking-[0.3em] uppercase">
             {EXIT_PHASES.includes(phase) ? 'Mission in progress' : ''}
           </span>
