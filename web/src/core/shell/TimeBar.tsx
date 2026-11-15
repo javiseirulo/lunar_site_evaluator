@@ -8,7 +8,14 @@ import { cn } from '@/lib/utils';
 import { useAppStore } from '../store';
 import { useData, useTimeseries } from '../data';
 import { formatHours, formatUtc } from '../format';
-import { hoursUntilChange, sampleAt } from '../timeseries';
+import {
+  changeLead,
+  changeWhen,
+  nextChange,
+  sampleAt,
+  seriesSpanLabel,
+  type NextChange,
+} from '../timeseries';
 import { dayOfWindow, friendlyHours } from '../metrics';
 import { EARTH_BAND, SUN_BAND, windowsGradient } from '../timeline';
 
@@ -66,16 +73,15 @@ export function TimeBar({ className }: { className?: string }) {
     [ts],
   );
   const sample = ts ? sampleAt(ts, currentTimeUTC) : null;
-  const toSunChange = ts ? hoursUntilChange(ts, ts.lit, currentTimeUTC) : null;
-  const toEarthChange = ts?.earth_visible
-    ? hoursUntilChange(ts, ts.earth_visible, currentTimeUTC)
-    : null;
+  const toSunChange = nextChange(ts, ts?.lit, currentTimeUTC);
+  const toEarthChange = nextChange(ts, ts?.earth_visible, currentTimeUTC);
 
   if (!range) return null;
   const pct = t1 > t0 ? ((Math.min(t1, Math.max(t0, now)) - t0) / (t1 - t0)) * 100 : 0;
   const day = dayOfWindow(currentTimeUTC, range.start_utc, range.end_utc);
-  const when = (h: number | null) =>
-    h === null ? 'not in this window' : proMode ? formatHours(h) : friendlyHours(h);
+  const span = ts ? seriesSpanLabel(ts) : '';
+  const when = (n: NextChange) =>
+    changeWhen(n, span, (h) => (proMode ? formatHours(h) : friendlyHours(h)));
 
   return (
     <section
@@ -189,12 +195,12 @@ export function TimeBar({ className }: { className?: string }) {
         )}
         {proMode && sample && (
           <span>
-            {sample.lit ? 'Sunset' : 'Sunrise'} in{' '}
+            {changeLead(sample.lit ? 'Sunset' : 'Sunrise', toSunChange)}{' '}
             <b className="text-heading">{when(toSunChange)}</b>
             {sample.earthVisible !== null && (
               <>
                 {', '}
-                {sample.earthVisible ? 'Earthset' : 'Earthrise'} in{' '}
+                {changeLead(sample.earthVisible ? 'Earthset' : 'Earthrise', toEarthChange)}{' '}
                 <b className="text-heading">{when(toEarthChange)}</b>
               </>
             )}

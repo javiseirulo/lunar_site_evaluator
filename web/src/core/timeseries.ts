@@ -77,3 +77,71 @@ export function fractionOn(flags: (0 | 1)[]): number {
   for (const f of flags) on += f;
   return on / flags.length;
 }
+
+/**
+ * What happens next to a flag (sun lit, Earth visible) from a given time, told apart so the UI never
+ * confuses "never happens in the loaded data" with "no data":
+ * - `in`: flips after `hours`.
+ * - `never`: the flag has one value for the whole series (e.g. Earth never rises from a far-side site).
+ * - `not-again`: it flipped earlier in the series but does not flip again.
+ * - `unknown`: no series or no flags (not loaded / failed / field missing).
+ */
+export type NextChange =
+  { kind: 'in'; hours: number } | { kind: 'never' } | { kind: 'not-again' } | { kind: 'unknown' };
+
+export function nextChange(
+  ts: Timeseries | null | undefined,
+  flags: (0 | 1)[] | null | undefined,
+  isoUtc: string,
+): NextChange {
+  if (!ts || !flags || flags.length === 0) return { kind: 'unknown' };
+  const hours = hoursUntilChange(ts, flags, isoUtc);
+  if (hours !== null) return { kind: 'in', hours };
+  return flags.every((f) => f === flags[0]) ? { kind: 'never' } : { kind: 'not-again' };
+}
+
+/** Period the series covers, from its own timestamps: "2027" or "2027–2028" (never hardcoded). */
+export function seriesSpanLabel(ts: Timeseries): string {
+  const first = ts.t_utc[0]?.slice(0, 4);
+  const last = ts.t_utc[ts.t_utc.length - 1]?.slice(0, 4);
+  if (!first || !last) return 'the data range';
+  return first === last ? first : `${first}–${last}`;
+}
+
+/** Value text for a countdown: "3 d", "never in 2027", "not again in 2027", "no data". */
+export function changeWhen(next: NextChange, span: string, fmt: (hours: number) => string): string {
+  switch (next.kind) {
+    case 'in':
+      return fmt(next.hours);
+    case 'never':
+      return `never in ${span}`;
+    case 'not-again':
+      return `not again in ${span}`;
+    default:
+      return 'no data';
+  }
+}
+
+/** "Sunset in" before a countdown, "Sunset:" when there is none. */
+export const changeLead = (label: string, next: NextChange) =>
+  next.kind === 'in' ? `${label} in` : `${label}:`;
+
+/** Sentence clause: "the Sun sets in 3 days", "Earth never rises here in 2027". */
+export function changeClause(
+  subject: string,
+  verb: 'set' | 'rise',
+  next: NextChange,
+  span: string,
+  fmt: (hours: number) => string,
+): string {
+  switch (next.kind) {
+    case 'in':
+      return `${subject} ${verb}s in ${fmt(next.hours)}`;
+    case 'never':
+      return `${subject} never ${verb}s here in ${span}`;
+    case 'not-again':
+      return `${subject} does not ${verb} again in ${span}`;
+    default:
+      return `${subject} ${verb}s: no data`;
+  }
+}
