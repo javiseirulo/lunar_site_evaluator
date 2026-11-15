@@ -85,3 +85,7 @@
   - #86 (contrato): `source` solo `https`; el test exige que cada `historic_landing` de `sites.json` esté en `historic_sites.json` y que los id compartidos sean `historic_landing`.
   - #89: el cargador valida todo lo que muestra la tarjeta y avisa en consola de filas descartadas; cursor y tarjeta se limpian al apagar la capa; leyenda con borde (contraste); los choques ya no dicen "Crashed · Crash site".
   - Decisiones de Marta: sin triángulo encima de un candidato visible (su tarjeta muestra "Past landing"); 7 misiones más (Luna 13, Luna 20, Surveyor 3/5/6/7, HAKUTO-R M2) → 32; contador "32 sites (5 crashes) · 2 south of 80°S"; el interruptor reintenta la carga tras un error.
+
+## 2026-11-15 — Sesión 5: v2 del globo (#92, rama `martaplatero2002-star/92-polar-patch`)
+- Datos revisados: `terrain/heightmap.json` (1025×1025, vértices, ±304006 m, LDEM_80S_80MPP_ADJ) y `ephem/index.json` cuadran con sus cabeceras. **Falta `terrain/valid.u8`** (citado en la cabecera): se usa el NaN de `heights.f32` como máscara — avisar a Pablo. El core carga `web/public/data/layers.json` (mock), no `terrain/layers.json` (real) — pedir a Javi2. `@/ephem` ya interpola el Sol (`sunDirectionMoonME`): se reutiliza.
+- Paso 0: `isCandidateSite` (missionStats) + `useCandidates` solo con `kind: "candidate"`: Explore pasa de 59 a 39 sitios. Con batería 20 000 Wh / 50 W (400 h) no pasa ninguno; con 50 000 Wh, 26 de 39; con 200 000 Wh, 39.
