@@ -133,7 +133,7 @@
 
 ### v3 del globo: estadísticas de cualquier punto (2026-11-15, #117)
 - `web/src/globe/pointStats.ts`: parte pura `computePointStats` (punto, elevación, horizonte, ventana, instante, requisitos → estado) y hook `usePointStats`. Usa `buildTimeseries` de `@/ephem` y la MISMA evaluación que la lista de candidatos (`missionStats` + `evaluateSite`). La ventana es la de `useMissionWindow` (recortada a `manifest.time_range`, 2027, como en la v1).
-- Horizonte plano salvo que el punto coincida (≈20 m) con un sitio del catálogo: entonces `loadHorizon(id)` y `elev_m` del sitio. Nunca se reutiliza un perfil en otro punto. Aviso visible "Flat horizon — terrain not included at this point".
+- Horizonte plano salvo que el punto coincida (≈6 m en latitud) con un sitio del catálogo: entonces `loadHorizon(id)` y `elev_m` del sitio. Nunca se reutiliza un perfil en otro punto. Aviso visible "Flat horizon — terrain not included at this point".
 - Elevación: heightmap polar (`sampleHeight`) al sur de −80°; fuera del parche o sin dato, 0 m y aviso "Elevation not available, 0 m assumed". Pendiente de un punto libre: sin dato (el chequeo queda "pending", no falla).
 - Caché por (punto a 4 decimales ≈ 3 m, elevación, ventana, horizonte): serie de la ventana (LRU 16) y serie de 30 días desde la hora del Mission Clock (LRU 400). "Ahora" y "horas hasta el próximo cambio" salen de esta segunda.
 - Estados: loading (efemérides/terreno/horizonte cargando), no_ephemeris (fuera de 2026–2055 o sin publicar), error, ready.

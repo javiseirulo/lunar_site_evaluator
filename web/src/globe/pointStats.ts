@@ -43,7 +43,7 @@ const EPHEM_END_MS = Date.UTC(2056, 0, 1);
 const HOUR = 3_600_000;
 /** How far ahead "hours until the next change" looks. */
 const LOOKAHEAD_MS = 30 * 24 * HOUR;
-/** A point this close to a catalogue site IS that site (≈ 20 m). */
+/** A point this close to a catalogue site IS that site (≈ 6 m of latitude). */
 const CATALOG_TOL_DEG = 0.0002;
 
 export const NO_EPHEMERIS_TEXT = 'No ephemeris for this date';
@@ -288,7 +288,7 @@ export function computePointStats(input: PointInput): PointStatsState {
 // Catalogue match and elevation
 // ---------------------------------------------------------------------------
 
-/** The catalogue site at (lat, lon), if the point is that site (≈ 20 m). */
+/** The catalogue site at (lat, lon), if the point is that site (≈ 6 m of latitude). */
 export function findCatalogSite(sites: Site[] | null, lat: number, lon: number): Site | null {
   if (!sites) return null;
   const dLon = (a: number, b: number) => Math.abs(((a - b + 540) % 360) - 180);
@@ -328,8 +328,8 @@ export function elevationAt(
 
 /**
  * Live statistics of a point. Follows the Mission Clock, the mission window and the requirements,
- * keeps showing the previous result while the new one is being computed, and loads what it needs
- * (ephemeris years, terrain, horizon of a catalogue site) in the background.
+ * reports `loading` while the data it needs is not in memory yet (ephemeris years, terrain, horizon
+ * of a catalogue site, all loaded in the background), and computes synchronously once it is.
  */
 export function usePointStats(
   point: { lat: number; lon: number } | null,
