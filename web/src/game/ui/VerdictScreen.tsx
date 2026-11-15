@@ -7,9 +7,9 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
 import { Star } from 'lucide-react';
 import { clsx } from 'clsx';
-import { useData, useTimeseries } from '@/core';
+import { useTimeseries } from '@/core';
 import { CAUSE_BAR, qualityBars } from '../engine/bars';
-import { DEFAULT_REQUIREMENTS } from '../engine/requirements';
+import { useMissionRules } from '../state/useMissionRules';
 import { sfx } from '../audio/sfx';
 import { useGame } from '../state/gameStore';
 import { verdictImage } from './assets';
@@ -21,9 +21,9 @@ import { GameGlobe } from './GameGlobe';
 import { GameImage } from './GameImage';
 import { QualityBar } from './QualityBar';
 import { survivorsLine, verdictSummary } from './reveal';
-
-const DAYS = DEFAULT_REQUIREMENTS.surface_days;
-const MISSION_HOURS = DAYS * 24;
+import { useCurrentMission } from '../historic/useCurrentMission';
+import { historyOption } from '../historic/deal';
+import { useGameSites } from '../historic/useGameSites';
 
 /** Seconds before star `n` (1-based) pops in. */
 const starDelay = (n: number) => 0.5 + n * 0.3;
@@ -119,15 +119,19 @@ function Stat({ label, children }: { label: string; children: ReactNode }) {
 }
 
 export function VerdictScreen() {
+  const DAYS = useMissionRules().surface_days;
+  const MISSION_HOURS = DAYS * 24;
   const hand = useGame((s) => s.hand);
   const chosenSlot = useGame((s) => s.chosenSlot);
-  const sites = useData((s) => s.sites);
+  const sites = useGameSites();
   // Focus the result heading on arrival so keyboard and screen-reader users start there.
   const headingRef = useRef<HTMLHeadingElement>(null);
   useEffect(() => headingRef.current?.focus({ preventScroll: true }), []);
   const difficulty = useGame((s) => s.difficulty);
   const card = hand?.cards.find((c) => c.slot === chosenSlot);
   const site = sites?.find((s) => s.id === card?.siteId);
+  const mission = useCurrentMission();
+  const real = mission ? historyOption(mission) : null;
   const ts = useTimeseries(card?.siteId);
 
   if (!card) {
@@ -234,7 +238,8 @@ export function VerdictScreen() {
         {bars.length > 0 && (
           <div className="border-2 border-black bg-black/50 p-2">
             <p className="text-ink-muted mb-1.5 font-mono text-[10px] tracking-wider uppercase">
-              Your card (Landing site {card.slot}, yearly averages)
+              Your card (Landing site {card.slot},{' '}
+              {mission ? `first ${DAYS} days after landing` : 'yearly averages'})
             </p>
             <div className="grid grid-cols-1 gap-x-3 gap-y-1.5 sm:grid-cols-2">
               {bars.map((b) => (
@@ -256,6 +261,15 @@ export function VerdictScreen() {
           <span className="text-warn font-mono font-bold uppercase">Lesson: </span>
           {lessonFor(v.win ? null : v.cause)}
         </div>
+        {mission && real && (
+          <div className="border-2 border-black bg-navy-900/80 p-2 text-[12px] text-ink">
+            <span className="text-warn font-mono font-bold uppercase">History: </span>
+            {real.site.id === card.siteId
+              ? `You picked the same site as ${mission.name}: ${real.site.name}, with the Sun ${real.landing_sun_el.toFixed(0)}° up. `
+              : `${mission.name} landed at ${real.site.name}, with the Sun ${real.landing_sun_el.toFixed(0)}° up. `}
+            {mission.fact}
+          </div>
+        )}
         <div className="mt-auto pt-1">
           <GameButtons />
         </div>

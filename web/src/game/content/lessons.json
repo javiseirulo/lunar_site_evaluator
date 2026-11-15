@@ -4,5 +4,7 @@
   "blackout": "Earth can sit below the horizon near the pole. After more than 72 hours without a link, the mission is lost. Check 'Longest blackout'.",
   "low_sun": "Solar panels need sunlight to make power. A site that stays dark for too long leaves the lander without energy. Needs the Sun at least 50% of the week.",
   "low_comm": "The Earth link depends on how much of the time Earth is above the horizon. Poor visibility means a patchy link with mission control. Needs Earth in view at least 50% of the week.",
-  "win": "Well done! You balanced slope, sunlight, long nights and the Earth link, and the lander survived until the end of its window."
+  "win": "Well done! You balanced slope, sunlight, long nights and the Earth link, and the lander survived until the end of its window.",
+  "dark_landing": "Pilots and landing cameras need light to see the ground. With the Sun below about 5°, the landing site is still in darkness or in very long shadows. Apollo waited for local sunrise.",
+  "glare_landing": "With the Sun high in the sky there are no shadows, and rocks and craters look flat. Apollo landed with the Sun only 5-14° up so long shadows showed every boulder."
 }

@@ -2,7 +2,7 @@
 import { useMemo } from 'react';
 import type { Site, Timeseries } from '@lunar/contracts';
 import { coachWin } from '../engine/coaching';
-import { DEFAULT_REQUIREMENTS } from '../engine/requirements';
+import { useMissionRules } from '../state/useMissionRules';
 import type { Verdict } from '../engine/simulate';
 
 export function CoachPanel({
@@ -16,9 +16,10 @@ export function CoachPanel({
   startIndex: number;
   verdict: Verdict;
 }) {
+  const rules = useMissionRules();
   const coaching = useMemo(
-    () => (site && ts ? coachWin(site, ts, startIndex, verdict, DEFAULT_REQUIREMENTS) : null),
-    [site, ts, startIndex, verdict],
+    () => (site && ts ? coachWin(site, ts, startIndex, verdict, rules) : null),
+    [site, ts, startIndex, verdict, rules],
   );
   if (!coaching) return null;
   const weak = coaching.weakest.map((w) => w.text);

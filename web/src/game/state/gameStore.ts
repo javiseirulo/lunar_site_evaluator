@@ -71,8 +71,15 @@ export const DESCENT_MS = 3500;
 /** The same with prefers-reduced-motion (the camera jumps, then holds briefly). */
 export const DESCENT_REDUCED_MS = 600;
 
+/** South Pole (random emergency, dealt hand) or Historical (a real mission's options). */
+export type GameMode = 'south_pole' | 'historical';
+
 export interface GameState {
   phase: Phase;
+  mode: GameMode;
+  /** Historical mode: the mission in play, and whether it has an alarm (else no alert phase). */
+  missionId: string | null;
+  missionAlarm: boolean;
   difficulty: Difficulty;
   seed: number;
   emergencyId: string | null;
@@ -95,7 +102,9 @@ export interface GameState {
   configure: (config: GameConfig, difficulty?: Difficulty | null) => void;
   /** menu → intro (→ alert straight away with `config.skipIntro`). */
   start: (seed?: number) => void;
-  /** intro → alert. */
+  /** menu → intro of a Historical mission (`hasAlarm` from the mission list). */
+  startHistorical: (missionId: string, hasAlarm: boolean, seed?: number) => void;
+  /** intro → alert (Historical without an alarm: straight to the briefing). */
   endIntro: () => void;
   skipIntro: () => void;
   /** Stores the hand dealt in the background (only during `alert` / `briefing`, once). */
@@ -145,8 +154,9 @@ function pickEmergency(seed: number): string {
 export const useGame = create<GameState>()((set, get) => {
   const enterAlert = () =>
     set((s) => ({
-      phase: 'alert',
-      emergencyId: pickEmergency(s.seed),
+      // A historical mission only has an alert when something really went wrong in its descent.
+      phase: s.mode === 'historical' && !s.missionAlarm ? 'briefing' : 'alert',
+      emergencyId: s.mode === 'historical' ? null : pickEmergency(s.seed),
       deadline: 0,
       pausedAt: null,
       heldAt: null,
@@ -169,8 +179,36 @@ export const useGame = create<GameState>()((set, get) => {
     enterAlert();
   };
 
+  const begin = (
+    mode: GameMode,
+    missionId: string | null,
+    missionAlarm: boolean,
+    seed?: number,
+  ) => {
+    const { phase, config } = get();
+    if (phase !== 'menu') return;
+    set({
+      phase: 'intro',
+      mode,
+      missionId,
+      missionAlarm,
+      seed: seed ?? config.seed ?? Date.now(),
+      emergencyId: null,
+      hand: null,
+      chosenSlot: null,
+      pendingSlot: null,
+      deadline: 0,
+      pausedAt: null,
+      heldAt: null,
+    });
+    if (config.skipIntro) enterAlert();
+  };
+
   return {
     phase: 'menu',
+    mode: 'south_pole',
+    missionId: null,
+    missionAlarm: false,
     difficulty: 'normal',
     seed: 0,
     emergencyId: null,
@@ -190,22 +228,9 @@ export const useGame = create<GameState>()((set, get) => {
       set(difficulty ? { config, difficulty } : { config });
     },
 
-    start: (seed) => {
-      const { phase, config } = get();
-      if (phase !== 'menu') return;
-      set({
-        phase: 'intro',
-        seed: seed ?? config.seed ?? Date.now(),
-        emergencyId: null,
-        hand: null,
-        chosenSlot: null,
-        pendingSlot: null,
-        deadline: 0,
-        pausedAt: null,
-        heldAt: null,
-      });
-      if (config.skipIntro) enterAlert();
-    },
+    start: (seed) => begin('south_pole', null, false, seed),
+
+    startHistorical: (missionId, hasAlarm, seed) => begin('historical', missionId, hasAlarm, seed),
 
     endIntro: () => leaveIntro(),
     skipIntro: () => leaveIntro(),

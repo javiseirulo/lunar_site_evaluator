@@ -13,13 +13,14 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Compass, Earth, Eye, Play, RotateCcw, Sun } from 'lucide-react';
 import { clsx } from 'clsx';
-import { formatUtc, useData, useTimeseries } from '@/core';
+import { formatUtc, useTimeseries } from '@/core';
 import type { StreetViewEmbedHandle, StreetViewEmbedProps } from '@/streetview/StreetViewEmbed';
 import { DEFAULT_REQUIREMENTS } from '../engine/requirements';
 import { useGame } from '../state/gameStore';
 import { skyAt, viewHeading } from './cockpit/sky';
 import { Countdown } from './Countdown';
 import { compassPoint, earthText, reconSky, SUN_TEXT } from './panorama';
+import { useGameSite } from '../historic/useGameSites';
 
 const MARGIN = DEFAULT_REQUIREMENTS.antenna_margin_deg;
 /** First load pulls the Cesium bundle and the Moon tiles. Give that time before giving up. */
@@ -45,7 +46,7 @@ export function SiteRecon() {
   const simulate = useGame((s) => s.simulate);
   const chooseAgain = useGame((s) => s.chooseAgain);
   const card = hand?.cards.find((c) => c.slot === slot);
-  const site = useData((s) => s.sites?.find((x) => x.id === card?.siteId) ?? null);
+  const site = useGameSite(card?.siteId);
   const ts = useTimeseries(card?.siteId);
   const sky = useMemo(() => (ts && hand ? skyAt(ts, hand.startIndex, 0) : null), [ts, hand]);
   const status = useMemo(() => (sky ? reconSky(sky, MARGIN) : null), [sky]);

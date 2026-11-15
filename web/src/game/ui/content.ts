@@ -20,4 +20,6 @@ export const CAUSE_HEADLINE: Record<FailCause, string> = {
   blackout: 'We lost contact with Earth!',
   low_sun: 'Not enough sunlight to stay alive!',
   low_comm: 'The link with Earth was too weak!',
+  dark_landing: 'Too dark to see the ground!',
+  glare_landing: 'Too much glare: no shadows, no rocks in sight!',
 };

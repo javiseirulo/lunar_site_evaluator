@@ -260,6 +260,8 @@ export const sfx = {
           }
           break;
         case 'slope':
+        case 'dark_landing':
+        case 'glare_landing':
           // Crash: noise collapsing downwards plus a heavy thud.
           noiseHit(g, { dur: 0.9, peak: 0.3, filter: 'lowpass', freq: 2200, to: 150 });
           tone(g, { type: 'sine', freq: 110, to: 32, dur: 0.5, peak: 0.4 });

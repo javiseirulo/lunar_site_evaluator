@@ -9,7 +9,7 @@
 import { useCallback, useEffect, useRef, type ReactNode } from 'react';
 import { motion, MotionConfig, useReducedMotion } from 'motion/react';
 import { clsx } from 'clsx';
-import { useAppStore, useData } from '@/core';
+import { useAppStore } from '@/core';
 import { useGameAudio } from '../audio/useGameAudio';
 import { DESCENT_MS, useGame, type Phase } from '../state/gameStore';
 import { AlertScreen } from './AlertScreen';
@@ -29,6 +29,7 @@ import { TimelapseScreen } from './TimelapseScreen';
 import { TimeoutScreen } from './TimeoutScreen';
 import { useDealHand } from './useDealHand';
 import { VerdictScreen } from './VerdictScreen';
+import { useGameSites } from '../historic/useGameSites';
 
 /** Screens that show the in-game exit (X); the menu and end screens have their own buttons. */
 const EXIT_PHASES: readonly Phase[] = [
@@ -112,7 +113,7 @@ export function MissionGame() {
   // Background globe shot for this phase (numbered, anonymous markers only).
   const cards = useGame((s) => s.hand?.cards);
   const chosenSlot = useGame((s) => s.chosenSlot);
-  const sites = useData((s) => s.sites);
+  const sites = useGameSites();
   const shot = backgroundShot(phase, cards ?? [], chosenSlot, sites);
   const onShotDone = useCallback(() => {
     const g = useGame.getState();

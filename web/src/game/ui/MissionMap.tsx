@@ -16,10 +16,11 @@
 import { clsx } from 'clsx';
 import { latLonToUv, useData } from '@/core';
 import { PolarMap as MapView } from '@/layers';
+import { useGameSite } from '../historic/useGameSites';
 
 export function MissionMap({ className, siteId }: { className?: string; siteId?: string | null }) {
   const manifest = useData((s) => s.layers);
-  const site = useData((s) => (siteId ? s.sites?.find((x) => x.id === siteId) : undefined));
+  const site = useGameSite(siteId) ?? undefined;
   const uv = manifest && site ? latLonToUv(site.lat, site.lon, manifest) : null;
 
   return (

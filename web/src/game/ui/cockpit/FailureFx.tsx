@@ -5,11 +5,9 @@
  */
 import { motion } from 'motion/react';
 import { WifiOff } from 'lucide-react';
-import { DEFAULT_REQUIREMENTS } from '../../engine/requirements';
+import { useMissionRules } from '../../state/useMissionRules';
 import { CAUSE_HEADLINE } from '../content';
 import type { CockpitFx } from './faults';
-
-const DAYS = DEFAULT_REQUIREMENTS.surface_days;
 
 /** Frost crystals growing from the window corners. */
 function Frost() {
@@ -70,6 +68,7 @@ export function WindowFx({ fx }: { fx: CockpitFx }) {
 
 /** The result stamp in the middle of the window. */
 export function CauseStamp({ fx, when }: { fx: CockpitFx; when: string }) {
+  const DAYS = useMissionRules().surface_days;
   if (fx === null) return null;
   const win = fx === 'win';
   return (

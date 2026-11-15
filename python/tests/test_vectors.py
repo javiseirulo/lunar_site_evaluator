@@ -33,11 +33,13 @@ def test_committed_index_matches_files():
     assert index["observer"] == "MOON" and index["abcorr"] == "LT+S"
     assert index["dtype"] == "float32-le" and index["step_s"] == 3600
     assert index["layout"] == list(v.LAYOUT)
-    assert index["start_utc"] == "2026-01-01T00:00:00Z"
+    # 2026-2055 for the app's timeline, plus the years of the historical missions (export.historic).
+    assert index["start_utc"] == f"{index['years'][0]['year']:04d}-01-01T00:00:00Z"
     assert index["end_utc"] == "2055-12-31T23:00:00Z"
     assert not index["generated_utc"].endswith(".000Z") and index["generated_utc"].endswith("Z")
     years = [y["year"] for y in index["years"]]
-    assert years == list(range(2026, 2056))
+    assert years == sorted(years) and set(range(2026, 2056)) <= set(years)
+    assert all(y < 2026 for y in years if y not in range(2026, 2056))
     for y in index["years"]:
         n = 8784 if calendar.isleap(y["year"]) else 8760
         assert y["n"] == n
