@@ -93,10 +93,22 @@ function ObserverView({ siteId }: { siteId: string }) {
     time,
     Number.isFinite(parsedTime) ? new Date(parsedTime + 1).toISOString() : time,
   );
-  const sample =
-    activeObserver && horizon.status !== 'loading'
-      ? observerSky(activeObserver, time, view.height, terrainPoint, horizon.horizon, margin)
-      : null;
+  const sample = useMemo(
+    () =>
+      activeObserver && ephem.ready && horizon.status !== 'loading'
+        ? observerSky(activeObserver, time, view.height, terrainPoint, horizon.horizon, margin)
+        : null,
+    [
+      activeObserver,
+      ephem.ready,
+      horizon.status,
+      horizon.horizon,
+      margin,
+      terrainPoint,
+      time,
+      view.height,
+    ],
+  );
   const onObserver = useCallback((point: Observer) => {
     setActivePoint(point);
     setMeshGround(null);
@@ -238,7 +250,12 @@ function ObserverView({ siteId }: { siteId: string }) {
       </div>
       <details className="lunar-sky-details">
         <summary>
-          {sample ? 'Real SPICE sky' : 'Loading sky / horizon'} ·{' '}
+          {sample
+            ? 'Real SPICE sky'
+            : ephem.error
+              ? 'Ephemeris unavailable'
+              : 'Loading sky / horizon'}{' '}
+          ·{' '}
           {sample?.terrainMatched
             ? 'LOLA terrain horizon'
             : sample
@@ -258,7 +275,8 @@ function ObserverView({ siteId }: { siteId: string }) {
               </p>
               <p>
                 Earth az {sample.earth_az.toFixed(2)}° / el {sample.earth_el.toFixed(3)}° ·{' '}
-                {sample.earth_km.toFixed(0)} km · direct link{' '}
+                {sample.earth_km.toFixed(0)} km · disc above horizon{' '}
+                {(100 * sample.earthDiscFraction).toFixed(1)}%{' · '}direct link{' '}
                 {sample.earthVisible ? 'clear' : 'blocked'} ({margin}° margin)
               </p>
               <p>
