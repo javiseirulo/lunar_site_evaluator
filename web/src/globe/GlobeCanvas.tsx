@@ -249,9 +249,15 @@ export default function GlobeCanvas({ hideChrome = false }: { hideChrome?: boole
     else setFocus({ kind: 'site', id }); // selected, but the card showed something else
   };
 
-  // Past landings open their own card; they are not candidates, so selectSite is never called.
+  // Past landings open their own card. They are not candidates, so selectSite is never called,
+  // but the same landing is published for the Explore card on the right.
   const onHistoricClick = (id: string) =>
     setFocus((f) => (f?.kind === 'historic' && f.id === id ? null : { kind: 'historic', id }));
+  useEffect(() => {
+    useHistoric
+      .getState()
+      .setFocusedId(focus?.kind === 'historic' && historicVisible ? focus.id : null);
+  }, [focus, historicVisible]);
 
   // A clicked own pin becomes the free point (same path as "Your points" and createPin, minus the
   // flight: the camera stays where it is) and its statistics show in the right-hand card again.
