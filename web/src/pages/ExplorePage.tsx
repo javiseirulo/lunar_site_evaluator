@@ -56,7 +56,7 @@ function SimulateHint() {
 const FRAME = 'border-edge-hi border-2 bg-panel shadow-[4px_4px_0_#000]';
 const FLAT = 'border-0 bg-transparent shadow-none';
 
-type LeftTab = 'window' | 'sites';
+type LeftTab = 'sites';
 type RightTab = 'now' | 'sun' | 'check';
 
 function Pages<T extends string>({
@@ -95,31 +95,21 @@ function Pages<T extends string>({
 
 function LeftPanel() {
   const proMode = useAppStore((s) => s.proMode);
-  const [tab, setTab] = useState<LeftTab>('sites');
-  const shown: LeftTab = !proMode && tab === 'window' ? 'sites' : tab;
-
-  const options: { id: LeftTab; label: string }[] = proMode
-    ? [
-        { id: 'sites', label: 'Sites' },
-        { id: 'window', label: 'Window' },
-      ]
-    : [{ id: 'sites', label: 'Sites' }];
+  const options: { id: LeftTab; label: string }[] = [{ id: 'sites', label: 'Sites' }];
 
   return (
     <aside
       className={`${FRAME} pointer-events-auto flex max-h-full min-h-0 w-full flex-col self-start overflow-y-auto`}
     >
-      <Pages options={options} value={shown} onChange={setTab} />
+      <Pages options={options} value="sites" onChange={() => undefined} />
       <div>
-        {shown === 'window' && <MissionTimingPanel className={FLAT} />}
-        {shown === 'sites' &&
-          (proMode ? (
-            // Booking style: requirements, window and the matching sites together, so the list
-            // changes live while you edit a requirement.
-            <SiteList className={FLAT} />
-          ) : (
-            <SimpleSiteList className={FLAT} />
-          ))}
+        {proMode ? (
+          // Booking style: requirements, window and the matching sites together, so the list
+          // changes live while you edit a requirement.
+          <SiteList className={FLAT} />
+        ) : (
+          <SimpleSiteList className={FLAT} />
+        )}
       </div>
     </aside>
   );
@@ -206,6 +196,7 @@ export default function ExplorePage() {
       <div className="mt-2 grid shrink-0 grid-cols-1 gap-3 px-3 pb-3 md:grid-cols-[minmax(200px,20%)_minmax(0,1fr)_minmax(210px,22%)]">
         <div className="flex flex-col gap-2 md:col-start-2">
           {!proMode && <LandingDate />}
+          {proMode && <MissionTimingPanel />}
           <TimeBar />
         </div>
       </div>
