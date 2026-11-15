@@ -11,7 +11,7 @@
 import { create } from 'zustand';
 import type { Difficulty } from '../engine/bars';
 import type { Hand } from '../engine/deal';
-import { mulberry32 } from '../engine/random';
+import { mulberry32, nextSeed } from '../engine/random';
 import emergencies from '../content/emergencies.json';
 
 export type Phase =
@@ -24,6 +24,26 @@ export type Phase =
   | 'timelapse'
   | 'verdict'
   | 'timeout';
+
+/** Phases with a game in progress (everything but the menu). */
+export const IN_GAME_PHASES: readonly Phase[] = [
+  'intro',
+  'alert',
+  'dealing',
+  'choosing',
+  'travel',
+  'timelapse',
+  'verdict',
+  'timeout',
+];
+
+/** Optional run settings (from `?seed=…&skipIntro=1`, see `ui/gameParams.ts`). */
+export interface GameConfig {
+  /** Seed of the first game; later games follow `nextSeed`. null = seeds from the clock. */
+  seed: number | null;
+  /** `start()` goes straight to the alert. */
+  skipIntro: boolean;
+}
 
 /** Time the player has to decide, in milliseconds. */
 export const COUNTDOWN_MS = 180_000;
@@ -39,10 +59,13 @@ export interface GameState {
   pendingSlot: number | null;
   /** Epoch ms at which the countdown ends. */
   deadline: number;
+  config: GameConfig;
 
   setDifficulty: (d: Difficulty) => void;
-  /** menu → intro. */
-  start: (seed?: number) => void;
+  /** Replaces the run settings (and the difficulty if given). Only in the menu. */
+  configure: (config: GameConfig, difficulty?: Difficulty | null) => void;
+  /** menu → intro (→ alert straight away with `config.skipIntro`). */
+  start: (seed?: number, now?: number) => void;
   /** intro → alert. */
   endIntro: (now?: number) => void;
   skipIntro: (now?: number) => void;
@@ -64,6 +87,8 @@ export interface GameState {
   retry: (now?: number) => void;
   /** verdict | timeout → alert with a fresh seed. */
   newGame: (seed?: number, now?: number) => void;
+  /** Any in-game phase → alert with a fresh seed and hand (the in-game "Restart mission"). */
+  restart: (seed?: number, now?: number) => void;
   /** Any phase → menu, dropping the current hand (keeps difficulty). */
   quit: () => void;
 }
@@ -85,6 +110,18 @@ export const useGame = create<GameState>()((set, get) => {
     if (get().phase === 'intro') enterAlert(now);
   };
 
+  /** Seed for the next game: the configured sequence, or the clock. */
+  const freshSeed = (): number => {
+    const { config, seed } = get();
+    return config.seed === null ? Date.now() : nextSeed(seed);
+  };
+
+  /** New hand from the alert, keeping difficulty and config. */
+  const reset = (seed: number, now: number) => {
+    set({ seed, hand: null, chosenSlot: null, pendingSlot: null });
+    enterAlert(now);
+  };
+
   return {
     phase: 'menu',
     difficulty: 'normal',
@@ -94,19 +131,27 @@ export const useGame = create<GameState>()((set, get) => {
     chosenSlot: null,
     pendingSlot: null,
     deadline: 0,
+    config: { seed: null, skipIntro: false },
 
     setDifficulty: (difficulty) => set({ difficulty }),
 
-    start: (seed = Date.now()) => {
+    configure: (config, difficulty) => {
       if (get().phase !== 'menu') return;
+      set(difficulty ? { config, difficulty } : { config });
+    },
+
+    start: (seed, now = Date.now()) => {
+      const { phase, config } = get();
+      if (phase !== 'menu') return;
       set({
         phase: 'intro',
-        seed,
+        seed: seed ?? config.seed ?? Date.now(),
         emergencyId: null,
         hand: null,
         chosenSlot: null,
         pendingSlot: null,
       });
+      if (config.skipIntro) enterAlert(now);
     },
 
     endIntro: (now = Date.now()) => leaveIntro(now),
@@ -149,11 +194,15 @@ export const useGame = create<GameState>()((set, get) => {
       set({ phase: 'choosing', chosenSlot: null, pendingSlot: null, deadline: now + COUNTDOWN_MS });
     },
 
-    newGame: (seed = Date.now(), now = Date.now()) => {
+    newGame: (seed, now = Date.now()) => {
       const p = get().phase;
       if (p !== 'verdict' && p !== 'timeout') return;
-      set({ seed, hand: null, chosenSlot: null, pendingSlot: null });
-      enterAlert(now);
+      reset(seed ?? freshSeed(), now);
+    },
+
+    restart: (seed, now = Date.now()) => {
+      if (!IN_GAME_PHASES.includes(get().phase)) return;
+      reset(seed ?? freshSeed(), now);
     },
 
     quit: () =>

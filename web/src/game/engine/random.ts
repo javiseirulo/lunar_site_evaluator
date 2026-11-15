@@ -19,3 +19,11 @@ export function shuffle<T>(items: T[], rnd: () => number): T[] {
   }
   return out;
 }
+
+/**
+ * Next seed in a deterministic sequence (for reproducible "New mission" runs): a uint32 that
+ * depends only on `seed`.
+ */
+export function nextSeed(seed: number): number {
+  return Math.floor(mulberry32((seed ^ 0x5bd1e995) >>> 0)() * 4294967296) >>> 0;
+}
