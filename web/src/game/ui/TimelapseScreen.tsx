@@ -12,6 +12,7 @@ import { clsx } from 'clsx';
 import { sampleAt, useAppStore, useTimeseries } from '@/core';
 import { DEFAULT_REQUIREMENTS } from '../engine/requirements';
 import { isLinkUp } from '../engine/simulate';
+import { sfx } from '../audio/sfx';
 import { useGame } from '../state/gameStore';
 import { siteTerrain } from './assets';
 import { CockpitView } from './cockpit/CockpitView';
@@ -118,6 +119,20 @@ export function TimelapseScreen() {
     [ts, hand],
   );
 
+  // Soft chime at each new mission day; the cause's sting when the mission freezes on a failure.
+  const day = dayOfMission(hour, DAYS);
+  const lastDay = useRef(day);
+  useEffect(() => {
+    if (day > lastDay.current && !ended) sfx.dayChime();
+    lastDay.current = day;
+  }, [day, ended]);
+  const verdict = card?.verdict;
+  useEffect(() => {
+    if (!ended || !verdict) return;
+    if (verdict.win) sfx.dayChime();
+    else if (verdict.cause) sfx.failure(verdict.cause);
+  }, [ended, verdict]);
+
   if (!card || !landingUtc || !hand) return null;
 
   const sample = ts ? sampleAt(ts, isoAtHour(landingUtc, hour)) : null;
@@ -126,7 +141,7 @@ export function TimelapseScreen() {
     : null;
   const lost = ended && !card.verdict.win;
   const shownHour = ended && card.verdict.win ? MISSION_HOURS : hour;
-  const when = `Day ${dayOfMission(hour, DAYS)} · hour ${shownHour}`;
+  const when = `Day ${day} · hour ${shownHour}`;
 
   return (
     <div

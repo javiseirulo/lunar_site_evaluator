@@ -48,6 +48,7 @@ export function MenuScreen() {
         <button
           type="button"
           onClick={() => start()}
+          data-sfx="hover"
           className="mission-pixel group flex cursor-pointer flex-col border-4 border-black bg-navy-800 text-left hover:border-warn focus-visible:border-warn"
         >
           <GameImage

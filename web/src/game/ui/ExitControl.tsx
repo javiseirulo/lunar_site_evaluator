@@ -7,6 +7,7 @@
  */
 import { useEffect, useRef, useState } from 'react';
 import { Home, Play, RotateCcw, Timer, X } from 'lucide-react';
+import { sfx } from '../audio/sfx';
 import { useGame, type Phase } from '../state/gameStore';
 
 /** Phases where the decision countdown is on screen. */
@@ -23,6 +24,7 @@ export function ExitControl() {
     const d = dialogRef.current;
     if (!d) return;
     if (open && !d.open) {
+      sfx.modalOpen();
       d.showModal();
       keepRef.current?.focus();
     } else if (!open && d.open) {
@@ -42,7 +44,8 @@ export function ExitControl() {
         title="Leave mission"
         aria-haspopup="dialog"
         onClick={() => setOpen(true)}
-        className="mission-pixel flex size-8 shrink-0 cursor-pointer items-center justify-center border-2 border-black bg-[#2a0a0e] text-white hover:bg-[#ff3b30] focus-visible:bg-[#ff3b30] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+        data-sfx-silent
+        className="mission-pixel flex size-10 shrink-0 cursor-pointer items-center justify-center border-2 border-black bg-[#2a0a0e] text-white hover:bg-[#ff3b30] focus-visible:bg-[#ff3b30] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
       >
         <X className="size-5" strokeWidth={3} aria-hidden />
       </button>
@@ -53,6 +56,8 @@ export function ExitControl() {
         aria-describedby="mission-exit-desc"
         // Esc (cancel) and every close path end here: sync state and return focus to the X.
         onClose={() => {
+          // Fires for every close (buttons, Esc, backdrop).
+          sfx.modalClose();
           setOpen(false);
           xRef.current?.focus();
         }}
@@ -82,7 +87,7 @@ export function ExitControl() {
           <div className="flex flex-col gap-2">
             <button
               type="button"
-              className="btn h-9 justify-start px-3 text-[13px]"
+              className="btn h-10 justify-start px-3 text-[13px]"
               onClick={() => {
                 close();
                 useGame.getState().restart();
@@ -93,7 +98,7 @@ export function ExitControl() {
             </button>
             <button
               type="button"
-              className="btn h-9 justify-start px-3 text-[13px]"
+              className="btn h-10 justify-start px-3 text-[13px]"
               onClick={() => {
                 close();
                 useGame.getState().quit();
@@ -105,7 +110,7 @@ export function ExitControl() {
             <button
               ref={keepRef}
               type="button"
-              className="btn btn-go h-9 justify-start px-3 text-[13px]"
+              className="btn btn-go h-10 justify-start px-3 text-[13px]"
               onClick={close}
             >
               <Play className="size-4" aria-hidden />

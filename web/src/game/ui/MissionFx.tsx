@@ -89,9 +89,16 @@ const CSS = `
   animation: mission-static 0.2s steps(3) infinite;
 }
 .mission-alarm-lamp { animation: mission-blink 0.5s steps(1) infinite; }
+/* Countdown: red pulse in the last 30 s. */
+@keyframes mission-pulse {
+  0%, 100% { transform: scale(1); box-shadow: 4px 4px 0 #000; }
+  50% { transform: scale(1.07); box-shadow: 4px 4px 0 #000, 0 0 18px #ff3b3088; }
+}
+.mission-timer[data-low='true'] { animation: mission-pulse 1s ease-in-out infinite; }
 @media (prefers-reduced-motion: reduce) {
   .mission-frame[data-flash='true'], .mission-blink, .mission-instrument[data-fault='true'],
-  .mission-static, .mission-alarm-lamp, .mission-cockpit[data-fx='slope'] { animation: none; }
+  .mission-static, .mission-alarm-lamp, .mission-cockpit[data-fx='slope'],
+  .mission-timer[data-low='true'] { animation: none; }
   .mission-cockpit, .mission-cockpit .mission-panel { transition: none; }
 }
 `;

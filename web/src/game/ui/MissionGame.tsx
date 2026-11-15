@@ -1,11 +1,13 @@
 /** The Mission mini-game: one screen per phase of `useGame`. */
-import { useEffect, type ReactNode } from 'react';
+import { useEffect, useRef, type ReactNode } from 'react';
 import { MotionConfig } from 'motion/react';
 import { useAppStore } from '@/core';
+import { useGameAudio } from '../audio/useGameAudio';
 import { useGame, type Phase } from '../state/gameStore';
 import { AlertScreen } from './AlertScreen';
 import { ExitControl } from './ExitControl';
 import { parseGameParams } from './gameParams';
+import { SoundControls } from './SoundControls';
 import { sharedSelectionFor } from './reveal';
 import { IntroScreen } from './IntroScreen';
 import { MenuScreen } from './MenuScreen';
@@ -29,6 +31,8 @@ const EXIT_PHASES: readonly Phase[] = [
 export function MissionGame() {
   const phase = useGame((s) => s.phase);
   const dealStatus = useDealHand();
+  const rootRef = useRef<HTMLDivElement>(null);
+  useGameAudio(rootRef);
 
   // Optional reproducible-run params (?seed=…&skipIntro=1&difficulty=expert). Without params
   // this resets the config to the defaults (clock seeds, intro), i.e. no change of behaviour.
@@ -79,15 +83,19 @@ export function MissionGame() {
   return (
     <MotionConfig reducedMotion="user">
       <MissionFx />
-      <div className="mission-root bg-navy-950 text-ink relative flex min-h-[544px] w-full flex-col overflow-hidden font-sans">
-        {EXIT_PHASES.includes(phase) && (
-          <div className="flex items-center justify-between gap-2 pb-1.5">
-            <span className="font-mono text-[10px] tracking-[0.3em] text-ink-faint uppercase">
-              Mission in progress
-            </span>
-            <ExitControl />
+      <div
+        ref={rootRef}
+        className="mission-root bg-navy-950 text-ink relative flex min-h-[544px] w-full flex-col overflow-hidden font-sans"
+      >
+        <div className="flex min-h-10 items-center justify-between gap-2 pb-1.5">
+          <span className="font-mono text-[10px] tracking-[0.3em] text-ink-faint uppercase">
+            {EXIT_PHASES.includes(phase) ? 'Mission in progress' : ''}
+          </span>
+          <div className="flex items-center gap-1.5">
+            <SoundControls />
+            {EXIT_PHASES.includes(phase) && <ExitControl />}
           </div>
-        )}
+        </div>
         {screen}
       </div>
     </MotionConfig>

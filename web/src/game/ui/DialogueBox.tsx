@@ -7,6 +7,8 @@ import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
 import { ChevronRight, FastForward } from 'lucide-react';
 import { clsx } from 'clsx';
+import { sfx } from '../audio/sfx';
+import { rateLimiter } from '../audio/theory';
 import { advanceAction, charsShown, isAdvanceKey } from './typewriter';
 
 export interface DialogueBoxProps {
@@ -27,6 +29,8 @@ export function DialogueBox({ lines, speaker, onDone, onSkip, className }: Dialo
   const [typed, setTyped] = useState(0);
   const doneRef = useRef(false);
   const boxRef = useRef<HTMLDivElement>(null);
+  /** The player completed the current line by hand: stop typing (and blipping) it. */
+  const rushedRef = useRef(false);
 
   const line = lines[index] ?? '';
   const shown = reduced ? line.length : Math.min(typed, line.length);
@@ -41,15 +45,28 @@ export function DialogueBox({ lines, speaker, onDone, onSkip, className }: Dialo
   // Type the current line; the timer is cleared on line change and on unmount.
   useEffect(() => {
     if (reduced) return;
+    rushedRef.current = false;
     const start = performance.now();
     const length = line.length;
+    // Typewriter blips, at most ~16 per second so they never become a buzz.
+    const blipGate = rateLimiter(60);
+    let blipped = 0;
     const id = window.setInterval(() => {
-      const next = charsShown(performance.now() - start, length);
+      if (rushedRef.current) {
+        window.clearInterval(id);
+        return;
+      }
+      const now = performance.now();
+      const next = charsShown(now - start, length);
       setTyped((prev) => Math.max(prev, next));
+      if (next > blipped) {
+        if (blipGate(now)) sfx.blip(line.charAt(next - 1));
+        blipped = next;
+      }
       if (next >= length) window.clearInterval(id);
     }, TICK_MS);
     return () => window.clearInterval(id);
-  }, [index, line.length, reduced]);
+  }, [index, line, reduced]);
 
   const finish = () => {
     if (doneRef.current) return;
@@ -60,6 +77,7 @@ export function DialogueBox({ lines, speaker, onDone, onSkip, className }: Dialo
   const advance = () => {
     switch (advanceAction(index, shown, line.length, lines.length)) {
       case 'complete':
+        rushedRef.current = true;
         setTyped(line.length);
         break;
       case 'next':

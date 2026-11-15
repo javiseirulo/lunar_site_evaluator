@@ -57,6 +57,7 @@ export function SiteCard(props: SiteCardProps) {
       <motion.button
         type="button"
         disabled={!clickable}
+        data-sfx={clickable ? 'hover' : undefined}
         onClick={() => onPick(card.slot)}
         aria-label={`Choose ${label}`}
         className={clsx(

@@ -5,6 +5,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useReducedMotion } from 'motion/react';
 import { useAppStore, useData } from '@/core';
+import { sfx } from '../audio/sfx';
 import { useGame } from '../state/gameStore';
 import { handSiteImages } from './assets';
 import { dealTimeline } from './format';
@@ -33,9 +34,16 @@ export function CardTable() {
 
   useEffect(() => {
     if (phase !== 'dealing') return;
-    const id = window.setTimeout(() => useGame.getState().revealed(), timeline.totalMs);
-    return () => window.clearTimeout(id);
-  }, [phase, timeline.totalMs]);
+    const ids = [window.setTimeout(() => useGame.getState().revealed(), timeline.totalMs)];
+    // Card sounds on the deal timeline (one slide and one flip per card).
+    if (timeline.totalMs > 0) {
+      for (let i = 0; i < cards.length; i++) {
+        ids.push(window.setTimeout(sfx.slide, timeline.slideDelay(i) * 1000));
+        ids.push(window.setTimeout(sfx.flip, timeline.flipDelay(i) * 1000));
+      }
+    }
+    return () => ids.forEach((id) => window.clearTimeout(id));
+  }, [phase, timeline, cards.length]);
 
   useEffect(() => {
     if (picked === null || !hand) return;

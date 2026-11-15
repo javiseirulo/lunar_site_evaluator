@@ -1,9 +1,11 @@
 /** Result of the chosen card: stars on a win, cause + lesson on a loss, and the real site name. */
+import { useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Star } from 'lucide-react';
 import { clsx } from 'clsx';
 import { useData } from '@/core';
 import { DEFAULT_REQUIREMENTS } from '../engine/requirements';
+import { sfx } from '../audio/sfx';
 import { useGame } from '../state/gameStore';
 import { verdictImage } from './assets';
 import { CAUSE_HEADLINE, lessonFor } from './content';
@@ -15,7 +17,18 @@ const DAYS = DEFAULT_REQUIREMENTS.surface_days;
 const MISSION_HOURS = DAYS * 24;
 
 /** Three big stars, the middle one raised, filled up to `count`. */
+/** Seconds before star `n` (1-based) pops in. */
+const starDelay = (n: number) => 0.5 + n * 0.3;
+
 function Stars({ count }: { count: number }) {
+  // One "pop" per earned star, in time with its spring.
+  useEffect(() => {
+    const ids = Array.from({ length: count }, (_, i) =>
+      window.setTimeout(() => sfx.starPop(i), starDelay(i + 1) * 1000),
+    );
+    return () => ids.forEach((id) => window.clearTimeout(id));
+  }, [count]);
+
   return (
     <div
       role="img"
@@ -29,9 +42,19 @@ function Stars({ count }: { count: number }) {
             key={n}
             initial={{ scale: 0, rotate: -30 }}
             animate={{ scale: 1, rotate: 0 }}
-            transition={{ delay: 0.3 + n * 0.25, type: 'spring', stiffness: 260, damping: 12 }}
-            className={clsx('block', n === 2 && '-translate-y-3')}
+            transition={{ delay: starDelay(n), type: 'spring', stiffness: 260, damping: 12 }}
+            className={clsx('relative block', n === 2 && '-translate-y-3')}
           >
+            {on && (
+              // Small burst behind the star as it lands.
+              <motion.span
+                aria-hidden
+                className="absolute inset-0 rounded-full bg-[radial-gradient(circle,#ffd23f_0%,#ffd23f66_35%,transparent_70%)]"
+                initial={{ scale: 0.2, opacity: 0 }}
+                animate={{ scale: [0.2, 1.9], opacity: [0.9, 0] }}
+                transition={{ delay: starDelay(n) + 0.05, duration: 0.6, ease: 'easeOut' }}
+              />
+            )}
             <Star
               aria-hidden
               strokeWidth={2.5}
