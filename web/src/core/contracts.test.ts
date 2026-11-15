@@ -5,7 +5,13 @@
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import type { DataManifest, LayersManifest, SitesFile, Timeseries } from '@lunar/contracts';
+import type {
+  DataManifest,
+  HistoricSitesFile,
+  LayersManifest,
+  SitesFile,
+  Timeseries,
+} from '@lunar/contracts';
 
 const DATA = join(__dirname, '..', '..', 'public', 'data');
 const read = <T>(p: string): T => JSON.parse(readFileSync(join(DATA, p), 'utf8')) as T;
@@ -68,14 +74,15 @@ describe('public/data follows contracts/types.ts', () => {
       // v1.1: sun_frac has the same length and lit = sun_frac >= 0.5.
       if (ts.sun_frac) {
         expect(ts.sun_frac.length, `${s.id}.sun_frac`).toBe(n);
-        ts.sun_frac.forEach((f, i) => {
-          expect(f >= 0 && f <= 1, `${s.id} sun_frac[${i}]`).toBe(true);
-          expect(ts.lit[i], `${s.id} lit[${i}] vs sun_frac`).toBe(f >= 0.5 ? 1 : 0);
-        });
+        // One assertion per file (real data: 8760 samples × 59 sites); first bad index reported.
+        const badFrac = ts.sun_frac.findIndex((f) => !(f >= 0 && f <= 1));
+        expect(badFrac, `${s.id} sun_frac out of [0, 1] at`).toBe(-1);
+        const badLit = ts.sun_frac.findIndex((f, i) => ts.lit[i] !== (f >= 0.5 ? 1 : 0));
+        expect(badLit, `${s.id} lit vs sun_frac mismatch at`).toBe(-1);
       }
       expect(ts.t_utc[0]).toBe(manifest.time_range.start_utc);
     }
-  });
+  }, 60_000);
 
   it("site metrics agree with that site's timeseries (same time window)", () => {
     for (const s of sites.sites) {
@@ -103,7 +110,7 @@ describe('public/data follows contracts/types.ts', () => {
         (longest * ts.step_s) / 3600 - 1,
       );
     }
-  });
+  }, 60_000);
 
   it('every layer points to an existing PNG and has a usable palette', () => {
     expect(layers.bounds_m).toHaveLength(4);
@@ -112,5 +119,57 @@ describe('public/data follows contracts/types.ts', () => {
       expect(l.palette.length).toBeGreaterThanOrEqual(2);
       expect(l.value_range[0]).toBeLessThan(l.value_range[1]);
     }
+  });
+});
+
+// historic_sites.json (Marta, v1.1): optional file, checked only when present.
+const HISTORIC = 'historic_sites.json';
+describe.runIf(existsSync(join(DATA, HISTORIC)))('historic_sites.json follows the contract', () => {
+  const ISO_UTC = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?Z$/;
+  const OUTCOMES = ['success', 'partial', 'failed'];
+  const KINDS = ['lander', 'rover', 'crewed', 'sample_return', 'impact'];
+
+  it('has unique ids, valid coordinates, ISO dates, known enums and URL sources', () => {
+    const file = read<HistoricSitesFile>(HISTORIC);
+    expect(file.version).toBe(1);
+    expect(Number.isNaN(Date.parse(file.generated_utc))).toBe(false);
+    const ids = file.sites.map((s) => s.id);
+    expect(new Set(ids).size).toBe(ids.length);
+    for (const s of file.sites) {
+      expect(s.id, s.id).toMatch(/^[a-z0-9_]+$/);
+      for (const k of ['name', 'agency', 'country', 'note'] as const) {
+        expect(s[k].trim().length, `${s.id}.${k}`).toBeGreaterThan(0);
+      }
+      expect(s.lat, s.id).toBeGreaterThanOrEqual(-90);
+      expect(s.lat, s.id).toBeLessThanOrEqual(90);
+      expect(s.lon, s.id).toBeGreaterThanOrEqual(-180);
+      expect(s.lon, s.id).toBeLessThanOrEqual(180);
+      expect(s.date_utc, s.id).toMatch(ISO_UTC);
+      expect(Number.isNaN(Date.parse(s.date_utc)), s.id).toBe(false);
+      expect(OUTCOMES, s.id).toContain(s.outcome);
+      expect(KINDS, s.id).toContain(s.kind);
+      expect(s.source, s.id).toMatch(/^https:\/\/\S+$/);
+    }
+  });
+
+  it('keeps the same coordinates as sites.json for shared ids', () => {
+    const file = read<HistoricSitesFile>(HISTORIC);
+    const catalog = new Map(read<SitesFile>('sites.json').sites.map((s) => [s.id, s]));
+    for (const h of file.sites) {
+      const c = catalog.get(h.id);
+      if (!c) continue;
+      // A shared id must be the same landing, not a candidate that happens to share the name.
+      expect(c.kind, h.id).toBe('historic_landing');
+      expect(h.lat, h.id).toBeCloseTo(c.lat, 6);
+      expect(h.lon, h.id).toBeCloseTo(c.lon, 6);
+    }
+  });
+
+  it('lists every historic_landing of sites.json (so a renamed id cannot slip through)', () => {
+    const ids = new Set(read<HistoricSitesFile>(HISTORIC).sites.map((s) => s.id));
+    const missing = read<SitesFile>('sites.json')
+      .sites.filter((s) => s.kind === 'historic_landing' && !ids.has(s.id))
+      .map((s) => s.id);
+    expect(missing).toEqual([]);
   });
 });

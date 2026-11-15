@@ -144,6 +144,12 @@ export interface SitesFile {
    * v1.1: may also carry weights for the extra metrics (e.g. max_blackout_hours).
    */
   weights: Record<keyof SiteMetrics, number> & Partial<Record<keyof SiteMetricsExtra, number>>;
+  /**
+   * v1.1: mission window that `Site.valid`, `score` and `checks` were evaluated over
+   * (`missionWindow(DEFAULT_MISSION_CONFIG)`). `Site.metrics` stay over the manifest window.
+   * Absent in v1 data: valid/score are then over the manifest window.
+   */
+  evaluation?: { start_utc: string; end_utc: string; config: 'default' };
   sites: Site[];
 }
 
@@ -423,4 +429,39 @@ export interface GridIndex {
   window: { start_utc: string; end_utc: string; step_s: number };
   dtype: 'float32-le';
   grids: GridDef[];
+}
+
+// ---------------------------------------------------------------------------
+// historic_sites.json — past lunar landings and impacts (owner: Marta; reused by Cristóbal in Mission). v1.1
+// Display layer for the globe ("Past landings"). Ids match the `kind: "historic_landing"` sites in
+// sites.json when the mission is also there, so both files link; coordinates come from the same source.
+// ---------------------------------------------------------------------------
+export type HistoricOutcome = 'success' | 'partial' | 'failed';
+
+export type HistoricKind = 'lander' | 'rover' | 'crewed' | 'sample_return' | 'impact';
+
+export interface HistoricSite {
+  /** Lowercase snake_case; equals the sites.json id when the mission is in the catalog. */
+  id: string;
+  name: string;
+  agency: string;
+  country: string;
+  /** Landing or impact date, ISO 8601 UTC (e.g. "1969-07-20T20:17:40Z", or "1969-07-20T00:00:00Z" if only the day is known). */
+  date_utc: string;
+  /** Planetocentric latitude, degrees (south negative). */
+  lat: number;
+  /** East longitude, degrees in [-180, 180]. */
+  lon: number;
+  outcome: HistoricOutcome;
+  kind: HistoricKind;
+  /** One line of context, in English. */
+  note: string;
+  /** https URL of the source of the coordinates. */
+  source: string;
+}
+
+export interface HistoricSitesFile {
+  version: 1;
+  generated_utc: string;
+  sites: HistoricSite[];
 }

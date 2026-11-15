@@ -49,8 +49,11 @@ python/ephem (SPICE, offline)  ──►  web/public/data/ephem/<año>.bin  ─�
 | Pablo | Formato de horizontes que consume la web | `HorizonProfile` (`contracts/horizon.schema.json`) en `web/public/data/horizon/<id>.json` |
 | Cristóbal (Mission) | Simular N días en un sitio y dar el veredicto | `buildTimeseries` + `evaluateSite`; `mergeMissionConfig` para los escenarios; `computeArrival` |
 | Javi2 (core/UI) | "—" en métricas pendientes, colocar el panel | `site.pending_metrics`, `<SiteCheckPanel />` |
+| Marta (globo / mapa polar) | Mapa de calor de métricas (año 2027, horizonte plano) | `loadGrid('global_1deg' \| 'south_5km')` + `sampleGrid(grid, metric, lat, lon)`; ver "Cómo pintar el heat map" abajo |
 
 Nota para Marta: tu decisión de "requisitos sin pesos" encaja. La validez de `@/scoring` **es** un filtro de requisitos duros y no usa pesos; los pesos solo afectan al score, que es opcional mostrar.
+
+**Cómo pintar el heat map (para Marta).** `grid/index.json` lista dos rejillas Float32: `global_1deg` (equirrectangular 360×180, fila 0 = lat 89.5, lon −179.5→179.5) y `south_5km` (estereográfica polar sur 122×122, mismos `bounds_m`/`radius_m`/`lat_limit` que `layers.json`, fila 0 = max_y, NaN fuera de −80°). Métricas: `illum_pct`, `max_dark_hours`, `earth_vis_pct`, `max_blackout_hours`, `sun_el_mean_deg`. Globo: `const g = await loadGrid('global_1deg')`, recorre `g.data` del plano `k = g.def.metrics.indexOf(m)` (offset `k*width*height`), pasa cada valor por la paleta a un `ImageData` width×height y úsalo como `CanvasTexture` en la esfera (UV equirrectangular, `u = 0` en lon −180; comprobad la rotación de la esfera igual que con la textura actual). Mapa polar: igual con `south_5km`, dibujado en el mismo rectángulo `bounds_m` que las capas PNG (NaN → transparente). Para un tooltip basta `sampleGrid(g, m, lat, lon)`. Rangos útiles: pct en 0–1, horas en 0–8760 (escala log o recorte a ~720 h), `sun_el_mean_deg` 0–~25.
 
 ## 6. Catálogo de sitios (#48)
 - `python/export/catalog.yaml`: **59 sitios con fuente**, sin ninguno inventado: 38 del polo sur, 3 del polo norte, 16 de la cara visible y 2 de la cara oculta, incluidos Apollo, Chang'e, Chandrayaan-3, SLIM, IM-1, IM-2 y Blue Ghost como aterrizajes históricos.

@@ -30,6 +30,7 @@ Nothing from v1 is renamed. Every new field is optional, so the v1 mocks stay va
 | `ephem/index.json` + `ephem/<YYYY>.bin` | `EphemIndex` | `ephem-index.schema.json` | Javi (`python/ephem`) |
 | `grid/index.json` + `grid/*.bin` | `GridIndex` | `grid-index.schema.json` | Javi (export) |
 | (store `missionConfig`, Mission scenarios) | `MissionConfig` | `mission_config.schema.json` | Javi / Cristóbal |
+| `historic_sites.json` | `HistoricSitesFile` | `historic_sites.schema.json` | Marta (curated; Cristóbal reuses it in Mission) |
 
 New optional fields:
 - `Site`: `region`, `kind`, `group`, `checks` (requirement results with margins), `pending_metrics`.
@@ -44,7 +45,9 @@ New optional fields:
 - **Mission scenarios** (Cristóbal) are partial overrides. Merge them onto `DEFAULT_MISSION_CONFIG` with `mergeMissionConfig` from `@/scoring` first, then validate the result against `mission_config.schema.json`.
 - **Historic landings:**
   - in `sites.json` they are sites like any other (`kind: "historic_landing"`), so they can be evaluated and compared;
-  - Marta's planned `historic_sites.json` (display layer with agency, date and outcome) can reuse the same `id`s so both link.
+  - `historic_sites.json` (Marta) is the display layer: agency, country, date, outcome, kind, a one-line note and the URL of the coordinate source.
+    It uses the same `id` and lat/lon as `sites.json` when the mission is in the catalog, and adds missions that are not (e.g. failed landings with a known impact point).
+    `pnpm test` checks unique ids, lat/lon ranges, ISO dates, `https` sources and that shared ids keep the same coordinates.
 - **`grid/*.bin` replaces the `grid_metrics.bin` sketched in docs/10 (Marta's block).** It is Float32 instead of uint8, and the time dimension is optional (`n_times`, `time_step_s`; e.g. per day for an animated heat map).
 
 ### Binary formats
@@ -80,6 +83,7 @@ New optional fields:
 - **Rounding:** files publish 2 decimals; validity and score are computed on the published values, so Python and TypeScript agree.
 
 ### Validity and score (docs/10 J6–J7; one implementation in `web/src/scoring/`, mirrored by the export)
+- **Evaluation window in `sites.json`:** `Site.metrics` cover the manifest window (all of 2027), while `valid`, `score` and `checks` cover the default mission window, written in `SitesFile.evaluation` (`missionWindow(DEFAULT_MISSION_CONFIG)`: 7 days from 2027-11-08). The default thresholds are sized for a 7-day stay, and over a whole year no site passes them. Any other window is re-evaluated in the browser with `@/scoring`.
 - **Validity:** a site is valid for a mission window when every requirement in `MissionConfig.requirements` that is not in `pending_metrics` passes its threshold. A requirement whose metric is missing counts as pending (`ok: true`, `value: null`, `margin: null`, `pending: true`); never NaN. JSON is written without NaN (`null`).
   - "Less is better" metrics fail above the threshold: `slope_deg`, `max_dark_hours`, `max_blackout_hours`, `psr_dist_km`.
   - All other metrics fail below it.
