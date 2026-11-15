@@ -1,23 +1,28 @@
 /**
  * The emergency stage for `alert`, `briefing`, `dealing` and `choosing`: red alarm frame
  * (flashing while the alert is fresh), countdown, and per phase:
- * - `alert`: the emergency scene; moves on to the briefing by itself (or "Continue").
- * - `briefing`: Dr. Regolith says what happened and what to do; "Plot approach" once the hand
- *   is dealt (it deals in the background since the alert).
+ * - `alert`: the animated emergency scene (`EmergencyScene`); moves on to the briefing by itself
+ *   (or "Continue").
+ * - `briefing`: Dr. Regolith, shaking, blurts out what happened and what to do (fast typing);
+ *   the end of his dialogue plots the approach once the hand is dealt (it deals in the background
+ *   since the alert; if it is not ready yet, the approach starts as soon as it is).
  * - `dealing` / `choosing`: the briefing line and the card table, over the faint polar globe.
- * Task 2 of #100 replaces the alert and briefing content with their own animated screens.
  */
 import { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
-import { AlertTriangle, Loader2, Navigation } from 'lucide-react';
+import { AlertTriangle, Loader2 } from 'lucide-react';
 import { clsx } from 'clsx';
 import { useData } from '@/core';
 import { useGame } from '../state/gameStore';
-import { emergencyImage, scientistImage } from './assets';
+import { scientistImage } from './assets';
 import { emergencyById } from './content';
 import { CardTable } from './CardTable';
+import { DialogueBox } from './DialogueBox';
+import { EmergencyScene } from './EmergencyScene';
+import { briefingLines, PANIC_CPS } from './emergencyFx';
 import { Countdown } from './Countdown';
 import { GameImage } from './GameImage';
+import { PixelScientist } from './PixelScientist';
 import type { DealStatus } from './useDealHand';
 
 /** How long the alarm and emergency scene play before the briefing. */
@@ -38,6 +43,13 @@ export function AlertScreen({
   const sitesFailed = useData((s) => s.status === 'error');
   // A brief screen shake when the emergency first appears (not on a retry, which skips the alert).
   const [shake] = useState(() => phase === 'alert');
+  // The doctor finished (or was skipped) before the hand was dealt: plot the approach once it is.
+  const [wantsApproach, setWantsApproach] = useState(false);
+  const [typing, setTyping] = useState(false);
+
+  useEffect(() => {
+    if (wantsApproach && hasHand) useGame.getState().endBriefing();
+  }, [wantsApproach, hasHand]);
 
   // The alarm plays for a moment, then the doctor explains.
   useEffect(() => {
@@ -103,7 +115,7 @@ export function AlertScreen({
         <Countdown />
       </header>
 
-      {phase !== 'alert' && (
+      {phase !== 'alert' && phase !== 'briefing' && (
         <div className="flex items-start gap-3 border-2 border-black bg-black/60 p-2">
           <GameImage
             src={scientistImage('alarm')}
@@ -120,11 +132,10 @@ export function AlertScreen({
 
       {phase === 'alert' ? (
         <div className="flex flex-1 flex-col items-center justify-center gap-3">
-          <GameImage
-            src={emergencyImage(emergency?.id ?? null)}
-            alt={emergency ? `${emergency.title} scene` : 'Emergency scene'}
-            label="Emergency scene pending"
-            className="h-48 w-full max-w-lg border-4 border-black"
+          <EmergencyScene
+            emergencyId={emergency?.id ?? null}
+            title={emergency?.title}
+            className="max-w-2xl"
           />
           <button
             type="button"
@@ -135,22 +146,41 @@ export function AlertScreen({
           </button>
         </div>
       ) : phase === 'briefing' ? (
-        <div className="flex flex-1 flex-col items-center justify-center gap-3">
-          {hasHand ? (
-            <button
-              type="button"
-              className="btn btn-go h-11 px-5"
-              onClick={() => useGame.getState().endBriefing()}
+        <div className="flex flex-1 flex-col items-center justify-center gap-4 sm:flex-row">
+          <motion.div
+            className="mission-bezel relative shrink-0 p-1.5"
+            animate={
+              typing
+                ? { x: [0, -4, 3, -3, 4, -2, 0], rotate: [0, -2, 2, -1.5, 1.5, 0] }
+                : { x: [0, -1.5, 1.5, 0], rotate: 0 }
+            }
+            transition={{ duration: typing ? 0.35 : 0.6, repeat: Infinity, ease: 'linear' }}
+          >
+            <PixelScientist mood="alarm" className="size-28 bg-black/60 sm:size-36" />
+            <span
+              aria-hidden
+              className="mission-blink absolute -top-2 -right-2 border-2 border-black bg-[#ff3b30] px-1 font-mono text-[11px] font-bold text-white"
             >
-              <Navigation className="size-4" aria-hidden />
-              Plot approach to the south pole
-            </button>
-          ) : (
-            <p className="text-ink-muted flex items-center gap-2 font-mono text-[11px] tracking-widest uppercase">
-              <Loader2 className="size-4 animate-spin motion-reduce:animate-none" aria-hidden />
-              Computing reachable landing sites…
-            </p>
-          )}
+              !!
+            </span>
+          </motion.div>
+          <div className="flex w-full max-w-2xl min-w-0 flex-1 flex-col gap-2">
+            <DialogueBox
+              speaker="Dr. Regolith"
+              lines={briefingLines(emergency?.briefing)}
+              cps={PANIC_CPS}
+              doneLabel="Plot approach to the south pole"
+              onTypingChange={setTyping}
+              onDone={() => setWantsApproach(true)}
+              onSkip={() => setWantsApproach(true)}
+            />
+            {wantsApproach && !hasHand && (
+              <p className="text-ink-muted flex items-center gap-2 font-mono text-[11px] tracking-widest uppercase">
+                <Loader2 className="size-4 animate-spin motion-reduce:animate-none" aria-hidden />
+                Computing reachable landing sites…
+              </p>
+            )}
+          </div>
         </div>
       ) : (
         <CardTable />

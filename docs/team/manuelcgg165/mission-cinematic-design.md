@@ -41,3 +41,17 @@
 - `web/src/game/`: nuevas fases `briefing`, `approach`, `descent`, `recon`; escenas de emergencia; coaching.
 - Si algo de Marta o Pablo cambia, la integración queda detrás de dos envoltorios en `web/src/game/ui/` (`GameGlobe`,
   `SiteRecon`) para adaptarla en un único sitio.
+
+## Estado 2026-11-15 (mediodía) — rama `Manuelcgg165/100-mission-cinematic`
+- Hecho y probado en el navegador: intro dentro de la cabina (Luna girando en la ventana), **escenas animadas de emergencia**
+  (`EmergencyScene.tsx` + `emergencyFx.ts`: la imagen de cada emergencia con efectos CSS anclados al punto que falla: llama
+  entrecortada y chispas del motor, Sol con llamaradas, estática en las tres pantallas, vapor de la válvula, anillos de señal
+  rotos y "NO SIGNAL"), **briefing con el doctor alterado** (retrato temblando, texto rápido; al acabar o con "Skip" se
+  traza la aproximación en cuanto el reparto está listo), coaching, barra de tiempo y reconocimiento con Street View
+  (rama `100-mission-recon` integrada). 378 tests en verde.
+- **[IA]** Con reduced motion las escenas quedan quietas (sin partículas).
+- **Pendiente (Pablo):** Cesium Ion responde **401** a `assets/2684829/endpoint` con el token de `web/.env.local` (antes daba 200
+  en `localhost:5173`). 401 = token inválido o sin acceso a ese asset, no un problema de origen (eso sería 403). Hasta que se
+  renueve, el reconocimiento usa el panorama de respaldo. `SiteRecon` ahora deja en consola el motivo
+  (`[recon] 3D Street View unavailable (<motivo>)`).
+- Pendiente aparte: el token para la web pública (Vercel) restringido a esa URL.

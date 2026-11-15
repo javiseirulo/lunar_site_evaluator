@@ -70,13 +70,19 @@ export function SiteRecon() {
     if (Math.abs(turn) > 0.5) embed.current?.look(turn, 0);
     setMode('3d');
   }, [initialHeading]);
-  const onError = useCallback(() => setMode('flat'), []);
+  const onError = useCallback((reason?: string) => {
+    // Visible in devtools: tells "no token" from "WebGL" or "Cesium load / timeout" at a glance.
+    console.warn(
+      `[recon] 3D Street View unavailable (${reason ?? 'unknown'}); using the panorama.`,
+    );
+    setMode('flat');
+  }, []);
   // Backstop: if even the embed's code never arrives, settle on the panorama.
   useEffect(() => {
     if (mode !== 'loading') return;
-    const id = window.setTimeout(() => setMode('flat'), TERRAIN_TIMEOUT_MS + 3000);
+    const id = window.setTimeout(() => onError('backstop'), TERRAIN_TIMEOUT_MS + 3000);
     return () => window.clearTimeout(id);
-  }, [mode]);
+  }, [mode, onError]);
   const onView = useCallback((v: { heading: number }) => setHeading(v.heading), []);
 
   const turn = useCallback(
