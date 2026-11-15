@@ -7,7 +7,7 @@ import { useState } from 'react';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router';
 import { useAppStore } from '../store';
 import { useData, useSelectedSite, useTimeseries } from '../data';
-import { TABS, modeForPath, pathForMode } from '../navigation';
+import { visibleTabs, modeForPath, pathForMode } from '../navigation';
 import { formatHours, formatUtc } from '../format';
 import { dayOfWindow, friendlyHours } from '../metrics';
 import { hoursUntilChange, sampleAt } from '../timeseries';
@@ -89,7 +89,7 @@ function TabBar() {
   const proMode = useAppStore((s) => s.proMode);
   return (
     <nav aria-label="Main" className="flex overflow-x-auto [scrollbar-width:none]">
-      {TABS.filter((t) => proMode || !t.expert).map((t) => (
+      {visibleTabs(proMode).map((t) => (
         <NavLink
           key={t.label}
           to={t.mode ? pathForMode(t.mode, selectedSiteId) : t.path}
