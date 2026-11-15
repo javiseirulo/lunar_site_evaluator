@@ -28,7 +28,7 @@ export function pathForMode(mode: AppMode, siteId?: string | null): string {
 
 /**
  * Main tab bar, in order. Mode tabs keep the selected site in their URL (Street View).
- * Normal mode shows the four tabs a first-time visitor needs; `expert` tabs appear only in
+ * Normal mode shows the tabs a first-time visitor needs; `expert` tabs appear only in
  * Expert mode. Pages that aren't modes (sites, compare, learn, about) don't change `mode`.
  */
 export const TABS: {
@@ -39,7 +39,7 @@ export const TABS: {
   expert?: boolean;
 }[] = [
   { label: 'Explore', path: '/explore', mode: 'explore' },
-  { label: 'Compare', path: '/compare' },
+  { label: 'Compare', path: '/compare', expert: true },
   { label: 'Mission', path: '/game', mode: 'game' },
   { label: 'Learn', path: '/learn' },
   { label: 'Sites', path: '/sites', expert: true },
