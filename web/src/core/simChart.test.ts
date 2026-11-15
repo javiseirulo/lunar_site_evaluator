@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { buildRunningStats, downsampleMinMax, monthTicks, onRuns, statsAt } from './simChart';
+import {
+  buildRunningStats,
+  downsampleMinMax,
+  monthTicks,
+  onRuns,
+  rollingWindow,
+  statsAt,
+  valueRange,
+} from './simChart';
 
 describe('downsampleMinMax', () => {
   it('keeps peaks and valleys per bucket', () => {
@@ -54,5 +62,25 @@ describe('monthTicks', () => {
       '2027-02-01T01:00:00Z',
     ];
     expect(monthTicks(t)).toEqual([{ index: 2, label: 'Feb' }]);
+  });
+});
+
+describe('rollingWindow', () => {
+  it('starts at 0 until the cursor passes the anchor, then scrolls', () => {
+    expect(rollingWindow(10, 8760, 720)).toEqual({ start: 0, end: 720 });
+    expect(rollingWindow(2000, 8760, 720)).toEqual({ start: 1460, end: 2180 });
+  });
+  it('stays inside the series at the end and for short series', () => {
+    expect(rollingWindow(8759, 8760, 720)).toEqual({ start: 8040, end: 8760 });
+    expect(rollingWindow(3, 5, 720)).toEqual({ start: 0, end: 5 });
+    expect(rollingWindow(-4, 100, 10)).toEqual({ start: 0, end: 10 });
+  });
+});
+
+describe('valueRange', () => {
+  it('always includes the horizon and rounds out', () => {
+    expect(valueRange([3.2, 1.4], 0, 1)).toEqual({ lo: 0, hi: 4 });
+    expect(valueRange([-12, 25], 0, 10)).toEqual({ lo: -20, hi: 30 });
+    expect(valueRange([], 0, 1)).toEqual({ lo: 0, hi: 1 });
   });
 });

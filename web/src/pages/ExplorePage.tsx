@@ -88,13 +88,13 @@ export default function ExplorePage() {
           )}
         </div>
         {proMode && <MissionTimingPanel />}
-        <TimeBar bands={false} />
-        <SimChart />
+        <TimeBar />
       </section>
 
       {/* Right: site card (+ validity check in Expert) */}
       <aside className="order-2 flex flex-col gap-4 md:order-3 lg:col-span-1">
         <SiteDetail />
+        <SimChart />
         {/* Validity for the current mission window (Javi, @/scoring; docs/10 J6–J7). */}
         {proMode && <SiteCheckPanel />}
       </aside>

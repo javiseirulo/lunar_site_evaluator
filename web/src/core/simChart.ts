@@ -1,8 +1,43 @@
 /**
- * Pure logic for the live simulation chart (Explore, under the Mission Clock): downsampling a
- * year of hourly samples to the chart width, on/off runs for the sun/Earth bands, month ticks and
- * the running "so far" stats. No React, no physics: it only reshapes the Timeseries contract.
+ * Pure logic for the live simulation chart (Explore, right column under the site card): a rolling
+ * window over the year of hourly samples, on/off runs, value range and the running "so far" stats.
+ * No React, no physics: it only reshapes the Timeseries contract.
  */
+
+/**
+ * Rolling window [start, end) of `span` samples that contains `idx`. The cursor travels across
+ * the window until it reaches `anchor` (0-1) of the width, then the window scrolls with it; at the
+ * end of the series it stays put. Always returns 0 <= start < end <= n (n > 0).
+ */
+export function rollingWindow(
+  idx: number,
+  n: number,
+  span: number,
+  anchor = 0.75,
+): { start: number; end: number } {
+  const len = Math.max(2, Math.min(Math.round(span), n));
+  const i = Math.max(0, Math.min(idx, n - 1));
+  const start = Math.max(0, Math.min(i - Math.floor(len * anchor), n - len));
+  return { start, end: start + len };
+}
+
+/** Min/max of `values`, always including `include` (e.g. the 0 deg horizon), padded to whole `pad`. */
+export function valueRange(
+  values: readonly number[],
+  include = 0,
+  pad = 1,
+): { lo: number; hi: number } {
+  let lo = include;
+  let hi = include;
+  for (const v of values) {
+    if (v < lo) lo = v;
+    if (v > hi) hi = v;
+  }
+  lo = Math.floor(lo / pad) * pad;
+  hi = Math.ceil(hi / pad) * pad;
+  if (hi - lo < pad) hi = lo + pad;
+  return { lo, hi };
+}
 
 export interface MinMax {
   min: number[];
