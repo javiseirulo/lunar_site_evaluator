@@ -55,3 +55,4 @@
 | 2026-11-15 | Pro mode renamed Expert, shown as a segmented switch | Same switch as Mission difficulty |
 | 2026-11-15 | Normal hides requirements form, layers, timing, site check | Few options; Expert keeps them |
 | 2026-11-15 | Compare moves to Expert; Explore drops the 2D map (3D globe only); selecting a site flies the globe camera; Mission Clock defaults to 2 days/s with a visible running state | Javi (#93–#96) |
+| 2026-11-15 | Landing date selector in Explore (Normal + Expert, #154). Default window keeps the published 2027 clock range; any other date computes the clock/chart client-side over [landing, landing+stay) from `@/ephem`. Dates in years without an ephemeris file are refused with a message. Catalogue `score`/`valid` exist only for the default window, so for other dates map markers go neutral and the Normal list is not score-sorted | Sun/Earth data covers 2026–2055 plus past-mission years only; stale scores must never read as the new date |

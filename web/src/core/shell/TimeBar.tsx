@@ -6,7 +6,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Pause, Play, SkipBack } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAppStore } from '../store';
-import { useData } from '../data';
+import { useClockRange } from '../clockRange';
 import { useActiveSeries } from '@/ephem/activeSeries';
 import { formatHours, formatUtc } from '../format';
 import {
@@ -32,7 +32,7 @@ const DEFAULT_SPEED = 3; // 2 days / sec
 const clampSpeed = (i: number) => (Number.isInteger(i) && SPEEDS[i] ? i : DEFAULT_SPEED);
 
 export function TimeBar({ className, compact = false }: { className?: string; compact?: boolean }) {
-  const range = useData((s) => s.manifest?.time_range);
+  const range = useClockRange();
   const currentTimeUTC = useAppStore((s) => s.currentTimeUTC);
   const setTime = useAppStore((s) => s.setTime);
   const active = useActiveSeries();
@@ -230,9 +230,9 @@ export function TimeBar({ className, compact = false }: { className?: string; co
           </span>
         ) : (
           <span>
-            {active.kind === 'point'
+            {active.kind
               ? active.error
-                ? 'Ephemeris unavailable for this point'
+                ? 'Ephemeris unavailable for this window'
                 : 'Computing…'
               : 'Pick a site to see when it gets sun and sees Earth'}
           </span>
