@@ -146,3 +146,4 @@
 - Tras el rediseño de pantalla completa (release #130), Layers y las coordenadas estaban en una pestaña "Map" y el astronauta arriba a la derecha. Se restauran sobre el mapa: coordenadas arriba a la izquierda, Layers abajo a la izquierda, astronauta abajo a la derecha.
 - Mecanismo: `ExplorePage` registra el hueco libre entre paneles (`chromeSlot`) y el globo coloca ahí sus controles con un portal; sin hueco, quedan sobre todo el globo como antes. Se quita la pestaña "Map" del panel izquierdo.
 - Toca `src/pages/ExplorePage.tsx` (de Javi2): coordinar el PR con él.
+- Mission Clock y fecha de aterrizaje (Normal) salen de encima de la Luna: van en una franja bajo el mapa 3D, bajo la columna central; paneles laterales y controles siguen sobre el globo.

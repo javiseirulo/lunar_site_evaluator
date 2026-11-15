@@ -190,7 +190,7 @@ export default function ExplorePage() {
           )}
         </div>
 
-        <div className="pointer-events-none absolute inset-0 grid grid-cols-1 grid-rows-[minmax(0,1fr)_auto] gap-3 p-3 md:grid-cols-[minmax(200px,20%)_minmax(0,1fr)_minmax(210px,22%)]">
+        <div className="pointer-events-none absolute inset-0 grid grid-cols-1 grid-rows-[minmax(0,1fr)] gap-3 p-3 md:grid-cols-[minmax(200px,20%)_minmax(0,1fr)_minmax(210px,22%)]">
           <LeftPanel />
           {/* Free map area between the panels: the globe puts its coordinate, Layers and astronaut controls here. */}
           <div
@@ -198,10 +198,14 @@ export default function ExplorePage() {
             className="pointer-events-none absolute inset-0 md:relative md:inset-auto md:col-start-2 md:row-start-1"
           />
           <RightPanel />
-          <div className="pointer-events-auto flex flex-col gap-2 self-end md:col-start-2 md:row-start-2">
-            {!proMode && <LandingDate />}
-            <TimeBar />
-          </div>
+        </div>
+      </div>
+
+      {/* Mission Clock below the 3D view (not over the Moon), under the free map column. */}
+      <div className="mt-2 grid shrink-0 grid-cols-1 gap-3 px-3 md:grid-cols-[minmax(200px,20%)_minmax(0,1fr)_minmax(210px,22%)]">
+        <div className="flex flex-col gap-2 md:col-start-2">
+          {!proMode && <LandingDate />}
+          <TimeBar />
         </div>
       </div>
     </>
