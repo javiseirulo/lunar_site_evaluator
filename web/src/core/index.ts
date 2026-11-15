@@ -4,7 +4,7 @@ export { prepareSurfaceLocation, surfacePath, validMoonPoint } from './surfaceNa
 export type { MoonPoint } from './surfaceNavigation';
 export { useCustomPins as useSavedPlaces } from './savedPlaces';
 export type { CustomPin as SavedPlace } from './savedPlaces';
-export type { AppState } from './store';
+export type { AppState, PendingPin } from './store';
 export { useData, useTimeseries, useSite, useSelectedSite, loadTimeseries, dataUrl } from './data';
 export {
   sampleAt,
