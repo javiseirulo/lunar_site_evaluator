@@ -1,6 +1,7 @@
 /**
- * Masthead: one line on the night page — mark, name, page links, site finder, Pro mode —
- * then a single sentence about the next sunrise or Earthrise.
+ * Masthead: one line on the night page — mark, name, four page links, Normal/Expert switch —
+ * then a single sentence about the next sunrise or Earthrise. Expert mode adds more pages and
+ * the site finder.
  */
 import { useState } from 'react';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router';
@@ -23,14 +24,14 @@ export function Masthead() {
           aria-label="Lunar Site Evaluator home"
         >
           <Logo className="size-8 shrink-0" />
-          <span className="font-display text-[20px] leading-none tracking-[-0.02em] text-[#f4f0e6]">
+          <span className="font-mono text-[13px] leading-none font-bold tracking-[0.14em] text-white uppercase">
             Lunar Site Evaluator
           </span>
         </Link>
         <TabBar />
         <div className="ml-auto flex max-w-full flex-wrap items-center gap-x-4 gap-y-2">
           <SiteFinder />
-          <ProSwitch />
+          <ModeSwitch />
         </div>
       </div>
       {modeForPath(pathname) !== 'streetview' && <NextUp />}
@@ -44,7 +45,8 @@ function SiteFinder() {
   const selectSite = useAppStore((s) => s.selectSite);
   const navigate = useNavigate();
   const [value, setValue] = useState('');
-  if (!sites) return null;
+  const proMode = useAppStore((s) => s.proMode);
+  if (!sites || !proMode) return null;
   const sorted = [...sites].sort((a, b) => a.name.localeCompare(b.name));
 
   return (
@@ -59,7 +61,7 @@ function SiteFinder() {
         else if (mode !== 'explore') navigate('/explore');
       }}
     >
-      <label htmlFor="site-finder" className="text-[13px] text-[#b7b1a6]">
+      <label htmlFor="site-finder" className="text-ink-muted text-[13px]">
         Find a site
       </label>
       <select
@@ -84,9 +86,10 @@ function SiteFinder() {
 
 function TabBar() {
   const selectedSiteId = useAppStore((s) => s.selectedSiteId);
+  const proMode = useAppStore((s) => s.proMode);
   return (
     <nav aria-label="Main" className="flex overflow-x-auto [scrollbar-width:none]">
-      {TABS.map((t) => (
+      {TABS.filter((t) => proMode || !t.expert).map((t) => (
         <NavLink
           key={t.label}
           to={t.mode ? pathForMode(t.mode, selectedSiteId) : t.path}
@@ -100,21 +103,24 @@ function TabBar() {
   );
 }
 
-function ProSwitch() {
+/** Normal | Expert. Same switch the Mission game uses for its difficulty. */
+function ModeSwitch() {
   const proMode = useAppStore((s) => s.proMode);
   const setProMode = useAppStore((s) => s.setProMode);
   return (
-    <button
-      type="button"
-      role="switch"
-      aria-checked={proMode}
-      onClick={() => setProMode(!proMode)}
-      className="flex cursor-pointer items-center gap-2 text-[13px] text-[#d9d3c7]"
-      title="Pro mode shows technical names, UTC times, coordinates and fine layer controls"
+    <div
+      className="seg"
+      role="group"
+      aria-label="Detail level"
+      title="Expert shows every control, UTC times, coordinates and technical names"
     >
-      <span className="switch" data-on={proMode} aria-hidden />
-      Pro mode
-    </button>
+      <button type="button" aria-pressed={!proMode} onClick={() => setProMode(false)}>
+        Normal
+      </button>
+      <button type="button" aria-pressed={proMode} onClick={() => setProMode(true)}>
+        Expert
+      </button>
+    </div>
   );
 }
 
@@ -140,10 +146,10 @@ function NextUp() {
   const day = range ? dayOfWindow(currentTimeUTC, range.start_utc, range.end_utc) : null;
 
   return (
-    <div className="flex flex-col gap-1 pt-3 pb-4 text-[13px] text-[#9c968b] sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-5">
+    <div className="flex flex-col gap-1 pt-3 pb-4 text-ink-muted text-[13px] sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-5">
       {subject && sample && (
         <p className="min-w-0 sm:flex-1">
-          At <span className="text-[#f4f0e6]">{subject.name}</span>, the Sun{' '}
+          At <span className="text-white">{subject.name}</span>, the Sun{' '}
           {sample.lit ? 'sets' : 'rises'} {when(toSun)}
           {sample.earthVisible !== null && (
             <>
@@ -155,15 +161,15 @@ function NextUp() {
         </p>
       )}
       <span className="ml-auto flex items-center gap-4">
-        {isMock && (
+        {proMode && isMock && (
           <span
-            className="text-[#e2b15a]"
-            title="The app is showing invented placeholder data until the real pipeline output lands."
+            className="text-warn"
+            title="Some layers still use invented placeholder data until the real pipeline output lands."
           >
-            Mock data
+            Mock layers
           </span>
         )}
-        <span className="num text-[#d9d3c7]">
+        <span className="num text-ink">
           {proMode ? formatUtc(currentTimeUTC) : day && `Day ${day.day} of ${day.total}`}
         </span>
       </span>

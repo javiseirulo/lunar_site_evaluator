@@ -2,7 +2,7 @@
 
 ## Estado vigente — 2026-11-15
 
-Rama `pabloizgui/46-globe-streetview`, desde dev `f6dd86f`, con #91, #97, #98 y #90 integrados.
+Rama `pabloizgui/46-globe-streetview`, desde dev `0ca606d`, con #91, #97, #98, #90 y #101 integrados.
 Guías actuales: [globe-surface-integration.md](globe-surface-integration.md) y
 [ephemeris-integration.md](ephemeris-integration.md). Sustituye estados históricos.
 
@@ -27,17 +27,16 @@ No se duplica la transición ni el acceso desde ficha que el usuario confirmó e
 
 ### Qué queda del resto del equipo
 
-- **Javi:** consumir `terrain/catalog.json` y los perfiles en `python/export/all.py`,
-  regenerando series/métricas/checks/score. Su export real todavía publica horizonte
-  plano, elevación 0 y `pending_metrics` para pendiente/PSR. Las rejillas de `grid/`
-  también son planas; 41 perfiles puntuales no constituyen una rejilla global.
-- **Marta:** el globo v2 ya consume heightmap/máscara; revisar el nuevo astronauta
-  y el store de pins compartido (formato anterior conservado).
-  Entrada por coordenadas/UTC y retorno al globo implementados en esta rama.
-- **Javi (ahora core/capas):** revisar `selectedPoint`/pins compartidos y cargar
-  `terrain/layers.json` real; el parche de Marta ya consume heights/máscara pero
-  las capas del core siguen mock. Fecha/hora del Mission Clock y altura de la
-  barra lateral son peticiones de Marta, fuera de esta modificación del visor.
+- **Javi:** el PR #101 ya incorpora los 41 horizontes y elevación/pendiente/PSR
+  al export y usa 10° de pendiente máxima. `psr_dist_km` sigue pendiente en 18
+  sitios sin cobertura. Las rejillas científicas globales/polares siguen siendo
+  geométricas; no equivalen a una oclusión de relieve calculada por celda.
+- **Marta:** su globo ya consume heights/máscara y, con #101, capas reales;
+  revisar astronauta, pins compartidos y rendimiento del parche. Entrada por
+  coordenadas/UTC y retorno al punto observado implementados en esta rama.
+- **Javi (core/capas):** #101 ya publica `layers.json` real y lo pinta en esfera
+  y parche; su actualización Normal/Expert y barra lateral se conservan.
+  Coordinar cualquier ajuste futuro del Mission Clock; Street View ya tiene UTC.
 - **Javi2 / despliegue:** configurar un token/origen permitido para el despliegue
   público de Vercel; el desarrollo local ya usa la clave compartida del código.
 - **Pablo / despliegue:** permitir el dominio definitivo en el token de lectura y

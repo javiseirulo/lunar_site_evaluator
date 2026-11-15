@@ -15,6 +15,10 @@ import {
   useTerrain,
 } from './terrainStore';
 import { vec3ToLatLon } from './geo';
+// Javi (@javiseirulo): map layers draped on the patch, see LayerOverlays.tsx.
+import { PatchLayers } from './LayerOverlays';
+import { patchUvs } from './layerUv';
+import { useData } from '@/core';
 
 export function PolarPatch({
   onSurfaceClick,
@@ -29,6 +33,8 @@ export function PolarPatch({
   const mask = useTerrain((s) => s.mask);
   const shown = useTerrain(patchOn);
   const exaggeration = useTerrain((s) => s.exaggeration);
+  // Javi: layers.json bounds for the overlay UVs (same as the heightmap's today).
+  const layerBounds = useData((s) => s.layers?.bounds_m);
 
   const geometry = useMemo(() => {
     if (status !== 'ready' || !header || !heights) return null;
@@ -36,31 +42,40 @@ export function PolarPatch({
     const g = new BufferGeometry();
     g.setAttribute('position', new BufferAttribute(a.positions, 3));
     g.setIndex(new BufferAttribute(a.indices, 1));
+    // Javi: stereographic UVs so layer PNGs drape pixel on pixel (unused by the grey material).
+    g.setAttribute(
+      'uv',
+      new BufferAttribute(patchUvs(header, a.n, 1, layerBounds ?? header.bounds_m), 2),
+    );
     g.computeVertexNormals();
     g.computeBoundingSphere();
     return g;
-  }, [status, header, heights, mask, exaggeration]);
+  }, [status, header, heights, mask, exaggeration, layerBounds]);
 
   useEffect(() => () => geometry?.dispose(), [geometry]);
 
   if (!geometry) return null;
   return (
-    <mesh
-      geometry={geometry}
-      userData={{ lunarSurface: true }}
-      // Kept mounted while hidden, so coming back to the pole does not rebuild the mesh.
-      visible={shown}
-      castShadow
-      receiveShadow
-      onClick={(e: ThreeEvent<MouseEvent>) => {
-        if (!shown || e.delta > clickTolerancePx) return; // hidden: let the Moon take it
-        e.stopPropagation();
-        const [lat, lon] = vec3ToLatLon(e.point.x, e.point.y, e.point.z);
-        onSurfaceClick(lat, lon);
-      }}
-    >
-      <meshStandardMaterial color="#8c8c8c" roughness={1} metalness={0} />
-    </mesh>
+    <>
+      <mesh
+        geometry={geometry}
+        userData={{ lunarSurface: true }}
+        // Kept mounted while hidden, so coming back to the pole does not rebuild the mesh.
+        visible={shown}
+        castShadow
+        receiveShadow
+        onClick={(e: ThreeEvent<MouseEvent>) => {
+          if (!shown || e.delta > clickTolerancePx) return; // hidden: let the Moon take it
+          e.stopPropagation();
+          const [lat, lon] = vec3ToLatLon(e.point.x, e.point.y, e.point.z);
+          onSurfaceClick(lat, lon);
+        }}
+      >
+        <meshStandardMaterial color="#8c8c8c" roughness={1} metalness={0} />
+      </mesh>
+      {/* Javi: active map layers on top of the terrain, same geometry and visibility. */}
+      <PatchLayers geometry={geometry} visible={shown} />
+    </>
   );
 }
 

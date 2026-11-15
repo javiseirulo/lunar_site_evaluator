@@ -2,7 +2,7 @@
 
 ## Entrega vigente — 2026-11-15
 
-Rama `pabloizgui/46-globe-streetview`, desde dev `f6dd86f` (PR #91, globo v2 #97, despliegue #98 y Mission #90 integrados).
+Rama `pabloizgui/46-globe-streetview`, desde dev `0ca606d` (PR #91, globo v2 #97, despliegue #98, Mission #90 y datos/capas/restyle #101 integrados).
 La nueva integración se describe en [globe-surface-integration.md](globe-surface-integration.md);
 la guía científica sigue en [ephemeris-integration.md](ephemeris-integration.md).
 Estado y dependencias: [tasks.md](tasks.md). Los estados antiguos se conservan como historial.
@@ -40,8 +40,11 @@ no se suben a una cuenta. El retorno pide Explore 3D centrado en el punto actual
 Los GeoTIFF originales y kernels están fuera de Git. Los compañeros pueden
 consumir todos los productos anteriores sin descargar varios GB ni ejecutar
 Python. Javi ya entregó las efemérides y el catálogo: dejaron de ser bloqueos.
-Su exportador debe incorporar estos horizontes/alturas/pendientes/PSR para
-regenerar la evaluación; sus series y rejillas publicadas siguen siendo planas.
+El PR #101 ya incorpora los 41 horizontes y alturas/pendientes/PSR al export,
+regenera series/evaluación y publica capas reales. PSR permanece pendiente en
+18 sitios sin cobertura. Las rejillas por celda siguen geométricas: esta entrega
+no añade horizontes densos a toda la Luna. El parche de Marta consume alturas,
+máscara y ahora las capas de Javi. No hace falta volver a entregar estos archivos.
 
 ## Historial de la entrega anterior
 

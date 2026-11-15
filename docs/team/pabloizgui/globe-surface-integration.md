@@ -1,7 +1,7 @@
 # Astronauta y mejoras de Street View
 
 2026-11-15 · Pablo · peticiones humanas implementadas con OpenAI Codex.
-Base actualizada: dev f6dd86f (#91, #97 globo v2, #98 despliegue y #90 Mission integrados). Rama pabloizgui/46-globe-streetview.
+Base actualizada: dev 0ca606d (#91, #97 globo v2, #98 despliegue, #90 Mission y #101 datos/capas/restyle integrados). Rama pabloizgui/46-globe-streetview.
 Las notas privadas se conservan en stash y se restauran al cerrar la entrega.
 
 ## Alcance vigente
@@ -67,3 +67,9 @@ lint y TypeScript correctos; verificador de entrega de terreno correcto, con
 comprueba arrastre → vuelo existente → ruta y cambio de UTC durante el vuelo:
 la llegada conserva el UTC nuevo. La prueba en teléfono físico sigue pendiente;
 no se afirma que haya terminado el flujo automático completo de gstack.
+
+Actualización de integración con #101: se preserva Explore siempre 3D con
+fallback WebGL, Normal/Expert y las nuevas capas de Javi. El retorno respeta
+selectedPoint y evita el vuelo inicial al centro original del sitio; las
+selecciones posteriores de catálogo conservan sus vuelos. El export de Javi ya
+consume los 41 horizontes y terreno; las rejillas por celda siguen geométricas.

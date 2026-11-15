@@ -44,6 +44,8 @@ export function MissionGame() {
   useEffect(() => {
     const { difficulty, ...config } = parseGameParams(window.location.search);
     useGame.getState().configure(config, difficulty);
+    // ?difficulty= also moves the site-wide Normal | Expert switch (one switch for everything).
+    if (difficulty) useAppStore.getState().setProMode(difficulty === 'expert');
   }, []);
 
   // Leaving the page ends the game: a later visit starts from the menu (fresh deadline, and
@@ -61,6 +63,13 @@ export function MissionGame() {
     const app = useAppStore.getState();
     if (app.selectedSiteId !== want) app.selectSite(want);
   }, [phase, chosenSiteId]);
+
+  // One switch for the whole site: Expert mode = the game's expert difficulty.
+  const proMode = useAppStore((s) => s.proMode);
+  const setDifficulty = useGame((s) => s.setDifficulty);
+  useEffect(() => {
+    setDifficulty(proMode ? 'expert' : 'normal');
+  }, [proMode, setDifficulty]);
 
   let screen: ReactNode;
   switch (phase) {
