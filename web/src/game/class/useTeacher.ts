@@ -109,7 +109,8 @@ export function useTeacher(difficulty: Difficulty): TeacherSession {
     async (q: number, total: number) => {
       setLoading(true);
       setError(null);
-      const h = await prefetch(q);
+      // A rejected deal (data fetch failed) must not leave the teacher stuck on "loading".
+      const h = await prefetch(q).catch(() => null);
       setLoading(false);
       if (!h) {
         hands.current.delete(q);
