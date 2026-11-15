@@ -5,6 +5,7 @@ import {
   HORIZON_Y,
   lerpAngle,
   placeBody,
+  signalBars,
   skyAt,
   VIEW_FOV_DEG,
   viewHeading,
@@ -78,5 +79,13 @@ describe('sky math', () => {
     expect(skyAt(ts, 0, 5)).toBeNull();
     const noVis = { ...ts, earth_visible: undefined } as unknown as Timeseries;
     expect(skyAt(noVis, 0, 0)!.earthVisible).toBeNull();
+  });
+
+  it('signalBars: 0 when down, 1 at the margin, up to 4', () => {
+    expect(signalBars(false, 10, 2)).toBe(0);
+    expect(signalBars(true, 2, 2)).toBe(1);
+    expect(signalBars(true, 3.6, 2)).toBe(2);
+    expect(signalBars(true, 30, 2)).toBe(4);
+    expect(signalBars(true, -5, 2)).toBe(1); // unknown-visibility edge cases still show a bar
   });
 });

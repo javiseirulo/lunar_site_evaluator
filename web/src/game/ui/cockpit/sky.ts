@@ -113,3 +113,9 @@ export function skyAt(ts: Timeseries, startIndex: number, h: number): SkyState |
     earthVisible: vis === undefined ? null : vis === 1,
   };
 }
+
+/** Signal bars (0-4) for the Earth link: 0 when down, then one more bar per 1.5° of margin. */
+export function signalBars(linkUp: boolean, earthElDeg: number, marginDeg: number): number {
+  if (!linkUp) return 0;
+  return 1 + Math.min(3, Math.max(0, Math.floor((earthElDeg - marginDeg) / 1.5)));
+}
