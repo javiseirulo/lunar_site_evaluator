@@ -7,7 +7,8 @@
 import intro from '../content/intro.json';
 import { useGame } from '../state/gameStore';
 import { DialogueBox } from './DialogueBox';
-import { PixelScientist } from './PixelScientist';
+import { useCurrentMission } from '../historic/useCurrentMission';
+import { NarratorPortrait } from './NarratorPortrait';
 
 /** Cabin wall colour: the viewport's giant shadow paints it around the window. */
 const CABIN_COLOR = '#0b0f1a';
@@ -19,6 +20,11 @@ function Rivet({ className }: { className: string }) {
 export function IntroScreen() {
   const endIntro = useGame((s) => s.endIntro);
   const skipIntro = useGame((s) => s.skipIntro);
+  const historical = useGame((s) => s.mode === 'historical');
+  const mission = useCurrentMission();
+  // Historical: the mission's narrator tells its story (wait for the mission file, it is small).
+  const speaker = mission ? mission.narrator.name : intro.speaker;
+  const lines = mission ? mission.intro : intro.lines;
 
   return (
     <div className="relative flex flex-1 flex-col overflow-hidden">
@@ -41,21 +47,32 @@ export function IntroScreen() {
       </div>
 
       <p className="text-ink-faint relative mt-2 text-center font-mono text-[10.5px] tracking-[0.3em] uppercase">
-        Lander cabin · lunar orbit
+        {mission
+          ? `${mission.name} · ${mission.year} · ${mission.country}`
+          : 'Lander cabin · lunar orbit'}
       </p>
 
       {/* The console: the doctor and his dialogue. */}
       <div className="relative flex flex-col items-center gap-3 p-3 sm:flex-row sm:items-end sm:p-4">
         <div className="mission-bezel relative shrink-0 p-1.5">
-          <PixelScientist mood="neutral" className="size-24 bg-black/60 sm:size-32" />
+          <NarratorPortrait
+            narrator={mission?.narrator ?? null}
+            mood="neutral"
+            className="size-24 bg-black/60 sm:size-32"
+          />
         </div>
-        <DialogueBox
-          className="max-w-2xl min-w-0 flex-1"
-          speaker={intro.speaker}
-          lines={intro.lines}
-          onDone={() => endIntro()}
-          onSkip={() => skipIntro()}
-        />
+        {historical && !mission ? (
+          <p className="text-ink-muted font-mono text-[11px] uppercase">Opening the mission log…</p>
+        ) : (
+          <DialogueBox
+            key={speaker}
+            className="max-w-2xl min-w-0 flex-1"
+            speaker={speaker}
+            lines={lines}
+            onDone={() => endIntro()}
+            onSkip={() => skipIntro()}
+          />
+        )}
       </div>
     </div>
   );

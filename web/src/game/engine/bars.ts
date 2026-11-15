@@ -42,6 +42,9 @@ export const CAUSE_BAR: Record<FailCause, string> = {
   blackout: 'max_blackout_hours',
   low_sun: 'illum_pct',
   low_comm: 'earth_vis_pct',
+  // Landing light has no bar (it is about one instant): the verdict highlights none.
+  dark_landing: '',
+  glare_landing: '',
 };
 
 const R = DEFAULT_REQUIREMENTS;

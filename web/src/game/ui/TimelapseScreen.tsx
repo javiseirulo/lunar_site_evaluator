@@ -10,7 +10,7 @@ import { useReducedMotion } from 'motion/react';
 import { FastForward, Gauge, Map as MapIcon } from 'lucide-react';
 import { clsx } from 'clsx';
 import { sampleAt, useAppStore, useTimeseries } from '@/core';
-import { DEFAULT_REQUIREMENTS } from '../engine/requirements';
+import { useMissionRules } from '../state/useMissionRules';
 import { isLinkUp } from '../engine/simulate';
 import { sfx } from '../audio/sfx';
 import { useGame } from '../state/gameStore';
@@ -27,9 +27,6 @@ import {
   TIMELAPSE_MS,
 } from './timelapse';
 
-const REQ = DEFAULT_REQUIREMENTS;
-const DAYS = REQ.surface_days;
-const MISSION_HOURS = DAYS * 24;
 /** How long the frozen end state stays on screen before the verdict (time for the failure fx). */
 const HOLD_MS = 3500;
 
@@ -41,6 +38,9 @@ const VIEWS: { id: View; label: string; icon: typeof Gauge }[] = [
 ];
 
 export function TimelapseScreen() {
+  const REQ = useMissionRules();
+  const DAYS = REQ.surface_days;
+  const MISSION_HOURS = DAYS * 24;
   const hand = useGame((s) => s.hand);
   const chosenSlot = useGame((s) => s.chosenSlot);
   const card = hand?.cards.find((c) => c.slot === chosenSlot);
@@ -119,12 +119,12 @@ export function TimelapseScreen() {
       cancelAnimationFrame(raf);
       window.clearTimeout(hold);
     };
-  }, [landingUtc, card, stop, reduced, ready]);
+  }, [landingUtc, card, stop, reduced, ready, MISSION_HOURS]);
 
   const runs = useMemo(
     () =>
       ts && hand ? missionRuns(ts, hand.startIndex, MISSION_HOURS, REQ.antenna_margin_deg) : null,
-    [ts, hand],
+    [ts, hand, MISSION_HOURS, REQ.antenna_margin_deg],
   );
 
   // Soft chime at each new mission day; the cause's sting when the mission freezes on a failure.

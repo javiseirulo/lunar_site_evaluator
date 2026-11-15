@@ -1,6 +1,6 @@
 /**
  * Words and facts for the intro page, in one place so the team can edit them without touching layout.
- * Every number here was checked against the repo on 2026-11-15 (see the comment next to each one);
+ * Every number here was checked against the repo on 2026-11-15 (again after #135) (see the comment next to each one);
  * if the data changes, change them here.
  */
 
@@ -55,53 +55,29 @@ export const STATS = [
 
 export const FEATURES = {
   title: 'What you can do with it',
-  lead: 'Everything runs in your browser. Normal view keeps things simple for students and the public. Expert view adds the technical detail planners want.',
+  lead: 'It all runs in your browser. Normal view keeps things simple; Expert view adds the detail planners want.',
   items: [
     {
       title: 'Explore',
-      text: 'A 3D Moon with every site on it. Set what your mission needs, such as a minimum amount of sunlight or Earth view during your landing window, and the matching sites update as you type.',
+      text: "A 3D Moon with every site on it. Set what your mission needs and the matching sites update as you type. Press Simulate to run through 2027 an hour at a time, click anywhere for that spot's figures, or switch on the 32 past landings.",
       to: '/explore',
       cta: 'Open the map',
     },
     {
-      title: 'Mission clock',
-      text: 'Press Play and time runs through 2027 an hour at a time, with a countdown to the next sunset and the next Earthset at the site you picked.',
-      to: '/explore',
-      cta: 'Try it',
-    },
-    {
-      title: 'Site Check',
-      text: 'Type any latitude and longitude on the Moon and get the same figures as for a catalogue site.',
-      to: '/explore',
-      cta: 'Check a spot',
-    },
-    {
-      title: 'Compare',
-      text: 'Put two or three sites side by side. The best value in each row is marked, and their sunlight and Earth windows line up on one timeline. This is the quick answer to "if we slip a week, where should we go instead?" (Expert view.)',
-      to: '/compare',
-      cta: 'Compare sites',
-    },
-    {
       title: 'Street View',
-      text: 'Stand on a site and see the terrain around you and where the Sun and Earth are in the sky at the time you chose. (Expert view.)',
+      text: 'Stand on a site and look around, with the Sun and Earth where they really are at the time you pick.',
       to: '/streetview',
       cta: 'Look around',
     },
     {
-      title: 'Mission, the game',
-      text: 'Your planned landing site falls through. Choose another, watch the days play out, and find out why it worked or why you ran out of light. South Pole mode is playable now.',
+      title: 'Mission',
+      text: 'A game: your landing site falls through and you pick another. Play the south pole or real historic landings, or run it with a whole class on their phones.',
       to: '/game',
       cta: 'Play',
     },
     {
-      title: 'Past landings',
-      text: 'A switch on the globe shows 32 historic landings, so you can see where earlier missions touched down compared with the candidate sites.',
-      to: '/explore',
-      cta: 'See them on the globe',
-    },
-    {
       title: 'Learn',
-      text: 'A plain-language explainer with a glossary, for anyone who wants to know why a few kilometres of ground matter so much.',
+      text: 'A plain-language explainer and glossary on why a few kilometres of ground matter so much.',
       to: '/learn',
       cta: 'Read it',
     },
@@ -178,15 +154,15 @@ export const DATA = {
   note: 'The landing sites themselves come from published studies, each cited in the app: Wueller et al. 2026 (JGR Planets), De Rosa et al. 2012 and Flahaut et al. 2020 (Planetary and Space Science).',
 };
 
-export const LIMITS = {
-  title: 'What it cannot do yet',
-  lead: 'We would rather tell you than have you find out.',
+export const FUTURE = {
+  title: 'What we would build next',
+  lead: 'The weekend ran out before the list did.',
   items: [
-    'Real terrain horizons exist for 41 polar sites. The other 18 sites use a flat horizon, so their sunlight and Earth figures are best case.',
-    'The data covers 2027, one value per hour. Other years are not in it.',
-    'A few sites are still missing their distance to shadowed craters. The app says "pending" instead of guessing.',
-    'We assume an observer 5 metres above the ground and keep a 2 degree margin for the antenna.',
-    'It is a planning aid. Do not use it to fly a real mission.',
+    'Real terrain horizons for every site. Today 41 polar sites have them; the other 18 use a flat horizon, so their sunlight and Earth figures are best case.',
+    'More than one year. The data covers 2027, one value per hour; other years and finer steps would cover longer missions.',
+    'Distance to shadowed craters for the 18 sites that still show "pending".',
+    'Your own lander settings. We assume an observer 5 metres above the ground and a 2 degree antenna margin; these should be yours to change.',
+    'Checks against flight-grade tools, so the numbers could back a real mission plan and not only a first look.',
   ],
 };
 
@@ -211,13 +187,11 @@ export const AUDIENCE = {
 export const TEAM = {
   title: 'Who made it',
   body: 'Five of us built this over one weekend at the Madrid event of the NASA Space Apps Challenge 2026. Between us we covered the ephemerides and scoring, the 3D globe and mission requirements, terrain and Street View, the Mission game, and the web platform and design.',
-  aiTitle: 'How we used AI',
-  ai: 'The idea and the product decisions are ours. We used AI assistants (Claude Code, OpenAI Codex and Cursor) to help write code and documentation, and the Mission illustrations are AI-generated. The scientific numbers come from NASA data and the papers cited above, calculated by our own code.',
   disclaimer:
     'An independent project for the NASA Space Apps Challenge, not affiliated with or endorsed by NASA.',
 };
 
 export const FINAL = {
   title: 'Pick a landing site.',
-  text: 'Open the map, press Play, and see which spot still has light when the others go dark.',
+  text: 'Open the map, press Simulate, and see which spot still has light when the others go dark.',
 };

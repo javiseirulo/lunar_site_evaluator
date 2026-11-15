@@ -35,6 +35,60 @@ const TOC = [
   { id: 'credits', label: 'Credits' },
 ];
 
+function H({ id, children }: { id: string; children: React.ReactNode }) {
+  return (
+    <h2
+      id={id}
+      className="border-edge mb-2 scroll-mt-4 border-b pb-1 text-[18px] font-bold text-heading"
+    >
+      {children}
+    </h2>
+  );
+}
+
+/** Text on one side, the picture on the other. The first picture sits on the right. */
+function Beside({
+  id,
+  title,
+  imageFirst,
+  src,
+  alt,
+  caption,
+  children,
+}: {
+  id: string;
+  title: string;
+  imageFirst?: boolean;
+  src: string;
+  alt: string;
+  caption: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  return (
+    <section>
+      <H id={id}>{title}</H>
+      <div
+        className={`mt-3 grid items-start gap-x-8 gap-y-4 ${
+          imageFirst
+            ? 'md:grid-cols-[minmax(200px,0.72fr)_minmax(0,1.4fr)]'
+            : 'md:grid-cols-[minmax(0,1.4fr)_minmax(200px,0.72fr)]'
+        }`}
+      >
+        <div className={`text-ink text-[16px] leading-[1.65] ${imageFirst ? 'md:order-2' : ''}`}>
+          {children}
+        </div>
+        <Figure
+          src={src}
+          alt={alt}
+          className={`border-edge border ${imageFirst ? 'md:order-1' : ''}`}
+        >
+          {caption}
+        </Figure>
+      </div>
+    </section>
+  );
+}
+
 export default function AboutPage() {
   const manifest = useData((s) => s.manifest);
   const isMock = useData((s) => s.isMock);
@@ -56,8 +110,8 @@ export default function AboutPage() {
 
       <article className="box">
         <div className="box-head">Data &amp; Method</div>
-        <div className="box-body max-w-[72ch] space-y-4 text-[12px]">
-          <h1 className="text-[18px] font-bold text-heading">Data, method and credits</h1>
+        <div className="box-body space-y-10 text-[16px] leading-[1.65]">
+          <h1 className="text-[22px] font-bold text-heading">Data, method and credits</h1>
 
           {isMock && (
             <p className="border-warn/60 bg-warn/10 text-warn border px-2 py-1.5 text-[11px]">
@@ -66,10 +120,20 @@ export default function AboutPage() {
             </p>
           )}
 
-          <section id="how">
-            <h2 className="border-edge mb-1 border-b text-[13px] font-bold text-heading">
-              How it works
-            </h2>
+          <Beside
+            id="how"
+            title="How it works"
+            src={figureSrc('shackleton-rim.png')}
+            alt="A sunlit arc of Shackleton crater's rim, with the crater floor left in darkness."
+            caption={
+              <>
+                Shackleton's rim, seen by the Lunar Reconnaissance Orbiter Camera. The Sun stays so
+                low that the floor never lights up while parts of the rim do. The horizon at a
+                landing site is this kind of terrain, plus the curve of the Moon. NASA/GSFC/Arizona
+                State University.
+              </>
+            }
+          >
             <p className="text-ink-muted">
               For each candidate site we compute where the Sun and Earth are in the sky over time
               and compare that with the local horizon built from lunar terrain. The Moon has no
@@ -77,21 +141,22 @@ export default function AboutPage() {
               of the lunar sphere. From that we derive how often a site is sunlit, how often Earth
               is visible, and the longest stretch of darkness.
             </p>
-            <Figure
-              src={figureSrc('shackleton-rim.png')}
-              alt="A sunlit arc of Shackleton crater's rim, with the crater floor left in darkness."
-            >
-              Shackleton's rim, seen by the Lunar Reconnaissance Orbiter Camera. The Sun stays so
-              low that the floor never lights up while parts of the rim do. The horizon at a landing
-              site is this kind of terrain, plus the curve of the Moon. NASA/GSFC/Arizona State
-              University.
-            </Figure>
-          </section>
+          </Beside>
 
-          <section id="sources">
-            <h2 className="border-edge mb-1 border-b text-[13px] font-bold text-heading">
-              Data sources
-            </h2>
+          <Beside
+            id="sources"
+            title="Data sources"
+            imageFirst
+            src={figureSrc('lola-south-pole.jpg')}
+            alt="The lunar south pole colored by height, with Shackleton and de Gerlache labeled near the center."
+            caption={
+              <>
+                South polar heights from LOLA. Low ground is blue, high ground is red and white.
+                Shackleton and de Gerlache, two of the places scored here, are labeled near the
+                middle. NASA Scientific Visualization Studio.
+              </>
+            }
+          >
             <ul className="text-ink-muted list-[square] space-y-1 pl-5">
               {DATA_SOURCES.map((d) => (
                 <li key={d.name}>
@@ -102,24 +167,16 @@ export default function AboutPage() {
                 </li>
               ))}
             </ul>
-            <Figure
-              src={figureSrc('lola-south-pole.jpg')}
-              alt="The lunar south pole colored by height, with Shackleton and de Gerlache labeled near the center."
-            >
-              South polar heights from LOLA. Low ground is blue, high ground is red and white.
-              Shackleton and de Gerlache, two of the places scored here, are labeled near the
-              middle. NASA Scientific Visualization Studio.
-            </Figure>
             {manifest && (
-              <p className="text-ink-faint mt-1.5 text-[10px]">
+              <p className="text-ink-muted mt-3 text-[14px]">
                 Loaded data: {manifest.sources.join('; ')} (generated{' '}
                 <span className="num">{manifest.generated_utc}</span>)
               </p>
             )}
-          </section>
+          </Beside>
 
           <section id="ai">
-            <h2 className="border-edge mb-1 border-b text-[13px] font-bold text-heading">
+            <h2 className="border-edge mb-2 border-b pb-1 text-[18px] font-bold text-heading">
               Use of AI
             </h2>
             <p className="text-ink-muted">
@@ -130,7 +187,7 @@ export default function AboutPage() {
           </section>
 
           <section id="credits">
-            <h2 className="border-edge mb-1 border-b text-[13px] font-bold text-heading">
+            <h2 className="border-edge mb-2 border-b pb-1 text-[18px] font-bold text-heading">
               Credits
             </h2>
             <p className="text-ink-muted">

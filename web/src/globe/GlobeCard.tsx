@@ -10,6 +10,7 @@ import type { CustomPin } from './customPins';
 import { coordsForClipboard } from './geo';
 import { KIND_LABELS, OUTCOME_COLORS, OUTCOME_LABELS } from './historicSites';
 import { PAPER } from './paper';
+import { PointStatsView } from './PointStatsView';
 
 export type CardContent =
   /** rank: 1–5 in the top five; summary: "Meets X of Y requirements"; note: first unmet check. */
@@ -142,6 +143,7 @@ export function GlobeCard({
             </button>
           </>
         )}
+        {content.kind === 'point' && <PointStatsView point={content} />}
         {content.kind === 'point' && (
           <button
             type="button"
@@ -193,7 +195,7 @@ function CopyButton({ text }: { text: string }) {
 }
 
 /** Text-only facts about a past landing: no logos, patches or flags (CLAUDE.md §3). */
-function HistoricDetails({ site }: { site: HistoricSite }) {
+export function HistoricDetails({ site }: { site: HistoricSite }) {
   return (
     <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-[12px]">
       <dt className="text-ink-muted">Agency</dt>

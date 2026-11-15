@@ -129,8 +129,9 @@ export function emergencyImage(id: string | null): string | null {
 export type VerdictScene = FailCause | 'win' | 'timeout';
 
 export function verdictImage(scene: VerdictScene): string {
-  const file =
-    scene === 'win' || scene === 'timeout' ? scene : `lose-${scene.replaceAll('_', '-')}`;
+  // A landing in the dark or in glare ends like a slope crash: the lander hits what it could not see.
+  const art = scene === 'dark_landing' || scene === 'glare_landing' ? 'slope' : scene;
+  const file = art === 'win' || art === 'timeout' ? art : `lose-${art.replaceAll('_', '-')}`;
   return gameAsset(`verdicts/${file}.png`);
 }
 

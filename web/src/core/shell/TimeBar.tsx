@@ -31,7 +31,7 @@ const SPEEDS = [
 const DEFAULT_SPEED = 3; // 2 days / sec
 const clampSpeed = (i: number) => (Number.isInteger(i) && SPEEDS[i] ? i : DEFAULT_SPEED);
 
-export function TimeBar({ className }: { className?: string }) {
+export function TimeBar({ className, compact = false }: { className?: string; compact?: boolean }) {
   const range = useData((s) => s.manifest?.time_range);
   const currentTimeUTC = useAppStore((s) => s.currentTimeUTC);
   const setTime = useAppStore((s) => s.setTime);
@@ -101,12 +101,18 @@ export function TimeBar({ className }: { className?: string }) {
 
   return (
     <section
-      className={cn('box relative overflow-hidden px-4 py-3', className)}
+      className={cn(
+        'box relative overflow-hidden',
+        compact ? 'px-3 py-1.5' : 'px-4 py-3',
+        className,
+      )}
       aria-label="Mission clock"
     >
       {playing && <div className="clock-scan" aria-hidden />}
       <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-        <h2 className="text-heading text-[17px] font-medium">Mission Clock</h2>
+        <h2 className={cn('text-heading font-medium', compact ? 'text-[14px]' : 'text-[17px]')}>
+          Mission Clock
+        </h2>
         <span
           className={cn(
             'font-mono text-[11px] tracking-[0.12em] uppercase',
@@ -119,6 +125,11 @@ export function TimeBar({ className }: { className?: string }) {
           </span>
           {playing ? 'Running' : 'Paused'}
         </span>
+        {compact && (
+          <span className="num text-heading text-[12px]">
+            {proMode ? formatUtc(currentTimeUTC) : `Day ${day.day} of ${day.total}`}
+          </span>
+        )}
         <span className="ml-auto flex items-center gap-2">
           {proMode && (
             <button
@@ -159,17 +170,22 @@ export function TimeBar({ className }: { className?: string }) {
         </span>
       </div>
 
-      <div className="mt-2 flex flex-wrap items-baseline gap-x-3">
-        <span className="num text-heading text-[22px] leading-tight font-medium">
+      <div className={cn('flex flex-wrap items-baseline gap-x-3', compact ? 'hidden' : 'mt-2')}>
+        <span
+          className={cn(
+            'num text-heading leading-tight font-medium',
+            compact ? 'text-[13px]' : 'text-[22px]',
+          )}
+        >
           {proMode ? formatUtc(currentTimeUTC, { seconds: true }) : `Day ${day.day}`}
         </span>
-        <span className="num text-ink-muted text-[13px]">
+        <span className={cn('num text-ink-muted', compact ? 'text-[11px]' : 'text-[13px]')}>
           {proMode ? `Day ${day.day} of ${day.total}` : `of ${day.total}`}
         </span>
       </div>
 
       {/* Timeline: sunlit (orange) / Earth in view (blue) bands under the slider. */}
-      <div className="relative mt-3">
+      <div className={cn('relative', compact ? 'mt-1' : 'mt-3')}>
         <div className="pointer-events-none mx-[8px] overflow-hidden rounded-full" aria-hidden>
           <div className="h-[5px] bg-white/5" style={{ background: sun ?? undefined }} />
           <div className="mt-[2px] h-[5px] bg-white/5" style={{ background: earth ?? undefined }} />
@@ -195,7 +211,12 @@ export function TimeBar({ className }: { className?: string }) {
           aria-valuetext={proMode ? formatUtc(currentTimeUTC) : `Day ${day.day} of ${day.total}`}
         />
       </div>
-      <div className="text-ink-faint mt-1 flex flex-wrap items-center justify-between gap-x-3 text-[12px]">
+      <div
+        className={cn(
+          'text-ink-faint mt-1 flex flex-wrap items-center justify-between gap-x-3 text-[12px]',
+          compact && 'hidden',
+        )}
+      >
         {ts ? (
           <span className="flex items-center gap-3">
             <span>
@@ -216,7 +237,7 @@ export function TimeBar({ className }: { className?: string }) {
               : 'Pick a site to see when it gets sun and sees Earth'}
           </span>
         )}
-        {proMode && sample && (
+        {proMode && sample && !compact && (
           <span>
             {changeLead(sample.lit ? 'Sunset' : 'Sunrise', toSunChange)}{' '}
             <b className="text-heading">{when(toSunChange)}</b>

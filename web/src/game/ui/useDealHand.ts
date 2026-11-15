@@ -12,6 +12,8 @@ import { useEffect, useState } from 'react';
 import { loadTimeseries, useData } from '@/core';
 import { deal, MAX_DEAL_ATTEMPTS, pickSubset, southPoleSites } from '../engine/deal';
 import { DEAL_PHASES, useGame } from '../state/gameStore';
+import { loadMission } from '../historic/data';
+import { dealHistoric } from '../historic/deal';
 
 export type DealStatus = 'loading' | 'empty' | 'error';
 
@@ -27,6 +29,7 @@ export function useDealHand(): DealHand {
   const hand = useGame((s) => s.hand);
   const seed = useGame((s) => s.seed);
   const dealId = useGame((s) => s.dealId);
+  const missionId = useGame((s) => (s.mode === 'historical' ? s.missionId : null));
   const sites = useData((s) => s.sites);
   const dataError = useData((s) => s.status === 'error');
   const [attempt, setAttempt] = useState(0);
@@ -44,6 +47,17 @@ export function useDealHand(): DealHand {
       );
     };
     const pool = southPoleSites(sites);
+
+    // Historical: the hand is the mission's own four options, judged at the real landing time.
+    const runHistoric = async (id: string): Promise<void> => {
+      const mission = await loadMission(id);
+      if (stale()) return;
+      if (!mission) {
+        setFailedKey(key);
+        return;
+      }
+      useGame.getState().dealt(dealHistoric(mission, seed));
+    };
 
     const run = async (): Promise<void> => {
       let loadFailed = false;
@@ -68,7 +82,7 @@ export function useDealHand(): DealHand {
       else setEmptyKey(key);
     };
 
-    run().catch((err: unknown) => {
+    (missionId ? runHistoric(missionId) : run()).catch((err: unknown) => {
       // A series failed to load or deal() threw: show the load error, not "no valid mission".
       console.error('Mission deal failed', err);
       if (!cancelled) setFailedKey(key);
@@ -76,7 +90,7 @@ export function useDealHand(): DealHand {
     return () => {
       cancelled = true;
     };
-  }, [inDeal, hand, seed, sites, key]);
+  }, [inDeal, hand, seed, sites, key, missionId]);
 
   const status: DealStatus =
     dataError || failedKey === key ? 'error' : emptyKey === key ? 'empty' : 'loading';

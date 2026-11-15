@@ -27,9 +27,9 @@ export function pathForMode(mode: AppMode, siteId?: string | null): string {
 }
 
 /**
- * Main tab bar, in order. Mode tabs keep the selected site in their URL (Street View).
- * Normal mode shows the tabs a first-time visitor needs; `expert` tabs appear only in
- * Expert mode. Pages that aren't modes (sites, compare, learn, about) don't change `mode`.
+ * Header order: Mission first, then Learn and Method beside it, then the map pages.
+ * `aside` pages sit after a divider. Mode tabs keep the selected site in their URL.
+ * Pages that aren't modes (sites, compare, learn, about) don't change `mode`.
  */
 export const TABS: {
   label: string;
@@ -37,14 +37,16 @@ export const TABS: {
   mode?: AppMode;
   end?: boolean;
   expert?: boolean;
+  /** Drawn after the divider, still in this order. */
+  aside?: boolean;
 }[] = [
-  { label: 'Explore', path: '/explore', mode: 'explore' },
-  { label: 'Compare', path: '/compare', expert: true },
   { label: 'Mission', path: '/game', mode: 'game' },
   { label: 'Learn', path: '/learn' },
-  { label: 'Sites', path: '/sites', expert: true },
-  { label: 'Street View', path: '/streetview', mode: 'streetview', expert: true },
-  { label: 'Data', path: '/about', expert: true },
+  { label: 'Method', path: '/about' },
+  { label: 'Explore', path: '/explore', mode: 'explore' },
+  { label: 'Street View', path: '/streetview', mode: 'streetview' },
+  { label: 'Compare', path: '/compare', expert: true, aside: true },
+  { label: 'All sites', path: '/sites', expert: true, aside: true },
 ];
 
 /** Tabs shown in the given mode: Normal hides the `expert` ones (Compare among them). */
@@ -55,13 +57,13 @@ export function visibleTabs(proMode: boolean): typeof TABS {
 /** Every page, for the footer in Expert mode. */
 export const ALL_PAGES: { label: string; path: string }[] = [
   { label: 'Home', path: '/home' },
-  { label: 'Explore', path: '/explore' },
-  { label: 'All sites', path: '/sites' },
-  { label: 'Compare', path: '/compare' },
-  { label: 'Street View', path: '/streetview' },
   { label: 'Mission', path: '/game' },
   { label: 'Learn', path: '/learn' },
-  { label: 'Data & method', path: '/about' },
+  { label: 'Method', path: '/about' },
+  { label: 'Explore', path: '/explore' },
+  { label: 'Street View', path: '/streetview' },
+  { label: 'Compare', path: '/compare' },
+  { label: 'All sites', path: '/sites' },
 ];
 
 /** Audience shortcuts shown under the tabs. */

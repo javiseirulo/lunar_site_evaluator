@@ -130,3 +130,13 @@
 ### Umbral único del parche y capa Día / noche (2026-11-15)
 - Petición de Marta: misma distancia para aparecer y desaparecer (la de desaparecer, para que se vea un pelín antes). `patchShownAt`: visible a ≤ 1,45 del centro y y/d ≤ −0,75; sin histéresis. El botón "South pole" sigue dejando la cámara a 1,3 (dentro).
 - Idea de Marta: ver cómo evoluciona la noche como capa, porque ahora el lado nocturno sale negro. Capa local "Day / night" (apagada por defecto, `nightLayer.ts` + `DayNight.tsx`): luz de relleno azulada (#8ea4dc, 0,6) para ver la superficie del lado nocturno y línea del terminador (círculo máximo perpendicular al Sol de las efemérides, r = 1,003) que se mueve con el Mission Clock. Sin efemérides: se ve el lado nocturno pero no hay terminador. Las sombras del parche también se ven en azul (zona sin sol directo). 2 tests nuevos.
+
+### v3 del globo: estadísticas de cualquier punto (2026-11-15, #117)
+- `web/src/globe/pointStats.ts`: parte pura `computePointStats` (punto, elevación, horizonte, ventana, instante, requisitos → estado) y hook `usePointStats`. Usa `buildTimeseries` de `@/ephem` y la MISMA evaluación que la lista de candidatos (`missionStats` + `evaluateSite`). La ventana es la de `useMissionWindow` (recortada a `manifest.time_range`, 2027, como en la v1).
+- Horizonte plano salvo que el punto coincida (≈6 m en latitud) con un sitio del catálogo: entonces `loadHorizon(id)` y `elev_m` del sitio. Nunca se reutiliza un perfil en otro punto. Aviso visible "Flat horizon — terrain not included at this point".
+- Elevación: heightmap polar (`sampleHeight`) al sur de −80°; fuera del parche o sin dato, 0 m y aviso "Elevation not available, 0 m assumed". Pendiente de un punto libre: sin dato (el chequeo queda "pending", no falla).
+- Caché por (punto a 4 decimales ≈ 3 m, elevación, ventana, horizonte): serie de la ventana (LRU 16) y serie de 30 días desde la hora del Mission Clock (LRU 400). "Ahora" y "horas hasta el próximo cambio" salen de esta segunda.
+- Estados: loading (efemérides/terreno/horizonte cargando), no_ephemeris (fuera de 2026–2055 o sin publicar), error, ready.
+- Test de coherencia: apollo_11 (flat) reproduce `timeseries/apollo_11.json` en 2027 (sunlitFraction a <0,002, noche y corte de Tierra a ≤2 h).
+- UI: `PointStatsView.tsx` en la ficha de punto y de pin propio; tarjeta lateral (`SiteDetail`) con las estadísticas del pin seleccionado, "Stand here in Street View" y borrar pin (`pinSelection.ts`). Se probó una tabla "Compare points" y Marta la descartó (2026-11-15).
+- Pendiente: mapa de calor con rejilla (v4); pendiente (slope) de puntos libres; no verificado visualmente en navegador.

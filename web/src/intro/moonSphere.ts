@@ -177,6 +177,7 @@ export function buildSpinner(
   viewLatDeg: number,
   sunAzimuthDeg: number,
   sunElevationDeg = 12,
+  zoom = 1,
 ): Spinner {
   const n = size * size;
   const { data, width: W, height: H } = tex;
@@ -201,10 +202,11 @@ export function buildSpinner(
     for (let px = 0; px < size; px++) {
       const x = (px + 0.5 - R) / R;
       const i = py * size + px;
-      const rho = Math.hypot(x, y);
-      const cover = Math.max(0, Math.min(1, (1 - rho) * R));
-      if (cover === 0) continue;
-      const ll = orthoInverse(Math.min(x, 0.99999), Math.min(y, 0.99999), lat0, 0);
+      const gx = x / zoom;
+      const gy = y / zoom;
+      const cover = Math.max(0, Math.min(1, (1 - Math.hypot(x, y)) * R));
+      if (cover === 0 || Math.hypot(gx, gy) > 1) continue;
+      const ll = orthoInverse(Math.min(gx, 0.99999), Math.min(gy, 0.99999), lat0, 0);
       if (!ll) continue;
       const [lat, lon] = ll;
       index.push(i);

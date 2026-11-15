@@ -6,7 +6,7 @@
  */
 import { useMemo } from 'react';
 import type { Timeseries } from '@lunar/contracts';
-import { DEFAULT_REQUIREMENTS } from '../../engine/requirements';
+import { useMissionRules } from '../../state/useMissionRules';
 import { isLinkUp, type Verdict } from '../../engine/simulate';
 import type { Terrain } from '../assets';
 import { missionTemperatures, valueAtHour } from '../thermal';
@@ -19,9 +19,6 @@ import { BAD, GOOD } from './palette';
 import { signalBars, skyAt, viewHeading } from './sky';
 import { WindowScene } from './WindowScene';
 
-const REQ = DEFAULT_REQUIREMENTS;
-const DAYS = REQ.surface_days;
-const MISSION_HOURS = DAYS * 24;
 const BELOW_MINIMUM = 'Below mission minimum';
 
 interface CockpitViewProps {
@@ -70,12 +67,18 @@ export function CockpitView({
   terrain,
   runs,
 }: CockpitViewProps) {
+  const REQ = useMissionRules();
+  const DAYS = REQ.surface_days;
+  const MISSION_HOURS = DAYS * 24;
   // One fixed heading per mission: half-way between the Sun and the Earth at mid-mission.
   const heading = useMemo(() => {
     const mid = skyAt(ts, startIndex, MISSION_HOURS / 2) ?? skyAt(ts, startIndex, 0);
     return mid ? viewHeading(mid.sunAz, mid.earthAz) : 0;
-  }, [ts, startIndex]);
-  const temps = useMemo(() => missionTemperatures(ts, startIndex, MISSION_HOURS), [ts, startIndex]);
+  }, [ts, startIndex, MISSION_HOURS]);
+  const temps = useMemo(
+    () => missionTemperatures(ts, startIndex, MISSION_HOURS),
+    [ts, startIndex, MISSION_HOURS],
+  );
 
   const sky = skyAt(ts, startIndex, hourF);
   const linkUp = sky ? isLinkUp(sky.earthVisible, sky.earthEl, REQ.antenna_margin_deg) : null;

@@ -1,7 +1,16 @@
 import type { Site, Timeseries } from '@lunar/contracts';
 import { DEFAULT_REQUIREMENTS, type Criterion, type MissionRequirements } from './requirements';
 
-export type FailCause = 'slope' | 'cold' | 'blackout' | 'low_sun' | 'low_comm';
+export type FailCause =
+  | 'slope'
+  | 'cold'
+  | 'blackout'
+  | 'low_sun'
+  | 'low_comm'
+  /** Historical mode: the Sun was too low at touchdown to see the ground. */
+  | 'dark_landing'
+  /** Historical mode: the Sun was too high at touchdown (no shadows to show the rocks). */
+  | 'glare_landing';
 
 export interface WindowMetrics {
   illum_pct: number;
@@ -79,6 +88,7 @@ export function hourlyFlags(
   startIndex: number,
   hours: number,
   marginDeg: number,
+  relay = false,
 ): HourlyFlags {
   const n = Math.max(0, Math.min(hours, ts.t_utc.length - startIndex));
   const at = (i: number) => startIndex + i;
@@ -88,8 +98,9 @@ export function hourlyFlags(
   };
   return {
     dark: Array.from({ length: n }, (_, i) => ts.lit[at(i)] !== 1),
-    linked: Array.from({ length: n }, (_, i) =>
-      isLinkUp(visible(i), ts.earth_el[at(i)], marginDeg),
+    linked: Array.from(
+      { length: n },
+      (_, i) => relay || isLinkUp(visible(i), ts.earth_el[at(i)], marginDeg),
     ),
   };
 }
@@ -104,6 +115,8 @@ export function simulate(
   ts: Timeseries,
   startIndex: number,
   req: MissionRequirements = DEFAULT_REQUIREMENTS,
+  /** Sun elevation at the exact touchdown time (defaults to the series' sample at `startIndex`). */
+  landingSunEl?: number,
 ): Verdict {
   const hours = req.surface_days * 24;
   if (startIndex < 0 || startIndex + hours > ts.t_utc.length) {
@@ -112,7 +125,7 @@ export function simulate(
     );
   }
 
-  const { dark, linked } = hourlyFlags(ts, startIndex, hours, req.antenna_margin_deg);
+  const { dark, linked } = hourlyFlags(ts, startIndex, hours, req.antenna_margin_deg, req.relay);
 
   const cold = runs(dark, req.max_dark_h.threshold);
   const blackout = runs(
@@ -148,6 +161,17 @@ export function simulate(
     stars: 0,
     detail,
   });
+
+  const light = req.landing_light;
+  if (light) {
+    const el = landingSunEl ?? ts.sun_el[startIndex] ?? -90;
+    if (el < light.min) {
+      return lose('dark_landing', 0, `Sun ${el.toFixed(1)}° at touchdown < ${light.min}° minimum`);
+    }
+    if (el > light.max) {
+      return lose('glare_landing', 0, `Sun ${el.toFixed(1)}° at touchdown > ${light.max}° maximum`);
+    }
+  }
 
   if (metrics.slope_deg !== null && metrics.slope_deg > req.slope_max_deg) {
     return lose('slope', 0, `Slope ${metrics.slope_deg.toFixed(1)}° > ${req.slope_max_deg}° limit`);

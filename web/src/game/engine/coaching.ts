@@ -117,6 +117,8 @@ const FAIL_REASON: Record<FailCause, string> = {
   blackout: 'the Earth link would have stayed lost for over',
   low_sun: 'sunlight would have dropped below the minimum',
   low_comm: 'the Earth link would have dropped below the minimum',
+  dark_landing: 'the Sun was too low to see the ground at touchdown',
+  glare_landing: 'the Sun was too high to see the rocks at touchdown',
 };
 
 /** Re-runs the same landing with a longer stay (up to 14 days or the end of the series). */
@@ -131,7 +133,8 @@ export function projectLonger(
   if (days <= req.surface_days) return null;
   const more = days - req.surface_days;
   const lead = `If the mission had lasted ${more} more day${more === 1 ? '' : 's'}`;
-  const v = simulate(site, ts, startIndex, { ...req, surface_days: days });
+  // The landing already happened (and was judged): only the longer stay is re-run.
+  const v = simulate(site, ts, startIndex, { ...req, surface_days: days, landing_light: null });
   if (v.win || v.cause === null || v.failHour === null) {
     return {
       days,

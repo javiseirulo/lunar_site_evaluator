@@ -59,6 +59,7 @@ import { flightAt, planFlight, type Flight } from './flight';
 import { useSunDirection } from './sunLight';
 import { NIGHT_FILL, useNightLayer } from './nightLayer';
 import { Terminator } from './DayNight';
+import { usePinSelection } from './pinSelection';
 import { LayersMenu } from './LayersMenu';
 import { PatchTrigger, PolarPatch, SunLight } from './PolarPatch';
 import { ActiveLegend } from '@/layers';
@@ -124,7 +125,7 @@ const ORIGIN = new Vector3();
 /** Stops DOM events in overlays from reaching the R3F canvas (which would raycast the Moon). */
 const stop = (e: SyntheticEvent) => e.stopPropagation();
 
-export default function GlobeCanvas() {
+export default function GlobeCanvas({ hideChrome = false }: { hideChrome?: boolean }) {
   const [cameraStart] = useState(() => {
     const point = useAppStore.getState().selectedPoint;
     return point ? latLonToVec3(point.lat, point.lon, 3) : INITIAL_CAMERA;
@@ -158,8 +159,9 @@ export default function GlobeCanvas() {
   const historic = useHistoric((s) => s.sites);
   const historicVisible = useHistoric((s) => s.visible);
 
-  // Past landings: load once; on failure the switch shows "unavailable" and the globe carries on.
+  // Past landings stay on for Explore. A failed load still shows "unavailable" and the globe carries on.
   useEffect(() => {
+    useHistoric.getState().setVisible(true);
     void loadHistoricSites();
   }, []);
 
@@ -246,12 +248,34 @@ export default function GlobeCanvas() {
     else setFocus({ kind: 'site', id }); // selected, but the card showed something else
   };
 
-  // Past landings open their own card; they are not candidates, so selectSite is never called.
+  // Past landings open their own card. They are not candidates, so selectSite is never called,
+  // but the same landing is published for the Explore card on the right.
   const onHistoricClick = (id: string) =>
     setFocus((f) => (f?.kind === 'historic' && f.id === id ? null : { kind: 'historic', id }));
+  useEffect(() => {
+    useHistoric
+      .getState()
+      .setFocusedId(focus?.kind === 'historic' && historicVisible ? focus.id : null);
+  }, [focus, historicVisible]);
 
-  const onCustomClick = (id: string) =>
-    setFocus((f) => (f?.kind === 'custom' && f.id === id ? null : { kind: 'custom', id }));
+  // A clicked own pin becomes the free point (same path as "Your points" and createPin, minus the
+  // flight: the camera stays where it is) and its statistics show in the right-hand card again.
+  const onCustomClick = (id: string) => {
+    const pin = pins.find((p) => p.id === id);
+    if (!pin) return;
+    useAppStore
+      .getState()
+      .requestSelection({ kind: 'point', lat: pin.lat, lon: pin.lon, name: pin.name }, () =>
+        setFocus({ kind: 'custom', id }),
+      );
+  };
+
+  // The right-hand card shows the statistics of the selected own pin.
+  const focusedPinId = focus?.kind === 'custom' ? focus.id : null;
+  useEffect(() => {
+    usePinSelection.getState().setPinId(focusedPinId);
+    return () => usePinSelection.getState().setPinId(null);
+  }, [focusedPinId]);
 
   const closeCard = () => {
     if (focus?.kind === 'site') useAppStore.getState().selectSite(null);
@@ -268,6 +292,19 @@ export default function GlobeCanvas() {
       );
     return pin;
   };
+  const pinRef = useRef(createPin);
+  useEffect(() => {
+    pinRef.current = createPin;
+  });
+  // Pins asked for by the Explore side panel (through the store): drop, fly, clear.
+  const pendingPin = useAppStore((s) => s.pendingPin);
+  useEffect(() => {
+    if (!pendingPin) return;
+    useAppStore.getState().clearPendingPin();
+    pinRef.current(pendingPin.lat, pendingPin.lon, pendingPin.name || undefined);
+    const safeLat = Math.max(-89.5, Math.min(89.5, pendingPin.lat));
+    flightRef.current = new Vector3(...latLonToVec3(safeLat, pendingPin.lon, PIN_VIEW_DISTANCE));
+  }, [pendingPin]);
 
   const onSurfaceClick = (lat: number, lon: number) => {
     if (placingAstronaut) {
@@ -340,31 +377,42 @@ export default function GlobeCanvas() {
         apiRef={surfaceApiRef}
         armed={placingAstronaut}
         onArmed={setPlacingAstronaut}
+        className={hideChrome ? 'is-staged' : undefined}
       />
-      <div className="absolute top-2 left-2 flex flex-col items-start gap-2">
-        {/* Coordinate entry is open in Normal too (kids can go anywhere); Normal only gets plainer wording. */}
-        <PinForm
-          buttonLabel={expert ? 'Pin by coordinates' : 'Go to coordinates'}
-          title={expert ? 'Pin by coordinates' : 'Go to coordinates'}
-          submitLabel={expert ? 'Add pin' : 'Go there'}
-          onAdd={({ name, lat, lon }) => {
-            createPin(lat, lon, name);
-            // Fly above the new pin (avoid the exact pole, where the orbit is undefined).
-            const safeLat = Math.max(-89.5, Math.min(89.5, lat));
-            flightRef.current = new Vector3(...latLonToVec3(safeLat, lon, PIN_VIEW_DISTANCE));
-          }}
-        />
-        <PatchControls />
-      </div>
-      <div className="absolute bottom-2 left-2 z-[60]">
-        <LayersMenu hasSun={!!sunDir} expert={expert} />
-      </div>
+      {!hideChrome && (
+        <div className="absolute top-2 left-2 flex flex-col items-start gap-2">
+          {/* Coordinate entry is open in Normal too (kids can go anywhere); Normal only gets plainer wording. */}
+          <PinForm
+            buttonLabel={expert ? 'Pin by coordinates' : 'Go to coordinates'}
+            title={expert ? 'Pin by coordinates' : 'Go to coordinates'}
+            submitLabel={expert ? 'Add pin' : 'Go there'}
+            onAdd={({ name, lat, lon }) => {
+              createPin(lat, lon, name);
+              // Fly above the new pin (avoid the exact pole, where the orbit is undefined).
+              const safeLat = Math.max(-89.5, Math.min(89.5, lat));
+              flightRef.current = new Vector3(...latLonToVec3(safeLat, lon, PIN_VIEW_DISTANCE));
+            }}
+          />
+          <PatchControls />
+        </div>
+      )}
+      {!hideChrome && (
+        <div className="absolute bottom-2 left-2 z-[60]">
+          <LayersMenu hasSun={!!sunDir} expert={expert} />
+        </div>
+      )}
       {/* Javi: legend of the active map layers (Expert only, like the layers panel). */}
-      {expert && <ActiveLegend className="pointer-events-none absolute top-2 right-2" />}
+      {expert && !hideChrome && (
+        <ActiveLegend className="pointer-events-none absolute top-3 right-[19.5rem] hidden lg:block" />
+      )}
       {exaggerated && (
         <div
           role="note"
-          className="pointer-events-none absolute bottom-2 left-[72px] rounded-[2px] bg-black/70 px-2 py-1 text-[11px] text-white"
+          className={
+            hideChrome
+              ? 'pointer-events-none absolute top-3 left-1/2 -translate-x-1/2 rounded-[2px] bg-black/70 px-2 py-1 text-[11px] text-white'
+              : 'pointer-events-none absolute bottom-2 left-[72px] rounded-[2px] bg-black/70 px-2 py-1 text-[11px] text-white'
+          }
         >
           {EXAGGERATION_LABEL}
         </div>
@@ -372,7 +420,11 @@ export default function GlobeCanvas() {
       {sun.status === 'no_ephemeris' && (
         <div
           role="status"
-          className="pointer-events-none absolute right-2 bottom-2 rounded-[2px] bg-black/70 px-2 py-1 text-[11px] text-white"
+          className={
+            hideChrome
+              ? 'pointer-events-none absolute top-3 left-1/2 -translate-x-1/2 rounded-[2px] bg-black/70 px-2 py-1 text-[11px] text-white'
+              : 'pointer-events-none absolute right-2 bottom-2 rounded-[2px] bg-black/70 px-2 py-1 text-[11px] text-white'
+          }
         >
           No ephemeris for this date · fixed lighting
         </div>

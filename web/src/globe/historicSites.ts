@@ -13,16 +13,21 @@ export type HistoricStatus = 'idle' | 'loading' | 'ready' | 'error';
 interface HistoricState {
   status: HistoricStatus;
   sites: HistoricSite[];
-  /** "Past landings" switch; off by default. */
+  /** "Past landings" switch. On when Explore opens. */
   visible: boolean;
+  /** Past landing clicked on the globe, so the Explore card can show it too. */
+  focusedId: string | null;
   setVisible: (on: boolean) => void;
+  setFocusedId: (id: string | null) => void;
 }
 
 export const useHistoric = create<HistoricState>()((set) => ({
   status: 'idle',
   sites: [],
-  visible: false,
+  visible: true,
+  focusedId: null,
   setVisible: (visible) => set({ visible }),
+  setFocusedId: (focusedId) => set({ focusedId }),
 }));
 
 const OUTCOMES: HistoricOutcome[] = ['success', 'partial', 'failed'];

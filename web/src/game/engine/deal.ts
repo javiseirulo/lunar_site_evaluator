@@ -11,6 +11,10 @@ export interface Card {
 }
 
 export interface Hand {
+  /** The rules this hand was judged with (absent = `DEFAULT_REQUIREMENTS`, South Pole). */
+  req?: MissionRequirements;
+  /** Sun elevation at the exact touchdown time per site id (Historical mode). */
+  landingSunEl?: Record<string, number>;
   startIndex: number;
   landingUtc: string;
   cards: Card[];
