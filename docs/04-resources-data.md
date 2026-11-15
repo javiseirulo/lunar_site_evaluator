@@ -134,4 +134,4 @@ Contactos de soporte: Microsoft samfal@microsoft.com · Google cloudstartupsuppo
 
 ## 2026-11-15 — modelo 3D del lander (Past landings)
 
-- (martaplatero2002-star, 2026-11-15) `web/public/models/past_landing_lander.glb`: modelo 3D del lander generado con IA y aportado por Marta; sustituye las pirámides de Past landings en el globo. Sin datos NASA ni texturas de terceros; no se cita licencia externa. Uso de IA declarado en docs/si-usage-log.md y nota visible en la leyenda de la capa.
+- (martaplatero2002-star, 2026-11-15) `web/public/models/past_landing_lander.glb`: modelo 3D del lander generado con Claude (Anthropic) y aportado por Marta; sustituye las pirámides de Past landings en el globo. Sin datos NASA ni texturas de terceros; no se cita licencia externa. Uso de IA declarado en docs/si-usage-log.md y nota visible en la leyenda de la capa.
