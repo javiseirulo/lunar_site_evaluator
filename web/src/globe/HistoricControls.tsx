@@ -2,17 +2,26 @@
  * "Past landings" layer state and legend, used by the Layers menu — owner: Marta (src/globe).
  * Local layer (not a raster layer). Off by default.
  */
-import type { HistoricOutcome } from '@lunar/contracts';
-import {
-  OUTCOME_COLORS,
-  OUTCOME_LABELS,
-  historicSummary,
-  loadHistoricSites,
-  summaryText,
-  useHistoric,
-} from './historicSites';
+import { historicSummary, loadHistoricSites, summaryText, useHistoric } from './historicSites';
 
-const ORDER: HistoricOutcome[] = ['success', 'partial', 'failed'];
+/** Small flat drawing of the lander marker (violet hull, gold foil, legs), for the legend. */
+function LanderIcon() {
+  return (
+    <svg viewBox="0 0 20 20" className="size-5 shrink-0" aria-hidden>
+      <g stroke="#2c2822" strokeWidth="0.6" strokeLinejoin="round">
+        <path
+          d="M6 12 L3 18 M14 12 L17 18 M10 13 L10 18"
+          stroke="#b8b0c9"
+          strokeWidth="1"
+          fill="none"
+        />
+        <path d="M5.5 8 H14.5 L13.5 13 H6.5 Z" fill="#c9a24a" />
+        <rect x="7" y="3.5" width="6" height="4.5" rx="1.2" fill="#6e5aa8" />
+        <circle cx="10" cy="5.8" r="1" fill="#d9ccff" />
+      </g>
+    </svg>
+  );
+}
 
 /** Switch state and handler for the Layers menu row (a failed load turns the switch into a retry). */
 export function useHistoricSwitch() {
@@ -41,22 +50,12 @@ export function HistoricDetails() {
   if (status !== 'ready') return null;
   return (
     <div className="mt-1 flex flex-col gap-1 pb-1 text-[12px]">
-      <ul className="flex flex-col gap-0.5" aria-label="Marker colours">
-        {ORDER.map((o) => (
-          <li key={o} className="flex items-center gap-2">
-            <svg viewBox="0 0 10 10" className="size-2.5" aria-hidden>
-              <path
-                d="M5 0.6 L9.4 9.4 L0.6 9.4 Z"
-                fill={OUTCOME_COLORS[o]}
-                stroke="#2c2822"
-                strokeWidth="0.8"
-              />
-            </svg>
-            {OUTCOME_LABELS[o]}
-            <span className="num text-ink-muted ml-auto">{summary.byOutcome[o]}</span>
-          </li>
-        ))}
-      </ul>
+      <div className="flex items-center gap-2">
+        <LanderIcon />
+        Past landing
+        <span className="num text-ink-muted ml-auto">{summary.total}</span>
+      </div>
+      <p className="text-ink-muted text-[11px]">Lander icon: AI-assisted 3D model</p>
       <p className="text-heading num mt-1 font-medium" aria-live="polite">
         {summaryText(summary)}
       </p>
