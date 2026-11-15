@@ -1,20 +1,9 @@
 /**
- * PLACEHOLDER — owner: Cristóbal (src/game). Replace with the mission engine + UI.
- *
- * Read: selectedSiteId, sites (useData), currentTimeUTC. Write: selectSite, setTime.
- * Missions can live in src/game/missions.json with conditions over Site.metrics.
+ * Mission mode (src/game). The game reads `sites`/timeseries from `useData` and writes the
+ * chosen site and landing time to the shared store (`selectSite`, `setTime`).
  */
-import { Rocket } from 'lucide-react';
-import { useSelectedSite } from '@/core';
+import { MissionGame } from './ui/MissionGame';
 
 export function GamePanel() {
-  const site = useSelectedSite();
-  return (
-    <div className="border-line-strong text-ink-faint flex size-full flex-col items-center justify-center gap-3 rounded-[var(--radius-panel)] border border-dashed p-6 text-center">
-      <Rocket className="size-8" aria-hidden />
-      <p className="text-ink-muted text-sm">Mission mode goes here</p>
-      <p className="font-mono text-[11px]">src/game · Cristóbal</p>
-      <p className="text-xs">Selected site: {site ? site.name : 'none'}</p>
-    </div>
-  );
+  return <MissionGame />;
 }
