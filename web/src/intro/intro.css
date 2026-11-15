@@ -1,21 +1,33 @@
 /*
  * Intro page styles. Everything is prefixed `lp-` and scoped under `.lp` so nothing leaks into the app.
- * Fonts (all SIL OFL) are imported by IntroPage.tsx: Dancing Script (logo), Instrument Serif (headings
- * and quote), Inter (everything else).
+ * Type follows nasa.gov (checked in its own CSS): Inter for text and headings, DM Mono Light for numerals.
+ * Both are SIL OFL and imported by IntroPage.tsx.
  */
 .lp {
   font-family: 'Inter Variable', 'Inter', system-ui, sans-serif;
   background: #05060d;
   color: #fff;
   overflow-x: clip;
+  letter-spacing: -0.011em;
 }
-.lp .lp-dancing {
-  font-family: 'Dancing Script', cursive;
+/* The app's global stylesheet sets its own face on h1 to h3; the intro uses Inter throughout. */
+.lp :is(h1, h2, h3, h4) {
+  font-family: 'Inter Variable', 'Inter', system-ui, sans-serif;
+  letter-spacing: -0.03em;
+  text-transform: none;
+}
+/* Headings: Inter semibold with the tight tracking NASA uses on its headings. */
+.lp .lp-display {
+  font-family: 'Inter Variable', 'Inter', system-ui, sans-serif;
   font-weight: 600;
+  letter-spacing: -0.04em;
 }
-.lp .lp-serif {
-  font-family: 'Instrument Serif', Georgia, serif;
-  font-weight: 400;
+/* Numerals: DM Mono Light, as in NASA's countdown clock. */
+.lp .lp-mono {
+  font-family: 'DM Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  font-weight: 300;
+  font-feature-settings: 'ss04' 1;
+  letter-spacing: -0.02em;
 }
 
 /* Frosted pill used for the menu button and the scroll cue. */
