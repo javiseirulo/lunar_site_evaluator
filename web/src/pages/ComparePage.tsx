@@ -4,7 +4,7 @@
  * Selection lives in the URL (?ids=a,b,c) so a comparison can be shared as a link.
  */
 import { useMemo } from 'react';
-import { Link, useSearchParams } from 'react-router';
+import { Navigate, useSearchParams } from 'react-router';
 import type { Site } from '@lunar/contracts';
 import { cn } from '@/lib/utils';
 import {
@@ -66,11 +66,16 @@ function buildRows(pro: boolean): Row[] {
   ];
 }
 
+/** Compare exists only in Expert mode: in Normal the route quietly goes back to Explore. */
 export default function ComparePage() {
+  const proMode = useAppStore((s) => s.proMode);
+  return proMode ? <CompareView /> : <Navigate to="/explore" replace />;
+}
+
+function CompareView() {
   const sites = useData((s) => s.sites);
   const selectedSiteId = useAppStore((s) => s.selectedSiteId);
   const proMode = useAppStore((s) => s.proMode);
-  const setProMode = useAppStore((s) => s.setProMode);
   const rows = useMemo(() => buildRows(proMode), [proMode]);
   const [params, setParams] = useSearchParams();
 
@@ -84,27 +89,6 @@ export default function ComparePage() {
       .map((s) => s.id);
     return [...new Set([selectedSiteId, ...ranked].filter((x): x is string => !!x))].slice(0, 3);
   }, [params, sites, selectedSiteId]);
-
-  if (!proMode) {
-    return (
-      <section className="box mx-auto max-w-[560px]">
-        <div className="box-head">Compare is an Expert tool</div>
-        <div className="box-body">
-          <p className="text-ink-muted mb-4">
-            Side-by-side figures and sunlight timelines are available in Expert mode.
-          </p>
-          <div className="flex flex-wrap gap-3">
-            <button type="button" className="btn btn-go" onClick={() => setProMode(true)}>
-              Switch to Expert
-            </button>
-            <Link to="/explore" className="btn">
-              Back to Explore
-            </Link>
-          </div>
-        </div>
-      </section>
-    );
-  }
 
   if (!sites) return null;
   const chosen = ids.flatMap((id) => sites.find((s) => s.id === id) ?? []);

@@ -114,7 +114,8 @@ export default function SitesPage() {
       <div className="box-body">
         <p className="text-ink-muted mb-3 max-w-[75ch]">
           Every candidate site with its key figures over the data window. Click a column to sort, a
-          name to open it on the map, or tick up to three sites to compare them side by side.
+          name to open it on the map
+          {proMode ? ', or tick up to three sites to compare them side by side' : ''}.
         </p>
         <div className="mb-3 flex flex-wrap items-center gap-3">
           <label className="flex items-center gap-1.5">
@@ -126,16 +127,20 @@ export default function SitesPage() {
             Only sites that pass the hard filters
           </label>
           <span className="ml-auto flex items-center gap-2">
-            <span className="text-ink-muted">{picked.length}/3 ticked</span>
             {proMode && (
-              <button
-                type="button"
-                className="btn btn-go"
-                disabled={picked.length < 2}
-                onClick={() => navigate(`/compare?ids=${picked.map(encodeURIComponent).join(',')}`)}
-              >
-                Compare ticked
-              </button>
+              <>
+                <span className="text-ink-muted">{picked.length}/3 ticked</span>
+                <button
+                  type="button"
+                  className="btn btn-go"
+                  disabled={picked.length < 2}
+                  onClick={() =>
+                    navigate(`/compare?ids=${picked.map(encodeURIComponent).join(',')}`)
+                  }
+                >
+                  Compare ticked
+                </button>
+              </>
             )}
           </span>
         </div>
@@ -143,7 +148,7 @@ export default function SitesPage() {
           <table className="border-edge w-full min-w-[720px] border-collapse border text-[12px]">
             <thead>
               <tr className="bg-navy-700 text-left">
-                <th className="w-8 px-2 py-2" />
+                {proMode && <th className="w-8 px-2 py-2" />}
                 <th className="px-2 py-2">
                   <button
                     type="button"
@@ -174,15 +179,17 @@ export default function SitesPage() {
                   key={s.id}
                   className={cn('border-edge border-t', i % 2 ? 'bg-navy-850' : 'bg-navy-900')}
                 >
-                  <td className="px-2 py-2 text-center">
-                    <input
-                      type="checkbox"
-                      checked={picked.includes(s.id)}
-                      disabled={!picked.includes(s.id) && picked.length >= 3}
-                      onChange={() => togglePick(s.id)}
-                      aria-label={`Tick ${s.name} to compare`}
-                    />
-                  </td>
+                  {proMode && (
+                    <td className="px-2 py-2 text-center">
+                      <input
+                        type="checkbox"
+                        checked={picked.includes(s.id)}
+                        disabled={!picked.includes(s.id) && picked.length >= 3}
+                        onChange={() => togglePick(s.id)}
+                        aria-label={`Tick ${s.name} to compare`}
+                      />
+                    </td>
+                  )}
                   <td className="px-2 py-2">
                     <button
                       type="button"

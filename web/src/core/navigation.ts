@@ -5,7 +5,7 @@ export const MODES: { id: AppMode; label: string; path: string; blurb: string }[
     id: 'explore',
     label: 'Explore',
     path: '/explore',
-    blurb: 'Filter the south pole by sunlight, Earth visibility and slope, and compare sites.',
+    blurb: 'Filter the south pole by sunlight, Earth visibility and slope.',
   },
   {
     id: 'streetview',
@@ -47,6 +47,11 @@ export const TABS: {
   { label: 'Data', path: '/about', expert: true },
 ];
 
+/** Tabs shown in the given mode: Normal hides the `expert` ones (Compare among them). */
+export function visibleTabs(proMode: boolean): typeof TABS {
+  return TABS.filter((t) => proMode || !t.expert);
+}
+
 /** Every page, for the footer in Expert mode. */
 export const ALL_PAGES: { label: string; path: string }[] = [
   { label: 'Home', path: '/' },
@@ -60,8 +65,8 @@ export const ALL_PAGES: { label: string; path: string }[] = [
 ];
 
 /** Audience shortcuts shown under the tabs. */
-export const AUDIENCES = [
-  { label: 'For Mission Planners', path: '/compare' },
+export const AUDIENCES: { label: string; path: string; expert?: boolean }[] = [
+  { label: 'For Mission Planners', path: '/compare', expert: true },
   { label: 'For Educators', path: '/learn' },
   { label: 'For Students', path: '/game' },
   { label: 'For Everyone', path: '/explore' },
