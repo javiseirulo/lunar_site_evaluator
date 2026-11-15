@@ -132,7 +132,11 @@ function SiteColumn({ site }: { site: Site }) {
   const sample = ts ? sampleAt(ts, now) : null;
   const sunEl = sample ? sample.sun_el : 2;
   const bars = [
-    { label: 'Score', value: Math.round(site.score * 100), text: String(Math.round(site.score * 100)) },
+    {
+      label: 'Score',
+      value: Math.round(site.score * 100),
+      text: String(Math.round(site.score * 100)),
+    },
     ...METRICS.flatMap((m) => {
       const goodness = m.goodness(site.metrics);
       if (goodness === null) return [];
@@ -177,7 +181,10 @@ function SiteColumn({ site }: { site: Site }) {
               <span className="num text-ink">{bar.text}</span>
             </div>
             <div className="bg-navy-950 h-1.5" aria-hidden>
-              <div className="bg-sun h-full" style={{ width: `${Math.min(100, Math.max(0, bar.value))}%` }} />
+              <div
+                className="bg-sun h-full"
+                style={{ width: `${Math.min(100, Math.max(0, bar.value))}%` }}
+              />
             </div>
           </li>
         ))}

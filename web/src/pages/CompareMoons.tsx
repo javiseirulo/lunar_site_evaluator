@@ -2,7 +2,7 @@
  * A lit Moon centred on one site. The camera eases to a new place when the site changes,
  * and the Sun's height follows the shared mission clock.
  */
-import { useEffect, useRef } from 'react';
+import { useEffect, useLayoutEffect, useRef } from 'react';
 import { buildSpinner } from '@/intro/moonSphere';
 import { loadMoonTexture } from '@/intro/moonTexture';
 
@@ -25,7 +25,10 @@ export function SiteMoon({
 }) {
   const canvas = useRef<HTMLCanvasElement>(null);
   const goal = useRef({ lat, lon, sunEl });
-  goal.current = { lat, lon, sunEl };
+  // Updated after render (not during it): the animation reads the latest target each frame.
+  useLayoutEffect(() => {
+    goal.current = { lat, lon, sunEl };
+  }, [lat, lon, sunEl]);
 
   useEffect(() => {
     const node = canvas.current;

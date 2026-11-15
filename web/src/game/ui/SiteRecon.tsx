@@ -69,9 +69,7 @@ export function SiteRecon() {
   }, [initialHeading]);
   const onError = useCallback((reason?: string) => {
     // Visible in devtools: tells "no token" from "WebGL" or "Cesium load / timeout" at a glance.
-    console.warn(
-      `[recon] 3D Street View unavailable (${reason ?? 'unknown'}).`,
-    );
+    console.warn(`[recon] 3D Street View unavailable (${reason ?? 'unknown'}).`);
     setMode('flat');
   }, []);
   // Backstop: if even the embed's code never arrives, settle on the panorama.
