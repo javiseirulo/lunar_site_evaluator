@@ -8,7 +8,6 @@ import { useHistoric } from '@/globe/historicSites';
 import { LayersMenu } from '@/globe/LayersMenu';
 import { PatchControls } from '@/globe/PatchControls';
 import { PinForm } from '@/globe/PinForm';
-import { submitExplorePin } from '@/globe/exploreBridge';
 import { MissionTimingPanel, SiteCheckPanel } from '@/scoring';
 import { SimpleSiteList } from './explore/SimpleSiteList';
 import { EndSimulationDialog } from './explore/EndSimulationDialog';
@@ -98,13 +97,14 @@ function Pages<T extends string>({
 
 function MapPage() {
   const proMode = useAppStore((s) => s.proMode);
+  const requestPin = useAppStore((s) => s.requestPin);
   return (
     <div className="flex flex-col gap-2 px-2 py-2">
       <PinForm
         embedded
         title={proMode ? 'Pin by coordinates' : 'Go to coordinates'}
         submitLabel={proMode ? 'Add pin' : 'Go there'}
-        onAdd={submitExplorePin}
+        onAdd={requestPin}
       />
       <div className="border-edge-hi border-t-2 pt-2">
         <LayersMenu embedded hasSun expert={proMode} />

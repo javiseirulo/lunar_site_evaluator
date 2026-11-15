@@ -31,7 +31,6 @@ import {
 import { Canvas, useFrame, useThree, type ThreeEvent } from '@react-three/fiber';
 import { useNavigate } from 'react-router';
 import { AstronautControl, SurfacePicker, type SurfaceBridgeApi } from './GlobeSurfaceBridge';
-import { registerExplorePin } from './exploreBridge';
 import { Html, OrbitControls, Stars, useGLTF, useTexture } from '@react-three/drei';
 import {
   CanvasTexture,
@@ -296,13 +295,16 @@ export default function GlobeCanvas({ hideChrome = false }: { hideChrome?: boole
   const pinRef = useRef(createPin);
   useEffect(() => {
     pinRef.current = createPin;
-    registerExplorePin((pin) => {
-      pinRef.current(pin.lat, pin.lon, pin.name || undefined);
-      const safeLat = Math.max(-89.5, Math.min(89.5, pin.lat));
-      flightRef.current = new Vector3(...latLonToVec3(safeLat, pin.lon, PIN_VIEW_DISTANCE));
-    });
-    return () => registerExplorePin(null);
   });
+  // Pins asked for by the Explore side panel (through the store): drop, fly, clear.
+  const pendingPin = useAppStore((s) => s.pendingPin);
+  useEffect(() => {
+    if (!pendingPin) return;
+    useAppStore.getState().clearPendingPin();
+    pinRef.current(pendingPin.lat, pendingPin.lon, pendingPin.name || undefined);
+    const safeLat = Math.max(-89.5, Math.min(89.5, pendingPin.lat));
+    flightRef.current = new Vector3(...latLonToVec3(safeLat, pendingPin.lon, PIN_VIEW_DISTANCE));
+  }, [pendingPin]);
 
   const onSurfaceClick = (lat: number, lon: number) => {
     if (placingAstronaut) {
