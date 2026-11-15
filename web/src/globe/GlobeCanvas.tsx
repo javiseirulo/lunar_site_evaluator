@@ -51,7 +51,14 @@ import { HistoricControls } from './HistoricControls';
 import { useSunDirection } from './sunLight';
 import { PatchTrigger, PolarPatch, SunLight } from './PolarPatch';
 import { EXAGGERATION_LABEL, PatchControls } from './PatchControls';
-import { loadTerrain, useTerrain, useTerrainLift, type LiftFn } from './terrainStore';
+import {
+  PATCH_SHOW_DISTANCE,
+  loadTerrain,
+  patchOn,
+  useTerrain,
+  useTerrainLift,
+  type LiftFn,
+} from './terrainStore';
 import { OUTCOME_COLORS, loadHistoricSites, useHistoric } from './historicSites';
 import { useRequirements } from './requirementsStore';
 import { useCandidates } from './useCandidates';
@@ -74,7 +81,8 @@ const MISS_PIN_COLOR = new Color('#9aa0aa');
 /** Sites that meet every requirement. */
 const CANDIDATE_PIN_COLOR = new Color('#f2c55c');
 const POLE_MARKER_MIN_DISTANCE = 2;
-const POLE_VIEW = { lat: -89, distance: 1.3 };
+/** The polar terrain patch shows from this distance in (see terrainStore). */
+const POLE_VIEW = { lat: -89, distance: PATCH_SHOW_DISTANCE };
 /** Camera distance from the Moon's centre after flying to a pin added by coordinates. */
 const PIN_VIEW_DISTANCE = 1.4;
 const INITIAL_CAMERA = latLonToVec3(-30, 0, 3);
@@ -113,7 +121,7 @@ export default function GlobeCanvas() {
   const now = useAppStore((s) => s.currentTimeUTC);
   const sun = useSunDirection(now);
   const sunDir = sun.dir;
-  const exaggerated = useTerrain((s) => s.status === 'ready' && s.exaggeration === 2);
+  const exaggerated = useTerrain((s) => patchOn(s) && s.exaggeration === 2);
 
   const sites = useData((s) => s.sites);
   const { evaluations, topRank } = useCandidates();
@@ -321,7 +329,7 @@ function Moon({
   useEffect(onReady, [onReady]);
   // While the polar terrain is loaded, cut the textured sphere's cap south of the patch edge
   // (with a sliver of overlap) so it never shows through the terrain.
-  const patchReady = useTerrain((s) => s.status === 'ready');
+  const patchReady = useTerrain(patchOn);
   const latLimit = useTerrain((s) => s.header?.lat_limit ?? -80);
   const geometry = useMemo(() => {
     const thetaLength = patchReady ? ((90 - latLimit + CAP_OVERLAP_DEG) * Math.PI) / 180 : Math.PI;

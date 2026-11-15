@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { loadTerrain, useTerrain } from './terrainStore';
+import { PATCH_SHOW_DISTANCE, loadTerrain, nextPatchShown, useTerrain } from './terrainStore';
 
 const header = {
   radius_m: 1737400,
@@ -74,5 +74,26 @@ describe('loadTerrain', () => {
     await loadTerrain((() =>
       Promise.resolve(res({}, 'application/json', false))) as unknown as typeof fetch);
     expect(useTerrain.getState().status).toBe('error');
+  });
+});
+
+describe('nextPatchShown', () => {
+  /** Camera at `d` from the centre, `latDeg` latitude (lon 0). */
+  const cam = (d: number, latDeg: number): [number, number, number] => {
+    const p = (latDeg * Math.PI) / 180;
+    return [d * Math.cos(p), d * Math.sin(p), 0];
+  };
+
+  it('shows from the South pole button view inwards, not from farther out', () => {
+    expect(nextPatchShown(cam(PATCH_SHOW_DISTANCE, -89), false)).toBe(true);
+    expect(nextPatchShown(cam(1.1, -80), false)).toBe(true);
+    expect(nextPatchShown(cam(1.4, -89), false)).toBe(false);
+    expect(nextPatchShown(cam(1.2, -30), false)).toBe(false); // close, but over the equator side
+  });
+
+  it('hides when zooming or panning away, with a margin so it does not flicker', () => {
+    expect(nextPatchShown(cam(1.4, -89), true)).toBe(true); // just past the threshold: stays
+    expect(nextPatchShown(cam(1.6, -89), true)).toBe(false);
+    expect(nextPatchShown(cam(1.2, -40), true)).toBe(false);
   });
 });

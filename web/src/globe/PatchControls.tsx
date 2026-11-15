@@ -1,6 +1,6 @@
 /**
  * Controls and labels for the polar terrain patch — owner: Marta (src/globe).
- * Shown once the patch has started loading (it loads near the south pole or from the pole marker).
+ * Shown while the camera is close to the south pole (the "South pole" button distance or closer).
  */
 import { loadTerrain, useTerrain } from './terrainStore';
 import { PAPER } from './paper';
@@ -12,11 +12,10 @@ export const EXAGGERATION_LABEL = 'Vertical exaggeration ×2 (shadows not to sca
 
 export function PatchControls() {
   const status = useTerrain((s) => s.status);
-  const highDetail = useTerrain((s) => s.highDetail);
+  const shown = useTerrain((s) => s.shown);
   const exaggeration = useTerrain((s) => s.exaggeration);
-  const setHighDetail = useTerrain((s) => s.setHighDetail);
   const setExaggeration = useTerrain((s) => s.setExaggeration);
-  if (status === 'idle') return null;
+  if (!shown || status === 'idle') return null;
 
   return (
     <div className="box w-60 px-3 py-2 text-[12px]" style={PAPER}>
@@ -37,17 +36,6 @@ export function PatchControls() {
       </p>
       {status === 'ready' && (
         <div className="mt-1.5 flex flex-col gap-1.5">
-          <label className="flex cursor-pointer items-center gap-2">
-            <button
-              type="button"
-              role="switch"
-              aria-checked={highDetail}
-              className="switch"
-              onClick={() => setHighDetail(!highDetail)}
-            />
-            High detail
-            <span className="text-ink-muted ml-auto">{highDetail ? '1025²' : '513²'}</span>
-          </label>
           <label className="flex cursor-pointer items-center gap-2">
             <button
               type="button"

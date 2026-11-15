@@ -7,13 +7,14 @@ import { useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import { useFrame, type ThreeEvent } from '@react-three/fiber';
 import { BufferAttribute, BufferGeometry, DirectionalLight, Object3D } from 'three';
 import { buildPatchArrays } from './terrain';
-import { loadTerrain, useTerrain } from './terrainStore';
+import {
+  PATCH_PREFETCH_DISTANCE,
+  loadTerrain,
+  nextPatchShown,
+  patchOn,
+  useTerrain,
+} from './terrainStore';
 import { vec3ToLatLon } from './geo';
-
-/** Load the patch when the camera is this close to the Moon (centre distance)… */
-const TRIGGER_DISTANCE = 1.8;
-/** …and looking at the south polar region (camera direction's y below this). */
-const TRIGGER_SOUTH = -0.85;
 
 export function PolarPatch({
   onSurfaceClick,
@@ -26,19 +27,19 @@ export function PolarPatch({
   const header = useTerrain((s) => s.header);
   const heights = useTerrain((s) => s.heights);
   const mask = useTerrain((s) => s.mask);
-  const highDetail = useTerrain((s) => s.highDetail);
+  const shown = useTerrain(patchOn);
   const exaggeration = useTerrain((s) => s.exaggeration);
 
   const geometry = useMemo(() => {
     if (status !== 'ready' || !header || !heights) return null;
-    const a = buildPatchArrays(header, heights, highDetail ? 1 : 2, exaggeration, mask);
+    const a = buildPatchArrays(header, heights, 1, exaggeration, mask); // full 1025² grid
     const g = new BufferGeometry();
     g.setAttribute('position', new BufferAttribute(a.positions, 3));
     g.setIndex(new BufferAttribute(a.indices, 1));
     g.computeVertexNormals();
     g.computeBoundingSphere();
     return g;
-  }, [status, header, heights, mask, highDetail, exaggeration]);
+  }, [status, header, heights, mask, exaggeration]);
 
   useEffect(() => () => geometry?.dispose(), [geometry]);
 
@@ -46,10 +47,12 @@ export function PolarPatch({
   return (
     <mesh
       geometry={geometry}
+      // Kept mounted while hidden, so coming back to the pole does not rebuild the mesh.
+      visible={shown}
       castShadow
       receiveShadow
       onClick={(e: ThreeEvent<MouseEvent>) => {
-        if (e.delta > clickTolerancePx) return;
+        if (!shown || e.delta > clickTolerancePx) return; // hidden: let the Moon take it
         e.stopPropagation();
         const [lat, lon] = vec3ToLatLon(e.point.x, e.point.y, e.point.z);
         onSurfaceClick(lat, lon);
@@ -83,7 +86,7 @@ export function SunLight({
   direction: readonly [number, number, number];
   intensity: number;
 }) {
-  const patchReady = useTerrain((s) => s.status === 'ready');
+  const patchShown = useTerrain(patchOn);
   const light = useRef<DirectionalLight>(null);
   const target = useRef<Object3D>(null);
 
@@ -108,7 +111,7 @@ export function SunLight({
         ref={light}
         position={[cx + dx * LIGHT_DISTANCE, cy + dy * LIGHT_DISTANCE, cz + dz * LIGHT_DISTANCE]}
         intensity={intensity}
-        castShadow={patchReady}
+        castShadow={patchShown}
         shadow-mapSize={[SHADOW_MAP_SIZE, SHADOW_MAP_SIZE]}
         // Grazing polar sunlight: a small offset along the normal avoids shadow acne on slopes.
         shadow-bias={-0.00005}
@@ -118,12 +121,18 @@ export function SunLight({
   );
 }
 
-/** Starts loading the terrain once the camera gets close to the south pole. */
+/**
+ * Shows the patch only from the "South pole" button's distance in (hides it when zooming out),
+ * and starts downloading it a little before.
+ */
 export function PatchTrigger() {
   useFrame(({ camera }) => {
-    if (useTerrain.getState().status !== 'idle') return;
-    const d = camera.position.length();
-    if (d < TRIGGER_DISTANCE && camera.position.y / d < TRIGGER_SOUTH) void loadTerrain();
+    const s = useTerrain.getState();
+    const p = camera.position;
+    const shown = nextPatchShown([p.x, p.y, p.z], s.shown);
+    if (shown !== s.shown) s.setShown(shown);
+    if (s.status === 'idle' && p.length() < PATCH_PREFETCH_DISTANCE && p.y / p.length() < -0.85)
+      void loadTerrain();
   });
   return null;
 }

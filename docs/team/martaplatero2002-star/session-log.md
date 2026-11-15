@@ -120,3 +120,9 @@
 ### Pendiente de pedir a otros
 - ~~Javi2~~ → **Javi (@javiseirulo)**, que ahora lleva el core y las capas: core → `terrain/layers.json` real; barra lateral más alta; campo de fecha/hora en el Mission Clock. (`candidateIds` para el mapa 2D: descartado, el 2D se quitará.)
 - (Ya no hace falta pedir `valid.u8` a Pablo: sí estaba.)
+
+### Ajustes del parche tras probarlo (2026-11-15)
+- Petición de Marta: parche más grande, visible solo a la distancia del botón "South pole" (desaparece al alejarse) y siempre en alta resolución.
+- **Tamaño: no se puede con los datos actuales.** `heights.f32`/`valid.u8` tienen datos justo hasta 80°S (ρ máx. 303978 m → −80,0009°); las esquinas son NaN. Para ampliarlo hace falta que Pablo exporte un heightmap mayor (p. ej. hasta −75° con `LDEM_60S_240MPP_ADJ`, ya citado en docs/04). No se inventa relieve.
+- Visibilidad: `nextPatchShown` (terrainStore.ts) con histéresis: aparece a ≤ 1,3 (= distancia del botón "South pole", constante compartida `PATCH_SHOW_DISTANCE`) mirando al sur (y/d ≤ −0,85) y se oculta a > 1,45 o y/d > −0,75. Se descarga antes (a 1,8) para que esté listo. Oculto: malla montada con `visible=false` (no se reconstruye), esfera completa, sin sombras y pins sobre la esfera.
+- Siempre 1025² (1,64 M triángulos); quitado el interruptor High detail. Riesgo de FPS en portátiles con sombras: si va lento, volver a 513².

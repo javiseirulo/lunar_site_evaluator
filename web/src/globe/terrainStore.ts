@@ -15,11 +15,11 @@ interface TerrainState {
   heights: Float32Array | null;
   /** Optional validity mask (terrain/valid.u8); without it, NaN heights mark missing data. */
   mask: Uint8Array | null;
-  /** 1025×1025 instead of the default 513×513. */
-  highDetail: boolean;
+  /** The camera is close to the south pole: the patch is drawn (once loaded). */
+  shown: boolean;
   /** Vertical exaggeration: 1 (default) or 2 (labelled on screen). */
   exaggeration: 1 | 2;
-  setHighDetail: (on: boolean) => void;
+  setShown: (on: boolean) => void;
   setExaggeration: (x: 1 | 2) => void;
 }
 
@@ -28,15 +28,42 @@ export const useTerrain = create<TerrainState>()((set) => ({
   header: null,
   heights: null,
   mask: null,
-  highDetail: false,
+  shown: false,
   exaggeration: 1,
-  setHighDetail: (highDetail) => set({ highDetail }),
+  setShown: (shown) => set({ shown }),
   setExaggeration: (exaggeration) => set({ exaggeration }),
 }));
 
 /** A response is a real binary file (Vite answers missing files with index.html and HTTP 200). */
 function isBinary(res: Response): boolean {
   return res.ok && !(res.headers.get('content-type') ?? '').includes('html');
+}
+
+/** The patch is loaded and the camera is close enough to draw it. */
+export function patchOn(s: Pick<TerrainState, 'status' | 'shown'>): boolean {
+  return s.status === 'ready' && s.shown;
+}
+
+/** Camera distance (Moon centre, R = 1) set by the "South pole" button; the patch shows from here in. */
+export const PATCH_SHOW_DISTANCE = 1.3;
+/** Hide again only a bit farther out, so it does not flicker at the threshold. */
+const PATCH_HIDE_DISTANCE = 1.45;
+/** Camera direction's y (−1 = straight over the south pole): show below, hide above the second. */
+const PATCH_SHOW_SOUTH = -0.85;
+const PATCH_HIDE_SOUTH = -0.75;
+/** Start downloading a little before the patch is due, so it is ready when it shows. */
+export const PATCH_PREFETCH_DISTANCE = 1.8;
+
+/** Whether the patch should be drawn for this camera position (with hysteresis). */
+export function nextPatchShown(
+  camera: readonly [number, number, number],
+  wasShown: boolean,
+): boolean {
+  const d = Math.hypot(camera[0], camera[1], camera[2]);
+  const south = camera[1] / d;
+  return wasShown
+    ? d <= PATCH_HIDE_DISTANCE && south <= PATCH_HIDE_SOUTH
+    : d <= PATCH_SHOW_DISTANCE + 0.005 && south <= PATCH_SHOW_SOUTH;
 }
 
 let inflight: Promise<void> | null = null;
@@ -79,7 +106,7 @@ export type LiftFn = (lat: number, lon: number) => number;
 
 /** Stable while the terrain and its exaggeration do not change, so markers can memo on it. */
 export function useTerrainLift(): LiftFn {
-  const header = useTerrain((s) => (s.status === 'ready' ? s.header : null));
+  const header = useTerrain((s) => (patchOn(s) ? s.header : null));
   const heights = useTerrain((s) => s.heights);
   const mask = useTerrain((s) => s.mask);
   const exaggeration = useTerrain((s) => s.exaggeration);
