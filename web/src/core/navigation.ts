@@ -5,7 +5,7 @@ export const MODES: { id: AppMode; label: string; path: string; blurb: string }[
     id: 'explore',
     label: 'Explore',
     path: '/explore',
-    blurb: 'Filter the south pole by sunlight, Earth visibility and slope, and compare sites.',
+    blurb: 'Filter the south pole by sunlight, Earth visibility and slope.',
   },
   {
     id: 'streetview',
@@ -27,9 +27,10 @@ export function pathForMode(mode: AppMode, siteId?: string | null): string {
 }
 
 /**
- * Main tab bar, in order. Mode tabs keep the selected site in their URL (Street View).
- * Normal mode shows the tabs a first-time visitor needs; `expert` tabs appear only in
- * Expert mode. Pages that aren't modes (sites, compare, learn, about) don't change `mode`.
+ * Main tab bar, in the order of the job: look, stand there, weigh the options, commit,
+ * then read why and how. Mode tabs keep the selected site in their URL (Street View).
+ * Normal mode is that story. `expert` tabs add the catalogue and the method.
+ * Pages that aren't modes (sites, compare, learn, about) don't change `mode`.
  */
 export const TABS: {
   label: string;
@@ -39,29 +40,34 @@ export const TABS: {
   expert?: boolean;
 }[] = [
   { label: 'Explore', path: '/explore', mode: 'explore' },
+  { label: 'Street View', path: '/streetview', mode: 'streetview' },
   { label: 'Compare', path: '/compare', expert: true },
+  { label: 'All sites', path: '/sites', expert: true },
   { label: 'Mission', path: '/game', mode: 'game' },
   { label: 'Learn', path: '/learn' },
-  { label: 'Sites', path: '/sites', expert: true },
-  { label: 'Street View', path: '/streetview', mode: 'streetview', expert: true },
-  { label: 'Data', path: '/about', expert: true },
+  { label: 'Method', path: '/about', expert: true },
 ];
+
+/** Tabs shown in the given mode: Normal hides the `expert` ones (Compare among them). */
+export function visibleTabs(proMode: boolean): typeof TABS {
+  return TABS.filter((t) => proMode || !t.expert);
+}
 
 /** Every page, for the footer in Expert mode. */
 export const ALL_PAGES: { label: string; path: string }[] = [
   { label: 'Home', path: '/home' },
   { label: 'Explore', path: '/explore' },
-  { label: 'All sites', path: '/sites' },
-  { label: 'Compare', path: '/compare' },
   { label: 'Street View', path: '/streetview' },
+  { label: 'Compare', path: '/compare' },
+  { label: 'All sites', path: '/sites' },
   { label: 'Mission', path: '/game' },
   { label: 'Learn', path: '/learn' },
-  { label: 'Data & method', path: '/about' },
+  { label: 'Method', path: '/about' },
 ];
 
 /** Audience shortcuts shown under the tabs. */
-export const AUDIENCES = [
-  { label: 'For Mission Planners', path: '/compare' },
+export const AUDIENCES: { label: string; path: string; expert?: boolean }[] = [
+  { label: 'For Mission Planners', path: '/compare', expert: true },
   { label: 'For Educators', path: '/learn' },
   { label: 'For Students', path: '/game' },
   { label: 'For Everyone', path: '/explore' },

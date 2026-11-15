@@ -2,9 +2,8 @@
  * `recon` phase: the player has touched down at the chosen site and looks around before
  * committing. Shows Pablo's look-only Street View (`@/streetview/StreetViewEmbed`, lazy: the
  * only game file that imports street view) at the landing point, with the real Sun and Earth
- * at the touchdown hour. Until the 3D terrain is ready, and whenever it is unavailable (no
- * token, no WebGL, an error or > 12 s), a draggable 360° panorama (`ReconPanorama`) shows the
- * same sky instead, so the game never waits on Cesium.
+ * at the touchdown hour. The view stays black while Cesium loads, and stays black with a
+ * short notice if the surface cannot load.
  *
  * HUD: "Landing site N" (never the real name or coordinates), touchdown time, Sun / Earth at
  * that hour (from the timeseries, as the engine judges them), compass, hint and the running
@@ -18,16 +17,14 @@ import { formatUtc, useTimeseries } from '@/core';
 import type { StreetViewEmbedHandle, StreetViewEmbedProps } from '@/streetview/StreetViewEmbed';
 import { DEFAULT_REQUIREMENTS } from '../engine/requirements';
 import { useGame } from '../state/gameStore';
-import { siteTerrain } from './assets';
 import { skyAt, viewHeading } from './cockpit/sky';
 import { Countdown } from './Countdown';
 import { compassPoint, earthText, reconSky, SUN_TEXT } from './panorama';
-import { ReconPanorama } from './ReconPanorama';
 import { useGameSite } from '../historic/useGameSites';
 
 const MARGIN = DEFAULT_REQUIREMENTS.antenna_margin_deg;
-/** Give the 3D terrain this long before settling on the panorama. */
-const TERRAIN_TIMEOUT_MS = 12_000;
+/** First load pulls the Cesium bundle and the Moon tiles. Give that time before giving up. */
+const TERRAIN_TIMEOUT_MS = 45_000;
 /** Degrees turned per arrow key press. */
 const KEY_STEP = 5;
 
@@ -53,7 +50,6 @@ export function SiteRecon() {
   const ts = useTimeseries(card?.siteId);
   const sky = useMemo(() => (ts && hand ? skyAt(ts, hand.startIndex, 0) : null), [ts, hand]);
   const status = useMemo(() => (sky ? reconSky(sky, MARGIN) : null), [sky]);
-  const terrain = card ? siteTerrain(card.siteId) : 'rim';
 
   // Start facing between the Sun and the Earth so both are near the view when possible.
   const [initialHeading] = useState(() => (sky ? viewHeading(sky.sunAz, sky.earthAz) : 0));
@@ -74,7 +70,7 @@ export function SiteRecon() {
   const onError = useCallback((reason?: string) => {
     // Visible in devtools: tells "no token" from "WebGL" or "Cesium load / timeout" at a glance.
     console.warn(
-      `[recon] 3D Street View unavailable (${reason ?? 'unknown'}); using the panorama.`,
+      `[recon] 3D Street View unavailable (${reason ?? 'unknown'}).`,
     );
     setMode('flat');
   }, []);
@@ -135,26 +131,14 @@ export function SiteRecon() {
       </header>
 
       <div
-        className="relative min-h-[300px] flex-1 overflow-hidden border-2 border-black bg-black"
+        className="relative min-h-[460px] flex-1 overflow-hidden border-2 border-black bg-black"
         role="group"
         aria-label={`Surface view at ${label}. Drag or use the arrow keys to look around.`}
       >
-        {sky && status && (
-          <div
-            className={clsx(
-              'absolute inset-0 transition-opacity duration-500 motion-reduce:transition-none',
-              mode === '3d' ? 'pointer-events-none opacity-0' : 'opacity-100',
-            )}
-            aria-hidden={mode === '3d'}
-          >
-            <ReconPanorama
-              sky={sky}
-              status={status}
-              terrain={terrain}
-              heading={heading}
-              onHeading={setHeading}
-            />
-          </div>
+        {mode !== '3d' && (
+          <p className="text-ink-muted pointer-events-none absolute inset-0 flex items-center justify-center bg-black px-6 text-center font-mono text-[11px] tracking-widest uppercase">
+            {mode === 'loading' ? 'Loading the surface…' : 'The surface did not load.'}
+          </p>
         )}
         {canEmbed && (
           <div

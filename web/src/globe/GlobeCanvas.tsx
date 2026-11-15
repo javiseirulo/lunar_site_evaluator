@@ -17,37 +17,43 @@
  * <Html> under React 19 throws "removeChild … not a child of this node" and breaks the tree.
  */
 import {
+  Component,
   Suspense,
   useEffect,
   useMemo,
   useRef,
   useState,
   type ComponentRef,
+  type ReactNode,
   type RefObject,
   type SyntheticEvent,
 } from 'react';
 import { Canvas, useFrame, useThree, type ThreeEvent } from '@react-three/fiber';
 import { useNavigate } from 'react-router';
 import { AstronautControl, SurfacePicker, type SurfaceBridgeApi } from './GlobeSurfaceBridge';
-import { Html, OrbitControls, Stars, useTexture } from '@react-three/drei';
+import { Html, OrbitControls, Stars, useGLTF, useTexture } from '@react-three/drei';
 import {
   CanvasTexture,
   Color,
   DoubleSide,
   Group,
-  SphereGeometry,
+  Material,
+  Mesh,
+  MeshStandardMaterial,
   MOUSE,
   Matrix4,
-  Mesh,
+  Object3D,
   Quaternion,
   SRGBColorSpace,
+  SphereGeometry,
   Sprite,
   Vector3,
 } from 'three';
-import { useAppStore, useData } from '@/core';
+import { formatLatLon, useAppStore, useData } from '@/core';
 import { GlobeCard, type CardContent } from './GlobeCard';
 import { PinForm } from './PinForm';
 import { useCustomPins } from './customPins';
+import { removeCustomPin, useFlyRequest } from './pointList';
 import { latLonToVec3, vec3ToLatLon } from './geo';
 import { flightAt, planFlight, type Flight } from './flight';
 import { useSunDirection } from './sunLight';
@@ -78,6 +84,11 @@ const PIN_SIZE = 0.012;
 const CUSTOM_PIN_COLOR = new Color('#8cc4ff');
 /** Sites that miss a requirement: faint grey, so they give context without competing. */
 const MISS_PIN_COLOR = new Color('#9aa0aa');
+/** Past-landing lander (GLB). Its height is ~2.27 units, the same as the old pyramid cone. */
+const LANDER_URL = `${import.meta.env.BASE_URL}models/past_landing_lander.glb`;
+/** Emissive share of each non-accent material's base colour, so the lander reads on the night side. */
+const LANDER_EMISSIVE = 0.3;
+useGLTF.preload(LANDER_URL);
 /** Sites that meet every requirement. */
 const CANDIDATE_PIN_COLOR = new Color('#f2c55c');
 const POLE_MARKER_MIN_DISTANCE = 2;
@@ -171,6 +182,28 @@ export default function GlobeCanvas() {
     [],
   );
 
+  // A row picked in the "Your points" list: fly there and show that pin's card.
+  useEffect(
+    () =>
+      useFlyRequest.subscribe((s, prev) => {
+        const r = s.request;
+        if (!r || r === prev.request) return;
+        setFocus({ kind: 'custom', id: r.id });
+        const safeLat = Math.max(-89.5, Math.min(89.5, r.lat));
+        flightRef.current = new Vector3(...latLonToVec3(safeLat, r.lon, PIN_VIEW_DISTANCE));
+      }),
+    [],
+  );
+
+  // A clicked ground point becomes the free point right away, so the simulation can run for it.
+  const clickPoint = (lat: number, lon: number) => {
+    useAppStore
+      .getState()
+      .requestSelection({ kind: 'point', lat, lon, name: formatLatLon(lat, lon) }, () =>
+        setFocus({ kind: 'point', lat, lon }),
+      );
+  };
+
   const card = useMemo<CardContent | null>(() => {
     if (!focus) return null;
     const pastOf = (id: string) =>
@@ -205,9 +238,11 @@ export default function GlobeCanvas() {
   }, [focus, evaluations, topRank, sites, pins, historic, historicVisible]);
 
   const onSiteClick = (id: string) => {
-    const { selectedSiteId, selectSite } = useAppStore.getState();
-    if (selectedSiteId !== id) selectSite(id);
-    else if (focus?.kind === 'site' && focus.id === id) selectSite(null);
+    const { selectedSiteId, selectSite, requestSelection } = useAppStore.getState();
+    if (selectedSiteId !== id) {
+      const name = sites?.find((x) => x.id === id)?.name ?? id;
+      requestSelection({ kind: 'site', id, name });
+    } else if (focus?.kind === 'site' && focus.id === id) selectSite(null);
     else setFocus({ kind: 'site', id }); // selected, but the card showed something else
   };
 
@@ -225,7 +260,12 @@ export default function GlobeCanvas() {
 
   const createPin = (lat: number, lon: number, name?: string) => {
     const pin = addPin({ lat, lon, name });
-    setFocus({ kind: 'custom', id: pin.id });
+    // Shared free point (store `selectedPoint`) for the "any lat/lon" checks; never touches selectedSiteId.
+    useAppStore
+      .getState()
+      .requestSelection({ kind: 'point', lat, lon, name: pin.name }, () =>
+        setFocus({ kind: 'custom', id: pin.id }),
+      );
     return pin;
   };
 
@@ -233,7 +273,7 @@ export default function GlobeCanvas() {
     if (placingAstronaut) {
       setPlacingAstronaut(false);
       surfaceApiRef.current?.enter({ lat, lon });
-    } else setFocus({ kind: 'point', lat, lon });
+    } else clickPoint(lat, lon);
   };
 
   return (
@@ -273,7 +313,9 @@ export default function GlobeCanvas() {
           onClose={closeCard}
           onCreatePin={(lat, lon) => createPin(lat, lon)}
           onDeletePin={(id) => {
-            removePin(id);
+            const pin = pins.find((p) => p.id === id);
+            if (pin) removeCustomPin(pin);
+            else removePin(id);
             setFocus(null);
           }}
         />
@@ -300,16 +342,18 @@ export default function GlobeCanvas() {
         onArmed={setPlacingAstronaut}
       />
       <div className="absolute top-2 left-2 flex flex-col items-start gap-2">
-        {expert && (
-          <PinForm
-            onAdd={({ name, lat, lon }) => {
-              createPin(lat, lon, name);
-              // Fly above the new pin (avoid the exact pole, where the orbit is undefined).
-              const safeLat = Math.max(-89.5, Math.min(89.5, lat));
-              flightRef.current = new Vector3(...latLonToVec3(safeLat, lon, PIN_VIEW_DISTANCE));
-            }}
-          />
-        )}
+        {/* Coordinate entry is open in Normal too (kids can go anywhere); Normal only gets plainer wording. */}
+        <PinForm
+          buttonLabel={expert ? 'Pin by coordinates' : 'Go to coordinates'}
+          title={expert ? 'Pin by coordinates' : 'Go to coordinates'}
+          submitLabel={expert ? 'Add pin' : 'Go there'}
+          onAdd={({ name, lat, lon }) => {
+            createPin(lat, lon, name);
+            // Fly above the new pin (avoid the exact pole, where the orbit is undefined).
+            const safeLat = Math.max(-89.5, Math.min(89.5, lat));
+            flightRef.current = new Vector3(...latLonToVec3(safeLat, lon, PIN_VIEW_DISTANCE));
+          }}
+        />
         <PatchControls />
       </div>
       <div className="absolute bottom-2 left-2 z-[60]">
@@ -742,6 +786,8 @@ function HistoricMarker({
 
   return (
     <group ref={group} position={position}>
+      <LanderOrCone color={color} />
+      {/* Invisible click target: the old cone's footprint, so small markers stay easy to press. */}
       <mesh
         position={[0, 1.2, 0]}
         onClick={(e: ThreeEvent<MouseEvent>) => {
@@ -756,7 +802,7 @@ function HistoricMarker({
         onPointerOut={() => onHover(false)}
       >
         <coneGeometry args={[1, 2.4, 3]} />
-        <meshBasicMaterial color={color} toneMapped={false} />
+        <meshBasicMaterial transparent opacity={0} depthWrite={false} />
       </mesh>
       {selected && (
         <mesh rotation={[-Math.PI / 2, 0, 0]}>
@@ -766,6 +812,78 @@ function HistoricMarker({
       )}
     </group>
   );
+}
+
+/**
+ * Clones the cached GLB scene for one marker. Materials are cloned too (the cache is never mutated);
+ * geometry stays shared with the cache, so only these materials need disposing.
+ */
+function buildLander(source: Object3D, outcomeColor: string) {
+  const root = source.clone(true);
+  const owned = new Map<Material, MeshStandardMaterial>();
+  root.traverse((obj) => {
+    const mesh = obj as Mesh;
+    if (!mesh.isMesh || Array.isArray(mesh.material)) return;
+    // Clicks and hover go to the invisible cone, so the 34 model meshes are never ray-tested.
+    mesh.raycast = () => null;
+    const original = mesh.material as MeshStandardMaterial;
+    let copy = owned.get(original);
+    if (!copy) {
+      copy = original.clone();
+      if (copy.name === 'outcome_accent') {
+        copy.color.set(outcomeColor);
+        copy.emissive.set(outcomeColor);
+      } else {
+        copy.emissive.copy(copy.color).multiplyScalar(LANDER_EMISSIVE);
+      }
+      owned.set(original, copy);
+    }
+    mesh.material = copy;
+  });
+  return { root, materials: [...owned.values()] };
+}
+
+/** Plain cone shown while the lander model loads, or instead of it if the file cannot be loaded. */
+function LanderCone({ color }: { color: string }) {
+  return (
+    <mesh position={[0, 1.2, 0]} raycast={() => null}>
+      <coneGeometry args={[1, 2.4, 3]} />
+      <meshBasicMaterial color={color} toneMapped={false} />
+    </mesh>
+  );
+}
+
+/** A failed model load must never take the whole globe down (it would fall back to the 2D map). */
+class LanderBoundary extends Component<
+  { fallback: ReactNode; children: ReactNode },
+  { failed: boolean }
+> {
+  state = { failed: false };
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+  render() {
+    return this.state.failed ? this.props.fallback : this.props.children;
+  }
+}
+
+function LanderOrCone({ color }: { color: string }) {
+  const cone = <LanderCone color={color} />;
+  return (
+    <LanderBoundary fallback={cone}>
+      <Suspense fallback={cone}>
+        <HistoricLander color={color} />
+      </Suspense>
+    </LanderBoundary>
+  );
+}
+
+/** The lander model for one past-landing marker, standing on the origin with +Y as its axis. */
+function HistoricLander({ color }: { color: string }) {
+  const { scene } = useGLTF(LANDER_URL);
+  const lander = useMemo(() => buildLander(scene, color), [scene, color]);
+  useEffect(() => () => lander.materials.forEach((m) => m.dispose()), [lander]);
+  return <primitive object={lander.root} />;
 }
 
 /** Always-mounted anchor for the info card next to the clicked pin or point. */

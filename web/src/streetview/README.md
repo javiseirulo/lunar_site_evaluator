@@ -127,10 +127,11 @@ visual mesh every ≤5 m, then eases for one second (instant with reduced motion
 Far mountains and sky are rejected. Global relocation is explicit under
 **View options → Go anywhere on the Moon**. **Expand view** works on mobile too.
 
-Relief reading light is enabled by default. It is artificial, camera-relative
-fill derived from geometric normals, with a subtle solar-state tint. It is not
-physical lighting, a new shadow calculation or a remedy for missing ephemerides.
-The lunar sky stays black. Toggle it off to inspect the source imagery.
+Relief reading light is off by default so the source imagery stays visible.
+It is artificial, camera-relative fill derived from geometric normals, with a
+subtle solar-state tint. It is not physical lighting, a new shadow calculation
+or a remedy for missing ephemerides. The lunar sky stays black. Turn it on
+under View options when the shapes are hard to read.
 After moving, the sky is recalculated for the new coordinates with `@/ephem`.
 The old terrain profile is invalidated; the UI labels the geometric fallback
 and unknown free-point DEM elevation. Published terrain profiles use 5 m.

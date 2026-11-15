@@ -5,6 +5,7 @@
 import { useEffect } from 'react';
 import { Link, useLocation } from 'react-router';
 import { useAppStore } from '@/core';
+import { Figure, figureSrc } from '@/core/shell/Figure';
 
 const SECTIONS = [
   { id: 'pole', title: 'Why the south pole?' },
@@ -45,6 +46,41 @@ function H({ id, children }: { id: string; children: React.ReactNode }) {
   );
 }
 
+/** Text on one side, the picture on the other, alternating so the page stays short. */
+function Beside({
+  id,
+  title,
+  imageFirst,
+  src,
+  alt,
+  caption,
+  children,
+}: {
+  id: string;
+  title: string;
+  imageFirst?: boolean;
+  src: string;
+  alt: string;
+  caption: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  return (
+    <section>
+      <H id={id}>{title}</H>
+      <div className="mt-2 grid items-center gap-4 md:grid-cols-2">
+        <div className={imageFirst ? 'md:order-2' : undefined}>{children}</div>
+        <Figure
+          src={src}
+          alt={alt}
+          className={`border-edge border ${imageFirst ? 'md:order-1' : ''}`}
+        >
+          {caption}
+        </Figure>
+      </div>
+    </section>
+  );
+}
+
 export default function LearnPage() {
   const { hash } = useLocation();
   const proMode = useAppStore((s) => s.proMode);
@@ -70,7 +106,7 @@ export default function LearnPage() {
 
       <article className="box">
         <div className="box-head">Light and line of sight at the lunar south pole</div>
-        <div className="box-body max-w-[72ch] space-y-6">
+        <div className="box-body space-y-8">
           <p className="text-ink-muted text-[13px]">
             Two questions decide whether a landing site near the lunar south pole can work: will the
             lander have <b className="text-sun">sunlight</b> for power, and will it be able to{' '}
@@ -78,8 +114,20 @@ export default function LearnPage() {
             exact spot and the exact date.
           </p>
 
-          <section>
-            <H id="pole">Why the south pole?</H>
+          <Beside
+            id="pole"
+            title="Why the south pole?"
+            src={figureSrc('illumination-south-pole.jpg')}
+            alt="A round map of the lunar south pole. Bright ground was sunlit often; crater floors are black."
+            caption={
+              <>
+                How often the ground was sunlit, from six months of Lunar Reconnaissance Orbiter
+                Camera images. Brighter means lit more of the time. Shackleton is the round dark
+                crater near the center; its floor never sees the Sun. NASA/GSFC/Arizona State
+                University.
+              </>
+            }
+          >
             <p className="text-ink-muted">
               The Moon&apos;s spin axis is tilted only about 1.5° relative to its path around the
               Sun. Near the poles the Sun therefore never climbs high: it circles close to the
@@ -88,10 +136,22 @@ export default function LearnPage() {
               Those permanently shadowed regions are among the coldest places known and can trap
               water ice, which is a big reason missions want to land nearby.
             </p>
-          </section>
+          </Beside>
 
-          <section>
-            <H id="sun">Sunlight and power</H>
+          <Beside
+            id="sun"
+            title="Sunlight and power"
+            imageFirst
+            src={figureSrc('rimlight-shackleton.jpg')}
+            alt="Sunlight grazing the rim of Shackleton crater, with the ground beyond it in shadow."
+            caption={
+              <>
+                Sunlight grazing Shackleton&apos;s rim. The lit strip is where solar panels can
+                work. A few kilometres into the shadow, they cannot. NASA/GSFC/Arizona State
+                University.
+              </>
+            }
+          >
             <p className="text-ink-muted">
               Solar panels only work while the Sun is above the local horizon. With the Sun so low,
               a hill a few kilometres away can block it for days. A full lunar day, from one sunrise
@@ -100,10 +160,22 @@ export default function LearnPage() {
               why we show both the share of time in sunlight and the <i>longest night</i>, which
               sets how big the batteries must be.
             </p>
-          </section>
+          </Beside>
 
-          <section>
-            <H id="earth">Earth and communications</H>
+          <Beside
+            id="earth"
+            title="Earth and communications"
+            src={figureSrc('south-pole-earth.jpg')}
+            alt="Earth hanging just above the lunar horizon, seen from near the south pole."
+            caption={
+              <>
+                Earth from near the south pole. It stays low, so the small wobble of libration can
+                drop it behind a ridge. The red dot marks the horizon in this visualization; it is
+                not a landing site. Drawn from LOLA terrain and a planetary ephemeris. NASA
+                Scientific Visualization Studio.
+              </>
+            }
+          >
             <p className="text-ink-muted">
               The Moon keeps the same face towards Earth, so from the near side Earth stays in
               roughly the same part of the sky. A slow wobble called libration moves it around by
@@ -111,17 +183,29 @@ export default function LearnPage() {
               wobble can hide it behind terrain. While Earth is hidden, a lander cannot send data
               directly home and has to wait or use a relay satellite.
             </p>
-          </section>
+          </Beside>
 
-          <section>
-            <H id="horizon">What counts as the horizon</H>
+          <Beside
+            id="horizon"
+            title="What counts as the horizon"
+            imageFirst
+            src={figureSrc('shackleton-heights.jpg')}
+            alt="Shackleton crater shown two ways: height in color on the left, and shaded relief on the right."
+            caption={
+              <>
+                Shackleton, measured by LOLA. Color on the left is height. The right side is the
+                same crater in shade, and the floor stays black because the Sun never reaches it.
+                NASA/Zuber et al., Nature, 2012.
+              </>
+            }
+          >
             <p className="text-ink-muted">
               The Moon has no atmosphere, so light is not bent the way it is on Earth: what you see
               is what is there. The horizon at a site is the terrain around it plus the curvature of
               the Moon itself. We build it from laser-altimeter elevation data and compare it, hour
               by hour, with the positions of the Sun and Earth.
             </p>
-          </section>
+          </Beside>
 
           <section>
             <H id="use">Using this site</H>

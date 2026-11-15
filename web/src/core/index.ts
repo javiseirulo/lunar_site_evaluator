@@ -6,8 +6,18 @@ export { useCustomPins as useSavedPlaces } from './savedPlaces';
 export type { CustomPin as SavedPlace } from './savedPlaces';
 export type { AppState } from './store';
 export { useData, useTimeseries, useSite, useSelectedSite, loadTimeseries, dataUrl } from './data';
-export { sampleAt, indexAt, hoursUntilChange, fractionOn } from './timeseries';
-export type { SkySample } from './timeseries';
+export {
+  sampleAt,
+  indexAt,
+  hoursUntilChange,
+  fractionOn,
+  nextChange,
+  seriesSpanLabel,
+  changeWhen,
+  changeLead,
+  changeClause,
+} from './timeseries';
+export type { SkySample, NextChange } from './timeseries';
 export { MODES, TABS, ALL_PAGES, AUDIENCES, pathForMode } from './navigation';
 export { windowsGradient, SUN_BAND, EARTH_BAND } from './timeline';
 export { latLonToUv, uvToLatLon, projectSouthPolar } from './projection';

@@ -40,6 +40,8 @@ export interface SceneOptions {
   names?: boolean;
   /** Click/tap nearby ground to walk (with the hover ring). */
   walk?: boolean;
+  /** Coarse tiles first. Used by the game so the surface appears sooner. */
+  detail?: 'full' | 'preview';
 }
 export interface LunarScene {
   /** Turn the view by `dh` degrees of heading and `dp` of pitch (clamped like dragging). */
@@ -152,12 +154,18 @@ export async function createLunarScene(
     });
     const resource = await C.IonResource.fromAssetId(2684829, { accessToken: token });
     if (disposed) throw new DOMException('Cancelled', 'AbortError');
+    const preview = options.detail === 'preview';
     const tiles = await C.Cesium3DTileset.fromUrl(resource, {
-      maximumScreenSpaceError: 1,
-      cacheBytes: matchMedia('(pointer: coarse)').matches ? 128 * 1024 * 1024 : 256 * 1024 * 1024,
-      maximumCacheOverflowBytes: 128 * 1024 * 1024,
-      foveatedScreenSpaceError: false,
-      cullRequestsWhileMoving: false,
+      maximumScreenSpaceError: preview ? 16 : 1,
+      cacheBytes: preview
+        ? 64 * 1024 * 1024
+        : matchMedia('(pointer: coarse)').matches
+          ? 128 * 1024 * 1024
+          : 256 * 1024 * 1024,
+      maximumCacheOverflowBytes: preview ? 32 * 1024 * 1024 : 128 * 1024 * 1024,
+      foveatedScreenSpaceError: preview,
+      dynamicScreenSpaceError: preview,
+      cullRequestsWhileMoving: preview,
     });
     if (disposed) {
       tiles.destroy();
@@ -169,7 +177,7 @@ export async function createLunarScene(
     const shader = new C.CustomShader({
       lightingModel: C.LightingModel.UNLIT,
       uniforms: {
-        u_reading: { type: C.UniformType.FLOAT, value: 1 },
+        u_reading: { type: C.UniformType.FLOAT, value: 0 },
         u_tint: { type: C.UniformType.VEC3, value: new C.Cartesian3(0.94, 0.96, 1) },
       },
       fragmentShaderText: `void fragmentMain(FragmentInput fsInput, inout czm_modelMaterial material) {

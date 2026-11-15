@@ -64,7 +64,7 @@ export interface GameConfig {
 }
 
 /** Time the player has to decide, in milliseconds. */
-export const COUNTDOWN_MS = 180_000;
+export const COUNTDOWN_MS = 60_000;
 
 /** Length of the descent shot (globe dive to the chosen site), in milliseconds. */
 export const DESCENT_MS = 3500;

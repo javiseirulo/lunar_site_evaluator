@@ -4,18 +4,19 @@
  * Selection lives in the URL (?ids=a,b,c) so a comparison can be shared as a link.
  */
 import { useMemo } from 'react';
-import { Link, useSearchParams } from 'react-router';
+import { Navigate, useSearchParams } from 'react-router';
 import type { Site } from '@lunar/contracts';
-import { cn } from '@/lib/utils';
 import {
   EARTH_BAND,
-  Hint,
   METRICS,
   friendlyHours,
   SUN_BAND,
   formatHours,
-  formatLatLon,
-  hoursUntilChange,
+  changeLead,
+  changeWhen,
+  nextChange,
+  seriesSpanLabel,
+  type NextChange,
   sampleAt,
   useAppStore,
   useData,
@@ -23,55 +24,17 @@ import {
   windowsGradient,
 } from '@/core';
 import { TimeBar } from '@/core/shell/TimeBar';
-import { scoreColor } from '@/layers';
+import { SiteMoon } from './CompareMoons';
 
-type Better = 'high' | 'low' | null;
-interface Row {
-  label: string;
-  value: (s: Site) => number;
-  fmt: (s: Site) => string;
-  better: Better;
-  tone?: string;
-  help?: string;
-}
-
-/** Score + the shared metric definitions (plain names for students, technical in Pro mode). */
-function buildRows(pro: boolean): Row[] {
-  return [
-    {
-      label: 'Score',
-      value: (s) => s.score,
-      fmt: (s) => String(Math.round(s.score * 100)),
-      better: 'high',
-      help: 'Overall rating from 0 to 100 using the default weights.',
-    },
-    ...METRICS.map((m) => ({
-      label: pro ? m.proLabel : m.label,
-      value: (s: Site) => s.metrics[m.key],
-      fmt: (s: Site) => m.format(s.metrics, pro),
-      better: m.better,
-      tone: m.tone,
-      help: m.help,
-    })),
-    ...(pro
-      ? [
-          {
-            label: 'Elevation',
-            value: (s: Site) => s.elev_m,
-            fmt: (s: Site) => `${s.elev_m.toLocaleString('en')} m`,
-            better: null,
-          } as Row,
-        ]
-      : []),
-  ];
-}
-
+/** Compare exists only in Expert mode: in Normal the route quietly goes back to Explore. */
 export default function ComparePage() {
+  const proMode = useAppStore((s) => s.proMode);
+  return proMode ? <CompareView /> : <Navigate to="/explore" replace />;
+}
+
+function CompareView() {
   const sites = useData((s) => s.sites);
   const selectedSiteId = useAppStore((s) => s.selectedSiteId);
-  const proMode = useAppStore((s) => s.proMode);
-  const setProMode = useAppStore((s) => s.setProMode);
-  const rows = useMemo(() => buildRows(proMode), [proMode]);
   const [params, setParams] = useSearchParams();
 
   const ids = useMemo(() => {
@@ -85,27 +48,6 @@ export default function ComparePage() {
     return [...new Set([selectedSiteId, ...ranked].filter((x): x is string => !!x))].slice(0, 3);
   }, [params, sites, selectedSiteId]);
 
-  if (!proMode) {
-    return (
-      <section className="box mx-auto max-w-[560px]">
-        <div className="box-head">Compare is an Expert tool</div>
-        <div className="box-body">
-          <p className="text-ink-muted mb-4">
-            Side-by-side figures and sunlight timelines are available in Expert mode.
-          </p>
-          <div className="flex flex-wrap gap-3">
-            <button type="button" className="btn btn-go" onClick={() => setProMode(true)}>
-              Switch to Expert
-            </button>
-            <Link to="/explore" className="btn">
-              Back to Explore
-            </Link>
-          </div>
-        </div>
-      </section>
-    );
-  }
-
   if (!sites) return null;
   const chosen = ids.flatMap((id) => sites.find((s) => s.id === id) ?? []);
   const sorted = [...sites].sort((a, b) => a.name.localeCompare(b.name));
@@ -117,22 +59,14 @@ export default function ComparePage() {
     setParams({ ids: [...new Set(next.filter(Boolean))].join(',') }, { replace: true });
   };
 
-  const best = (row: Row) => {
-    if (!row.better || chosen.length < 2) return null;
-    const values = chosen.map(row.value);
-    const target = row.better === 'high' ? Math.max(...values) : Math.min(...values);
-    return values.filter((v) => v === target).length === values.length ? null : target;
-  };
-
   return (
     <div className="flex flex-col gap-3">
       <section className="box">
         <div className="box-head">Compare Sites</div>
         <div className="box-body">
           <p className="text-ink-muted mb-3 max-w-[75ch]">
-            A mission slips and you need an alternative nearby? Put up to three sites side by side.
-            The best value in each row gets a <b className="text-accent">★</b>. Drag the Mission
-            Clock below to see which site has the Sun and Earth up at any moment.
+            Put up to three sites side by side. Each Moon turns to face its site, and the Mission
+            Clock below moves the sunlight across them. The bars run from 0 to 100.
           </p>
           <div className="mb-4 flex flex-wrap gap-3">
             {[0, 1, 2].map((slot) => (
@@ -160,80 +94,10 @@ export default function ComparePage() {
           </div>
 
           {chosen.length > 0 && (
-            <div className="overflow-x-auto overscroll-x-contain">
-              <table className="border-edge w-full min-w-[560px] border-collapse border text-[12px]">
-                <thead>
-                  <tr className="bg-navy-700">
-                    <th className="sticky left-0 z-10 w-40 bg-navy-700 px-3 py-2" />
-                    {chosen.map((s) => (
-                      <th key={s.id} className="px-3 py-2 text-left">
-                        <span className="block text-[14px] text-heading font-medium">{s.name}</span>
-                        <span className="text-ink-faint num block text-[10px] font-normal">
-                          {formatLatLon(s.lat, s.lon)}
-                        </span>
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {rows.map((row, i) => {
-                    const target = best(row);
-                    return (
-                      <tr
-                        key={row.label}
-                        className={cn(
-                          'border-edge border-t',
-                          i % 2 ? 'bg-navy-850' : 'bg-navy-900',
-                        )}
-                      >
-                        <th
-                          className={cn(
-                            'sticky left-0 z-10 px-3 py-2 text-left font-normal text-ink-muted',
-                            i % 2 ? 'bg-navy-850' : 'bg-navy-900',
-                          )}
-                        >
-                          <span className="inline-flex items-center gap-1.5">
-                            {row.label}
-                            {row.help && <Hint text={row.help} />}
-                          </span>
-                        </th>
-                        {chosen.map((s) => {
-                          const isBest = target !== null && row.value(s) === target;
-                          return (
-                            <td
-                              key={s.id}
-                              className={cn('num px-3 py-2', row.tone, isBest && 'font-bold')}
-                            >
-                              {row.label === 'Score' ? (
-                                <span
-                                  className="inline-block min-w-8 border border-black px-1 text-center font-bold text-black"
-                                  style={{ background: scoreColor(s.score) }}
-                                >
-                                  {row.fmt(s)}
-                                </span>
-                              ) : (
-                                row.fmt(s)
-                              )}
-                              {isBest && <span className="text-accent ml-1">★</span>}
-                            </td>
-                          );
-                        })}
-                      </tr>
-                    );
-                  })}
-                  <tr className="border-edge border-t">
-                    <th className="text-ink-muted px-3 py-2 text-left font-normal">Hard filters</th>
-                    {chosen.map((s) => (
-                      <td
-                        key={s.id}
-                        className={cn('px-3 py-2 font-bold', s.valid ? 'text-good' : 'text-bad')}
-                      >
-                        {s.valid ? '✔ Pass' : '✖ Fail'}
-                      </td>
-                    ))}
-                  </tr>
-                </tbody>
-              </table>
+            <div className="grid items-start gap-3 md:grid-cols-3">
+              {chosen.map((site) => (
+                <SiteColumn key={site.id} site={site} />
+              ))}
             </div>
           )}
         </div>
@@ -261,6 +125,67 @@ export default function ComparePage() {
   );
 }
 
+function SiteColumn({ site }: { site: Site }) {
+  const pro = useAppStore((s) => s.proMode);
+  const ts = useTimeseries(site.id);
+  const now = useAppStore((s) => s.currentTimeUTC);
+  const sample = ts ? sampleAt(ts, now) : null;
+  const sunEl = sample ? sample.sun_el : 2;
+  const bars = [
+    { label: 'Score', value: Math.round(site.score * 100), text: String(Math.round(site.score * 100)) },
+    ...METRICS.flatMap((m) => {
+      const goodness = m.goodness(site.metrics);
+      if (goodness === null) return [];
+      return [
+        {
+          label: pro ? m.proLabel : m.label,
+          value: Math.round(goodness * 100),
+          text: m.format(site.metrics, pro),
+        },
+      ];
+    }),
+  ];
+
+  return (
+    <article className="border-edge flex flex-col gap-3 border bg-black p-3">
+      <SiteMoon lat={site.lat} lon={site.lon} sunEl={sunEl} label={site.name} />
+      <div>
+        <h3 className="text-[15px] font-medium text-heading">{site.name}</h3>
+        <p className="text-ink-muted mt-1 text-[12px]">
+          {sample ? (
+            <>
+              <span className="text-sun">{sample.lit ? 'Sun up' : 'Sun down'}</span>
+              {' · '}
+              <span className="text-earth">
+                {sample.earthVisible === null
+                  ? 'Earth unknown'
+                  : sample.earthVisible
+                    ? 'Earth in view'
+                    : 'Earth hidden'}
+              </span>
+            </>
+          ) : (
+            'Loading the sky…'
+          )}
+        </p>
+      </div>
+      <ul className="flex flex-col gap-2">
+        {bars.map((bar) => (
+          <li key={bar.label}>
+            <div className="text-ink-muted mb-1 flex items-baseline justify-between gap-2 text-[11px]">
+              <span>{bar.label}</span>
+              <span className="num text-ink">{bar.text}</span>
+            </div>
+            <div className="bg-navy-950 h-1.5" aria-hidden>
+              <div className="bg-sun h-full" style={{ width: `${Math.min(100, Math.max(0, bar.value))}%` }} />
+            </div>
+          </li>
+        ))}
+      </ul>
+    </article>
+  );
+}
+
 function TimelineRow({ site }: { site: Site }) {
   const ts = useTimeseries(site.id);
   const range = useData((s) => s.manifest?.time_range);
@@ -271,15 +196,16 @@ function TimelineRow({ site }: { site: Site }) {
     [ts],
   );
   const sample = ts ? sampleAt(ts, currentTimeUTC) : null;
-  const toSun = ts ? hoursUntilChange(ts, ts.lit, currentTimeUTC) : null;
-  const toEarth = ts?.earth_visible ? hoursUntilChange(ts, ts.earth_visible, currentTimeUTC) : null;
+  const toSun = nextChange(ts, ts?.lit, currentTimeUTC);
+  const toEarth = nextChange(ts, ts?.earth_visible, currentTimeUTC);
 
   const t0 = range ? Date.parse(range.start_utc) : 0;
   const t1 = range ? Date.parse(range.end_utc) : 1;
   const pos = Math.min(1, Math.max(0, (Date.parse(currentTimeUTC) - t0) / (t1 - t0 || 1)));
   const proMode = useAppStore((s) => s.proMode);
-  const when = (h: number | null) =>
-    h === null ? 'not in this window' : proMode ? formatHours(h) : friendlyHours(h);
+  const span = ts ? seriesSpanLabel(ts) : '';
+  const when = (n: NextChange) =>
+    changeWhen(n, span, (h) => (proMode ? formatHours(h) : friendlyHours(h)));
 
   return (
     <div className="grid items-center gap-x-3 gap-y-1 sm:grid-cols-[150px_minmax(0,1fr)_210px]">
@@ -296,12 +222,13 @@ function TimelineRow({ site }: { site: Site }) {
       <span className="text-ink-muted text-[11px]">
         {sample ? (
           <>
-            <span className="text-sun">{sample.lit ? 'Sunset' : 'Sunrise'}</span> {when(toSun)}
+            <span className="text-sun">{changeLead(sample.lit ? 'Sunset' : 'Sunrise', toSun)}</span>{' '}
+            {when(toSun)}
             {sample.earthVisible !== null && (
               <>
                 {', '}
                 <span className="text-earth">
-                  {sample.earthVisible ? 'Earthset' : 'Earthrise'}
+                  {changeLead(sample.earthVisible ? 'Earthset' : 'Earthrise', toEarth)}
                 </span>{' '}
                 {when(toEarth)}
               </>

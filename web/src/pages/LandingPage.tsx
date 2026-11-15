@@ -1,49 +1,9 @@
 import { Link, useNavigate } from 'react-router';
 import { useAppStore, useData, useSelectedSite } from '@/core';
+import { figureSrc } from '@/core/shell/Figure';
 import { SpinningMoon } from '@/intro/SpinningMoon';
 
-const PLACES: { to: string; title: string; line: string }[] = [
-  {
-    to: '/explore',
-    title: 'Explore',
-    line: 'Open the south-pole map, turn layers on, and pick a site.',
-  },
-  {
-    to: '/compare',
-    title: 'Compare',
-    line: 'Put two or three sites side by side and see which one wins.',
-  },
-  {
-    to: '/game',
-    title: 'Mission',
-    line: 'A landing site just fell through. Choose another and watch the days play out.',
-  },
-  {
-    to: '/learn',
-    title: 'Learn',
-    line: 'Why a few kilometres of ground decide power and a call home.',
-  },
-  {
-    to: '/sites',
-    title: 'All sites',
-    line: 'The full list, with a score out of 100 for each one.',
-  },
-  {
-    to: '/streetview',
-    title: 'Street View',
-    line: 'Stand on the ground and watch the Sun and Earth move.',
-  },
-  {
-    to: '/about',
-    title: 'Data and method',
-    line: 'Where the numbers come from, and what is still mock data.',
-  },
-];
-
-/**
- * Home is a landing page: a short pitch and the live map, then buttons for every page.
- * The header and the footer carry the same trips on every other screen.
- */
+/** Home: the question, the Moon, and the two photos that explain the south pole. */
 export function LandingPage() {
   const sites = useData((s) => s.sites);
   const selected = useSelectedSite();
@@ -52,7 +12,6 @@ export function LandingPage() {
     : null;
   const site = selected ?? best;
   const navigate = useNavigate();
-  const proMode = useAppStore((s) => s.proMode);
   const selectSite = useAppStore((s) => s.selectSite);
 
   const openMap = () => {
@@ -80,8 +39,8 @@ export function LandingPage() {
             >
               Explore the map
             </button>
-            <Link to="/game" className="btn h-[44px] px-6 text-[13px]">
-              Play Mission
+            <Link to="/streetview" className="btn h-[44px] px-6 text-[13px]">
+              Stand on a site
             </Link>
           </div>
         </div>
@@ -91,27 +50,39 @@ export function LandingPage() {
         </div>
       </section>
 
-      {proMode && (
-        <section aria-labelledby="places-heading">
-          <h2 id="places-heading" className="text-[18px] tracking-[0.12em] uppercase">
-            All pages
-          </h2>
-          <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {PLACES.map((place) => (
-              <Link
-                key={place.to}
-                to={place.to}
-                className="box hover:border-edge-lo flex flex-col px-5 py-4 transition-colors duration-150"
-              >
-                <span className="text-heading font-mono text-[15px] font-bold tracking-[0.08em] uppercase">
-                  {place.title}
-                </span>
-                <span className="text-ink-muted mt-1 text-[14px] leading-snug">{place.line}</span>
-              </Link>
-            ))}
-          </div>
-        </section>
-      )}
+      <section
+        aria-label="The two things a south-pole site needs"
+        className="mx-auto grid w-full max-w-4xl grid-cols-1 items-stretch justify-center gap-4 sm:grid-cols-2"
+      >
+        <figure className="box flex h-full flex-col overflow-hidden">
+          <img
+            src={figureSrc('ridge-shadow.jpg')}
+            alt="A long shadow cast across the ground near Shackleton crater."
+            className="h-64 w-full bg-black object-cover object-center sm:h-72"
+          />
+          <figcaption className="text-ink-muted flex-1 px-4 py-3 text-[14px] leading-snug">
+            Near Shackleton, the low Sun throws a shadow across the ground. Step into it and the
+            power goes.{' '}
+            <Link to="/learn#sun" className="lnk">
+              Why the light is so uneven
+            </Link>
+          </figcaption>
+        </figure>
+        <figure className="box flex h-full flex-col overflow-hidden">
+          <img
+            src={figureSrc('south-pole-sunlight.jpg')}
+            alt="The lunar south pole in low sunlight, with Shackleton and de Gerlache labeled."
+            className="h-64 w-full bg-black object-cover object-center sm:h-72"
+          />
+          <figcaption className="text-ink-muted flex-1 px-4 py-3 text-[14px] leading-snug">
+            Shackleton and de Gerlache under that same low Sun. Lit ground and darkness sit side by
+            side.{' '}
+            <Link to="/learn#pole" className="lnk">
+              Why the south pole
+            </Link>
+          </figcaption>
+        </figure>
+      </section>
     </div>
   );
 }
