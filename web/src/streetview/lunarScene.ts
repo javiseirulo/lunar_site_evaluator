@@ -25,7 +25,17 @@ export interface Observer {
   lat: number;
   lon: number;
 }
+export class MissingSurfaceHeight extends Error {
+  constructor(
+    readonly nearby?: Observer,
+    readonly distanceM = 0,
+  ) {
+    super('Surface height unavailable');
+  }
+}
+
 export interface SceneCallbacks {
+  findNearbyGround?: boolean;
   ground: (height: number) => void;
   error: () => void;
   observer: (point: Observer) => void;
@@ -218,7 +228,7 @@ export async function createLunarScene(
         window.clearTimeout(timer);
       }
     };
-    const sampleGround = async (points: Observer[]) => {
+    const probeGround = async (points: Observer[]) => {
       // Start the radial ray above the Moon's highest peaks, beyond Cesium's
       // Earth-oriented 9 km default ray origin. The returned height is unchanged.
       const sampled = await withDeadline(
@@ -227,8 +237,11 @@ export async function createLunarScene(
         ),
       );
       if (disposed) throw new DOMException('Cancelled', 'AbortError');
-      if (sampled.some((p) => !Number.isFinite(p?.height)))
-        throw new Error('Surface height unavailable');
+      return sampled;
+    };
+    const sampleGround = async (points: Observer[]) => {
+      const sampled = await probeGround(points);
+      if (sampled.some((p) => !Number.isFinite(p?.height))) throw new MissingSurfaceHeight();
       return sampled.map((p) => p!.height);
     };
     // Place the camera on tiles already in view, instead of waiting for the leaf tiles.
@@ -251,7 +264,24 @@ export async function createLunarScene(
     const quick = viewer.scene.sampleHeight(
       C.Cartographic.fromDegrees(observer.lon, observer.lat, 30_000),
     );
-    ground = Number.isFinite(quick) ? quick! : (await sampleGround([observer]))[0]!;
+    try {
+      ground = Number.isFinite(quick) ? quick! : (await sampleGround([observer]))[0]!;
+    } catch (error) {
+      if (!(error instanceof MissingSurfaceHeight) || !callbacks.findNearbyGround) throw error;
+      // Sample distinct points within 43 m. Keep the requested observer until the
+      // visitor explicitly opens a measured alternative; never fill a missing height.
+      const candidates: Observer[] = [];
+      for (const dLat of [0.001, -0.001]) {
+        const lat = observer.lat + dLat;
+        if (Math.abs(lat) > 90) continue;
+        for (const dLon of [-0.001, 0.001]) {
+          candidates.push({ lat, lon: ((observer.lon + dLon + 540) % 360) - 180 });
+        }
+      }
+      const nearby = await probeGround(candidates);
+      const point = candidates[nearby.findIndex((p) => Number.isFinite(p?.height))];
+      throw new MissingSurfaceHeight(point, point ? surfaceDistance(observer, point) : 0);
+    }
     let exactGround = ground;
     callbacks.ground(ground);
     // Sharpen after the first picture. Leaf tiles (error 1) are what made the wait so long.

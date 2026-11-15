@@ -230,6 +230,9 @@ function ObserverView({ siteId }: { siteId: string }) {
                 onReturn={returnToMap}
                 onObserver={onObserver}
                 onView={onView}
+                nearbyHref={(point) =>
+                  makeViewLink(new URL(window.location.href), 'free', point, time, view)
+                }
                 onGround={setMeshGround}
               />
             </Suspense>

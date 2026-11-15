@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import type { ViewerSky } from './sky';
 import type { Observer, LunarScene } from './lunarScene';
-import { createLunarScene } from './lunarScene';
+import { MissingSurfaceHeight, createLunarScene } from './lunarScene';
 import { lightingState } from './navigation';
 import type { LabelLayout } from './landmarks';
 import { DEFAULT_VIEW, type ViewState } from './viewLink';
@@ -18,6 +18,7 @@ interface Props {
   onView: (state: ViewState) => void;
   onGround: (height: number) => void;
   onReturn: () => void;
+  nearbyHref: (point: Observer) => string;
 }
 const lightText = {
   unknown: 'Solar state unavailable',
@@ -35,7 +36,9 @@ export default function LunarViewport({
   onView,
   onGround,
   onReturn,
+  nearbyHref,
 }: Props) {
+  const [missing, setMissing] = useState<MissingSurfaceHeight | null>(null);
   const [savePoint, setSavePoint] = useState<Observer | null>(null);
   const container = useRef<HTMLDivElement>(null);
   const scene = useRef<LunarScene | null>(null);
@@ -92,6 +95,7 @@ export default function LunarViewport({
           latest.current.onGround(value);
         },
         error: fail,
+        findNearbyGround: true,
         hint: setHint,
         labels: setLabels,
         save: setSavePoint,
@@ -119,9 +123,12 @@ export default function LunarViewport({
         instance.setSky(latest.current.sample);
         setStatus('ready');
       })
-      .catch(() => {
+      .catch((error: unknown) => {
         window.clearTimeout(timeout);
-        if (!abort.signal.aborted) setStatus('error');
+        if (!abort.signal.aborted) {
+          setMissing(error instanceof MissingSurfaceHeight ? error : null);
+          setStatus('error');
+        }
       });
     return () => {
       window.clearTimeout(timeout);
@@ -156,10 +163,20 @@ export default function LunarViewport({
           ) : (
             <>
               <p>Could not load the lunar surface.</p>
-              <small>Check network, WebGL and token access to Cesium Moon.</small>
+              <small>
+                {missing
+                  ? 'Cesium Moon returned no surface height at these coordinates.'
+                  : 'Check network, WebGL and token access to Cesium Moon.'}
+              </small>
+              {missing?.nearby && (
+                <a className="btn" href={nearbyHref(missing.nearby)}>
+                  Open sampled ground {Math.round(missing.distanceM)} m away
+                </a>
+              )}
               <button
                 className="btn"
                 onClick={() => {
+                  setMissing(null);
                   setStatus('loading');
                   setHeight(initialCamera.current.height);
                   setReading(false);
