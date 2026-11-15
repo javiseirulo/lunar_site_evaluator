@@ -87,6 +87,14 @@
   - Decisiones de Marta: sin triángulo encima de un candidato visible (su tarjeta muestra "Past landing"); 7 misiones más (Luna 13, Luna 20, Surveyor 3/5/6/7, HAKUTO-R M2) → 32; contador "32 sites (5 crashes) · 2 south of 80°S"; el interruptor reintenta la carga tras un error.
 
 ## 2026-11-15 — Sesión 5: v2 del globo (#92, rama `martaplatero2002-star/92-polar-patch`)
-- Datos revisados: `terrain/heightmap.json` (1025×1025, vértices, ±304006 m, LDEM_80S_80MPP_ADJ) y `ephem/index.json` cuadran con sus cabeceras. **Falta `terrain/valid.u8`** (citado en la cabecera): se usa el NaN de `heights.f32` como máscara — avisar a Pablo. El core carga `web/public/data/layers.json` (mock), no `terrain/layers.json` (real) — pedir a Javi2. `@/ephem` ya interpola el Sol (`sunDirectionMoonME`): se reutiliza.
+- Datos revisados: `terrain/heightmap.json` (1025×1025, vértices, ±304006 m, LDEM_80S_80MPP_ADJ) y `ephem/index.json` cuadran con sus cabeceras. `terrain/valid.u8` sí está (corregido: al principio lo di por ausente); se usa como máscara y, si faltara, el NaN de `heights.f32`. El core carga `web/public/data/layers.json` (mock), no `terrain/layers.json` (real) — pedir a Javi2. `@/ephem` ya interpola el Sol (`sunDirectionMoonME`): se reutiliza.
 - Paso 0: `isCandidateSite` (missionStats) + `useCandidates` solo con `kind: "candidate"`: Explore pasa de 59 a 39 sitios. Con batería 20 000 Wh / 50 W (400 h) no pasa ninguno; con 50 000 Wh, 26 de 39; con 200 000 Wh, 39.
 - Paso 1: luz según la fecha. `sunLight.ts` (+6 tests): `moonMeToThree` = (X, Z, −Y), cobertura 2026–2055 desde `ephem/index.json`, estado ok / loading / no_ephemeris. `@/ephem` de Javi carga el año (caché) e interpola el Sol; no se duplica. En el globo: luz direccional en la dirección del Sol del Mission Clock, ambiente 0,04 (sin atmósfera); sin efemérides → luz fija y aviso "No ephemeris for this date · fixed lighting". Comprobado: al abrir el 3D solo se descargan `ephem/index.json` y `ephem/2027.bin`. Línea día/noche con Play: sin comprobar visualmente (panel oculto).
+
+### Paso 2 — parche polar 3D (2026-11-15)
+- `terrain.ts`: inversa estereográfica polar sur, rejilla de la cabecera, altura bilineal y `buildPatchArrays` (radio (R+h·exag)/R, solo triángulos con los 3 vértices válidos, normales hacia fuera). 10 tests.
+- `terrainStore.ts`: carga perezosa de `heightmap.json` + `heights.f32` + `valid.u8` (opcional; detecta el index.html que Vite devuelve si falta). Se dispara al acercar la cámara al polo (<1.8, mirando al sur) o con el marcador del polo.
+- `PolarPatch.tsx`: malla gris mate (#8c8c8c, sin hillshade), 513² por defecto (paso 2), "High detail" 1025². Mientras está cargado, la esfera texturizada se corta al sur de −80° (thetaLength + 0.05° de solape, UV corregidas).
+- `PatchControls.tsx`: interruptores High detail / Vertical ×2 y etiqueta "Vertical exaggeration ×2 (shadows not to scale)".
+- Medido en el navegador: descarga ~96 ms en local; construir la malla 513² = 410 k triángulos en ~160 ms, 1025² = 1,64 M triángulos en ~460 ms. FPS sin medir (el panel del navegador estaba oculto): pendiente de que Marta lo vea.
+

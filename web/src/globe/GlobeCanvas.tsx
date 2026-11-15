@@ -33,6 +33,7 @@ import {
   Color,
   DoubleSide,
   Group,
+  SphereGeometry,
   MOUSE,
   Mesh,
   SRGBColorSpace,
@@ -46,6 +47,9 @@ import { useCustomPins } from './customPins';
 import { latLonToVec3, vec3ToLatLon } from './geo';
 import { HistoricControls } from './HistoricControls';
 import { useSunDirection } from './sunLight';
+import { PatchTrigger, PolarPatch } from './PolarPatch';
+import { EXAGGERATION_LABEL, PatchControls } from './PatchControls';
+import { loadTerrain, useTerrain } from './terrainStore';
 import { OUTCOME_COLORS, loadHistoricSites, useHistoric } from './historicSites';
 import { useRequirements } from './requirementsStore';
 import { useCandidates } from './useCandidates';
@@ -65,6 +69,8 @@ const POLE_VIEW = { lat: -89, distance: 1.3 };
 /** Camera distance from the Moon's centre after flying to a pin added by coordinates. */
 const PIN_VIEW_DISTANCE = 1.4;
 const INITIAL_CAMERA = latLonToVec3(-30, 0, 3);
+/** Degrees the cut sphere keeps past the terrain edge, so no gap opens between them. */
+const CAP_OVERLAP_DEG = 0.05;
 /** Light used when there is no ephemeris for the Mission Clock date. */
 const FIXED_LIGHT: [number, number, number] = [4, 1.5, 3];
 /** Camera never closer than this to the Moon's centre (surface = 1). */
@@ -98,6 +104,7 @@ export default function GlobeCanvas() {
   const now = useAppStore((s) => s.currentTimeUTC);
   const sun = useSunDirection(now);
   const sunDir = sun.dir;
+  const exaggerated = useTerrain((s) => s.status === 'ready' && s.exaggeration === 2);
 
   const sites = useData((s) => s.sites);
   const { evaluations, topRank } = useCandidates();
@@ -222,6 +229,11 @@ export default function GlobeCanvas() {
             setFocus(null);
           }}
         />
+        <PolarPatch
+          onSurfaceClick={(lat, lon) => setFocus({ kind: 'point', lat, lon })}
+          clickTolerancePx={CLICK_TOLERANCE_PX}
+        />
+        <PatchTrigger />
         <PoleMarker flightRef={flightRef} />
         <OrbitControls
           ref={controlsRef}
@@ -246,7 +258,16 @@ export default function GlobeCanvas() {
           }}
         />
         <HistoricControls />
+        <PatchControls />
       </div>
+      {exaggerated && (
+        <div
+          role="note"
+          className="pointer-events-none absolute bottom-2 left-2 rounded-[2px] bg-black/70 px-2 py-1 text-[11px] text-white"
+        >
+          {EXAGGERATION_LABEL}
+        </div>
+      )}
       {sun.status === 'no_ephemeris' && (
         <div
           role="status"
@@ -288,15 +309,31 @@ function Moon({
     t.anisotropy = 8;
   });
   useEffect(onReady, [onReady]);
+  // While the polar terrain is loaded, cut the textured sphere's cap south of the patch edge
+  // (with a sliver of overlap) so it never shows through the terrain.
+  const patchReady = useTerrain((s) => s.status === 'ready');
+  const latLimit = useTerrain((s) => s.header?.lat_limit ?? -80);
+  const geometry = useMemo(() => {
+    const thetaLength = patchReady ? ((90 - latLimit + CAP_OVERLAP_DEG) * Math.PI) / 180 : Math.PI;
+    const g = new SphereGeometry(1, 128, 64, 0, Math.PI * 2, 0, thetaLength);
+    if (thetaLength < Math.PI) {
+      // SphereGeometry stretches v over thetaLength; put it back to the full texture's latitude.
+      const uv = g.getAttribute('uv');
+      for (let i = 0; i < uv.count; i++) uv.setY(i, 1 - ((1 - uv.getY(i)) * thetaLength) / Math.PI);
+      uv.needsUpdate = true;
+    }
+    return g;
+  }, [patchReady, latLimit]);
+  useEffect(() => () => geometry.dispose(), [geometry]);
   return (
     <mesh
+      geometry={geometry}
       onClick={(e) => {
         if (e.delta > CLICK_TOLERANCE_PX) return; // it was a drag (pan/rotate)
         const [lat, lon] = vec3ToLatLon(e.point.x, e.point.y, e.point.z);
         onSurfaceClick(lat, lon);
       }}
     >
-      <sphereGeometry args={[1, 128, 64]} />
       <meshStandardMaterial map={texture} roughness={1} metalness={0} />
     </mesh>
   );
@@ -741,6 +778,7 @@ function PoleMarker({ flightRef }: { flightRef: FlightRef }) {
           onClick={(e) => {
             e.stopPropagation();
             flightRef.current = new Vector3(); // azimuth filled in by CameraRig
+            void loadTerrain(); // the polar terrain loads on demand
           }}
         >
           {matching === null ? 'South Pole' : `South Pole · ${matching} matching`}
