@@ -10,6 +10,7 @@ import type { CustomPin } from './customPins';
 import { coordsForClipboard } from './geo';
 import { KIND_LABELS, OUTCOME_COLORS, OUTCOME_LABELS } from './historicSites';
 import { PAPER } from './paper';
+import { PointStatsView } from './PointStatsView';
 
 export type CardContent =
   /** rank: 1–5 in the top five; summary: "Meets X of Y requirements"; note: first unmet check. */
@@ -129,9 +130,7 @@ export function GlobeCard({
         )}
         {content.kind === 'custom' && (
           <>
-            <p className="text-ink-faint text-[12px]">
-              Your pin. No sunlight or Earth data for this exact point yet.
-            </p>
+            <PointStatsView point={content.pin} />
             <button
               type="button"
               className="btn h-[28px] self-start px-2 text-[12px]"
@@ -141,6 +140,7 @@ export function GlobeCard({
             </button>
           </>
         )}
+        {content.kind === 'point' && <PointStatsView point={content} />}
         {content.kind === 'point' && (
           <button
             type="button"

@@ -58,6 +58,7 @@ import { flightAt, planFlight, type Flight } from './flight';
 import { useSunDirection } from './sunLight';
 import { NIGHT_FILL, useNightLayer } from './nightLayer';
 import { Terminator } from './DayNight';
+import { ComparePoints } from './ComparePoints';
 import { LayersMenu } from './LayersMenu';
 import { PatchTrigger, PolarPatch, SunLight } from './PolarPatch';
 import { ActiveLegend } from '@/layers';
@@ -327,6 +328,7 @@ export default function GlobeCanvas() {
       </div>
       {/* Javi: legend of the active map layers (Expert only, like the layers panel). */}
       {expert && <ActiveLegend className="pointer-events-none absolute top-2 right-2" />}
+      <ComparePoints className="absolute right-2 bottom-10 z-[50]" />
       {exaggerated && (
         <div
           role="note"
