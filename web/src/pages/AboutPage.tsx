@@ -180,9 +180,12 @@ export default function AboutPage() {
               Use of AI
             </h2>
             <p className="text-ink-muted">
-              The project idea comes from the team. AI coding assistants were used to help write
-              parts of the code and documentation; the full log is in the repository
-              (docs/si-usage-log.md).
+              The project idea comes from the team. AI tools helped build it: Claude Code
+              (Anthropic) and OpenAI Codex helped write parts of the code and documentation, and the
+              Mission game illustrations were generated with OpenAI Codex image generation and the
+              3D lander model was generated with Claude. The full log is in the repository
+              (docs/si-usage-log.md). The scientific data come from NASA and other public sources
+              listed above; none of the AI output uses NASA logos or mission identifiers.
             </p>
           </section>
 
