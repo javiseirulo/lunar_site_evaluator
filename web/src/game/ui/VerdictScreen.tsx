@@ -7,12 +7,13 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
 import { Star } from 'lucide-react';
 import { clsx } from 'clsx';
-import { useData } from '@/core';
+import { useData, useTimeseries } from '@/core';
 import { CAUSE_BAR, qualityBars } from '../engine/bars';
 import { DEFAULT_REQUIREMENTS } from '../engine/requirements';
 import { sfx } from '../audio/sfx';
 import { useGame } from '../state/gameStore';
 import { verdictImage } from './assets';
+import { CoachPanel } from './CoachPanel';
 import { CAUSE_HEADLINE, lessonFor } from './content';
 import { GameButtons } from './GameButtons';
 import { countUp } from './format';
@@ -126,6 +127,7 @@ export function VerdictScreen() {
   const difficulty = useGame((s) => s.difficulty);
   const card = hand?.cards.find((c) => c.slot === chosenSlot);
   const site = sites?.find((s) => s.id === card?.siteId);
+  const ts = useTimeseries(card?.siteId);
 
   if (!card) {
     return (
@@ -236,6 +238,9 @@ export function VerdictScreen() {
               ))}
             </div>
           </div>
+        )}
+        {v.win && v.stars < 3 && (
+          <CoachPanel site={site} ts={ts} startIndex={hand?.startIndex ?? 0} verdict={v} />
         )}
         {survivors && <p className="text-good text-[12.5px] font-bold">{survivors}</p>}
         <div className="border-2 border-black bg-black/50 p-2 text-[12px] text-ink">
