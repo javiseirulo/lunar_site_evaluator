@@ -19,7 +19,7 @@ export function embedSceneOptions(
   hideLabels: boolean,
   interactive: EmbedInteraction,
 ): Required<SceneOptions> {
-  return { names: !hideLabels, walk: interactive === 'walk' };
+  return { names: !hideLabels, walk: interactive === 'walk', detail: 'full' };
 }
 
 /** Starting camera: the default eye height and field of view, facing `heading` (deg from N). */

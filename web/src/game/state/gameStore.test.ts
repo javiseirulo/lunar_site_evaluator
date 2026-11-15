@@ -44,7 +44,7 @@ describe('useGame phase machine', () => {
     g().endIntro();
     expect(g().phase).toBe('alert');
     expect(g().deadline).toBe(0); // the clock waits for the cards
-    expect(COUNTDOWN_MS).toBe(180_000);
+    expect(COUNTDOWN_MS).toBe(60_000);
     toDealing();
     expect(g().phase).toBe('dealing');
     expect(g().deadline).toBe(0);

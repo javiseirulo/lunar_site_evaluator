@@ -3,7 +3,7 @@
  * Pure DOM content; GlobeCanvas places it in the 3D scene with a drei <Html>.
  */
 import { useEffect, useState, type FormEventHandler, type ReactNode } from 'react';
-import { Check, Copy, MapPinPlus, Trash2, X } from 'lucide-react';
+import { Check, Copy, ListPlus, Trash2, X } from 'lucide-react';
 import type { HistoricSite, Site } from '@lunar/contracts';
 import { formatLatLon } from '@/core';
 import type { CustomPin } from './customPins';
@@ -130,7 +130,10 @@ export function GlobeCard({
         )}
         {content.kind === 'custom' && (
           <>
-            <PointStatsView point={content.pin} />
+            <p className="text-ink-faint text-[12px]">
+              Your pin. Sunlight and Earth view are computed for this exact point (flat horizon).
+            </p>
+            <p className="text-heading text-[12px] font-medium">In your list</p>
             <button
               type="button"
               className="btn h-[28px] self-start px-2 text-[12px]"
@@ -147,7 +150,7 @@ export function GlobeCard({
             className="btn btn-go h-[28px] self-start px-2 text-[12px]"
             onClick={() => onCreatePin(lat, lon)}
           >
-            <MapPinPlus className="size-3.5" aria-hidden /> Create pin here
+            <ListPlus className="size-3.5" aria-hidden /> Add to list
           </button>
         )}
       </div>

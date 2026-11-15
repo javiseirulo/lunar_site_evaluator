@@ -11,9 +11,13 @@ describe('StreetViewEmbed helpers', () => {
   });
 
   it('hides names on request and walks only in walk mode', () => {
-    expect(embedSceneOptions(true, 'look-only')).toEqual({ names: false, walk: false });
-    expect(embedSceneOptions(false, 'walk')).toEqual({ names: true, walk: true });
-    expect(embedSceneOptions(true, 'walk')).toEqual({ names: false, walk: true });
+    expect(embedSceneOptions(true, 'look-only')).toEqual({
+      names: false,
+      walk: false,
+      detail: 'full',
+    });
+    expect(embedSceneOptions(false, 'walk')).toEqual({ names: true, walk: true, detail: 'full' });
+    expect(embedSceneOptions(true, 'walk')).toEqual({ names: false, walk: true, detail: 'full' });
   });
 
   it('starts at the default eye height facing a wrapped, clamped heading', () => {

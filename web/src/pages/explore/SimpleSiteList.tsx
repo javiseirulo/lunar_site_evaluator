@@ -1,15 +1,15 @@
 /**
- * Normal-mode site picker for Explore: every site, best first, one tap to select.
+ * Normal-mode site picker for Explore: every site, one tap to select.
  * Expert mode uses the requirements-driven list in `@/globe` instead.
  */
 import { useAppStore, useData } from '@/core';
-import { scoreColor } from '@/layers';
 import { cn } from '@/lib/utils';
+import { YourPoints } from '@/globe';
 
 export function SimpleSiteList({ className }: { className?: string }) {
   const sites = useData((s) => s.sites);
   const selectedSiteId = useAppStore((s) => s.selectedSiteId);
-  const selectSite = useAppStore((s) => s.selectSite);
+  const requestSelection = useAppStore((s) => s.requestSelection);
   if (!sites) return null;
   const sorted = [...sites].sort((a, b) => b.score - a.score);
 
@@ -21,6 +21,9 @@ export function SimpleSiteList({ className }: { className?: string }) {
       >
         Pick a site
       </h2>
+      <p className="text-ink-muted px-5 pb-2 text-[12px]">
+        Select a site to learn whether it works for the mission
+      </p>
       <ul className="max-h-[420px] overflow-y-auto px-2 pb-3">
         {sorted.map((s) => {
           const selected = s.id === selectedSiteId;
@@ -29,24 +32,28 @@ export function SimpleSiteList({ className }: { className?: string }) {
               <button
                 type="button"
                 aria-pressed={selected}
-                onClick={() => selectSite(selected ? null : s.id)}
+                onClick={() =>
+                  requestSelection(selected ? null : { kind: 'site', id: s.id, name: s.name })
+                }
                 className={cn(
                   'flex w-full items-center gap-2 px-3 py-[7px] text-left text-[14px]',
                   selected ? 'bg-warn text-black' : 'hover:bg-panel-2',
                 )}
               >
                 <span
-                  className="size-2.5 shrink-0 border border-black"
-                  style={{ background: scoreColor(s.score) }}
+                  className={cn(
+                    'size-2 shrink-0 border',
+                    selected ? 'border-black' : 'border-ink-muted',
+                  )}
                   aria-hidden
                 />
                 <span className="truncate">{s.name}</span>
-                <span className="num ml-auto text-[12px]">{Math.round(s.score * 100)}</span>
               </button>
             </li>
           );
         })}
       </ul>
+      <YourPoints />
     </section>
   );
 }

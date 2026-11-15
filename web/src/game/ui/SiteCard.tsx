@@ -3,15 +3,32 @@
  * real site name is never shown here ("Landing site N"), only in the verdict.
  */
 import { motion } from 'motion/react';
-import { Moon } from 'lucide-react';
 import { clsx } from 'clsx';
 import type { Site } from '@lunar/contracts';
 import { qualityBars, type Difficulty } from '../engine/bars';
 import type { Card } from '../engine/deal';
-import { CARD_BACK } from './assets';
 import type { DealTimeline } from './format';
 import { GameImage } from './GameImage';
 import { QualityBar } from './QualityBar';
+
+/** Fixed star field for the card back. Not an agency mark. */
+const STARS = [
+  [12, 18, 1.2],
+  [28, 40, 0.8],
+  [46, 14, 1.4],
+  [70, 32, 0.7],
+  [84, 58, 1.1],
+  [18, 72, 0.9],
+  [36, 88, 1.3],
+  [58, 70, 0.6],
+  [78, 86, 1],
+  [90, 22, 0.8],
+  [8, 48, 0.7],
+  [52, 46, 1.5],
+  [64, 12, 0.6],
+  [22, 28, 0.5],
+  [40, 60, 0.9],
+] as const;
 
 export type CardState = 'idle' | 'picked' | 'dismissed';
 
@@ -115,21 +132,15 @@ export function SiteCard(props: SiteCardProps) {
         {/* Back (face-down). */}
         <div
           aria-hidden
-          className="mission-pixel absolute inset-0 overflow-hidden border-4 border-black bg-navy-700 [backface-visibility:hidden] [transform:rotateY(180deg)]"
+          className="mission-pixel absolute inset-0 overflow-hidden border-4 border-black bg-black [backface-visibility:hidden] [transform:rotateY(180deg)]"
         >
-          <GameImage
-            src={CARD_BACK}
-            alt=""
-            className="absolute inset-0 size-full"
-            fallback={
-              <div className="absolute inset-0 bg-[repeating-linear-gradient(45deg,#15305c_0_10px,#0e2040_10px_20px)]" />
-            }
-          />
-          <div className="relative flex size-full flex-col items-center justify-center gap-3 p-3">
-            <div className="flex size-16 items-center justify-center rounded-full border-4 border-black bg-warn text-black">
-              <Moon className="size-8" aria-hidden />
-            </div>
-            <span className="border-2 border-black bg-black px-2 py-0.5 font-mono text-[12px] font-bold tracking-wider text-warn uppercase">
+          <svg viewBox="0 0 100 100" className="absolute inset-0 size-full">
+            {STARS.map(([x, y, r]) => (
+              <circle key={`${x}-${y}`} cx={x} cy={y} r={r} fill="#f4f7ff" />
+            ))}
+          </svg>
+          <div className="relative flex size-full items-end justify-center p-3">
+            <span className="border border-white/30 bg-black/70 px-2 py-0.5 font-mono text-[12px] font-bold tracking-wider text-white uppercase">
               {label}
             </span>
           </div>

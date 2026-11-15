@@ -49,10 +49,11 @@ import {
   Sprite,
   Vector3,
 } from 'three';
-import { useAppStore, useData } from '@/core';
+import { formatLatLon, useAppStore, useData } from '@/core';
 import { GlobeCard, type CardContent } from './GlobeCard';
 import { PinForm } from './PinForm';
 import { useCustomPins } from './customPins';
+import { removeCustomPin, useFlyRequest } from './pointList';
 import { latLonToVec3, vec3ToLatLon } from './geo';
 import { flightAt, planFlight, type Flight } from './flight';
 import { useSunDirection } from './sunLight';
@@ -182,6 +183,28 @@ export default function GlobeCanvas() {
     [],
   );
 
+  // A row picked in the "Your points" list: fly there and show that pin's card.
+  useEffect(
+    () =>
+      useFlyRequest.subscribe((s, prev) => {
+        const r = s.request;
+        if (!r || r === prev.request) return;
+        setFocus({ kind: 'custom', id: r.id });
+        const safeLat = Math.max(-89.5, Math.min(89.5, r.lat));
+        flightRef.current = new Vector3(...latLonToVec3(safeLat, r.lon, PIN_VIEW_DISTANCE));
+      }),
+    [],
+  );
+
+  // A clicked ground point becomes the free point right away, so the simulation can run for it.
+  const clickPoint = (lat: number, lon: number) => {
+    useAppStore
+      .getState()
+      .requestSelection({ kind: 'point', lat, lon, name: formatLatLon(lat, lon) }, () =>
+        setFocus({ kind: 'point', lat, lon }),
+      );
+  };
+
   const card = useMemo<CardContent | null>(() => {
     if (!focus) return null;
     const pastOf = (id: string) =>
@@ -216,9 +239,11 @@ export default function GlobeCanvas() {
   }, [focus, evaluations, topRank, sites, pins, historic, historicVisible]);
 
   const onSiteClick = (id: string) => {
-    const { selectedSiteId, selectSite } = useAppStore.getState();
-    if (selectedSiteId !== id) selectSite(id);
-    else if (focus?.kind === 'site' && focus.id === id) selectSite(null);
+    const { selectedSiteId, selectSite, requestSelection } = useAppStore.getState();
+    if (selectedSiteId !== id) {
+      const name = sites?.find((x) => x.id === id)?.name ?? id;
+      requestSelection({ kind: 'site', id, name });
+    } else if (focus?.kind === 'site' && focus.id === id) selectSite(null);
     else setFocus({ kind: 'site', id }); // selected, but the card showed something else
   };
 
@@ -243,7 +268,12 @@ export default function GlobeCanvas() {
 
   const createPin = (lat: number, lon: number, name?: string) => {
     const pin = addPin({ lat, lon, name });
-    setFocus({ kind: 'custom', id: pin.id });
+    // Shared free point (store `selectedPoint`) for the "any lat/lon" checks; never touches selectedSiteId.
+    useAppStore
+      .getState()
+      .requestSelection({ kind: 'point', lat, lon, name: pin.name }, () =>
+        setFocus({ kind: 'custom', id: pin.id }),
+      );
     return pin;
   };
 
@@ -251,7 +281,7 @@ export default function GlobeCanvas() {
     if (placingAstronaut) {
       setPlacingAstronaut(false);
       surfaceApiRef.current?.enter({ lat, lon });
-    } else setFocus({ kind: 'point', lat, lon });
+    } else clickPoint(lat, lon);
   };
 
   return (
@@ -291,7 +321,9 @@ export default function GlobeCanvas() {
           onClose={closeCard}
           onCreatePin={(lat, lon) => createPin(lat, lon)}
           onDeletePin={(id) => {
-            removePin(id);
+            const pin = pins.find((p) => p.id === id);
+            if (pin) removeCustomPin(pin);
+            else removePin(id);
             setFocus(null);
           }}
         />
@@ -318,16 +350,18 @@ export default function GlobeCanvas() {
         onArmed={setPlacingAstronaut}
       />
       <div className="absolute top-2 left-2 flex flex-col items-start gap-2">
-        {expert && (
-          <PinForm
-            onAdd={({ name, lat, lon }) => {
-              createPin(lat, lon, name);
-              // Fly above the new pin (avoid the exact pole, where the orbit is undefined).
-              const safeLat = Math.max(-89.5, Math.min(89.5, lat));
-              flightRef.current = new Vector3(...latLonToVec3(safeLat, lon, PIN_VIEW_DISTANCE));
-            }}
-          />
-        )}
+        {/* Coordinate entry is open in Normal too (kids can go anywhere); Normal only gets plainer wording. */}
+        <PinForm
+          buttonLabel={expert ? 'Pin by coordinates' : 'Go to coordinates'}
+          title={expert ? 'Pin by coordinates' : 'Go to coordinates'}
+          submitLabel={expert ? 'Add pin' : 'Go there'}
+          onAdd={({ name, lat, lon }) => {
+            createPin(lat, lon, name);
+            // Fly above the new pin (avoid the exact pole, where the orbit is undefined).
+            const safeLat = Math.max(-89.5, Math.min(89.5, lat));
+            flightRef.current = new Vector3(...latLonToVec3(safeLat, lon, PIN_VIEW_DISTANCE));
+          }}
+        />
         <PatchControls />
       </div>
       <div className="absolute bottom-2 left-2 z-[60]">
