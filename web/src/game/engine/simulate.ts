@@ -166,7 +166,7 @@ export function simulate(
     candidates.push({
       cause: 'blackout',
       at: blackout.exceedsAt,
-      detail: `Comms blackout lasted over ${req.max_blackout_h.threshold} h`,
+      detail: `Earth link lost for over ${req.max_blackout_h.threshold} h`,
     });
   }
   if (candidates.length > 0) {

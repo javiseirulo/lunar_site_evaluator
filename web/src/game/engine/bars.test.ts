@@ -38,40 +38,62 @@ const terrainPending = makeSite({ slope_deg: 0, psr_dist_km: 0 }, ['slope_deg', 
 const keys = (s: Site, d: Difficulty) => qualityBars(s, d).map((b) => b.key);
 
 describe('qualityBars', () => {
-  it('normal shows Sunlight, Earth view, Sun + Earth, and Slope only when it is real', () => {
+  it('normal shows Sunlight, Earth link, Longest dark, Longest blackout, and Slope only when it is real', () => {
     expect(keys(real, 'normal')).toEqual([
       'illum_pct',
       'earth_vis_pct',
-      'sun_earth_pct',
+      'max_dark_hours',
+      'max_blackout_hours',
       'slope_deg',
     ]);
-    expect(keys(terrainPending, 'normal')).toEqual(['illum_pct', 'earth_vis_pct', 'sun_earth_pct']);
+    expect(keys(terrainPending, 'normal')).toEqual([
+      'illum_pct',
+      'earth_vis_pct',
+      'max_dark_hours',
+      'max_blackout_hours',
+    ]);
   });
 
-  it('expert adds dark, blackout and icy craters, and omits pending metrics', () => {
+  it('expert adds Sun + Earth together and icy craters, and omits pending metrics', () => {
     expect(keys(real, 'expert')).toEqual([
       'illum_pct',
       'earth_vis_pct',
-      'sun_earth_pct',
-      'slope_deg',
       'max_dark_hours',
       'max_blackout_hours',
+      'slope_deg',
+      'sun_earth_pct',
       'psr_dist_km',
     ]);
     expect(keys(terrainPending, 'expert')).toEqual([
       'illum_pct',
       'earth_vis_pct',
-      'sun_earth_pct',
       'max_dark_hours',
       'max_blackout_hours',
+      'sun_earth_pct',
     ]);
+  });
+
+  it('every bar has a hint; only slope has a pass/fail tick', () => {
+    for (const b of qualityBars(real, 'expert')) {
+      expect(b.hint.length, b.key).toBeGreaterThan(10);
+      expect(b.pass, b.key).toBe(b.key === 'slope_deg' ? true : null);
+    }
+    const steep = qualityBars(makeSite({ slope_deg: 12 }), 'normal').find(
+      (b) => b.key === 'slope_deg',
+    );
+    expect(steep?.pass).toBe(false);
   });
 
   it('omits optional metrics the site does not have', () => {
     const old = makeSite({ max_blackout_hours: undefined, sun_earth_pct: undefined });
     expect(keys(old, 'expert')).not.toContain('max_blackout_hours');
     expect(keys(old, 'expert')).not.toContain('sun_earth_pct');
-    expect(keys(old, 'normal')).toEqual(['illum_pct', 'earth_vis_pct', 'slope_deg']);
+    expect(keys(old, 'normal')).toEqual([
+      'illum_pct',
+      'earth_vis_pct',
+      'max_dark_hours',
+      'slope_deg',
+    ]);
   });
 
   it('every label is in BAR_LABELS, in order, and the menu hint matches', () => {

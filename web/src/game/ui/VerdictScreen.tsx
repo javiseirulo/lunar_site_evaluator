@@ -1,9 +1,14 @@
-/** Result of the chosen card: stars on a win, cause + lesson on a loss, and the real site name. */
+/**
+ * Result of the chosen card: stars on a win, cause + lesson on a loss, and the real site name.
+ * The chosen card's bars come back with the deciding one highlighted, and a loss names the
+ * landing sites that would have survived.
+ */
 import { useEffect, useState, type ReactNode } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
 import { Star } from 'lucide-react';
 import { clsx } from 'clsx';
 import { useData } from '@/core';
+import { CAUSE_BAR, qualityBars } from '../engine/bars';
 import { DEFAULT_REQUIREMENTS } from '../engine/requirements';
 import { sfx } from '../audio/sfx';
 import { useGame } from '../state/gameStore';
@@ -12,15 +17,16 @@ import { CAUSE_HEADLINE, lessonFor } from './content';
 import { GameButtons } from './GameButtons';
 import { countUp } from './format';
 import { GameImage } from './GameImage';
-import { verdictSummary } from './reveal';
+import { QualityBar } from './QualityBar';
+import { survivorsLine, verdictSummary } from './reveal';
 
 const DAYS = DEFAULT_REQUIREMENTS.surface_days;
 const MISSION_HOURS = DAYS * 24;
 
-/** Three big stars, the middle one raised, filled up to `count`. */
 /** Seconds before star `n` (1-based) pops in. */
 const starDelay = (n: number) => 0.5 + n * 0.3;
 
+/** Three big stars, the middle one raised, filled up to `count`. */
 function Stars({ count }: { count: number }) {
   // One "pop" per earned star, in time with its spring.
   useEffect(() => {
@@ -114,6 +120,7 @@ export function VerdictScreen() {
   const hand = useGame((s) => s.hand);
   const chosenSlot = useGame((s) => s.chosenSlot);
   const sites = useData((s) => s.sites);
+  const difficulty = useGame((s) => s.difficulty);
   const card = hand?.cards.find((c) => c.slot === chosenSlot);
   const site = sites?.find((s) => s.id === card?.siteId);
 
@@ -128,6 +135,10 @@ export function VerdictScreen() {
 
   const v = card.verdict;
   const siteName = site?.name ?? card.siteId;
+  const bars = site ? qualityBars(site, difficulty) : [];
+  const decidingKey = v.win || !v.cause ? null : CAUSE_BAR[v.cause];
+  const runLoss = v.cause === 'cold' || v.cause === 'blackout';
+  const survivors = v.win ? null : survivorsLine(hand?.cards ?? []);
   // Shortfalls judged over the whole mission (failHour = last hour) did survive every hour.
   const hoursSurvived =
     v.win || v.failHour === null || v.failHour >= MISSION_HOURS - 1 ? MISSION_HOURS : v.failHour;
@@ -171,6 +182,9 @@ export function VerdictScreen() {
         {v.win ? (
           <>
             <Stars count={v.stars} />
+            <p className="text-ink-muted text-center font-mono text-[10.5px] tracking-wide">
+              ★ survived · ★★ good margins · ★★★ beat every objective
+            </p>
             <p className="text-[14px] font-bold text-white">
               Congratulations! The site you chose is fit for the mission!
             </p>
@@ -199,7 +213,26 @@ export function VerdictScreen() {
         </p>
         <p className="font-mono text-[11.5px] text-ink-muted">
           {verdictSummary(v.detail, v.win ? null : v.failHour, MISSION_HOURS, DAYS)}
+          {runLoss && ' Your week was harsher than the yearly average on the card.'}
         </p>
+        {bars.length > 0 && (
+          <div className="border-2 border-black bg-black/50 p-2">
+            <p className="text-ink-muted mb-1.5 font-mono text-[10px] tracking-wider uppercase">
+              Your card (Landing site {card.slot}, yearly averages)
+            </p>
+            <div className="grid grid-cols-1 gap-x-3 gap-y-1.5 sm:grid-cols-2">
+              {bars.map((b) => (
+                <QualityBar
+                  key={b.key}
+                  bar={b}
+                  showValue={difficulty === 'expert'}
+                  highlight={b.key === decidingKey}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+        {survivors && <p className="text-good text-[12.5px] font-bold">{survivors}</p>}
         <div className="border-2 border-black bg-black/50 p-2 text-[12px] text-ink">
           <span className="text-warn font-mono font-bold uppercase">Lesson: </span>
           {lessonFor(v.win ? null : v.cause)}

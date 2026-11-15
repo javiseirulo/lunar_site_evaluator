@@ -102,7 +102,7 @@ export function SiteCard(props: SiteCardProps) {
           />
           <div className="flex flex-col gap-1.5">
             {bars.map((b) => (
-              <QualityBar key={b.key} bar={b} />
+              <QualityBar key={b.key} bar={b} showValue={difficulty === 'expert'} />
             ))}
           </div>
           {clickable && (

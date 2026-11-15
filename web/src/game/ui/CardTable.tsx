@@ -85,9 +85,15 @@ export function CardTable() {
         {phase === 'dealing'
           ? 'Scanning reachable landing sites…'
           : picked !== null
-            ? `Landing site ${picked} locked in. Engines burning!`
-            : 'Pick one landing site: read the bars, trust the data. Keys 1–4 work too.'}
+            ? `Landing site ${picked} locked in. Descending…`
+            : 'Pick one landing site. Keys 1–4 work too.'}
       </p>
+      {phase === 'choosing' && picked === null && (
+        <p className="text-ink-muted mx-auto max-w-xl text-center text-[11.5px] leading-snug">
+          Bars show each site&apos;s average over a whole year. Your mission is one 7-day week.
+          Fuller and greener is safer.
+        </p>
+      )}
       <div className="grid grid-cols-2 gap-3 px-1 pt-5 pb-2 md:grid-cols-4">
         {cards.map((card, i) => (
           <SiteCard

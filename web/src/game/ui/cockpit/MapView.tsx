@@ -173,13 +173,13 @@ export function MapView({
         <div className="flex flex-col gap-2 border-2 border-black bg-black/40 p-2">
           <RunMeter
             icon={<Snowflake className="size-3.5" aria-hidden />}
-            label="Battery night"
+            label="Long night"
             value={darkRun}
             limit={darkLimit}
           />
           <RunMeter
             icon={<WifiOff className="size-3.5" aria-hidden />}
-            label="Comms blackout"
+            label="Earth link blackout"
             value={blackoutRun}
             limit={blackoutLimit}
           />

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { IN_GAME_PHASES } from '../state/gameStore';
-import { sharedSelectionFor, verdictSummary } from './reveal';
+import { sharedSelectionFor, survivorsLine, verdictSummary } from './reveal';
 
 describe('sharedSelectionFor', () => {
   it('never exposes a site before the verdict', () => {
@@ -38,5 +38,16 @@ describe('verdictSummary', () => {
     expect(verdictSummary('Mission complete: 90% sunlight', null, 168, 7)).toBe(
       'Mission complete: 90% sunlight.',
     );
+  });
+
+  it('survivorsLine names the winning landing sites', () => {
+    const c = (slot: number, win: boolean) => ({ slot, verdict: { win } });
+    expect(survivorsLine([c(1, false), c(2, true), c(3, false)])).toBe(
+      'Landing site 2 would have survived.',
+    );
+    expect(survivorsLine([c(1, true), c(2, false), c(3, true), c(4, true)])).toBe(
+      'Landing sites 1, 3 and 4 would have survived.',
+    );
+    expect(survivorsLine([c(1, false)])).toBeNull();
   });
 });

@@ -48,3 +48,17 @@ export function verdictSummary(
   if (failHour >= missionHours - 1) return `${head} Judged over the full ${days}-day mission.`;
   return `${head} Failed at hour ${failHour} of ${missionHours} (day ${dayOfMission(failHour, days)}).`;
 }
+
+/**
+ * After a loss: which landing sites of the hand would have survived, e.g. "Landing site 2
+ * would have survived." / "Landing sites 1 and 4 would have survived." null if none.
+ */
+export function survivorsLine(
+  cards: readonly { slot: number; verdict: { win: boolean } }[],
+): string | null {
+  const slots = cards.filter((c) => c.verdict.win).map((c) => c.slot);
+  if (slots.length === 0) return null;
+  if (slots.length === 1) return `Landing site ${slots[0]} would have survived.`;
+  const list = `${slots.slice(0, -1).join(', ')} and ${slots[slots.length - 1]}`;
+  return `Landing sites ${list} would have survived.`;
+}

@@ -1,8 +1,8 @@
 {
-  "slope": "Steep ground tips a lander over. Safe landing sites need gentle slopes, so always check the slope before committing.",
-  "cold": "Without sunlight the lander's batteries must keep heaters and electronics alive, and long polar nights drain them. Very cold sites are hard to survive.",
-  "blackout": "Near the pole, Earth can sit below the horizon for long stretches, cutting the radio link. A site that is often in view of Earth keeps communications open.",
-  "low_sun": "Solar panels need sunlight to make power. A site that stays dark for too long leaves the lander without energy.",
-  "low_comm": "Communication depends on how much of the time Earth is above the horizon. Poor visibility means a patchy link with mission control.",
-  "win": "Well done! You balanced slope, sunlight, temperature and Earth visibility, and the lander survived until the end of its window."
+  "slope": "Ground steeper than 10° tips the lander over. Check the Slope bar before you commit.",
+  "cold": "When the Sun is gone for more than 100 hours, batteries run out and heaters stop. Check 'Longest dark': long nights freeze landers.",
+  "blackout": "Earth can sit below the horizon near the pole. After more than 72 hours without a link, the mission is lost. Check 'Longest blackout'.",
+  "low_sun": "Solar panels need sunlight to make power. A site that stays dark for too long leaves the lander without energy. Needs the Sun at least 50% of the week.",
+  "low_comm": "The Earth link depends on how much of the time Earth is above the horizon. Poor visibility means a patchy link with mission control. Needs Earth in view at least 50% of the week.",
+  "win": "Well done! You balanced slope, sunlight, long nights and the Earth link, and the lander survived until the end of its window."
 }

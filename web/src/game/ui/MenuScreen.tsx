@@ -1,4 +1,4 @@
-/** Title screen: pick a mode (South Pole now, Historical later) and the difficulty. */
+/** Title screen: pick the difficulty, then a mode (South Pole now, Historical later). */
 import { Lock, Play } from 'lucide-react';
 import { clsx } from 'clsx';
 import { useData } from '@/core';
@@ -42,7 +42,37 @@ export function MenuScreen() {
         <h1 className="font-mono text-4xl font-bold tracking-[0.15em] text-white uppercase [text-shadow:4px_4px_0_#000]">
           Mission
         </h1>
+        <p className="mt-2 font-mono text-[12px] text-ink">
+          Pick a landing site in 3 minutes. Survive 7 days.
+        </p>
       </header>
+
+      <div className="relative flex flex-col items-center gap-2">
+        <span className="label">Difficulty</span>
+        <div
+          role="group"
+          aria-label="Difficulty"
+          className="mission-pixel flex border-2 border-black"
+        >
+          {DIFFICULTIES.map((d) => (
+            <button
+              key={d.id}
+              type="button"
+              aria-pressed={difficulty === d.id}
+              onClick={() => setDifficulty(d.id)}
+              className={clsx(
+                'min-h-10 cursor-pointer px-5 font-mono text-[12px] font-bold tracking-wider uppercase transition-colors focus-visible:outline-2 focus-visible:-outline-offset-4 focus-visible:outline-current',
+                difficulty === d.id
+                  ? 'bg-warn text-black'
+                  : 'bg-black text-ink-muted hover:text-white',
+              )}
+            >
+              {d.label}
+            </button>
+          ))}
+        </div>
+        <p className="text-ink-muted font-mono text-[11px]">{difficultyHint(difficulty, sample)}</p>
+      </div>
 
       <div className="relative grid w-full max-w-2xl grid-cols-1 gap-4 sm:grid-cols-2">
         <button
@@ -71,7 +101,7 @@ export function MenuScreen() {
         <button
           type="button"
           disabled
-          aria-describedby="mission-historical-soon"
+          aria-label="Historical missions (coming soon)"
           className="mission-pixel relative flex cursor-not-allowed flex-col border-4 border-black bg-navy-900 text-left opacity-60 grayscale"
         >
           <GameImage
@@ -93,33 +123,6 @@ export function MenuScreen() {
             Coming soon
           </span>
         </button>
-      </div>
-
-      <div className="relative flex flex-col items-center gap-2">
-        <span className="label">Difficulty</span>
-        <div
-          role="group"
-          aria-label="Difficulty"
-          className="mission-pixel flex border-2 border-black"
-        >
-          {DIFFICULTIES.map((d) => (
-            <button
-              key={d.id}
-              type="button"
-              aria-pressed={difficulty === d.id}
-              onClick={() => setDifficulty(d.id)}
-              className={clsx(
-                'min-h-10 cursor-pointer px-5 font-mono text-[12px] font-bold tracking-wider uppercase transition-colors focus-visible:outline-2 focus-visible:-outline-offset-4 focus-visible:outline-current',
-                difficulty === d.id
-                  ? 'bg-warn text-black'
-                  : 'bg-black text-ink-muted hover:text-white',
-              )}
-            >
-              {d.label}
-            </button>
-          ))}
-        </div>
-        <p className="text-ink-muted font-mono text-[11px]">{difficultyHint(difficulty, sample)}</p>
       </div>
     </div>
   );
