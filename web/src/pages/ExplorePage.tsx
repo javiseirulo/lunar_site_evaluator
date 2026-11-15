@@ -1,4 +1,4 @@
-import { Component, useEffect, useState, type ReactNode } from 'react';
+import { Component, useState, type ReactNode } from 'react';
 import { useAppStore } from '@/core';
 import { TimeBar } from '@/core/shell/TimeBar';
 import { SimChart } from '@/core/shell/SimChart';
@@ -113,9 +113,7 @@ function MapPage() {
 function LeftPanel() {
   const proMode = useAppStore((s) => s.proMode);
   const [tab, setTab] = useState<LeftTab>(proMode ? 'needs' : 'sites');
-  useEffect(() => {
-    if (!proMode && (tab === 'needs' || tab === 'window')) setTab('sites');
-  }, [proMode, tab]);
+  const shown: LeftTab = !proMode && (tab === 'needs' || tab === 'window') ? 'sites' : tab;
 
   const options: { id: LeftTab; label: string }[] = proMode
     ? [
@@ -130,24 +128,26 @@ function LeftPanel() {
       ];
 
   return (
-    <aside className={`${FRAME} pointer-events-auto flex max-h-[62%] min-h-0 w-full flex-col self-start overflow-hidden`}>
-      <Pages options={options} value={tab} onChange={setTab} />
+    <aside
+      className={`${FRAME} pointer-events-auto flex max-h-[62%] min-h-0 w-full flex-col self-start overflow-hidden`}
+    >
+      <Pages options={options} value={shown} onChange={setTab} />
       <div className="min-h-0 flex-1 overflow-hidden">
-        {tab === 'needs' && (
+        {shown === 'needs' && (
           <SiteList part="requirements" className={`${FLAT} h-full overflow-y-auto`} />
         )}
-        {tab === 'window' && (
+        {shown === 'window' && (
           <div className="h-full overflow-y-auto">
             <MissionTimingPanel className={FLAT} />
           </div>
         )}
-        {tab === 'sites' &&
+        {shown === 'sites' &&
           (proMode ? (
             <SiteList part="sites" className={`${FLAT} h-full`} />
           ) : (
             <SimpleSiteList className={`${FLAT} h-full`} />
           ))}
-        {tab === 'map' && <MapPage />}
+        {shown === 'map' && <MapPage />}
       </div>
     </aside>
   );
@@ -160,9 +160,6 @@ function RightPanel() {
   const selectedPoint = useAppStore((s) => s.selectedPoint);
   const hasSubject = Boolean(selectedSiteId || selectedPoint);
   const [tab, setTab] = useState<RightTab>('now');
-  useEffect(() => {
-    if (!hasSubject && tab !== 'now') setTab('now');
-  }, [hasSubject, tab]);
 
   const options: { id: RightTab; label: string }[] = [
     { id: 'now', label: 'Now' },
@@ -171,20 +168,17 @@ function RightPanel() {
       ? [{ id: 'check' as const, label: proMode || simulationStarted ? 'Check' : 'Mission' }]
       : []),
   ];
+  const shown: RightTab = options.some((o) => o.id === tab) ? tab : 'now';
 
   return (
     <aside
       className={`${FRAME} pointer-events-auto flex max-h-[62%] min-h-0 w-full flex-col self-start overflow-hidden md:col-start-3`}
     >
-      <Pages
-        options={options}
-        value={options.some((o) => o.id === tab) ? tab : 'now'}
-        onChange={setTab}
-      />
+      <Pages options={options} value={shown} onChange={setTab} />
       <div className="min-h-0 flex-1 overflow-y-auto">
-        {tab === 'now' && <SiteDetail className={`${FLAT} h-full`} />}
-        {tab === 'sun' && hasSubject && <SimChart className={`${FLAT} h-full`} />}
-        {tab === 'check' &&
+        {shown === 'now' && <SiteDetail className={`${FLAT} h-full`} />}
+        {shown === 'sun' && <SimChart className={`${FLAT} h-full`} />}
+        {shown === 'check' &&
           hasSubject &&
           (proMode || simulationStarted ? (
             <SiteCheckPanel simple={!proMode} className={`${FLAT} h-full`} />

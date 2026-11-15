@@ -90,7 +90,10 @@ export function PinForm({
           {error}
         </p>
       )}
-      <button type="submit" className="btn btn-go col-span-2 h-[30px] justify-self-start text-[13px]">
+      <button
+        type="submit"
+        className="btn btn-go col-span-2 h-[30px] justify-self-start text-[13px]"
+      >
         {submitLabel}
       </button>
     </div>

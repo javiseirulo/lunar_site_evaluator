@@ -288,15 +288,15 @@ export default function GlobeCanvas({ hideChrome = false }: { hideChrome?: boole
     return pin;
   };
   const pinRef = useRef(createPin);
-  pinRef.current = createPin;
   useEffect(() => {
+    pinRef.current = createPin;
     registerExplorePin((pin) => {
       pinRef.current(pin.lat, pin.lon, pin.name || undefined);
       const safeLat = Math.max(-89.5, Math.min(89.5, pin.lat));
       flightRef.current = new Vector3(...latLonToVec3(safeLat, pin.lon, PIN_VIEW_DISTANCE));
     });
     return () => registerExplorePin(null);
-  }, []);
+  });
 
   const onSurfaceClick = (lat: number, lon: number) => {
     if (placingAstronaut) {
