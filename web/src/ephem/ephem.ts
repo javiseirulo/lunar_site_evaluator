@@ -179,6 +179,47 @@ export function ephemError(start: TimeInput, end: TimeInput): string | null {
   return index ? null : indexError;
 }
 
+/** Sorted list of the years that have an hourly file. */
+export function availableYears(idx: Pick<EphemIndex, 'years'> | null = index): number[] {
+  return idx ? idx.years.map((y) => y.year).sort((a, b) => a - b) : [];
+}
+
+/** "1966–1973, 1976, 2013, 2019–2020, 2023–2055": consecutive years collapsed into ranges. */
+export function formatYearRanges(list: number[]): string {
+  const out: string[] = [];
+  for (let i = 0; i < list.length;) {
+    let j = i;
+    while (j + 1 < list.length && list[j + 1] === list[j]! + 1) j++;
+    out.push(j > i ? `${list[i]}–${list[j]}` : String(list[i]));
+    i = j + 1;
+  }
+  return out.join(', ');
+}
+
+/**
+ * Years touched by the half-open window [start, end) that have no file in `idx`. A window that
+ * straddles New Year needs both years; one ending exactly at 00:00 on 1 January does not need the
+ * new year.
+ */
+export function missingEphemYears(
+  idx: Pick<EphemIndex, 'years'>,
+  start: TimeInput,
+  end: TimeInput,
+): number[] {
+  const { required } = yearsFor(start, end);
+  const have = new Set(idx.years.map((y) => y.year));
+  return required.filter((y) => !have.has(y));
+}
+
+/** Index for React (loads it once, re-renders when it arrives). */
+export function useEphemIndex(): EphemIndex | null {
+  useEphemVersion();
+  useEffect(() => {
+    loadEphemIndex().catch(() => undefined);
+  }, []);
+  return index;
+}
+
 /** The loaded index (null until `loadEphemIndex` resolves). */
 export function getEphemIndex(): EphemIndex | null {
   return index;

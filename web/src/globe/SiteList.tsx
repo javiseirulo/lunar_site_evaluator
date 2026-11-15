@@ -31,6 +31,7 @@ import {
   sampleAt,
   useAppStore,
   useData,
+  useScoresStale,
   useSelectedSite,
 } from '@/core';
 import {
@@ -306,6 +307,7 @@ function MissionWindowFields() {
   const input = useRequirements((s) => s.window);
   const setWindow = useRequirements((s) => s.setWindow);
   const resolved = useMissionWindow();
+  const stale = useScoresStale();
   if (!range || !resolved) return null;
   const maxDays = Math.ceil(
     (Date.parse(range.end_utc) + range.step_s * 1000 - Date.parse(range.start_utc)) / 86_400_000,
@@ -349,6 +351,12 @@ function MissionWindowFields() {
           />
         </div>
       </div>
+      {stale && (
+        <p className="text-warn text-[12px]" role="note">
+          This list is ranked over the 2027 data window above, not the landing date chosen in
+          Window. Per-site checks for the chosen date are in the Check tab.
+        </p>
+      )}
       <p className="text-ink-muted text-[12px]">
         {resolved.isFullRange
           ? `No landing date: using all data, ${formatUtc(range.start_utc)} – ${formatUtc(range.end_utc)}${input.durationDays ? '. Days apply once a landing date is set.' : '.'}`
