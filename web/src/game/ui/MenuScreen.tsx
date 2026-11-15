@@ -1,4 +1,7 @@
-/** Title screen: pick the difficulty, then a mode (South Pole now, Historical later). */
+/**
+ * Title screen: pick the difficulty, then a mode (South Pole now, Historical later). Drawn over
+ * MissionGame's background globe (the spinning Moon).
+ */
 import { Lock, Play } from 'lucide-react';
 import { clsx } from 'clsx';
 import { useData } from '@/core';
@@ -6,7 +9,7 @@ import { difficultyHint, type Difficulty } from '../engine/bars';
 import { southPoleSites } from '../engine/deal';
 import { useAppStore } from '@/core';
 import { useGame } from '../state/gameStore';
-import { MENU_BG, MODE_HISTORICAL, MODE_SOUTH_POLE } from './assets';
+import { MODE_HISTORICAL, MODE_SOUTH_POLE } from './assets';
 import { GameImage } from './GameImage';
 
 const DIFFICULTIES: { id: Difficulty; label: string }[] = [
@@ -26,17 +29,7 @@ export function MenuScreen() {
 
   return (
     <div className="relative flex flex-1 flex-col items-center justify-center gap-6 overflow-hidden p-6">
-      <GameImage
-        src={MENU_BG}
-        alt=""
-        className="absolute inset-0 size-full opacity-60"
-        fallback={
-          <div
-            aria-hidden
-            className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_120%,#2a5aa6_0%,#061022_55%,#02050c_100%)]"
-          />
-        }
-      />
+      {/* The spinning Moon behind comes from MissionGame's background globe (MENU_BG without WebGL). */}
       <div aria-hidden className="mission-scan absolute inset-0" />
 
       <header className="relative text-center">

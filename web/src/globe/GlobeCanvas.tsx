@@ -345,7 +345,8 @@ export default function GlobeCanvas() {
   );
 }
 
-function PlaceholderMoon() {
+/** Grey sphere shown while the Moon texture loads (also used by CinematicCanvas). */
+export function PlaceholderMoon() {
   return (
     <mesh>
       <sphereGeometry args={[1, 64, 32]} />
@@ -354,7 +355,8 @@ function PlaceholderMoon() {
   );
 }
 
-function Moon({
+/** Textured Moon sphere (also used by CinematicCanvas). */
+export function Moon({
   onReady,
   onSurfaceClick,
 }: {
