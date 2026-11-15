@@ -32,8 +32,35 @@ if (existsSync(resolve(root, 'terrain/delivery.json'))) {
   assert.equal(processing.horizon.curated.sample_count, 3600);
   assert.equal(processing.horizon.heatmap.sample_count, 360);
   assert.equal(processing.horizon.max_range_km, 300);
-  assert.equal(delivery.horizon.ready_profiles, 0);
-  assert.equal(delivery.horizon.status, 'pending_computation_and_validation');
+  if (delivery.horizon.ready_profiles === 0) {
+    assert.equal(delivery.horizon.status, 'pending_computation_and_validation');
+  } else {
+    assert.equal(delivery.horizon.status, 'sampled_terrain_not_flight_certified');
+    const catalogue = json(delivery.site_terrain.file);
+    const summary = json(delivery.horizon.validation_file);
+    assert.equal(catalogue.mock, false);
+    assert.equal(catalogue.sites.length, 59);
+    const polar = catalogue.sites.filter((site) => Math.abs(site.lat) >= 80);
+    assert.equal(polar.length, 41);
+    assert.equal(delivery.horizon.ready_profiles, polar.length);
+    assert.equal(summary.ready_profiles, polar.length);
+    assert.equal(summary.angular_midpoint_validation, 'passed for all published profiles');
+    for (const site of polar) {
+      const profile = json(site.horizon_file);
+      assert.equal(profile.site_id, site.id);
+      assert.deepEqual([profile.lat, profile.lon], [site.lat, site.lon]);
+      assert.equal(profile.observer_height_m, 5);
+      assert.equal(profile.max_range_km, 310);
+      assert.equal(profile.elev_deg.length * profile.az_step_deg, 360);
+      assert(profile.az_step_deg <= 0.1);
+      assert(profile.elev_deg.every((value) => Number.isFinite(value) && Math.abs(value) <= 90));
+      assert.equal(profile.complete.length, profile.elev_deg.length);
+      assert(profile.complete.every(Boolean));
+      assert(profile.validation.radial_max_delta_deg <= 0.05);
+      assert(profile.validation.angular_max_delta_deg <= 0.05);
+      assert(Object.keys(profile.source_integrity).length > 0);
+    }
+  }
 }
 for (const key of ['projection', 'radius_m', 'bounds_m', 'lat_limit']) {
   assert.deepEqual(meta[key], shared[key], `Shared grid mismatch: ${key}`);

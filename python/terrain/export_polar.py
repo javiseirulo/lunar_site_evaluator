@@ -81,8 +81,8 @@ def same_projection(left, right):
             return None
         params = crs.to_dict()
         params.pop("no_defs", None)
-        if params.get("proj") == "stere" and params.get("lat_0") == -90:
-            if params.get("lat_ts") == -90 and params.get("k", 1) == 1:
+        if params.get("proj") == "stere" and params.get("lat_0") in (-90, 90):
+            if params.get("lat_ts") == params.get("lat_0") and params.get("k", 1) == 1:
                 params.pop("lat_ts")
                 params["k"] = 1
         return params

@@ -1,5 +1,49 @@
 # Pablo: progreso y pendientes
 
+## Estado vigente — 2026-11-15
+
+Rama `pabloizgui/38-streetview-ephemerides`, PR contra `dev`. El PR #72 ya fue
+integrado por el equipo. Este estado reemplaza las tablas históricas de abajo.
+Guía actual: [ephemeris-integration.md](ephemeris-integration.md).
+
+| Tarea de Pablo | Entrega |
+|---|---|
+| Heightmap/capas para Marta | `terrain/heightmap.json`, `heights.f32`, `valid.u8`, `layers.json`: bytes/hashes originales conservados; malla 1025², fuente 80 m, ventana hasta 80°S |
+| Relieve de los 59 sitios reales | `terrain/catalog.json` y `catalog-terrain.csv`: elevación, pendiente, fuente, precisión y PSR; los 20 puntos fixture de `site-terrain.*` son históricos |
+| Horizontes de los 41 sitios polares | `horizon/<id>.json`, 5 m, 0,1°/3600 azimuts, 310 km, curvatura, cobertura y refinamiento radial/angular; resultados en `catalog-delivery.json` |
+| Norte / PSR | DEM norte 80/240 m, pendiente norte 80 m y máscaras binarias PSR norte/sur 20 m. Distancias aproximadas, cota espacial 190 m; null fuera de cobertura demostrable |
+| Cielo real | `@/ephem` de Javi, 2026–2055, paralaje terrestre y marco ME_DE440_ME421; sin series mock en Street View |
+| Navegación global y móvil | Arrastre izquierdo/un dedo, rueda/pinza, sin flechas; pasos hasta 200 m, transición suave, coordenadas libres y teclado |
+| Lectura del relieve / nombres | Luz artificial, estado solar explícito, cielo negro, rótulos IAU/USGS con línea oblicua/horizontal; centros de accidentes, no cumbres |
+| Reloj y enseñanza | UTC completo, pasos y reproducción sobre el reloj de core; enlace/QR con posición, cámara, altura y tiempo, sin token |
+| Validación y publicación | Comprobaciones automáticas y navegador; publicación autorizada, sin merge automático |
+
+### Qué queda del resto del equipo
+
+- **Javi:** consumir `terrain/catalog.json` y los perfiles en `python/export/all.py`,
+  regenerando series/métricas/checks/score. Su export real todavía publica horizonte
+  plano, elevación 0 y `pending_metrics` para pendiente/PSR. Las rejillas de `grid/`
+  también son planas; 41 perfiles puntuales no constituyen una rejilla global.
+- **Marta:** revisar/consumir heightmap y capas en su globo; conectar sus pins
+  libres con `selectedPoint` o el enlace. No se modifica su motor unilateralmente.
+- **Javi2:** revisar `AppEvents.selectedPoint`, coordinar consumidores y configurar
+  la variable Cesium en el build de despliegue.
+- **Pablo / despliegue:** permitir el dominio definitivo en el token de lectura y
+  probar teléfono físico. Un QR localhost no abre el ordenador del profesor desde
+  otro teléfono; no hace falta otra cuenta Cesium para cada compañero.
+- **Cristóbal:** comprobar Mission → sitio/fecha → visor usando el store compartido.
+
+### Próxima revisión gráfica
+
+Pulido con Pablo, teléfono físico, calibración Cesium/LOLA con varios puntos y
+costuras temporales de LOD. No se aplica un offset vertical supuesto. Los perfiles
+son estimaciones muestreadas, no certificación de aterrizaje ni resolución 5 m global.
+Fuera de los puntos/altura calculados se etiqueta el horizonte geométrico y la
+altitud de referencia para paralaje. Estrellas/constelaciones quedan como mejora
+didáctica posterior, con catálogo y orientación verificados.
+
+## Historial anterior (no representa el estado vigente)
+
 Actualizado: 2026-11-14. Contexto vigente: `docs/10-plan-tecnico.md`, §5 y §9;
 `origin/dev` en `0e00fc3` integrado conservando los commits locales; decisiones
 de Javi J0/J10 de `461507a`. Prioridad: desbloquear a Marta y

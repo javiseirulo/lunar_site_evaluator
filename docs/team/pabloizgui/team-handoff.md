@@ -1,5 +1,35 @@
 # Entrega de Pablo: terreno y Lunar Street View
 
+## Entrega vigente — 2026-11-15
+
+Rama `pabloizgui/38-streetview-ephemerides`. Guía funcional y científica:
+[ephemeris-integration.md](ephemeris-integration.md); estado y dependencias:
+[tasks.md](tasks.md). Los estados antiguos de abajo se conservan como historial.
+
+| Persona | Archivos actuales incluidos en Git | Uso |
+|---|---|---|
+| Marta | `web/public/data/terrain/heightmap.json`, `heights.f32`, `valid.u8`, `layers.json`, `elevation.png`, `slope.png` | Entrega visual original intacta: vértices 1025², metros, máscara, NoData; ventana sur hasta 80°S |
+| Javi | `web/public/data/horizon/<id>.json` (41) | Contrato v1.1, coordenadas del catálogo real, 5 m, norte horario, 0,1°, alcance 310 km; sin interpolar perfiles entre sitios |
+| Javi / Marta / Javi2 | `web/public/data/terrain/catalog.json`, `catalog-terrain.csv` | 59 elevaciones/pendientes y PSR con cobertura/error explícitos; fuentes y precisión por punto. Sustituyen a `site-terrain.*` para el catálogo real |
+| Equipo | `web/public/data/terrain/catalog-delivery.json`, `delivery.json` | Convergencia/cobertura, origen y estado de los productos; la configuración antigua es nominal, el perfil describe el cálculo publicado |
+| Javi2 / Marta | `contracts/types.ts`, `web/src/core/store.ts` | `selectedPoint` aditivo; selección de sitio lo limpia. El visor lo publica, sus pins/mapas deben adoptarlo o abrir un enlace reproducible |
+| Equipo | `web/src/streetview/` | Cámara, controles, cielo SPICE, reloj UTC común y QR; ruta `/streetview/<id>` |
+
+Para ejecutar, seguir las instrucciones de entorno de abajo cambiando la rama
+por la vigente. El token sigue en `web/.env.local` ignorado o variable de build;
+no se incluye en Git ni en los enlaces. No se necesitan otras cuentas Cesium:
+cada navegador consume la cuenta de Pablo con su token público de lectura.
+La configuración actual solo permite localhost/127.0.0.1:5173. Un QR para clase
+necesita una URL de despliegue o LAN permitida por el dueño del token.
+
+Los GeoTIFF originales y kernels están fuera de Git. Los compañeros pueden
+consumir todos los productos anteriores sin descargar varios GB ni ejecutar
+Python. Javi ya entregó las efemérides y el catálogo: dejaron de ser bloqueos.
+Su exportador debe incorporar estos horizontes/alturas/pendientes/PSR para
+regenerar la evaluación; sus series y rejillas publicadas siguen siendo planas.
+
+## Historial de la entrega anterior
+
 Actualizado 2026-11-14. Rama de entrega unificada:
 `pabloizgui/46-lunar-streetview`, con el último `dev` (`e6825cd`, incluye #66)
 y el trabajo de `pabloizgui/37-terrain-handoff`. No hace falta cambiar de rama

@@ -1,19 +1,21 @@
 import { useEffect, useRef, useState } from 'react';
-import type { SkySample } from '@/core';
-import { DEFAULT_OBSERVER_HEIGHT_M } from './geometry';
+import type { ViewerSky } from './sky';
 import type { Observer, LunarScene } from './lunarScene';
 import { createLunarScene } from './lunarScene';
 import { lightingState } from './navigation';
 import type { LabelLayout } from './landmarks';
+import { DEFAULT_VIEW, type ViewState } from './viewLink';
 import 'cesium/Build/Cesium/Widgets/widgets.css';
 import './streetview.css';
 
 interface Props {
   observer: Observer;
   token: string;
-  sample: SkySample | null;
-  mock: boolean;
+  sample: ViewerSky | null;
+  initialView?: ViewState;
   onObserver: (point: Observer) => void;
+  onView: (state: ViewState) => void;
+  onGround: (height: number) => void;
 }
 const lightText = {
   unknown: 'Solar state unavailable',
@@ -22,19 +24,28 @@ const lightText = {
   sunlight: 'Sunlight',
 };
 
-export default function LunarViewport({ observer, token, sample, mock, onObserver }: Props) {
+export default function LunarViewport({
+  observer,
+  token,
+  sample,
+  initialView = DEFAULT_VIEW,
+  onObserver,
+  onView,
+  onGround,
+}: Props) {
   const container = useRef<HTMLDivElement>(null);
   const scene = useRef<LunarScene | null>(null);
   const currentObserver = useRef(observer);
-  const latest = useRef({ sample, onObserver });
+  const latest = useRef({ sample, onObserver, onView, onGround });
+  const initialCamera = useRef(initialView);
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
   const [ground, setGround] = useState<number | null>(null);
   const [retry, setRetry] = useState(0);
-  const [height, setHeight] = useState(DEFAULT_OBSERVER_HEIGHT_M);
+  const [height, setHeight] = useState(initialView.height);
   const [reading, setReading] = useState(true);
   const [names, setNames] = useState(true);
   const [hint, setHint] = useState('Click or tap nearby ground to walk · up to 200 m per step.');
-  const [view, setView] = useState({ heading: 0, fov: 65 });
+  const [view, setView] = useState(initialView);
   const [labels, setLabels] = useState<LabelLayout[]>([]);
   const [coordinates, setCoordinates] = useState(observer);
   const [expanded, setExpanded] = useState(false);
@@ -52,9 +63,11 @@ export default function LunarViewport({ observer, token, sample, mock, onObserve
     };
   }, [expanded]);
   useEffect(() => {
-    latest.current = { sample, onObserver };
+    latest.current = { sample, onObserver, onView, onGround };
+  }, [sample, onObserver, onView, onGround]);
+  useEffect(() => {
     scene.current?.setSky(sample);
-  }, [sample, onObserver]);
+  }, [sample]);
   useEffect(() => {
     if (!container.current) return;
     const abort = new AbortController();
@@ -64,18 +77,32 @@ export default function LunarViewport({ observer, token, sample, mock, onObserve
       abort.abort();
     };
     const timeout = window.setTimeout(fail, 90_000);
-    createLunarScene(container.current, currentObserver.current, token, abort.signal, {
-      ground: setGround,
-      error: fail,
-      hint: setHint,
-      labels: setLabels,
-      view: (heading, fov) => setView({ heading, fov }),
-      observer: (point) => {
-        currentObserver.current = point;
-        setCoordinates(point);
-        latest.current.onObserver(point);
+    createLunarScene(
+      container.current,
+      currentObserver.current,
+      token,
+      abort.signal,
+      {
+        ground: (value) => {
+          setGround(value);
+          latest.current.onGround(value);
+        },
+        error: fail,
+        hint: setHint,
+        labels: setLabels,
+        view: (state) => {
+          initialCamera.current = state;
+          setView(state);
+          latest.current.onView(state);
+        },
+        observer: (point) => {
+          currentObserver.current = point;
+          setCoordinates(point);
+          latest.current.onObserver(point);
+        },
       },
-    })
+      initialCamera.current,
+    )
       .then((instance) => {
         window.clearTimeout(timeout);
         if (abort.signal.aborted) {
@@ -129,7 +156,7 @@ export default function LunarViewport({ observer, token, sample, mock, onObserve
                 className="btn"
                 onClick={() => {
                   setStatus('loading');
-                  setHeight(DEFAULT_OBSERVER_HEIGHT_M);
+                  setHeight(initialCamera.current.height);
                   setReading(true);
                   setNames(true);
                   setRetry((n) => n + 1);
@@ -145,8 +172,11 @@ export default function LunarViewport({ observer, token, sample, mock, onObserve
           <div className="lunar-environment" aria-live="polite">
             <span className="lunar-state-dot" />
             <span>
-              {sample && mock ? 'Mock · ' : ''}
-              {lightText[state]}
+              {sample && !sample.terrainMatched
+                ? sample.lit
+                  ? 'Sun above geometric horizon · no terrain'
+                  : 'Sun below geometric horizon · no terrain'
+                : lightText[state]}
             </span>
             {reading && <small>Relief light on</small>}
           </div>

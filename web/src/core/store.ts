@@ -16,6 +16,8 @@ import { DEFAULT_MISSION_CONFIG } from '@/scoring/defaults';
 export const DEFAULT_TIME_UTC = '2027-01-01T00:00:00Z';
 
 export interface AppState extends AppEvents {
+  selectedPoint: { lat: number; lon: number } | null;
+  setSelectedPoint: (point: { lat: number; lon: number } | null) => void;
   /** Per-layer opacity 0–1 (layer UI state, read by the map/globe when drawing). */
   layerOpacity: Record<string, number>;
   /** True once layer defaults from layers.json have been applied. */
@@ -53,6 +55,7 @@ function readPro(): boolean {
 
 export const useAppStore = create<AppState>()((set, get) => ({
   selectedSiteId: null,
+  selectedPoint: null,
   currentTimeUTC: DEFAULT_TIME_UTC,
   activeLayers: [],
   mode: 'explore',
@@ -61,7 +64,21 @@ export const useAppStore = create<AppState>()((set, get) => ({
   proMode: readPro(),
   missionConfig: DEFAULT_MISSION_CONFIG,
 
-  selectSite: (id) => set({ selectedSiteId: id }),
+  selectSite: (id) => set({ selectedSiteId: id, selectedPoint: null }),
+  setSelectedPoint: (point) => {
+    if (
+      point &&
+      (!Number.isFinite(point.lat + point.lon) ||
+        Math.abs(point.lat) > 90 ||
+        Math.abs(point.lon) > 180)
+    )
+      throw new RangeError('Invalid lunar coordinates');
+    set((state) =>
+      state.selectedPoint?.lat === point?.lat && state.selectedPoint?.lon === point?.lon
+        ? state
+        : { selectedPoint: point ? { lat: point.lat, lon: point.lon } : null },
+    );
+  },
   setTime: (isoUtc) => set({ currentTimeUTC: isoUtc }),
   setMode: (mode) => set({ mode }),
 

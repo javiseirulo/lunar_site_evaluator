@@ -42,10 +42,10 @@ def elevation_angle(distance, target_height, ground_height, observer_height=5.0,
                                 target_radius * np.sin(theta)))
 
 
-def polar_xy(lat, lon):
-    rho = 2 * RADIUS * np.tan(np.deg2rad((90 + np.asarray(lat)) / 2))
+def polar_xy(lat, lon, pole=-1):
+    rho = 2 * RADIUS * np.tan(np.deg2rad((90 - pole * np.asarray(lat)) / 2))
     lon = np.deg2rad(lon)
-    return rho * np.sin(lon), rho * np.cos(lon)
+    return rho * np.sin(lon), -pole * rho * np.cos(lon)
 
 
 def bilinear(values, row, col, wrap=False):
@@ -64,14 +64,16 @@ def bilinear(values, row, col, wrap=False):
 
 
 class PolarDem:
-    def __init__(self, path, lat, lon, reach):
+    def __init__(self, path, lat, lon, reach, pole=-1):
         self.path = Path(path)
+        self.pole = pole
         with rasterio.open(path) as ds:
-            if not same_projection(ds.crs, POLAR_CRS) or ds.count != 1:
+            expected = CRS.from_string(f"+proj=stere +lat_0={pole*90} +lat_ts={pole*90} +lon_0=0 +R={RADIUS} +units=m")
+            if not same_projection(ds.crs, expected) or ds.count != 1:
                 raise ValueError("Unexpected lunar DEM projection")
             edge_lat, edge_lon = destination(lat, lon, np.arange(0, 360, 2), [reach])
-            x, y = polar_xy(edge_lat, edge_lon)
-            ox, oy = polar_xy(lat, lon)
+            x, y = polar_xy(edge_lat, edge_lon, pole)
+            ox, oy = polar_xy(lat, lon, pole)
             inv = ~ds.transform
             cols, rows = inv * (np.append(x, ox), np.append(y, oy))
             c0, r0 = max(0, int(np.floor(cols.min())) - 2), max(0, int(np.floor(rows.min())) - 2)
@@ -87,7 +89,7 @@ class PolarDem:
     def sample(self, lat, lon):
         if self.values is None:
             return np.full(np.broadcast_arrays(lat, lon)[0].shape, np.nan)
-        x, y = polar_xy(lat, lon)
+        x, y = polar_xy(lat, lon, self.pole)
         col, row = self.transform * (x, y)
         return bilinear(self.values, row - .5, col - .5)
 
@@ -116,8 +118,8 @@ def radial_samples(max_range, refinement=1):
 
 
 def compute(lat, lon, root, az_step=1.0, max_range=310000, refinement=1):
-    if not (-90 <= lat <= 90 and np.isfinite(lon) and az_step in (.1, .5, 1, 5)
-            and 1000 <= max_range <= 310000 and refinement in (1, 2, 4)):
+    if not (-90 <= lat <= 90 and np.isfinite(lon) and az_step in (.025, .05, .1, .5, 1, 5)
+            and 1000 <= max_range <= 310000 and refinement in (1, 2, 4, 8, 16)):
         raise ValueError("Invalid trial coordinates or resolution")
     started = time.monotonic()
     global_path = root / "lola-global-64ppd/ldem_64.img"
@@ -132,6 +134,14 @@ def compute(lat, lon, root, az_step=1.0, max_range=310000, refinement=1):
             path = root / name / filename
             if path.is_file():
                 layers.append((name, reach, PolarDem(path, lat, lon, reach)))
+    elif lat >= 70:
+        for name, filename, reach in [
+            ("lola-north-pole-80m", "LDEM_80N_80MPP_ADJ.TIF", 80000),
+            ("lola-north-pole-far-240m", "LDEM_60N_240MPP_ADJ.TIF", max_range),
+        ]:
+            path = root / name / filename
+            if path.is_file():
+                layers.append((name, reach, PolarDem(path, lat, lon, reach, pole=1)))
     distances = radial_samples(max_range, refinement)
     ground = np.nan
     for _, _, dem in layers:

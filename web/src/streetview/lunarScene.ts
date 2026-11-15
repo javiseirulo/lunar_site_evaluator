@@ -11,6 +11,7 @@ import {
   wheelFactor,
 } from './navigation';
 import { layoutLabels, nearbyLandmarks, type LabelLayout, type Landmark } from './landmarks';
+import { DEFAULT_VIEW, type ViewState } from './viewLink';
 
 export interface Observer {
   lat: number;
@@ -21,7 +22,7 @@ export interface SceneCallbacks {
   error: () => void;
   observer: (point: Observer) => void;
   hint: (message: string) => void;
-  view: (heading: number, fov: number) => void;
+  view: (state: ViewState) => void;
   labels: (labels: LabelLayout[]) => void;
 }
 export interface LunarScene {
@@ -40,6 +41,7 @@ export async function createLunarScene(
   token: string,
   signal: AbortSignal,
   callbacks: SceneCallbacks,
+  initialView: ViewState = DEFAULT_VIEW,
 ): Promise<LunarScene> {
   (window as Window & { CESIUM_BASE_URL?: string }).CESIUM_BASE_URL = new URL(
     `${import.meta.env.BASE_URL}cesium/`,
@@ -96,9 +98,9 @@ export async function createLunarScene(
     frustum.far = 1e9;
     let observer = { ...initial };
     let ground = 0;
-    let height = DEFAULT_OBSERVER_HEIGHT_M;
-    let fov = 65;
-    let pose = { heading: 0, pitch: 0 };
+    let height = initialView.height ?? DEFAULT_OBSERVER_HEIGHT_M;
+    let fov = limitFov(initialView.fov);
+    let pose = limitLook(initialView.heading, initialView.pitch);
     let moving = false;
     let sky: SkySample | null = null;
     let namesEnabled = true;
@@ -281,6 +283,7 @@ export async function createLunarScene(
     let previousLabels = '';
     let lastLabels = 0;
     let labelTimer = 0;
+    let previousView = '';
     const renderLabels = () => {
       const now = performance.now();
       if (now - lastLabels < 120) {
@@ -295,7 +298,12 @@ export async function createLunarScene(
         return;
       }
       lastLabels = now;
-      callbacks.view(pose.heading, fov);
+      const state = { ...pose, fov, height };
+      const viewKey = JSON.stringify(state);
+      if (viewKey !== previousView) {
+        previousView = viewKey;
+        callbacks.view(state);
+      }
       const points =
         namesEnabled && !moving
           ? anchors.flatMap(({ feature, position: anchor }) => {
@@ -457,7 +465,7 @@ export async function createLunarScene(
             moving = false;
             setSky(sky);
             callbacks.ground(ground);
-            callbacks.hint('Location changed · sky data pending for this point.');
+            callbacks.hint('Location updated.');
             void loadAnchors();
           }
         };
@@ -613,7 +621,7 @@ export async function createLunarScene(
             renderPose();
             setSky(sky);
             callbacks.ground(ground);
-            callbacks.hint('Location changed · sky data pending for this point.');
+            callbacks.hint('Location updated.');
             void loadAnchors();
           };
           viewer.camera.flyTo({

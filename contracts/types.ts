@@ -277,6 +277,8 @@ export type AppMode = 'explore' | 'streetview' | 'game';
 
 export interface AppEvents {
   selectedSiteId: string | null;
+  /** Arbitrary lunar location (planetocentric degrees, east longitude). Additive §10 bridge. */
+  selectedPoint?: { lat: number; lon: number } | null;
   /** ISO 8601 UTC. */
   currentTimeUTC: string;
   /** Layer ids, drawn bottom → top in this order. */

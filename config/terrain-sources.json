@@ -86,6 +86,71 @@
       "product_creation_date": "2019-03-15",
       "vertical_reference": "LOLA elevation relative to the 1737400 m sphere",
       "publisher_checksum": null
+    },
+    {
+      "id": "lola-north-pole-80m",
+      "pixel_spacing_m": 80,
+      "coverage": "80 to 90 degrees north; not global",
+      "filename": "LDEM_80N_80MPP_ADJ.TIF",
+      "url": "https://pgda.gsfc.nasa.gov/data/LOLA_20mpp_NP/LDEM_80N_80MPP_ADJ.TIF",
+      "product_page": "https://pgda.gsfc.nasa.gov/products/98",
+      "expected_bytes": 202061552,
+      "quantity": "surface height, meters",
+      "reference_frame": "MOON_ME, JPL DE421",
+      "publisher_checksum": null,
+      "source_last_modified_http": "Sat, 23 Dec 2023 00:29:56 GMT"
+    },
+    {
+      "id": "lola-north-pole-far-240m",
+      "pixel_spacing_m": 240,
+      "coverage": "60 to 90 degrees north; far terrain",
+      "filename": "LDEM_60N_240MPP_ADJ.TIF",
+      "url": "https://pgda.gsfc.nasa.gov/data/LOLA_20mpp_NP/LDEM_60N_240MPP_ADJ.TIF",
+      "product_page": "https://pgda.gsfc.nasa.gov/products/98",
+      "expected_bytes": 224039701,
+      "quantity": "surface height, meters",
+      "reference_frame": "MOON_ME, JPL DE421",
+      "publisher_checksum": null,
+      "source_last_modified_http": "Sat, 23 Dec 2023 00:31:44 GMT"
+    },
+    {
+      "id": "lola-north-pole-slope-80m",
+      "pixel_spacing_m": 80,
+      "coverage": "80 to 90 degrees north; not global",
+      "filename": "LDSM_80N_80MPP_ADJ.TIF",
+      "url": "https://pgda.gsfc.nasa.gov/data/LOLA_20mpp_NP/LDSM_80N_80MPP_ADJ.TIF",
+      "product_page": "https://pgda.gsfc.nasa.gov/products/98",
+      "expected_bytes": 243515242,
+      "quantity": "publisher slope, degrees",
+      "reference_frame": "MOON_ME, JPL DE421",
+      "publisher_checksum": null,
+      "source_last_modified_http": "Sat, 23 Dec 2023 14:15:29 GMT"
+    },
+    {
+      "id": "psr-north-20m",
+      "pixel_spacing_m": 20,
+      "coverage": "80 to 90 degrees north; not global",
+      "filename": "LPSR_80N_20MPP_ADJ.TIF",
+      "url": "https://pgda.gsfc.nasa.gov/data/LOLA_20mpp_NP/LPSR_80N_20MPP_ADJ.TIF",
+      "product_page": "https://pgda.gsfc.nasa.gov/products/98",
+      "expected_bytes": 128792644,
+      "quantity": "binary permanent shadow mask: 1 PSR, 0 non-PSR, NaN outside coverage",
+      "reference_frame": "MOON_ME, JPL DE421",
+      "publisher_checksum": null,
+      "source_last_modified_http": "Sat, 07 Dec 2024 17:12:59 GMT"
+    },
+    {
+      "id": "psr-south-20m",
+      "pixel_spacing_m": 20,
+      "coverage": "80 to 90 degrees south; not global",
+      "filename": "LPSR_80S_20MPP_ADJ.TIF",
+      "url": "https://pgda.gsfc.nasa.gov/data/LOLA_20mpp/LPSR_80S_20MPP_ADJ.TIF",
+      "product_page": "https://pgda.gsfc.nasa.gov/products/90",
+      "expected_bytes": 154221202,
+      "quantity": "binary permanent shadow mask: 1 PSR, 0 non-PSR, NaN outside coverage",
+      "reference_frame": "MOON_ME, JPL DE421",
+      "publisher_checksum": null,
+      "source_last_modified_http": "Sat, 03 Jun 2023 00:59:02 GMT"
     }
   ]
 }
