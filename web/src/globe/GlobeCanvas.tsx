@@ -252,20 +252,15 @@ export default function GlobeCanvas() {
     setFocus((f) => (f?.kind === 'historic' && f.id === id ? null : { kind: 'historic', id }));
 
   // A clicked own pin becomes the free point (same path as "Your points" and createPin, minus the
-  // flight: the camera stays where it is); clicking it again deselects it.
+  // flight: the camera stays where it is) and its statistics show in the right-hand card again.
   const onCustomClick = (id: string) => {
     const pin = pins.find((p) => p.id === id);
     if (!pin) return;
-    const app = useAppStore.getState();
-    if (focus?.kind === 'custom' && focus.id === id) {
-      const p = app.selectedPoint;
-      if (p && p.lat === pin.lat && p.lon === pin.lon) app.setSelectedPoint(null);
-      setFocus(null);
-      return;
-    }
-    app.requestSelection({ kind: 'point', lat: pin.lat, lon: pin.lon, name: pin.name }, () =>
-      setFocus({ kind: 'custom', id }),
-    );
+    useAppStore
+      .getState()
+      .requestSelection({ kind: 'point', lat: pin.lat, lon: pin.lon, name: pin.name }, () =>
+        setFocus({ kind: 'custom', id }),
+      );
   };
 
   // The right-hand card shows the statistics of the selected own pin.

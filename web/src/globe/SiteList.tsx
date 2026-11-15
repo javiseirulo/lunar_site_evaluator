@@ -541,9 +541,7 @@ function SiteBody({ className }: { className?: string }) {
   const stats = useSiteStats(site?.id ?? null);
   const loadError = useData((s) => (site ? s.timeseriesErrors[site.id] : undefined));
   const window = useMissionWindow();
-  const point = useAppStore((s) => s.selectedPoint);
 
-  if (!site && point) return <PointDetail className={className} />;
   if (!site) {
     return (
       <section className={cn('box p-5', className)}>
@@ -647,23 +645,6 @@ function SiteBody({ className }: { className?: string }) {
       >
         Stand here in Street View
       </button>
-    </section>
-  );
-}
-
-/** Card for a free lat/lon ("Go to coordinates"): the same live Mission Clock readout, in situ. */
-function PointDetail({ className }: { className?: string }) {
-  const active = useActiveSeries();
-  const proMode = useAppStore((s) => s.proMode);
-  if (!active.site) return null;
-  return (
-    <section className={cn('box p-5', className)} aria-label="Selected point details">
-      <h2 className="text-[24px] leading-tight">{active.site.name}</h2>
-      <p className="text-ink-muted mt-1 text-[12px]">
-        Your point{proMode ? ` · ${formatLatLon(active.site.lat, active.site.lon)}` : ''}. Press
-        Play to watch its sunlight and Earth view.
-      </p>
-      <NowSection siteId="point" expert={proMode} />
     </section>
   );
 }
