@@ -21,6 +21,8 @@ const LAYER_UI: Record<string, string> = {
   earth_vis: 'Earth in view',
 };
 const ORDER = ['illumination', 'earth_vis', 'slope', 'psr', 'elevation'];
+/** Layers computed for the whole Moon; every other raster only exists on the south polar patch. */
+const WHOLE_MOON = new Set(['illumination', 'earth_vis']);
 
 function Row({
   label,
@@ -150,41 +152,61 @@ export function LayersMenu({ hasSun, expert }: { hasSun: boolean; expert: boolea
   const rasters = [...(manifest?.layers ?? [])].sort(
     (a, b) => ((ORDER.indexOf(a.id) + 99) % 99) - ((ORDER.indexOf(b.id) + 99) % 99),
   );
+  const global = rasters.filter((l) => WHOLE_MOON.has(l.id));
+  const polar = rasters.filter((l) => !WHOLE_MOON.has(l.id));
   const activeCount =
     rasters.filter((l) => activeLayers.includes(l.id)).length +
     (nightOn ? 1 : 0) +
     (historic.on ? 1 : 0);
+  const renderRaster = (l: LayerDef) => (
+    <RasterRow
+      key={l.id}
+      layer={l}
+      index={activeLayers.indexOf(l.id)}
+      count={activeLayers.length}
+      expert={expert}
+    />
+  );
 
   return (
     <div ref={ref} className="relative" style={PAPER}>
       <button
         type="button"
-        className="btn"
+        className="box hover:bg-panel-2 relative flex size-14 flex-col items-center justify-center gap-0.5 p-0 text-[10px] font-medium"
         aria-expanded={open}
         aria-haspopup="true"
+        aria-label={`Layers${activeCount > 0 ? `, ${activeCount} on` : ''}`}
         onClick={() => setOpen((o) => !o)}
       >
-        Layers{activeCount > 0 && <span className="num ml-1.5">· {activeCount}</span>}
-        <span aria-hidden className="ml-2 text-[9px]">
-          {open ? '▲' : '▼'}
-        </span>
+        {/* Stacked-sheets icon, like the layers button of web maps. */}
+        <svg
+          viewBox="0 0 24 24"
+          className="text-heading size-6"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.7"
+          strokeLinejoin="round"
+          aria-hidden
+        >
+          <path d="M12 3 2.5 8.5 12 14l9.5-5.5z" />
+          <path d="m2.5 12.5 9.5 5.5 9.5-5.5" />
+          <path d="m2.5 16.5 9.5 5.5 9.5-5.5" opacity="0.55" />
+        </svg>
+        <span className="text-heading">Layers</span>
+        {activeCount > 0 && (
+          <span className="num bg-accent absolute -top-1.5 -right-1.5 grid min-w-4 place-items-center rounded-full px-1 text-[9px] leading-4 text-black">
+            {activeCount}
+          </span>
+        )}
       </button>
       {open && (
         <div
-          className="box absolute top-full left-0 z-10 mt-1 max-h-[60vh] w-64 overflow-y-auto px-3 py-2"
+          className="box absolute bottom-full left-0 z-10 mb-1 max-h-[60vh] w-64 overflow-y-auto px-3 py-2"
           role="group"
           aria-label="Map layers"
         >
           <ul className="space-y-0.5">
-            {rasters.map((l) => (
-              <RasterRow
-                key={l.id}
-                layer={l}
-                index={activeLayers.indexOf(l.id)}
-                count={activeLayers.length}
-                expert={expert}
-              />
-            ))}
+            {global.map(renderRaster)}
             <Row label="Day / night" on={nightOn} onToggle={() => setNightOn(!nightOn)}>
               <NightDetails hasSun={hasSun} />
             </Row>
@@ -203,6 +225,14 @@ export function LayersMenu({ hasSun, expert }: { hasSun: boolean; expert: boolea
             >
               <HistoricDetails />
             </Row>
+            {polar.length > 0 && (
+              <li className="border-edge mt-2 border-t pt-2" aria-hidden>
+                <p className="text-ink-muted text-[11px]">
+                  Only visible near the south pole (below 80°S), zoom in to see them:
+                </p>
+              </li>
+            )}
+            {polar.map(renderRaster)}
           </ul>
         </div>
       )}

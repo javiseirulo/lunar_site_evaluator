@@ -310,15 +310,17 @@ export default function GlobeCanvas() {
             }}
           />
         )}
-        <LayersMenu hasSun={!!sunDir} expert={expert} />
         <PatchControls />
+      </div>
+      <div className="absolute bottom-2 left-2">
+        <LayersMenu hasSun={!!sunDir} expert={expert} />
       </div>
       {/* Javi: legend of the active map layers (Expert only, like the layers panel). */}
       {expert && <ActiveLegend className="pointer-events-none absolute top-2 right-2" />}
       {exaggerated && (
         <div
           role="note"
-          className="pointer-events-none absolute bottom-2 left-2 rounded-[2px] bg-black/70 px-2 py-1 text-[11px] text-white"
+          className="pointer-events-none absolute bottom-2 left-[72px] rounded-[2px] bg-black/70 px-2 py-1 text-[11px] text-white"
         >
           {EXAGGERATION_LABEL}
         </div>
