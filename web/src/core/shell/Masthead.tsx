@@ -19,7 +19,7 @@ export function Masthead() {
     <header className="portal">
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
         <Link
-          to="/"
+          to="/home"
           className="mr-2 flex items-center gap-2.5"
           aria-label="Lunar Site Evaluator home"
         >
