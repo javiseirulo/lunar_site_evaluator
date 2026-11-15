@@ -1,18 +1,19 @@
 /**
- * Masthead: one line on the night page — mark, name, four page links, Normal/Expert switch —
- * then a single sentence about the next sunrise or Earthrise. Expert mode adds more pages and
- * the site finder.
+ * Masthead: one line on the night page — mark, name, the pages, Normal/Expert switch —
+ * then a single sentence about the next sunrise or Earthrise. Extra pages follow a divider
+ * and stay next to the others, so the row does not open a gap.
  */
-import { useState } from 'react';
-import { Link, NavLink, useLocation, useNavigate } from 'react-router';
+import { Link, NavLink, useLocation } from 'react-router';
 import { useAppStore } from '../store';
 import { useData, useTimeseries } from '../data';
 import { useActiveSeries } from '@/ephem/activeSeries';
-import { visibleTabs, modeForPath, pathForMode } from '../navigation';
+import { TABS, modeForPath, pathForMode } from '../navigation';
 import { formatHours, formatUtc } from '../format';
 import { dayOfWindow, friendlyHours } from '../metrics';
 import { changeClause, nextChange, sampleAt, seriesSpanLabel } from '../timeseries';
 import { Logo } from './Logo';
+
+type Tab = (typeof TABS)[number];
 
 export function Masthead() {
   const { pathname } = useLocation();
@@ -30,8 +31,7 @@ export function Masthead() {
           </span>
         </Link>
         <TabBar />
-        <div className="ml-auto flex max-w-full flex-wrap items-center gap-x-4 gap-y-2">
-          <SiteFinder />
+        <div className="ml-auto">
           <ModeSwitch />
         </div>
       </div>
@@ -40,67 +40,36 @@ export function Masthead() {
   );
 }
 
-/** Picks a site and opens it in Explore (or keeps the current mode). */
-function SiteFinder() {
-  const sites = useData((s) => s.sites);
-  const selectSite = useAppStore((s) => s.selectSite);
-  const navigate = useNavigate();
-  const [value, setValue] = useState('');
-  const proMode = useAppStore((s) => s.proMode);
-  if (!sites || !proMode) return null;
-  const sorted = [...sites].sort((a, b) => a.name.localeCompare(b.name));
-
+function TabLink({ tab, siteId }: { tab: Tab; siteId: string | null }) {
   return (
-    <form
-      className="flex max-w-full flex-wrap items-center gap-2"
-      onSubmit={(e) => {
-        e.preventDefault();
-        if (!value) return;
-        selectSite(value);
-        const mode = modeForPath(window.location.pathname);
-        if (mode === 'streetview') navigate(pathForMode('streetview', value));
-        else if (mode !== 'explore') navigate('/explore');
-      }}
-    >
-      <label htmlFor="site-finder" className="text-ink-muted text-[13px]">
-        Find a site
-      </label>
-      <select
-        id="site-finder"
-        className="field w-40 max-w-full sm:w-48"
-        value={value}
-        onChange={(e) => setValue(e.target.value)}
-      >
-        <option value="">Choose a site</option>
-        {sorted.map((s) => (
-          <option key={s.id} value={s.id}>
-            {s.name}
-          </option>
-        ))}
-      </select>
-      <button type="submit" className="btn" disabled={!value}>
-        Open
-      </button>
-    </form>
+    <NavLink to={tab.mode ? pathForMode(tab.mode, siteId) : tab.path} end={tab.end} className="tab">
+      {tab.label}
+    </NavLink>
   );
 }
 
 function TabBar() {
   const selectedSiteId = useAppStore((s) => s.selectedSiteId);
   const proMode = useAppStore((s) => s.proMode);
+  const shown = TABS.filter((t) => proMode || !t.expert);
+  const main = shown.filter((t) => !t.aside);
+  const aside = shown.filter((t) => t.aside);
   return (
-    <nav aria-label="Main" className="flex max-w-full flex-wrap">
-      {visibleTabs(proMode).map((t) => (
-        <NavLink
-          key={t.label}
-          to={t.mode ? pathForMode(t.mode, selectedSiteId) : t.path}
-          end={t.end}
-          className="tab"
-        >
-          {t.label}
-        </NavLink>
-      ))}
-    </nav>
+    <div className="flex max-w-full flex-wrap items-center">
+      <nav aria-label="Main" className="flex max-w-full flex-wrap">
+        {main.map((t) => (
+          <TabLink key={t.label} tab={t} siteId={selectedSiteId} />
+        ))}
+      </nav>
+      {aside.length > 0 && (
+        <nav aria-label="More" className="flex max-w-full flex-wrap items-center">
+          <span className="bg-edge mx-2 h-8 w-1 shrink-0" aria-hidden />
+          {aside.map((t) => (
+            <TabLink key={t.label} tab={t} siteId={selectedSiteId} />
+          ))}
+        </nav>
+      )}
+    </div>
   );
 }
 

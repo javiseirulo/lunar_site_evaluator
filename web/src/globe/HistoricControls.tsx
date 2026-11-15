@@ -1,6 +1,6 @@
 /**
  * "Past landings" layer state and legend, used by the Layers menu — owner: Marta (src/globe).
- * Local layer (not a raster layer). Off by default.
+ * Local layer (not a raster layer). On when Explore opens.
  */
 import { historicSummary, loadHistoricSites, summaryText, useHistoric } from './historicSites';
 

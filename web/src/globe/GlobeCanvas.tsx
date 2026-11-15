@@ -158,8 +158,9 @@ export default function GlobeCanvas() {
   const historic = useHistoric((s) => s.sites);
   const historicVisible = useHistoric((s) => s.visible);
 
-  // Past landings: load once; on failure the switch shows "unavailable" and the globe carries on.
+  // Past landings stay on for Explore. A failed load still shows "unavailable" and the globe carries on.
   useEffect(() => {
+    useHistoric.getState().setVisible(true);
     void loadHistoricSites();
   }, []);
 

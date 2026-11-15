@@ -5,7 +5,7 @@
  */
 import { useMemo } from 'react';
 import { Navigate, useSearchParams } from 'react-router';
-import type { Site } from '@lunar/contracts';
+import type { Site, SiteRegion } from '@lunar/contracts';
 import {
   EARTH_BAND,
   METRICS,
@@ -25,6 +25,54 @@ import {
 } from '@/core';
 import { TimeBar } from '@/core/shell/TimeBar';
 import { SiteMoon } from './CompareMoons';
+
+const REGION_LABEL: Record<SiteRegion, string> = {
+  south_pole: 'South pole',
+  north_pole: 'North pole',
+  near_side: 'Near side',
+  far_side: 'Far side',
+};
+
+/** A short place name, so the menus group neighbours instead of one long alphabetical list. */
+function placeName(group: string | undefined): string | null {
+  const g = group ?? '';
+  if (/Shackleton/i.test(g)) return 'Shackleton';
+  if (/Luna-27/i.test(g)) return 'Luna-27';
+  if (/Apollo/i.test(g)) return 'Apollo';
+  if (/Surveyor/i.test(g)) return 'Surveyor';
+  if (/Luna robotic/i.test(g)) return 'Luna';
+  if (/Chang'e/i.test(g)) return "Chang'e";
+  if (/ISRO/i.test(g)) return 'Chandrayaan';
+  if (/JAXA/i.test(g)) return 'SLIM';
+  if (/Firefly/i.test(g)) return 'Firefly';
+  if (/Intuitive Machines/i.test(g)) return 'Intuitive Machines';
+  if (/Glaser/i.test(g)) return 'High illumination';
+  const tail = g.includes(':') ? (g.split(':').pop()?.split(';')[0]?.trim() ?? '') : '';
+  return tail.replace(/\s+\d+$/, '') || null;
+}
+
+function areaGroups(sites: Site[]) {
+  const buckets = new Map<string, Site[]>();
+  for (const site of sites) {
+    const region = (site.region && REGION_LABEL[site.region]) || 'Other';
+    const place = placeName(site.group);
+    const label = place ? `${region} — ${place}` : region;
+    const list = buckets.get(label);
+    if (list) list.push(site);
+    else buckets.set(label, [site]);
+  }
+  const rank = (label: string) => {
+    const region = label.split(' — ')[0] ?? '';
+    const i = ['South pole', 'North pole', 'Near side', 'Far side', 'Other'].indexOf(region);
+    return i < 0 ? 9 : i;
+  };
+  return [...buckets.entries()]
+    .map(([label, list]) => ({
+      label,
+      sites: list.sort((a, b) => a.name.localeCompare(b.name)),
+    }))
+    .sort((a, b) => rank(a.label) - rank(b.label) || a.label.localeCompare(b.label));
+}
 
 /** Compare exists only in Expert mode: in Normal the route quietly goes back to Explore. */
 export default function ComparePage() {
@@ -48,9 +96,10 @@ function CompareView() {
     return [...new Set([selectedSiteId, ...ranked].filter((x): x is string => !!x))].slice(0, 3);
   }, [params, sites, selectedSiteId]);
 
+  const groups = useMemo(() => areaGroups(sites ?? []), [sites]);
+
   if (!sites) return null;
   const chosen = ids.flatMap((id) => sites.find((s) => s.id === id) ?? []);
-  const sorted = [...sites].sort((a, b) => a.name.localeCompare(b.name));
 
   const setSlot = (slot: number, id: string) => {
     const next = [...ids];
@@ -79,14 +128,18 @@ function CompareView() {
                   disabled={slot > ids.length}
                 >
                   <option value="">{slot < 2 ? 'Choose…' : '— none —'}</option>
-                  {sorted.map((s) => (
-                    <option
-                      key={s.id}
-                      value={s.id}
-                      disabled={ids.includes(s.id) && ids[slot] !== s.id}
-                    >
-                      {s.name}
-                    </option>
+                  {groups.map((group) => (
+                    <optgroup key={group.label} label={group.label}>
+                      {group.sites.map((s) => (
+                        <option
+                          key={s.id}
+                          value={s.id}
+                          disabled={ids.includes(s.id) && ids[slot] !== s.id}
+                        >
+                          {s.name}
+                        </option>
+                      ))}
+                    </optgroup>
                   ))}
                 </select>
               </label>
@@ -95,8 +148,8 @@ function CompareView() {
 
           {chosen.length > 0 && (
             <div className="grid items-start gap-3 md:grid-cols-3">
-              {chosen.map((site) => (
-                <SiteColumn key={site.id} site={site} />
+              {chosen.map((site, index) => (
+                <SiteColumn key={index} site={site} />
               ))}
             </div>
           )}

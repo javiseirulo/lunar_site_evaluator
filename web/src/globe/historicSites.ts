@@ -13,7 +13,7 @@ export type HistoricStatus = 'idle' | 'loading' | 'ready' | 'error';
 interface HistoricState {
   status: HistoricStatus;
   sites: HistoricSite[];
-  /** "Past landings" switch; off by default. */
+  /** "Past landings" switch. On when Explore opens. */
   visible: boolean;
   setVisible: (on: boolean) => void;
 }
@@ -21,7 +21,7 @@ interface HistoricState {
 export const useHistoric = create<HistoricState>()((set) => ({
   status: 'idle',
   sites: [],
-  visible: false,
+  visible: true,
   setVisible: (visible) => set({ visible }),
 }));
 
