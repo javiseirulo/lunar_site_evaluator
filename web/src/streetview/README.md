@@ -125,7 +125,7 @@ Left drag / one-finger drag looks around; wheel / pinch changes field of view
 Click or tap visible ground 1–500 m away to walk. The route samples the actual
 visual mesh every ≤5 m, then eases for up to 2.4 seconds (instant with reduced motion).
 Far mountains and sky are rejected. Global relocation is explicit under
-**View options → Go anywhere on the Moon**. **Expand view** works on mobile too.
+**View options → Go anywhere on the Moon**. The fullscreen icon uses native fullscreen when available and a viewport-filling layout on mobile browsers that lack it. The map, sky and QR controls stay inside the viewer.
 
 Relief reading light is off by default so the source imagery stays visible.
 It is artificial, camera-relative fill derived from geometric normals, with a
