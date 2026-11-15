@@ -6,6 +6,7 @@
 import { Link, NavLink, useLocation } from 'react-router';
 import { useAppStore } from '../store';
 import { useData, useTimeseries } from '../data';
+import { useClockRange } from '../clockRange';
 import { useActiveSeries } from '@/ephem/activeSeries';
 import { TABS, modeForPath, pathForMode } from '../navigation';
 import { formatHours, formatUtc } from '../format';
@@ -98,7 +99,7 @@ function ModeSwitch() {
 function NextUp() {
   const sites = useData((s) => s.sites);
   const isMock = useData((s) => s.isMock);
-  const range = useData((s) => s.manifest?.time_range);
+  const range = useClockRange();
   const active = useActiveSeries();
   const currentTimeUTC = useAppStore((s) => s.currentTimeUTC);
   const proMode = useAppStore((s) => s.proMode);
