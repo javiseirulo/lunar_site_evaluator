@@ -263,6 +263,9 @@ function ObserverView({ siteId, showcase }: { siteId: string; showcase: boolean 
                 onReturn={returnToMap}
                 onObserver={onObserver}
                 onView={onView}
+                nearbyHref={(point) =>
+                  makeViewLink(new URL(window.location.href), 'free', point, time, view)
+                }
                 onGround={setMeshGround}
               />
             </Suspense>
