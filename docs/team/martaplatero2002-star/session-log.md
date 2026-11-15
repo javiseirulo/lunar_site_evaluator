@@ -138,5 +138,5 @@
 - Caché por (punto a 4 decimales ≈ 3 m, elevación, ventana, horizonte): serie de la ventana (LRU 16) y serie de 30 días desde la hora del Mission Clock (LRU 400). "Ahora" y "horas hasta el próximo cambio" salen de esta segunda.
 - Estados: loading (efemérides/terreno/horizonte cargando), no_ephemeris (fuera de 2026–2055 o sin publicar), error, ready.
 - Test de coherencia: apollo_11 (flat) reproduce `timeseries/apollo_11.json` en 2027 (sunlitFraction a <0,002, noche y corte de Tierra a ≤2 h).
-- UI: `PointStatsView.tsx` en la ficha de punto y de pin propio; `ComparePoints.tsx` (abajo a la derecha, plegable, una fila por pin, se recalcula con el reloj/ventana/requisitos, botón de quitar pin).
+- UI: `PointStatsView.tsx` en la ficha de punto y de pin propio; tarjeta lateral (`SiteDetail`) con las estadísticas del pin seleccionado, "Stand here in Street View" y borrar pin (`pinSelection.ts`). Se probó una tabla "Compare points" y Marta la descartó (2026-11-15).
 - Pendiente: mapa de calor con rejilla (v4); pendiente (slope) de puntos libres; no verificado visualmente en navegador.

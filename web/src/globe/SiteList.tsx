@@ -6,6 +6,11 @@
  * SiteDetail: the selected site's sheet: requirement checks, "Now" (Mission Clock) and window stats.
  */
 import { standHere } from './streetViewFlight';
+import { useNavigate } from 'react-router';
+import { prepareSurfaceLocation } from '@/core';
+import { useCustomPins } from './customPins';
+import { PointStatsView } from './PointStatsView';
+import { usePinSelection } from './pinSelection';
 import { useEffect, useRef, useState } from 'react';
 import { Plus, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -466,7 +471,61 @@ function Results() {
 // Site sheet
 // ---------------------------------------------------------------------------
 
+/** Right-hand card: the selected own pin if there is one, otherwise the selected catalogue site. */
 export function SiteDetail({ className }: { className?: string }) {
+  const pinId = usePinSelection((s) => s.pinId);
+  const pin = useCustomPins((s) => s.pins.find((p) => p.id === pinId) ?? null);
+  return pin ? <PinDetail pin={pin} className={className} /> : <SiteBody className={className} />;
+}
+
+function PinDetail({
+  pin,
+  className,
+}: {
+  pin: { id: string; name: string; lat: number; lon: number };
+  className?: string;
+}) {
+  const navigate = useNavigate();
+  const proMode = useAppStore((s) => s.proMode);
+  const removePin = useCustomPins((s) => s.removePin);
+  return (
+    <section className={cn('box p-5', className)} aria-label={`${pin.name} details`}>
+      <h2 className="text-[24px] leading-tight">{pin.name}</h2>
+      <p className="text-ink-muted num mt-1 text-[12px]">
+        {proMode ? formatLatLon(pin.lat, pin.lon) : 'Your own pin'}
+      </p>
+      <div className="mt-4">
+        <PointStatsView point={pin} />
+      </div>
+      <button
+        type="button"
+        onClick={() =>
+          standHere({
+            siteId: 'free',
+            lat: pin.lat,
+            lon: pin.lon,
+            onArrive: () => navigate(prepareSurfaceLocation({ lat: pin.lat, lon: pin.lon })),
+          })
+        }
+        className="btn mt-5 w-full"
+      >
+        Stand here in Street View
+      </button>
+      <button
+        type="button"
+        onClick={() => {
+          usePinSelection.getState().setPinId(null);
+          removePin(pin.id);
+        }}
+        className="btn btn-quiet mt-2 w-full"
+      >
+        Delete pin
+      </button>
+    </section>
+  );
+}
+
+function SiteBody({ className }: { className?: string }) {
   const site = useSelectedSite();
   const proMode = useAppStore((s) => s.proMode);
   const req = useRequirements((s) => s.req);

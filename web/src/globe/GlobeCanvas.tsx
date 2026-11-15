@@ -58,7 +58,7 @@ import { flightAt, planFlight, type Flight } from './flight';
 import { useSunDirection } from './sunLight';
 import { NIGHT_FILL, useNightLayer } from './nightLayer';
 import { Terminator } from './DayNight';
-import { ComparePoints } from './ComparePoints';
+import { usePinSelection } from './pinSelection';
 import { LayersMenu } from './LayersMenu';
 import { PatchTrigger, PolarPatch, SunLight } from './PolarPatch';
 import { ActiveLegend } from '@/layers';
@@ -229,6 +229,13 @@ export default function GlobeCanvas() {
   const onCustomClick = (id: string) =>
     setFocus((f) => (f?.kind === 'custom' && f.id === id ? null : { kind: 'custom', id }));
 
+  // The right-hand card shows the statistics of the selected own pin.
+  const focusedPinId = focus?.kind === 'custom' ? focus.id : null;
+  useEffect(() => {
+    usePinSelection.getState().setPinId(focusedPinId);
+    return () => usePinSelection.getState().setPinId(null);
+  }, [focusedPinId]);
+
   const closeCard = () => {
     if (focus?.kind === 'site') useAppStore.getState().selectSite(null);
     else setFocus(null);
@@ -328,7 +335,6 @@ export default function GlobeCanvas() {
       </div>
       {/* Javi: legend of the active map layers (Expert only, like the layers panel). */}
       {expert && <ActiveLegend className="pointer-events-none absolute top-2 right-2" />}
-      <ComparePoints className="absolute right-2 bottom-10 z-[50]" />
       {exaggerated && (
         <div
           role="note"
