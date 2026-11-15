@@ -260,7 +260,7 @@ function Final() {
         <h2 className="lp-display text-4xl text-white md:text-7xl">{FINAL.title}</h2>
         <p className={`${BODY} mx-auto mt-5 max-w-xl`}>{FINAL.text}</p>
         <div className="mt-9 flex flex-wrap items-center justify-center gap-x-8 gap-y-4">
-          <Link to="/explore" className={`${PILL} inline-flex px-8 py-3.5`}>
+          <Link to="/home" className={`${PILL} inline-flex px-8 py-3.5`}>
             Open the map
           </Link>
           <Link to="/game" className={LINK}>

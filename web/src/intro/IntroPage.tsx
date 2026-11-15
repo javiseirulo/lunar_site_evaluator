@@ -165,7 +165,7 @@ export default function IntroPage() {
               their sunlight and a view of Earth, hour by hour through 2027.
             </p>
             <Link
-              to="/explore"
+              to="/home"
               className={`${PILL} lp-rise mt-6 inline-flex px-8 py-3.5 md:mt-9`}
               style={{ animationDelay: '320ms' }}
             >
@@ -224,7 +224,7 @@ export default function IntroPage() {
               The {BRAND} team
             </figcaption>
             <div className="mt-7 flex flex-wrap items-center justify-center gap-x-8 gap-y-4 md:mt-8">
-              <Link to="/explore" className={`${PILL} inline-flex px-8 py-3.5`}>
+              <Link to="/home" className={`${PILL} inline-flex px-8 py-3.5`}>
                 Open the map
               </Link>
               <button
@@ -304,7 +304,7 @@ function Nav() {
           ))}
         </nav>
 
-        <Link to="/explore" className={`${PILL} hidden px-6 py-2.5 md:inline-flex`}>
+        <Link to="/home" className={`${PILL} hidden px-6 py-2.5 md:inline-flex`}>
           Open the app
         </Link>
 
@@ -366,7 +366,7 @@ function Nav() {
           ))}
         </nav>
         <Link
-          to="/explore"
+          to="/home"
           onClick={() => setOpen(false)}
           className={`${PILL} mt-auto inline-flex px-8 py-3.5 transition-all duration-500 ${ease} ${
             open ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
