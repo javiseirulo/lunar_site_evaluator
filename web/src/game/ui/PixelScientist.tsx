@@ -1,10 +1,10 @@
 /**
- * Dr. Regolith, the Mission narrator: the generated portrait (`dr-regolith-talk.png`) when it
- * exists, otherwise an inline 16×16 pixel-art SVG with a gentle idle bob.
+ * Dr. Regolith, the Mission narrator: the generated portrait for `mood` (`dr-regolith-<mood>.png`)
+ * when it exists, otherwise an inline 16×16 pixel-art SVG with a gentle idle bob.
  */
 import { motion } from 'motion/react';
 import { clsx } from 'clsx';
-import { scientistImage } from './assets';
+import { scientistImage, type Mood } from './assets';
 import { GameImage } from './GameImage';
 import { SCIENTIST_PALETTE, SCIENTIST_PIXELS } from './pixelScientistArt';
 
@@ -30,11 +30,11 @@ function PixelSvg({ className }: { className?: string }) {
   );
 }
 
-export function PixelScientist({ className }: { className?: string }) {
+export function PixelScientist({ className, mood = 'talk' }: { className?: string; mood?: Mood }) {
   const size = clsx('size-32 sm:size-40', className);
   return (
     <GameImage
-      src={scientistImage('talk')}
+      src={scientistImage(mood)}
       alt="Dr. Regolith, the mission scientist"
       className={clsx(size, 'object-contain [image-rendering:pixelated]')}
       fallback={<PixelSvg className={size} />}

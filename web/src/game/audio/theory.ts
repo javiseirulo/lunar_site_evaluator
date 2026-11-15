@@ -166,10 +166,13 @@ export function barEvents(mood: Mood, bar: number): NoteEvent[] {
 export function moodFor(phase: Phase, win: boolean | null): Mood {
   switch (phase) {
     case 'alert':
+    case 'briefing':
+    case 'approach':
     case 'dealing':
     case 'choosing':
+    case 'descent':
+    case 'recon':
       return 'tense';
-    case 'travel':
     case 'timelapse':
       return 'ambient';
     case 'verdict':

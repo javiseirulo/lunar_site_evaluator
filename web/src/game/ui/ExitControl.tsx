@@ -12,7 +12,15 @@ import { sfx } from '../audio/sfx';
 import { useGame, type Phase } from '../state/gameStore';
 
 /** Phases where the decision countdown is on screen. */
-const CLOCK_PHASES: readonly Phase[] = ['alert', 'dealing', 'choosing'];
+const CLOCK_PHASES: readonly Phase[] = [
+  'alert',
+  'briefing',
+  'approach',
+  'dealing',
+  'choosing',
+  'descent',
+  'recon',
+];
 
 export function ExitControl() {
   const phase = useGame((s) => s.phase);

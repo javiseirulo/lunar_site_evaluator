@@ -57,6 +57,17 @@ describe('parseCoordinate', () => {
     expect(parseCoordinate('abc', 'lat')).toBeNull();
     expect(parseCoordinate('', 'lon')).toBeNull();
   });
+
+  it('accepts arbitrary points and the exact range limits', () => {
+    expect(parseCoordinate('12.5', 'lat')).toBe(12.5);
+    expect(parseCoordinate('45.0', 'lon')).toBe(45);
+    expect(parseCoordinate('90', 'lat')).toBe(90);
+    expect(parseCoordinate('-90', 'lat')).toBe(-90);
+    expect(parseCoordinate('180', 'lon')).toBe(180);
+    expect(parseCoordinate('-180', 'lon')).toBe(-180);
+    expect(parseCoordinate('90.0001', 'lat')).toBeNull();
+    expect(parseCoordinate('180.0001', 'lon')).toBeNull();
+  });
 });
 
 describe('coordsForClipboard', () => {

@@ -47,3 +47,5 @@ export type { Robustness, RobustnessShift } from './robustness';
 export { bestDateCurve, paretoFront } from './curves';
 export type { DatePoint, ParetoPoint } from './curves';
 export { SiteCheckPanel } from './SiteCheckPanel';
+export { explainEvaluation, requirementLabel, formatRequirementValue, formatNeed } from './explain';
+export type { Explanation } from './explain';

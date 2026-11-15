@@ -1,21 +1,23 @@
 /**
  * Result of the chosen card: stars on a win, cause + lesson on a loss, and the real site name.
  * The chosen card's bars come back with the deciding one highlighted, and a loss names the
- * landing sites that would have survived.
+ * landing sites that would have survived. A small globe pulls back from the site and names it.
  */
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
 import { Star } from 'lucide-react';
 import { clsx } from 'clsx';
-import { useData } from '@/core';
+import { useData, useTimeseries } from '@/core';
 import { CAUSE_BAR, qualityBars } from '../engine/bars';
 import { DEFAULT_REQUIREMENTS } from '../engine/requirements';
 import { sfx } from '../audio/sfx';
 import { useGame } from '../state/gameStore';
 import { verdictImage } from './assets';
+import { CoachPanel } from './CoachPanel';
 import { CAUSE_HEADLINE, lessonFor } from './content';
 import { GameButtons } from './GameButtons';
 import { countUp } from './format';
+import { GameGlobe } from './GameGlobe';
 import { GameImage } from './GameImage';
 import { QualityBar } from './QualityBar';
 import { survivorsLine, verdictSummary } from './reveal';
@@ -126,6 +128,7 @@ export function VerdictScreen() {
   const difficulty = useGame((s) => s.difficulty);
   const card = hand?.cards.find((c) => c.slot === chosenSlot);
   const site = sites?.find((s) => s.id === card?.siteId);
+  const ts = useTimeseries(card?.siteId);
 
   if (!card) {
     return (
@@ -170,6 +173,14 @@ export function VerdictScreen() {
             className="size-full"
           />
         </motion.div>
+        {site && (
+          // The globe pulls back from the site and names it: the moment the name goes public.
+          <div className="mission-pixel absolute right-2 bottom-2 h-28 w-44 overflow-hidden border-2 border-black sm:h-36 sm:w-56">
+            <GameGlobe
+              shot={{ kind: 'reveal', target: { lat: site.lat, lon: site.lon }, label: siteName }}
+            />
+          </div>
+        )}
       </div>
       <div className="flex min-w-0 flex-1 flex-col gap-3">
         <h2
@@ -236,6 +247,9 @@ export function VerdictScreen() {
               ))}
             </div>
           </div>
+        )}
+        {v.win && v.stars < 3 && (
+          <CoachPanel site={site} ts={ts} startIndex={hand?.startIndex ?? 0} verdict={v} />
         )}
         {survivors && <p className="text-good text-[12.5px] font-bold">{survivors}</p>}
         <div className="border-2 border-black bg-black/50 p-2 text-[12px] text-ink">

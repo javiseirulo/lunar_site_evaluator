@@ -1,0 +1,44 @@
+[
+  {
+    "id": "01-hook",
+    "start": 0.0,
+    "style": "low, calm and intriguing, posing a challenge to one person; brisk, about 3 words per second",
+    "text": "Pick any spot on the Moon. <short pause> Would your mission survive?"
+  },
+  {
+    "id": "02-clock",
+    "start": 3.2,
+    "style": "steady and curious, rhythm building as the clock speeds up; brisk, about 3 words per second",
+    "text": "Run the clock. Watch sunlight sweep every crater."
+  },
+  {
+    "id": "03-ground",
+    "start": 7.0,
+    "style": "hushed awe, easing off as the camera lands, almost a whisper of wonder; unhurried but not slow, about 2.5 words per second",
+    "text": "Drop to the surface. <short pause> Is the Sun up? Can you see Earth?"
+  },
+  {
+    "id": "04-game",
+    "start": 11.5,
+    "style": "energy lift, confident and a little faster, like starting a mission briefing; brisk, about 3 words per second",
+    "text": "Make it a game: an emergency, four sites, one choice."
+  },
+  {
+    "id": "05-vote",
+    "start": 15.5,
+    "style": "warm and upbeat, quick and light; brisk, about 3 words per second",
+    "text": "Your class votes from their phones."
+  },
+  {
+    "id": "06-reveal",
+    "start": 19.0,
+    "style": "satisfied and knowing, warm, a smile in the voice; natural pace, about 2.5 words per second",
+    "text": "Then the Moon plays it out, <short pause> and the teacher shows why."
+  },
+  {
+    "id": "07-close",
+    "start": 24.0,
+    "style": "confident and resolved, closing line; land the last five words with weight; natural pace, about 2.5 words per second",
+    "text": "Simple for a class. Deep for engineers. <short pause> Moonfall: where would you land?"
+  }
+]

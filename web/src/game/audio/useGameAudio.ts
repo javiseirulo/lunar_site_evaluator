@@ -6,16 +6,12 @@
  * `data-sfx="hover"` tick on mouse hover.
  */
 import { useEffect, type RefObject } from 'react';
-import { useGame, type GameState } from '../state/gameStore';
+import { DESCENT_MS, DESCENT_REDUCED_MS, useGame, type GameState } from '../state/gameStore';
 import { deactivate, setHidden, setMuted, unlock } from './engine';
 import { setMood, setMusicEnabled, startMusic, stopMusic } from './music';
 import { useSoundPrefs } from './prefs';
 import { sfx } from './sfx';
 import { moodFor, rateLimiter } from './theory';
-
-/** Seconds of descent before touchdown (mirrors TravelScreen's timing). */
-const FLIGHT_S = 3.4;
-const REDUCED_FLIGHT_S = 0.6;
 
 function chosenWin(s: GameState): boolean | null {
   const card = s.hand?.cards.find((c) => c.slot === s.chosenSlot);
@@ -36,8 +32,11 @@ function onPhase(s: GameState, prev: GameState) {
       case 'alert':
         sfx.klaxon();
         break;
-      case 'travel': {
-        const flight = prefersReducedMotion() ? REDUCED_FLIGHT_S : FLIGHT_S;
+      case 'descent': {
+        // Seconds until touchdown (the globe dive's length).
+        const reduced = prefersReducedMotion();
+        const flight = (reduced ? DESCENT_REDUCED_MS : DESCENT_MS) / 1000;
+        if (!reduced) sfx.whoosh(flight * 0.6);
         sfx.rumble(flight);
         sfx.thud(flight);
         break;
