@@ -16,6 +16,8 @@ export {
 } from './arrival';
 export type { Arrival, SiteLocation } from './arrival';
 export { MissionTimingPanel } from './MissionTimingPanel';
+export { LandingDate } from './LandingDate';
+export { windowIssue, landingBounds, unavailableMessage } from './landingWindow';
 export type { ArrivalOptions } from './arrival';
 export { LESS_IS_BETTER, lessIsBetter, passes, margin, utility } from './utility';
 export {

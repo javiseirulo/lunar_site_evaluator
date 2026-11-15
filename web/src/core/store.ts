@@ -38,6 +38,15 @@ export interface AppState extends AppEvents {
   setSimulationStarted: (started: boolean) => void;
   /** A site/point switch the user must confirm first (Normal mode, simulation running). */
   pendingSelection: PendingSelection | null;
+  /** A landing-date change the user must confirm first (Normal mode, simulation running). */
+  pendingLanding: { patch: Partial<MissionConfig>; startUtc: string } | null;
+  /**
+   * Change the mission window (landing date). Applies at once, resetting the clock to `startUtc`
+   * and ending any simulation, unless a Normal-mode simulation is running: then it waits in
+   * `pendingLanding` for the "End simulation?" confirm.
+   */
+  requestLanding: (patch: Partial<MissionConfig>, startUtc: string) => void;
+  confirmLanding: () => void;
   /** Bumped by `resetClock`; TimeBar observes it to stop its own playback loop. */
   clockResetNonce: number;
   setSelectedPoint: (point: { lat: number; lon: number } | null) => void;
@@ -76,6 +85,20 @@ export interface AppState extends AppEvents {
   cancelPending: () => void;
   /** Pause-and-rewind helper shared by TimeBar's reset and the end-simulation confirm. */
   resetClock: (startUtc: string) => void;
+  /**
+   * A pin the Explore side panel asked for (by coordinates). The globe, which owns the camera,
+   * drops it, flies there and clears it with `clearPendingPin`. A new object per request, so the
+   * same coordinates twice still fire.
+   */
+  pendingPin: PendingPin | null;
+  requestPin: (pin: PendingPin) => void;
+  clearPendingPin: () => void;
+}
+
+export interface PendingPin {
+  name: string;
+  lat: number;
+  lon: number;
 }
 
 const PRO_KEY = 'lse.proMode';
@@ -110,6 +133,7 @@ export const useAppStore = create<AppState>()((set, get) => {
     selectedPoint: null,
     simulationStarted: false,
     pendingSelection: null,
+    pendingLanding: null,
     clockResetNonce: 0,
     currentTimeUTC: DEFAULT_TIME_UTC,
     timeRevision: 0,
@@ -119,6 +143,7 @@ export const useAppStore = create<AppState>()((set, get) => {
     layersInitialised: false,
     proMode: readPro(),
     missionConfig: DEFAULT_MISSION_CONFIG,
+    pendingPin: null,
 
     selectSite: (id) =>
       set((s) =>
@@ -144,6 +169,8 @@ export const useAppStore = create<AppState>()((set, get) => {
       );
     },
     setSimulationStarted: (started) => set({ simulationStarted: started }),
+    requestPin: (pin) => set({ pendingPin: { ...pin } }),
+    clearPendingPin: () => set({ pendingPin: null }),
     setTime: (isoUtc) => set((s) => ({ currentTimeUTC: isoUtc, timeRevision: s.timeRevision + 1 })),
     setMode: (mode) => set({ mode }),
 
@@ -222,7 +249,25 @@ export const useAppStore = create<AppState>()((set, get) => {
       pending.after?.();
     },
 
-    cancelPending: () => set({ pendingSelection: null }),
+    cancelPending: () => set({ pendingSelection: null, pendingLanding: null }),
+
+    requestLanding: (patch, startUtc) => {
+      const s = get();
+      if (!s.proMode && s.simulationStarted) {
+        set({ pendingLanding: { patch, startUtc } });
+        return;
+      }
+      s.setMissionConfig(patch);
+      s.resetClock(startUtc);
+    },
+
+    confirmLanding: () => {
+      const pending = get().pendingLanding;
+      if (!pending) return;
+      set({ pendingLanding: null });
+      get().setMissionConfig(pending.patch);
+      get().resetClock(pending.startUtc);
+    },
 
     resetClock: (startUtc) =>
       set((s) => ({
