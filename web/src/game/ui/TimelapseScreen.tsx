@@ -1,19 +1,23 @@
 /**
  * `timelapse` phase: plays the 7-day surface mission in ~25 s by driving the shared clock
- * (`setTime`) from the landing time. Map on the left, HUD on the right. It freezes at the
- * verdict's `failHour` (red freeze + cause stamp) or runs to the last hour (gold burst), holds
- * for a moment, then calls `finish()`.
+ * (`setTime`) from the landing time. The default view is the lander cockpit (window + control
+ * panel, `cockpit/CockpitView`); a "Map" tab shows the polar map. It freezes at the verdict's
+ * `failHour` (the cockpit dramatises the cause) or runs to the last hour (all systems
+ * nominal), holds for a moment, then calls `finish()`.
  */
-import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import { motion, useReducedMotion } from 'motion/react';
-import { FastForward, Moon, SatelliteDish, Snowflake, Sun, WifiOff } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { useReducedMotion } from 'motion/react';
+import { FastForward, Gauge, Map as MapIcon } from 'lucide-react';
 import { clsx } from 'clsx';
 import { sampleAt, useAppStore, useTimeseries } from '@/core';
 import { DEFAULT_REQUIREMENTS } from '../engine/requirements';
-import { isLinkUp, type Verdict } from '../engine/simulate';
+import { isLinkUp } from '../engine/simulate';
+import { sfx } from '../audio/sfx';
 import { useGame } from '../state/gameStore';
+import { siteTerrain } from './assets';
 import { CAUSE_HEADLINE } from './content';
-import { MissionMap } from './MissionMap';
+import { CockpitView } from './cockpit/CockpitView';
+import { MapView } from './cockpit/MapView';
 import {
   dayOfMission,
   isoAtHour,
@@ -26,109 +30,15 @@ import {
 const REQ = DEFAULT_REQUIREMENTS;
 const DAYS = REQ.surface_days;
 const MISSION_HOURS = DAYS * 24;
-const DARK_LIMIT = REQ.max_dark_h.threshold;
-const BLACKOUT_LIMIT = REQ.max_blackout_h.threshold;
-/** How long the frozen end state stays on screen before the verdict. */
-const HOLD_MS = 2500;
+/** How long the frozen end state stays on screen before the verdict (time for the failure fx). */
+const HOLD_MS = 3500;
 
-const GOOD = '#3ddc84';
-const WARN = '#ffd23f';
-const BAD = '#ff3b30';
+type View = 'cockpit' | 'map';
 
-function StatusRow({ on, icon, label }: { on: boolean | null; icon: ReactNode; label: string }) {
-  return (
-    <div
-      className="flex items-center gap-2 border-2 border-black bg-black/50 px-2 py-1.5 font-mono text-[12px] font-bold uppercase"
-      style={{ color: on === null ? undefined : on ? GOOD : BAD }}
-    >
-      {icon}
-      {label}
-    </div>
-  );
-}
-
-/** Current run of hours vs. its limit, as a bar that warms up towards the limit. */
-function RunMeter({
-  icon,
-  label,
-  value,
-  limit,
-}: {
-  icon: ReactNode;
-  label: string;
-  value: number;
-  limit: number;
-}) {
-  const color = value > limit ? BAD : value >= limit * 0.75 ? WARN : GOOD;
-  return (
-    <div className="flex flex-col gap-1">
-      <div className="flex items-center justify-between gap-2 font-mono text-[11px] uppercase">
-        <span className="text-ink-muted flex items-center gap-1.5">
-          {icon}
-          {label}
-        </span>
-        <span className="font-bold" style={{ color }}>
-          {value} h / {limit} h
-        </span>
-      </div>
-      <div className="h-3 border-2 border-black bg-black/60">
-        <div
-          className="h-full"
-          style={{ width: `${Math.min(100, (value / limit) * 100)}%`, background: color }}
-        />
-      </div>
-    </div>
-  );
-}
-
-/** End-of-timelapse overlay: cause stamp on a loss, gold burst on a win. */
-function EndOverlay({ verdict, hour }: { verdict: Verdict; hour: number }) {
-  const when = `Day ${dayOfMission(hour, DAYS)} · hour ${hour}`;
-  if (verdict.win) {
-    return (
-      <div className="pointer-events-none absolute inset-0 flex items-center justify-center overflow-hidden">
-        <motion.div
-          className="absolute size-40 rounded-full"
-          style={{
-            background: `radial-gradient(circle, ${WARN} 0%, ${WARN}80 40%, transparent 70%)`,
-          }}
-          initial={{ scale: 0, opacity: 1 }}
-          animate={{ scale: 6, opacity: 0 }}
-          transition={{ duration: 1.2, ease: 'easeOut' }}
-        />
-        <motion.div
-          role="status"
-          className="mission-pixel relative border-4 border-black bg-[#ffd23f] px-5 py-3 text-center text-black"
-          initial={{ scale: 0.4, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ type: 'spring', stiffness: 260, damping: 14 }}
-        >
-          <p className="font-mono text-xl font-bold tracking-widest uppercase">Mission complete</p>
-          <p className="font-mono text-[12px] font-bold">All {DAYS} days survived</p>
-        </motion.div>
-      </div>
-    );
-  }
-  return (
-    <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-[#ff3b30]/15">
-      <motion.div
-        role="status"
-        className="mission-pixel max-w-sm border-4 border-[#ff3b30] bg-[#14060a] px-5 py-3 text-center"
-        initial={{ scale: 2.2, opacity: 0, rotate: -14 }}
-        animate={{ scale: 1, opacity: 1, rotate: -6 }}
-        transition={{ type: 'spring', stiffness: 320, damping: 18 }}
-      >
-        <p className="font-mono text-xl font-bold tracking-widest text-[#ff3b30] uppercase">
-          Mission failed
-        </p>
-        <p className="text-[14px] font-bold text-white">
-          {verdict.cause ? CAUSE_HEADLINE[verdict.cause] : 'The mission did not survive.'}
-        </p>
-        <p className="text-ink-muted font-mono text-[11px] uppercase">{when}</p>
-      </motion.div>
-    </div>
-  );
-}
+const VIEWS: { id: View; label: string; icon: typeof Gauge }[] = [
+  { id: 'cockpit', label: 'Cockpit', icon: Gauge },
+  { id: 'map', label: 'Map', icon: MapIcon },
+];
 
 export function TimelapseScreen() {
   const hand = useGame((s) => s.hand);
@@ -136,9 +46,11 @@ export function TimelapseScreen() {
   const card = hand?.cards.find((c) => c.slot === chosenSlot);
   const reduced = useReducedMotion() ?? false;
   const ts = useTimeseries(card?.siteId);
+  const [view, setView] = useState<View>('cockpit');
 
-  /** Whole mission hour on screen (the shared clock moves smoothly in between). */
-  const [hour, setHour] = useState(0);
+  /** Fractional mission hour on screen (smooth sky motion); instruments use the whole hour. */
+  const [hourF, setHourF] = useState(0);
+  const hour = Math.floor(hourF);
   const [ended, setEnded] = useState(false);
   const skipRef = useRef(false);
   const finishedRef = useRef(false);
@@ -167,7 +79,7 @@ export function TimelapseScreen() {
     const settle = () => {
       settledRef.current = true;
       useAppStore.getState().setTime(isoAtHour(landingUtc, stop));
-      setHour(stop);
+      setHourF(stop);
       setEnded(true);
       hold = window.setTimeout(finishOnce, HOLD_MS);
     };
@@ -180,6 +92,9 @@ export function TimelapseScreen() {
     }
 
     const t0 = performance.now();
+    // The shared clock moves in whole hours only: setTime notifies every app subscriber, so it
+    // must not run on every animation frame. The fractional hour stays local (smooth sky).
+    let lastWhole = -1;
     const tick = (now: number) => {
       // Reduced motion: no playback, show the end state straight away.
       const h =
@@ -190,8 +105,12 @@ export function TimelapseScreen() {
         settle();
         return;
       }
-      useAppStore.getState().setTime(isoAtHour(landingUtc, h));
-      setHour(Math.floor(h));
+      const whole = Math.floor(h);
+      if (whole !== lastWhole) {
+        lastWhole = whole;
+        useAppStore.getState().setTime(isoAtHour(landingUtc, whole));
+      }
+      setHourF(h);
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
@@ -208,106 +127,111 @@ export function TimelapseScreen() {
     [ts, hand],
   );
 
-  if (!card || !landingUtc) return null;
+  // Soft chime at each new mission day; the cause's sting when the mission freezes on a failure.
+  const day = dayOfMission(hour, DAYS);
+  const lastDay = useRef(day);
+  useEffect(() => {
+    if (day > lastDay.current && !ended) sfx.dayChime();
+    lastDay.current = day;
+  }, [day, ended]);
+  const verdict = card?.verdict;
+  useEffect(() => {
+    if (!ended || !verdict) return;
+    if (verdict.win) sfx.dayChime();
+    else if (verdict.cause) sfx.failure(verdict.cause);
+  }, [ended, verdict]);
+
+  if (!card || !landingUtc || !hand) return null;
 
   const sample = ts ? sampleAt(ts, isoAtHour(landingUtc, hour)) : null;
-  const sunUp = sample ? sample.lit : null;
   const linkUp = sample
     ? isLinkUp(sample.earthVisible, sample.earth_el, REQ.antenna_margin_deg)
     : null;
-  const day = dayOfMission(hour, DAYS);
   const lost = ended && !card.verdict.win;
+  const shownHour = ended && card.verdict.win ? MISSION_HOURS : hour;
+  const when = `Day ${day} · hour ${shownHour}`;
 
   return (
     <div
       className={clsx(
-        'mission-scan relative flex flex-1 flex-col gap-3 border-4 bg-[#05070f] p-3 md:flex-row',
-        lost ? 'border-[#ff3b30]' : ended ? 'border-[#ffd23f]' : 'border-black',
+        'mission-scan relative flex flex-1 flex-col gap-2 overflow-hidden border-4 bg-[#05070f] p-2 sm:p-3',
+        lost ? 'border-[#ff3b30]' : ended ? 'border-[#3ddc84]' : 'border-black',
       )}
     >
-      <MissionMap
-        className={clsx(
-          'w-full max-w-[420px] self-center transition-[filter] md:w-[46%]',
-          lost && 'grayscale',
-        )}
-      />
-
-      <div className="flex min-w-0 flex-1 flex-col gap-3">
-        <header>
-          <p className="text-warn font-mono text-[11px] font-bold tracking-widest uppercase">
-            Landing site {card.slot} · surface mission
-          </p>
-          <p className="font-mono text-3xl font-bold tracking-wider text-white uppercase">
-            Day {day} of {DAYS}
-          </p>
-          <p className="text-ink-muted font-mono text-[11px] uppercase">
-            {/* Hours count from 0; a completed mission has lived through all of them. */}
-            Hour {ended && card.verdict.win ? MISSION_HOURS : hour} of {MISSION_HOURS}
-          </p>
-          <div className="mt-1 h-2 border-2 border-black bg-black/60">
-            <div
-              className="h-full bg-[#8fd3ff]"
-              style={{ width: `${((hour + 1) / MISSION_HOURS) * 100}%` }}
-            />
-          </div>
-        </header>
-
-        <div className="grid grid-cols-2 gap-2">
-          <StatusRow
-            on={sunUp}
-            icon={
-              sunUp === false ? (
-                <Moon className="size-4" aria-hidden />
-              ) : (
-                <Sun className="size-4" aria-hidden />
-              )
-            }
-            label={sunUp === null ? 'Sun —' : sunUp ? 'Sun up' : 'Sun down'}
-          />
-          <StatusRow
-            on={linkUp}
-            icon={
-              linkUp === false ? (
-                <WifiOff className="size-4" aria-hidden />
-              ) : (
-                <SatelliteDish className="size-4" aria-hidden />
-              )
-            }
-            label={linkUp === null ? 'Earth link —' : linkUp ? 'Earth link up' : 'Earth link down'}
-          />
+      <header className="flex flex-wrap items-center justify-between gap-2">
+        <p className="text-warn font-mono text-[11px] font-bold tracking-widest uppercase">
+          Landing site {card.slot} · surface mission
+        </p>
+        <div role="tablist" aria-label="View" className="flex border-2 border-black">
+          {VIEWS.map(({ id, label, icon: Icon }) => (
+            <button
+              key={id}
+              type="button"
+              role="tab"
+              aria-selected={view === id}
+              onClick={() => setView(id)}
+              className={clsx(
+                'flex min-h-10 cursor-pointer items-center gap-1 px-2.5 font-mono text-[11px] font-bold tracking-wider uppercase',
+                view === id ? 'bg-warn text-black' : 'text-ink-muted bg-black hover:text-white',
+              )}
+            >
+              <Icon className="size-3.5" aria-hidden />
+              {label}
+            </button>
+          ))}
         </div>
+      </header>
+      <p className="sr-only" aria-live="polite">
+        {ended
+          ? card.verdict.win
+            ? `Mission complete: ${DAYS} days survived.`
+            : `Day ${day}: ${card.verdict.cause ? CAUSE_HEADLINE[card.verdict.cause] : 'mission failed.'}`
+          : `Day ${day} of ${DAYS}`}
+      </p>
 
-        <div className="flex flex-col gap-2 border-2 border-black bg-black/40 p-2">
-          <RunMeter
-            icon={<Snowflake className="size-3.5" aria-hidden />}
-            label="Battery night"
-            value={runs?.dark[hour] ?? 0}
-            limit={DARK_LIMIT}
-          />
-          <RunMeter
-            icon={<WifiOff className="size-3.5" aria-hidden />}
-            label="Comms blackout"
-            value={runs?.blackout[hour] ?? 0}
-            limit={BLACKOUT_LIMIT}
-          />
-        </div>
+      {view === 'cockpit' && !ts ? (
+        <p className="text-ink-muted flex flex-1 items-center justify-center font-mono text-[11px] tracking-widest uppercase">
+          Loading telemetry…
+        </p>
+      ) : view === 'cockpit' && ts ? (
+        <CockpitView
+          ts={ts}
+          startIndex={hand.startIndex}
+          hourF={hourF}
+          hour={hour}
+          ended={ended}
+          verdict={card.verdict}
+          terrain={siteTerrain(card.siteId)}
+          runs={runs}
+        />
+      ) : (
+        <MapView
+          sunUp={sample ? sample.lit : null}
+          linkUp={linkUp}
+          darkRun={runs?.dark[hour] ?? 0}
+          darkLimit={REQ.max_dark_h.threshold}
+          blackoutRun={runs?.blackout[hour] ?? 0}
+          blackoutLimit={REQ.max_blackout_h.threshold}
+          ended={ended}
+          verdict={card.verdict}
+          when={when}
+          days={DAYS}
+        />
+      )}
 
-        <div className="mt-auto flex justify-end">
-          <button
-            type="button"
-            className="btn h-8 px-3 text-[12px]"
-            disabled={ended}
-            onClick={() => {
-              skipRef.current = true;
-            }}
-          >
-            <FastForward className="size-4" aria-hidden />
-            Skip
-          </button>
-        </div>
+      <div className="flex justify-end">
+        <button
+          type="button"
+          className="btn h-10 px-3 text-[12px]"
+          disabled={ended}
+          onClick={() => {
+            skipRef.current = true;
+          }}
+        >
+          <FastForward className="size-4" aria-hidden />
+          Skip
+        </button>
       </div>
-
-      {ended && <EndOverlay verdict={card.verdict} hour={stop} />}
     </div>
   );
 }

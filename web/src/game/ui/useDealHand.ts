@@ -4,6 +4,9 @@
  * (`pickSubset`), loads only their timeseries and runs `deal()` on them; if that subset has no
  * valid hand it tries another one, up to `MAX_DEAL_ATTEMPTS`. Safe against StrictMode double
  * effects and against results that arrive after the phase or seed changed.
+ *
+ * A failed or empty result is keyed on the store's `dealId` plus a local retry counter, so it
+ * never leaks into a later deal (quit + start with the same seed), and `retry()` re-runs it.
  */
 import { useEffect, useState } from 'react';
 import { loadTimeseries, useData } from '@/core';
@@ -12,14 +15,23 @@ import { useGame } from '../state/gameStore';
 
 export type DealStatus = 'loading' | 'empty' | 'error';
 
-export function useDealHand(): DealStatus {
+export interface DealHand {
+  status: DealStatus;
+  /** Re-runs the deal after a load failure (the series that failed are fetched again). */
+  retry: () => void;
+}
+
+export function useDealHand(): DealHand {
   const phase = useGame((s) => s.phase);
   const hand = useGame((s) => s.hand);
   const seed = useGame((s) => s.seed);
+  const dealId = useGame((s) => s.dealId);
   const sites = useData((s) => s.sites);
   const dataError = useData((s) => s.status === 'error');
-  const [emptySeed, setEmptySeed] = useState<number | null>(null);
-  const [failedSeed, setFailedSeed] = useState<number | null>(null);
+  const [attempt, setAttempt] = useState(0);
+  const key = `${dealId}:${attempt}`;
+  const [emptyKey, setEmptyKey] = useState<string | null>(null);
+  const [failedKey, setFailedKey] = useState<string | null>(null);
 
   useEffect(() => {
     if (phase !== 'alert' || hand !== null || !sites) return;
@@ -38,7 +50,8 @@ export function useDealHand(): DealStatus {
         if (stale()) return;
         const data = useData.getState();
         // deal() skips sites whose series failed; remember failures to report a load error.
-        loadFailed ||= subset.some((s) => data.timeseriesErrors[s.id]);
+        // timeseriesErrors is never cleared, so a site that has a series now did load.
+        loadFailed ||= subset.some((s) => !data.timeseries[s.id] && data.timeseriesErrors[s.id]);
         const dealt = deal(subset, data.timeseries, seed);
         if (dealt) {
           useGame.getState().beginDealing(dealt);
@@ -48,20 +61,21 @@ export function useDealHand(): DealStatus {
       }
       // loadTimeseries swallows fetch errors (it records them in timeseriesErrors): with no
       // hand, a failed series means a load problem, not "no valid mission".
-      if (loadFailed) setFailedSeed(seed);
-      else setEmptySeed(seed);
+      if (loadFailed) setFailedKey(key);
+      else setEmptyKey(key);
     };
 
     run().catch((err: unknown) => {
       // A series failed to load or deal() threw: show the load error, not "no valid mission".
       console.error('Mission deal failed', err);
-      if (!cancelled) setFailedSeed(seed);
+      if (!cancelled) setFailedKey(key);
     });
     return () => {
       cancelled = true;
     };
-  }, [phase, hand, seed, sites]);
+  }, [phase, hand, seed, sites, key]);
 
-  if (dataError || failedSeed === seed) return 'error';
-  return emptySeed === seed ? 'empty' : 'loading';
+  const status: DealStatus =
+    dataError || failedKey === key ? 'error' : emptyKey === key ? 'empty' : 'loading';
+  return { status, retry: () => setAttempt((a) => a + 1) };
 }

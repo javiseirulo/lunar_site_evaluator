@@ -15,7 +15,7 @@ import {
   verdictImage,
 } from './assets';
 import { CAUSE_HEADLINE, emergencyById, lessonFor } from './content';
-import { dealTimeline, formatClock } from './format';
+import { countUp, dealTimeline, formatClock, slotForKey } from './format';
 
 describe('formatClock', () => {
   it('formats mm:ss and rounds up partial seconds', () => {
@@ -137,5 +137,24 @@ describe('content', () => {
       expect(lessonFor(cause).length).toBeGreaterThan(10);
     }
     expect(lessonFor(null)).toMatch(/Well done/);
+  });
+});
+
+describe('countUp', () => {
+  it('eases from 0 to the target and lands exactly on it', () => {
+    expect(countUp(0, 1000, 168)).toBe(0);
+    expect(countUp(500, 1000, 168)).toBeGreaterThan(84);
+    expect(countUp(1000, 1000, 168)).toBe(168);
+    expect(countUp(5000, 1000, 168)).toBe(168);
+    expect(countUp(10, 0, 42)).toBe(42);
+  });
+});
+
+describe('slotForKey', () => {
+  it('maps number keys to the dealt slots only', () => {
+    expect(slotForKey('2', [1, 2, 3, 4])).toBe(2);
+    expect(slotForKey('5', [1, 2, 3, 4])).toBeNull();
+    expect(slotForKey('a', [1, 2, 3, 4])).toBeNull();
+    expect(slotForKey('12', [1, 2, 3, 4])).toBeNull();
   });
 });

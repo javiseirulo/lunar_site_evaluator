@@ -2,12 +2,13 @@
  * The table of landing-site cards during `dealing` and `choosing`. Runs the deal animation
  * (then `revealed()`), and on a pick fades the other cards before calling `choose(slot)`.
  */
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useReducedMotion } from 'motion/react';
 import { useAppStore, useData } from '@/core';
+import { sfx } from '../audio/sfx';
 import { useGame } from '../state/gameStore';
 import { handSiteImages } from './assets';
-import { dealTimeline } from './format';
+import { dealTimeline, slotForKey } from './format';
 import { SiteCard } from './SiteCard';
 
 /** Time the pick animation plays before the game moves on. */
@@ -33,9 +34,16 @@ export function CardTable() {
 
   useEffect(() => {
     if (phase !== 'dealing') return;
-    const id = window.setTimeout(() => useGame.getState().revealed(), timeline.totalMs);
-    return () => window.clearTimeout(id);
-  }, [phase, timeline.totalMs]);
+    const ids = [window.setTimeout(() => useGame.getState().revealed(), timeline.totalMs)];
+    // Card sounds on the deal timeline (one slide and one flip per card).
+    if (timeline.totalMs > 0) {
+      for (let i = 0; i < cards.length; i++) {
+        ids.push(window.setTimeout(sfx.slide, timeline.slideDelay(i) * 1000));
+        ids.push(window.setTimeout(sfx.flip, timeline.flipDelay(i) * 1000));
+      }
+    }
+    return () => ids.forEach((id) => window.clearTimeout(id));
+  }, [phase, timeline, cards.length]);
 
   useEffect(() => {
     if (picked === null || !hand) return;
@@ -44,12 +52,9 @@ export function CardTable() {
         useGame.getState().choose(picked);
         const after = useGame.getState();
         if (after.phase !== 'travel' || after.chosenSlot !== picked) return;
-        const card = hand.cards.find((c) => c.slot === picked);
-        if (!card) return;
-        // Share the choice with the rest of the app (map, globe, timeline).
-        const app = useAppStore.getState();
-        app.selectSite(card.siteId);
-        app.setTime(hand.landingUtc);
+        // Share the landing time with the rest of the app. The site itself stays secret until
+        // the verdict (see reveal.ts), so it is NOT selected in the shared store here.
+        useAppStore.getState().setTime(hand.landingUtc);
       },
       reduced ? 0 : PICK_MS,
     );
@@ -58,16 +63,47 @@ export function CardTable() {
 
   const choosing = phase === 'choosing' && picked === null;
 
+  // When the cards become pickable, move keyboard focus to the first one.
+  const gridRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!choosing || document.querySelector('dialog[open]')) return;
+    gridRef.current?.querySelector<HTMLButtonElement>('button:not([disabled])')?.focus({
+      preventScroll: true,
+    });
+  }, [choosing]);
+
+  // Number keys 1–4 pick the matching landing site (ignored while the exit dialog is open).
+  useEffect(() => {
+    if (!choosing) return;
+    const slots = cards.map((c) => c.slot);
+    const onKey = (e: globalThis.KeyboardEvent) => {
+      if (e.repeat || e.altKey || e.ctrlKey || e.metaKey) return;
+      if (document.querySelector('dialog[open]')) return;
+      const slot = slotForKey(e.key, slots);
+      if (slot === null) return;
+      e.preventDefault();
+      pick(slot);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [choosing, cards, pick]);
+
   return (
     <div className="flex flex-1 flex-col gap-2">
       <p className="text-ink-muted text-center font-mono text-[11px] tracking-widest uppercase">
         {phase === 'dealing'
           ? 'Scanning reachable landing sites…'
           : picked !== null
-            ? `Landing site ${picked} locked in. Engines burning!`
-            : 'Pick one landing site: read the bars, trust the data.'}
+            ? `Landing site ${picked} locked in. Descending…`
+            : 'Pick one landing site. Keys 1–4 work too.'}
       </p>
-      <div className="grid grid-cols-2 gap-3 px-1 pt-5 pb-2 md:grid-cols-4">
+      {phase === 'choosing' && picked === null && (
+        <p className="text-ink-muted mx-auto max-w-xl text-center text-[11.5px] leading-snug">
+          Bars show each site&apos;s average over a whole year. Your mission is one 7-day week.
+          Fuller and greener is safer.
+        </p>
+      )}
+      <div ref={gridRef} className="grid grid-cols-2 gap-3 px-1 pt-5 pb-2 md:grid-cols-4">
         {cards.map((card, i) => (
           <SiteCard
             key={card.slot}
