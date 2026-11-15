@@ -3,7 +3,7 @@
  * lat/lon typed in — for the current mission win, with each requirement's margin, the score
  * breakdown and the temporal robustness (±3 days). Sky computed client-side from `@/ephem`.
  */
-import { useMemo, useState } from 'react';
+import { useId, useMemo, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { formatUtc, useAppStore, useSelectedSite } from '@/core';
 import {
@@ -15,40 +15,66 @@ import {
 } from '@/ephem';
 import { evaluateWindow, type EvaluableSite } from './evaluate';
 import { missionWindow } from './arrival';
+import {
+  explainEvaluation,
+  formatNeed,
+  formatRequirementValue,
+  requirementLabel,
+  type Explanation,
+} from './explain';
 import { robustnessRange, temporalRobustness } from './robustness';
 
-const fmt = (v: number | null | undefined, d = 2) =>
-  typeof v === 'number' && Number.isFinite(v) ? v.toFixed(d) : '—';
+const label = requirementLabel;
+const show = formatRequirementValue;
 
-/** Plain-language label and unit per requirement key. */
-const LABEL: Record<string, { label: string; unit: 'pct' | 'h' | 'deg' | 'km' }> = {
-  illum_pct: { label: 'Sunlight', unit: 'pct' },
-  earth_vis_pct: { label: 'Earth in view', unit: 'pct' },
-  max_dark_hours: { label: 'Longest night', unit: 'h' },
-  max_blackout_hours: { label: 'Longest Earth blackout', unit: 'h' },
-  sun_el_mean_deg: { label: 'Mean Sun height', unit: 'deg' },
-  sun_earth_pct: { label: 'Sun and Earth together', unit: 'pct' },
-  slope_deg: { label: 'Slope', unit: 'deg' },
-  psr_dist_km: { label: 'To icy craters', unit: 'km' },
-};
-const label = (k: string) => LABEL[k]?.label ?? k;
-function show(k: string, v: number | null | undefined): string {
-  if (typeof v !== 'number' || !Number.isFinite(v)) return '—';
-  switch (LABEL[k]?.unit) {
-    case 'pct':
-      return `${Math.round(v * 100)}%`;
-    case 'h':
-      return `${Math.round(v)} h`;
-    case 'deg':
-      return `${v.toFixed(1)}°`;
-    case 'km':
-      return `${v.toFixed(1)} km`;
-    default:
-      return fmt(v);
-  }
+/** Small 'i' disclosure (inline, not a modal) that explains why the site is valid or not. */
+function WhyInfo({ exp }: { exp: Explanation }) {
+  const [open, setOpen] = useState(false);
+  const id = useId();
+  return (
+    <>
+      <button
+        type="button"
+        aria-expanded={open}
+        aria-controls={id}
+        aria-label="Why this result?"
+        title="Why this result?"
+        onClick={() => setOpen(!open)}
+        className={cn(
+          'num inline-flex size-[22px] shrink-0 items-center justify-center border text-[11px] leading-none italic',
+          open ? 'bg-warn border-black text-black' : 'border-current',
+        )}
+      >
+        i
+      </button>
+      {open && (
+        <div
+          id={id}
+          role="region"
+          aria-label="Why this result"
+          className="border-edge-lo bg-panel-2 basis-full border p-2 text-[12px] leading-snug"
+        >
+          <p>{exp.general}</p>
+          <p className="mt-2 font-bold">{exp.headline}</p>
+          <ul className="mt-1 list-disc pl-4">
+            {exp.reasons.map((r) => (
+              <li key={r}>{r}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </>
+  );
 }
 
-export function SiteCheckPanel({ className }: { className?: string }) {
+export function SiteCheckPanel({
+  className,
+  simple = false,
+}: {
+  className?: string;
+  /** Normal mode: friendly verdict and requirement rows, without the Expert-only detail. */
+  simple?: boolean;
+}) {
   const config = useAppStore((s) => s.missionConfig);
   const selected = useSelectedSite();
   const [custom, setCustom] = useState<{ lat: string; lon: string } | null>(null);
@@ -106,7 +132,8 @@ export function SiteCheckPanel({ className }: { className?: string }) {
   return (
     <section className={cn('box', className)} aria-label="Site check">
       <div className="box-head">
-        Site Check
+        {simple ? 'Does it work for the mission?' : 'Site Check'}
+        {!simple && (
         <button
           type="button"
           className="ml-auto border px-1.5 text-[10px] leading-[14px]"
@@ -118,9 +145,10 @@ export function SiteCheckPanel({ className }: { className?: string }) {
         >
           {custom ? 'Use selected site' : 'Any lat/lon'}
         </button>
+        )}
       </div>
-      <div className="box-body flex flex-col gap-2 text-[11px]">
-        {custom && (
+      <div className={cn('box-body flex flex-col gap-2', simple ? 'text-[13px]' : 'text-[11px]')}>
+        {custom && !simple && (
           <div className="flex gap-2">
             <label>
               Lat{' '}
@@ -151,37 +179,46 @@ export function SiteCheckPanel({ className }: { className?: string }) {
           <p className="text-ink-faint text-[10px]">Computing…</p>
         ) : (
           <>
-            <div className="flex items-baseline gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <strong
                 className={cn(
-                  'shrink-0 border px-1.5 text-[11px] whitespace-nowrap',
+                  'shrink-0 border px-1.5 whitespace-nowrap',
+                  simple ? 'py-0.5 text-[14px]' : 'text-[11px]',
                   result.ev.valid
-                    ? 'border-green-600 text-green-700'
-                    : 'border-red-600 text-red-700',
+                    ? 'border-green-500 text-green-400'
+                    : 'border-red-500 text-red-400',
                 )}
               >
-                {result.ev.valid ? 'VALID' : 'NOT VALID'}
+                {result.ev.valid
+                  ? simple
+                    ? 'VALID for this mission'
+                    : 'VALID'
+                  : 'NOT VALID'}
               </strong>
-              <span className="min-w-0 truncate">{point.name}</span>
-              <span className="num ml-auto shrink-0">
-                score {Math.round(result.ev.score * 100)}/100
+              {!simple && <span className="min-w-0 truncate">{point.name}</span>}
+              <span className={cn('num shrink-0', simple ? 'text-[15px] font-bold' : 'ml-auto')}>
+                {simple ? '' : 'score '}
+                {Math.round(result.ev.score * 100)}/100
               </span>
+              <WhyInfo
+                exp={explainEvaluation(result.ev, config, config.surface_days)}
+              />
             </div>
-            <p className="text-ink-faint text-[10px]">
-              Mission window <span className="num">{formatUtc(win.start_utc)}</span> →{' '}
-              <span className="num">{formatUtc(win.end_utc)}</span> · horizon:{' '}
-              {result.horizonSource}
-            </p>
+            {!simple && (
+              <p className="text-ink-faint text-[10px]">
+                Mission window <span className="num">{formatUtc(win.start_utc)}</span> →{' '}
+                <span className="num">{formatUtc(win.end_utc)}</span> · horizon:{' '}
+                {result.horizonSource}
+              </p>
+            )}
             <ul className="border-edge-lo flex flex-col border-t">
               {result.ev.checks.map((c) => {
-                const less = ['max_dark_hours', 'max_blackout_hours', 'slope_deg', 'psr_dist_km'];
-                const op = less.includes(c.key) ? '≤' : '≥';
                 return (
                   <li
                     key={c.key}
                     className={cn(
                       'border-edge-lo border-b py-1',
-                      c.pending ? 'text-ink-faint' : c.ok ? '' : 'text-red-700',
+                      c.pending ? 'text-ink-faint' : c.ok ? '' : 'text-red-400',
                     )}
                   >
                     <div className="flex justify-between gap-2">
@@ -189,17 +226,19 @@ export function SiteCheckPanel({ className }: { className?: string }) {
                         {c.pending ? '–' : c.ok ? '✔' : '✖'} {label(c.key)}
                       </span>
                       <span className="num">
-                        {c.pending ? 'pending terrain' : show(c.key, c.value)}
+                        {c.pending ? (simple ? 'not measured yet' : 'pending terrain') : show(c.key, c.value)}
                       </span>
                     </div>
                     <div className="text-ink-faint text-[10px]">
-                      needs {op} {show(c.key, c.threshold)}
-                      {c.margin !== null && ` · margin ${Math.round(c.margin * 100)}%`}
+                      needs {formatNeed(c.key, c.threshold)}
+                      {!simple && c.margin !== null && ` · margin ${Math.round(c.margin * 100)}%`}
                     </div>
                   </li>
                 );
               })}
             </ul>
+            {!simple && (
+              <>
             <p className="text-ink-faint text-[10px]">
               Score points (of 100):{' '}
               {result.ev.contributions.length === 0
@@ -214,6 +253,8 @@ export function SiteCheckPanel({ className }: { className?: string }) {
                 ? `valid in ${result.rob.valid_count} of ${result.rob.total} shifted windows`
                 : '—'}
             </p>
+              </>
+            )}
           </>
         )}
       </div>

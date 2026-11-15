@@ -96,7 +96,7 @@ export default function ExplorePage() {
         <SiteDetail />
         <SimChart />
         {/* Validity for the current mission window (Javi, @/scoring; docs/10 J6–J7). */}
-        {proMode && <SiteCheckPanel />}
+        <SiteCheckPanel simple={!proMode} />
       </aside>
     </div>
   );
