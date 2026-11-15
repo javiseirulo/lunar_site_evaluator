@@ -158,3 +158,4 @@
 ## 2026-11-16 — Explore en móvil (#167)
 
 - En pantallas estrechas (< md) el mapa 3D va arriba (55 dvh, mínimo 20 rem) con sus controles encima (coordenadas, Layers y astronauta) y los paneles Sites y Now quedan debajo en el flujo normal (altura máxima 50 dvh con su scroll), en vez de apilarse sobre el globo. Escritorio no cambia. Solo `src/pages/ExplorePage.tsx`. Sustituye la limitación anotada en #161.
+- Móvil: botón arriba a la derecha del mapa para ponerlo en pantalla completa (`fixed inset-0`, paneles ocultos, controles del globo visibles) y reducirlo; Escape también sale. Solo `< md`; en escritorio no aparece.

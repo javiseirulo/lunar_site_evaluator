@@ -1,4 +1,5 @@
-import { Component, useState, type ReactNode } from 'react';
+import { Component, useEffect, useState, type ReactNode } from 'react';
+import { Maximize2, Minimize2 } from 'lucide-react';
 import { useAppStore } from '@/core';
 import { TimeBar } from '@/core/shell/TimeBar';
 import { SimChart } from '@/core/shell/SimChart';
@@ -165,6 +166,14 @@ function RightPanel() {
 export default function ExplorePage() {
   const proMode = useAppStore((s) => s.proMode);
   const setChromeSlot = useChromeSlot((s) => s.setSlot);
+  // Narrow screens only: the map can fill the whole screen (panels hidden) and shrink back.
+  const [full, setFull] = useState(false);
+  useEffect(() => {
+    if (!full) return;
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setFull(false);
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [full]);
 
   return (
     // The page scrolls: a tall 3D map first, the Mission Clock below it.
@@ -172,8 +181,28 @@ export default function ExplorePage() {
       <EndSimulationDialog />
       {/* Wide screens: panels float over a tall map. Narrow screens: the map comes first and the panels
           follow in the normal flow, so nothing covers the globe or its controls. */}
-      <div className="border-edge-hi relative shrink-0 border-2 bg-black md:h-[calc(100dvh-8.5rem)] md:min-h-[26rem] md:overflow-hidden">
-        <div className="h-[55dvh] min-h-[20rem] md:absolute md:inset-0 md:h-auto md:min-h-0">
+      <div
+        className={`border-edge-hi relative shrink-0 border-2 bg-black md:h-[calc(100dvh-8.5rem)] md:min-h-[26rem] md:overflow-hidden ${
+          full ? 'max-md:fixed max-md:inset-0 max-md:z-50 max-md:overflow-hidden' : ''
+        }`}
+      >
+        <button
+          type="button"
+          onClick={() => setFull((f) => !f)}
+          aria-label={full ? 'Exit full screen map' : 'Full screen map'}
+          aria-pressed={full}
+          title={full ? 'Exit full screen' : 'Full screen'}
+          className="box hover:bg-panel-2 absolute top-2 right-2 z-[70] grid size-10 place-items-center md:hidden"
+        >
+          {full ? (
+            <Minimize2 className="size-5" aria-hidden />
+          ) : (
+            <Maximize2 className="size-5" aria-hidden />
+          )}
+        </button>
+        <div
+          className={`md:absolute md:inset-0 md:h-auto md:min-h-0 ${full ? 'max-md:h-full' : 'h-[55dvh] min-h-[20rem]'}`}
+        >
           {WEBGL ? (
             <GlobeBoundary fallback={<PolarMap className="size-full" neutral={!proMode} />}>
               <GlobeView />
@@ -183,12 +212,18 @@ export default function ExplorePage() {
           )}
         </div>
 
-        <div className="pointer-events-none grid grid-cols-1 gap-3 p-3 md:absolute md:inset-0 md:grid-rows-[minmax(0,1fr)] md:grid-cols-[minmax(200px,20%)_minmax(0,1fr)_minmax(210px,22%)]">
+        <div
+          className={`pointer-events-none grid grid-cols-1 gap-3 p-3 md:absolute md:inset-0 md:grid-cols-[minmax(200px,20%)_minmax(0,1fr)_minmax(210px,22%)] md:grid-rows-[minmax(0,1fr)] ${
+            full ? 'max-md:[&>aside]:hidden' : ''
+          }`}
+        >
           <LeftPanel />
           {/* Free map area between the panels: the globe puts its coordinate, Layers and astronaut controls here. */}
           <div
             ref={setChromeSlot}
-            className="pointer-events-none absolute inset-x-0 top-0 h-[55dvh] min-h-[20rem] md:relative md:inset-auto md:h-auto md:min-h-0 md:col-start-2 md:row-start-1"
+            className={`pointer-events-none absolute md:relative md:inset-auto md:col-start-2 md:row-start-1 md:h-auto md:min-h-0 ${
+              full ? 'max-md:inset-0' : 'inset-x-0 top-0 h-[55dvh] min-h-[20rem]'
+            }`}
           />
           <RightPanel />
         </div>
