@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   NavigationGestures,
+  SurfaceTap,
   canWalk,
   lightingState,
   limitFov,
@@ -9,6 +10,15 @@ import {
 } from './navigation';
 
 describe('street view pointer gestures', () => {
+  it('recognizes a nearby second tap for saving and keeps distant taps independent', () => {
+    const taps = new SurfaceTap();
+    expect(taps.tap(100, 200, 0)).toBe('wait');
+    expect(taps.tap(105, 204, 250)).toBe('save');
+    expect(taps.tap(100, 200, 600)).toBe('wait');
+    expect(taps.tap(200, 300, 700)).toBe('wait');
+    taps.clear();
+    expect(taps.tap(200, 300, 800)).toBe('wait');
+  });
   it('only accepts the primary button and distinguishes a tap from a drag', () => {
     const g = new NavigationGestures();
     expect(g.down(1, 20, 30, 2)).toBe(false);

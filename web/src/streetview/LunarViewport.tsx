@@ -5,6 +5,7 @@ import { createLunarScene } from './lunarScene';
 import { lightingState } from './navigation';
 import type { LabelLayout } from './landmarks';
 import { DEFAULT_VIEW, type ViewState } from './viewLink';
+import { SaveLocation } from './SaveLocation';
 import 'cesium/Build/Cesium/Widgets/widgets.css';
 import './streetview.css';
 
@@ -16,6 +17,7 @@ interface Props {
   onObserver: (point: Observer) => void;
   onView: (state: ViewState) => void;
   onGround: (height: number) => void;
+  onReturn: () => void;
 }
 const lightText = {
   unknown: 'Solar state unavailable',
@@ -32,7 +34,9 @@ export default function LunarViewport({
   onObserver,
   onView,
   onGround,
+  onReturn,
 }: Props) {
+  const [savePoint, setSavePoint] = useState<Observer | null>(null);
   const container = useRef<HTMLDivElement>(null);
   const scene = useRef<LunarScene | null>(null);
   const currentObserver = useRef(observer);
@@ -90,6 +94,7 @@ export default function LunarViewport({
         error: fail,
         hint: setHint,
         labels: setLabels,
+        save: setSavePoint,
         view: (state) => {
           initialCamera.current = state;
           setView(state);
@@ -174,26 +179,45 @@ export default function LunarViewport({
             <span>
               {sample && !sample.terrainMatched
                 ? sample.lit
-                  ? 'Sun above geometric horizon · no terrain'
-                  : 'Sun below geometric horizon · no terrain'
+                  ? 'Sun above estimated horizon'
+                  : 'Sun below estimated horizon'
                 : lightText[state]}
             </span>
+            {sample && !sample.terrainMatched && (
+              <small title="The 3D surface is visible. A terrain horizon has not been calculated for this exact location and eye height, so mountains are not included in this visibility estimate.">
+                Terrain visibility not calculated
+              </small>
+            )}
             {reading && <small>Relief light on</small>}
           </div>
           <div className="lunar-toolbar">
+            <button className="lunar-close" onClick={onReturn}>
+              3D map
+            </button>
             {expanded && (
               <button className="lunar-close" onClick={() => setExpanded(false)}>
                 Close view
               </button>
             )}
-            <button
-              className="lunar-north"
-              aria-label="Face north and reset zoom"
-              onClick={() => scene.current?.resetLook()}
-            >
-              <span>N</span>
-              <small>{Math.round(view.heading)}°</small>
-            </button>
+            <div className="lunar-body-controls">
+              <button
+                className="lunar-close"
+                disabled={!sample}
+                onClick={() => scene.current?.faceBody('sun')}
+              >
+                Face Sun
+              </button>
+              <button
+                className="lunar-close"
+                disabled={!sample}
+                onClick={() => scene.current?.faceBody('earth')}
+              >
+                Face Earth
+              </button>
+              <small>
+                Az {Math.round(view.heading)}° · El {Math.round(view.pitch)}°
+              </small>
+            </div>
             <details className="lunar-options">
               <summary>View options</summary>
               <div className="lunar-option-panel">
@@ -295,8 +319,12 @@ export default function LunarViewport({
                   </button>
                 </form>
                 <small>
-                  Place names: IAU / USGS. Anchors indicate feature centres, not summits.
+                  Place names: IAU / USGS. Labels mark approximate feature areas, not measured
+                  summits.
                 </small>
+                <button className="btn" onClick={() => setSavePoint(currentObserver.current)}>
+                  Save current location
+                </button>
               </div>
             </details>
           </div>
@@ -313,8 +341,16 @@ export default function LunarViewport({
             <small>
               Mesh {ground?.toFixed(1)} m · Eye {height} m · Field of view {Math.round(view.fov)}°
             </small>
+            <small>Right-click ground / double-tap to save a named location</small>
           </div>
         </>
+      )}
+      {savePoint && (
+        <SaveLocation
+          key={`${savePoint.lat}:${savePoint.lon}`}
+          point={savePoint}
+          onClose={() => setSavePoint(null)}
+        />
       )}
     </div>
   );

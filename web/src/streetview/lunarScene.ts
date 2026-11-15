@@ -9,8 +9,16 @@ import {
   NavigationGestures,
   surfaceDistance,
   wheelFactor,
+  SurfaceTap,
+  DOUBLE_TAP_MS,
 } from './navigation';
-import { layoutLabels, nearbyLandmarks, type LabelLayout, type Landmark } from './landmarks';
+import {
+  isLandmarkOccluded,
+  layoutLabels,
+  nearbyLandmarks,
+  type LabelLayout,
+  type Landmark,
+} from './landmarks';
 import { DEFAULT_VIEW, type ViewState } from './viewLink';
 
 export interface Observer {
@@ -24,9 +32,10 @@ export interface SceneCallbacks {
   hint: (message: string) => void;
   view: (state: ViewState) => void;
   labels: (labels: LabelLayout[]) => void;
+  save: (point: Observer) => void;
 }
 export interface LunarScene {
-  resetLook: () => void;
+  faceBody: (body: 'sun' | 'earth') => void;
   setHeight: (height: number) => void;
   setSky: (sample: SkySample | null) => void;
   setReadingLight: (enabled: boolean) => void;
@@ -70,7 +79,8 @@ export async function createLunarScene(
     shouldAnimate: false,
     requestRenderMode: true,
     maximumRenderTimeChange: Infinity,
-    msaaSamples: 1,
+    msaaSamples: 4,
+    useBrowserRecommendedResolution: false,
     showRenderLoopErrors: false,
   });
   let disposed = false;
@@ -92,7 +102,7 @@ export async function createLunarScene(
     viewer.scene.backgroundColor = C.Color.BLACK;
     viewer.scene.fog.enabled = false;
     viewer.scene.screenSpaceCameraController.enableInputs = false;
-    viewer.resolutionScale = Math.min(window.devicePixelRatio, 1.5) / window.devicePixelRatio;
+    viewer.resolutionScale = Math.min(window.devicePixelRatio, 2) / window.devicePixelRatio;
     const frustum = viewer.camera.frustum as import('cesium').PerspectiveFrustum;
     frustum.near = 0.1;
     frustum.far = 1e9;
@@ -131,7 +141,9 @@ export async function createLunarScene(
     const resource = await C.IonResource.fromAssetId(2684829, { accessToken: token });
     if (disposed) throw new DOMException('Cancelled', 'AbortError');
     const tiles = await C.Cesium3DTileset.fromUrl(resource, {
-      maximumScreenSpaceError: 4,
+      maximumScreenSpaceError: 1,
+      cacheBytes: matchMedia('(pointer: coarse)').matches ? 128 * 1024 * 1024 : 256 * 1024 * 1024,
+      maximumCacheOverflowBytes: 128 * 1024 * 1024,
       foveatedScreenSpaceError: false,
       cullRequestsWhileMoving: false,
     });
@@ -150,6 +162,9 @@ export async function createLunarScene(
       },
       fragmentShaderText: `void fragmentMain(FragmentInput fsInput, inout czm_modelMaterial material) {
         vec3 n = normalize(cross(dFdx(fsInput.attributes.positionEC), dFdy(fsInput.attributes.positionEC)));
+        #ifdef HAS_NORMALS
+        n = normalize(fsInput.attributes.normalEC);
+        #endif
         if (!gl_FrontFacing) n = -n;
         float relief = 0.22 + 0.58 * max(dot(n, normalize(vec3(-0.35, 0.6, 0.7))), 0.0);
         vec3 readable = vec3(relief) * u_tint;
@@ -316,18 +331,31 @@ export async function createLunarScene(
               const projected = C.SceneTransforms.worldToWindowCoordinates(viewer.scene, anchor);
               if (!projected) return [];
               if (
-                projected.x < 0 ||
+                projected.x < -32 ||
                 projected.y < 0 ||
-                projected.x >= container.clientWidth ||
+                projected.x >= container.clientWidth + 32 ||
                 projected.y >= container.clientHeight
               )
                 return [];
-              // Hide names whose centre is behind closer terrain. Do not label through the Moon.
+              // A feature centre may be hidden by its own near slope. Allow its footprint,
+              // while rejecting clearly separate foreground occlusion.
               const distance = C.Cartesian3.magnitude(delta);
               const hit = viewer.scene.pickPositionSupported
-                ? viewer.scene.pickPosition(projected)
+                ? viewer.scene.pickPosition(
+                    new C.Cartesian2(
+                      Math.max(0, Math.min(container.clientWidth - 1, projected.x)),
+                      projected.y,
+                    ),
+                  )
                 : undefined;
-              if (hit && C.Cartesian3.distance(viewer.camera.positionWC, hit) < distance - 15)
+              if (
+                hit &&
+                isLandmarkOccluded(
+                  distance,
+                  C.Cartesian3.distance(viewer.camera.positionWC, hit),
+                  feature.diameter_km,
+                )
+              )
                 return [];
               return [{ id: feature.id, name: feature.name, x: projected.x, y: projected.y }];
             })
@@ -386,6 +414,9 @@ export async function createLunarScene(
     );
     canvas.style.touchAction = 'none';
     const gestures = new NavigationGestures();
+    const taps = new SurfaceTap();
+    let tapTimer = 0;
+    cleanup.push(() => window.clearTimeout(tapTimer));
     const pickGround = (clientX: number, clientY: number) => {
       if (moving || disposed || !viewer.scene.pickPositionSupported) return null;
       const bounds = canvas.getBoundingClientRect();
@@ -500,10 +531,15 @@ export async function createLunarScene(
     const move = (event: PointerEvent) => {
       const gesture = gestures.move(event.pointerId, event.clientX, event.clientY);
       if (gesture?.type === 'look') {
+        window.clearTimeout(tapTimer);
+        taps.clear();
         const sensitivity = fov / Math.max(200, canvas.clientHeight);
         look(gesture.dx * sensitivity, gesture.dy * sensitivity);
-      } else if (gesture?.type === 'zoom') zoom(gesture.factor);
-      else if (
+      } else if (gesture?.type === 'zoom') {
+        window.clearTimeout(tapTimer);
+        taps.clear();
+        zoom(gesture.factor);
+      } else if (
         !gestures.active &&
         event.pointerType !== 'touch' &&
         performance.now() - lastHover > 50
@@ -515,12 +551,33 @@ export async function createLunarScene(
     const up = (event: PointerEvent) => {
       const gesture = gestures.up(event.pointerId, event.clientX, event.clientY);
       if (canvas.hasPointerCapture(event.pointerId)) canvas.releasePointerCapture(event.pointerId);
-      if (gesture?.type === 'tap') void walk(gesture.x, gesture.y);
+      if (gesture?.type === 'tap') {
+        if (event.pointerType !== 'touch') {
+          void walk(gesture.x, gesture.y);
+          return;
+        }
+        window.clearTimeout(tapTimer);
+        if (taps.tap(gesture.x, gesture.y, performance.now()) === 'save') {
+          const target = pickGround(gesture.x, gesture.y);
+          if (target) callbacks.save(target.point);
+          else callbacks.hint('Choose visible ground to save a location.');
+        } else
+          tapTimer = window.setTimeout(() => {
+            taps.clear();
+            void walk(gesture.x, gesture.y);
+          }, DOUBLE_TAP_MS);
+      }
     };
     const cancel = () => {
       gestures.cancel();
       ring.show = false;
       viewer.scene.requestRender();
+    };
+    const context = (event: MouseEvent) => {
+      event.preventDefault();
+      const target = pickGround(event.clientX, event.clientY);
+      if (target) callbacks.save(target.point);
+      else callbacks.hint('Choose visible ground to save a location.');
     };
     const wheel = (event: WheelEvent) => {
       event.preventDefault();
@@ -540,9 +597,6 @@ export async function createLunarScene(
       } else if (['+', '=', '-', '_'].includes(event.key)) {
         event.preventDefault();
         zoom(event.key === '-' || event.key === '_' ? 1.1 : 1 / 1.1);
-      } else if (event.key.toLowerCase() === 'n') {
-        pose = { heading: 0, pitch: 0 };
-        renderPose();
       }
     };
     canvas.addEventListener('pointerdown', down);
@@ -555,6 +609,7 @@ export async function createLunarScene(
     });
     canvas.addEventListener('wheel', wheel, { passive: false });
     canvas.addEventListener('keydown', key);
+    canvas.addEventListener('contextmenu', context);
     cleanup.push(() => {
       canvas.removeEventListener('pointerdown', down);
       canvas.removeEventListener('pointermove', move);
@@ -563,6 +618,7 @@ export async function createLunarScene(
       canvas.removeEventListener('lostpointercapture', cancel);
       canvas.removeEventListener('wheel', wheel);
       canvas.removeEventListener('keydown', key);
+      canvas.removeEventListener('contextmenu', context);
     });
     const resize = new ResizeObserver(() => {
       if (!disposed) {
@@ -574,11 +630,37 @@ export async function createLunarScene(
     cleanup.push(() => resize.disconnect());
     renderPose();
     return {
-      resetLook: () => {
-        if (moving) return;
-        pose = { heading: 0, pitch: 0 };
-        fov = 65;
-        renderPose();
+      faceBody: (body) => {
+        if (!sky || moving) return;
+        const target = limitLook(
+          body === 'sun' ? sky.sun_az : sky.earth_az,
+          body === 'sun' ? sky.sun_el : sky.earth_el,
+        );
+        const start = { ...pose };
+        const delta = ((target.heading - start.heading + 540) % 360) - 180;
+        const started = performance.now();
+        moving = true;
+        const aim = (now: number) => {
+          if (disposed) return;
+          const t = matchMedia('(prefers-reduced-motion: reduce)').matches
+            ? 1
+            : Math.min(1, (now - started) / 550);
+          const eased = t * t * (3 - 2 * t);
+          pose = limitLook(
+            start.heading + delta * eased,
+            start.pitch + (target.pitch - start.pitch) * eased,
+          );
+          renderPose();
+          if (t < 1) animation = requestAnimationFrame(aim);
+          else {
+            moving = false;
+            setSky(sky);
+            callbacks.hint(
+              `${body === 'sun' ? 'Sun' : 'Earth'} direction${target.pitch < 0 ? ' · below local horizontal' : ''}.`,
+            );
+          }
+        };
+        animation = requestAnimationFrame(aim);
       },
       setHeight: (value) => {
         height = Math.max(0.5, Math.min(20, value));

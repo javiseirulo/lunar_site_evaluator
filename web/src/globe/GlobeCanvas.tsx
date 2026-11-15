@@ -27,6 +27,8 @@ import {
   type SyntheticEvent,
 } from 'react';
 import { Canvas, useFrame, useThree, type ThreeEvent } from '@react-three/fiber';
+import { useNavigate } from 'react-router';
+import { AstronautControl, SurfacePicker, type SurfaceBridgeApi } from './GlobeSurfaceBridge';
 import { Html, OrbitControls, Stars, useTexture } from '@react-three/drei';
 import {
   CanvasTexture,
@@ -112,6 +114,20 @@ const ORIGIN = new Vector3();
 const stop = (e: SyntheticEvent) => e.stopPropagation();
 
 export default function GlobeCanvas() {
+  const [cameraStart] = useState(() => {
+    const point = useAppStore.getState().selectedPoint;
+    return point ? latLonToVec3(point.lat, point.lon, 3) : INITIAL_CAMERA;
+  });
+  const navigate = useNavigate();
+  const surfaceApiRef = useRef<SurfaceBridgeApi | null>(null);
+  const [placingAstronaut, setPlacingAstronaut] = useState(false);
+  useEffect(() => {
+    const cancel = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setPlacingAstronaut(false);
+    };
+    window.addEventListener('keydown', cancel);
+    return () => window.removeEventListener('keydown', cancel);
+  }, []);
   const flightRef = useRef<Vector3 | null>(null);
   const controlsRef = useRef<Controls>(null);
   const [textureReady, setTextureReady] = useState(false);
@@ -137,6 +153,9 @@ export default function GlobeCanvas() {
   }, []);
 
   const [focus, setFocus] = useState<Focus>(() => {
+    const point = useAppStore.getState().selectedPoint;
+    if (point && useAppStore.getState().selectedSiteId === 'free')
+      return { kind: 'point', ...point };
     const id = useAppStore.getState().selectedSiteId;
     return id ? { kind: 'site', id } : null;
   });
@@ -210,6 +229,13 @@ export default function GlobeCanvas() {
     return pin;
   };
 
+  const onSurfaceClick = (lat: number, lon: number) => {
+    if (placingAstronaut) {
+      setPlacingAstronaut(false);
+      surfaceApiRef.current?.enter({ lat, lon });
+    } else setFocus({ kind: 'point', lat, lon });
+  };
+
   return (
     <div
       className="relative size-full overflow-hidden bg-black"
@@ -217,7 +243,7 @@ export default function GlobeCanvas() {
       aria-label="3D Moon globe with candidate landing sites. Left-drag to move, right-drag to rotate, scroll to zoom, click the ground for coordinates."
     >
       <Canvas
-        camera={{ position: INITIAL_CAMERA, fov: 45, near: 0.001, far: 200 }}
+        camera={{ position: cameraStart, fov: 45, near: 0.001, far: 200 }}
         dpr={[1, 2]}
         shadows
       >
@@ -232,10 +258,7 @@ export default function GlobeCanvas() {
         <SunLight direction={sunDir ?? FIXED_LIGHT_DIR} intensity={sunDir ? 2.6 : 2} />
         <Stars radius={60} depth={30} count={3000} factor={3} saturation={0} fade />
         <Suspense fallback={<PlaceholderMoon />}>
-          <Moon
-            onReady={() => setTextureReady(true)}
-            onSurfaceClick={(lat, lon) => setFocus({ kind: 'point', lat, lon })}
-          />
+          <Moon onReady={() => setTextureReady(true)} onSurfaceClick={onSurfaceClick} />
         </Suspense>
         {/* Javi: global heat map (grid/global_1deg.bin) for active sunlight / Earth layers. */}
         <GlobalHeat />
@@ -254,10 +277,7 @@ export default function GlobeCanvas() {
             setFocus(null);
           }}
         />
-        <PolarPatch
-          onSurfaceClick={(lat, lon) => setFocus({ kind: 'point', lat, lon })}
-          clickTolerancePx={CLICK_TOLERANCE_PX}
-        />
+        <PolarPatch onSurfaceClick={onSurfaceClick} clickTolerancePx={CLICK_TOLERANCE_PX} />
         <PatchTrigger />
         <PoleMarker flightRef={flightRef} />
         <OrbitControls
@@ -272,7 +292,13 @@ export default function GlobeCanvas() {
           zoomSpeed={MOUSE_SPEED}
         />
         <CameraRig flightRef={flightRef} controlsRef={controlsRef} />
+        <SurfacePicker apiRef={surfaceApiRef} onEnter={navigate} />
       </Canvas>
+      <AstronautControl
+        apiRef={surfaceApiRef}
+        armed={placingAstronaut}
+        onArmed={setPlacingAstronaut}
+      />
       <div className="absolute top-2 left-2 flex flex-col items-start gap-2">
         {expert && (
           <PinForm
@@ -357,6 +383,7 @@ function Moon({
   return (
     <mesh
       geometry={geometry}
+      userData={{ lunarSurface: true }}
       onClick={(e) => {
         if (e.delta > CLICK_TOLERANCE_PX) return; // it was a drag (pan/rotate)
         const [lat, lon] = vec3ToLatLon(e.point.x, e.point.y, e.point.z);
@@ -856,17 +883,19 @@ function CameraRig({
       }
       siteFlight.current = { flight, elapsed: 0 };
     };
-    // A site already selected when the globe opens is flown to as soon as the sites are loaded.
+    // An observed point already sets cameraStart when returning from Street View.
+    // Otherwise fly to a selected site as soon as the catalogue is loaded.
     let pending: (() => void) | null = null;
     const initial = useAppStore.getState().selectedSiteId;
-    if (initial) {
+    if (initial && !useAppStore.getState().selectedPoint) {
       if (useData.getState().sites) fly(initial);
       else
         pending = useData.subscribe((d) => {
           if (!d.sites) return;
           pending?.();
           pending = null;
-          if (useAppStore.getState().selectedSiteId === initial) fly(initial);
+          const app = useAppStore.getState();
+          if (app.selectedSiteId === initial && !app.selectedPoint) fly(initial);
         });
     }
     const unsub = useAppStore.subscribe((s, prev) => {
@@ -938,7 +967,8 @@ function CameraRig({
       if (e >= 1) {
         svFlight.current = null;
         useStreetViewFlight.getState().clear();
-        useAppStore.getState().setMode('streetview');
+        if (sv.req.onArrive) sv.req.onArrive();
+        else useAppStore.getState().setMode('streetview');
       }
       return; // controls and the minimum radius stay out of the way while flying down
     }

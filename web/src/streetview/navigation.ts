@@ -106,3 +106,25 @@ export function wheelFactor(delta: number, mode: number, height: number) {
 export function lightingState(sample: { sun_el: number; lit: boolean } | null) {
   return !sample ? 'unknown' : sample.lit ? 'sunlight' : sample.sun_el <= 0 ? 'night' : 'shadow';
 }
+
+/** Distinguish bookmarking double taps from walking, without moving on tap one. */
+export const DOUBLE_TAP_MS = 400;
+export class SurfaceTap {
+  private pending: { x: number; y: number; time: number } | null = null;
+  tap(x: number, y: number, time: number): 'wait' | 'save' {
+    const previous = this.pending;
+    this.pending = { x, y, time };
+    if (
+      previous &&
+      time - previous.time <= DOUBLE_TAP_MS &&
+      Math.hypot(x - previous.x, y - previous.y) <= 28
+    ) {
+      this.pending = null;
+      return 'save';
+    }
+    return 'wait';
+  }
+  clear() {
+    this.pending = null;
+  }
+}
