@@ -303,8 +303,9 @@ export async function createLunarScene(
         if (!visibleSky || !marker.show) return;
         const radius = index ? visibleSky.earthRadiusDeg : SUN_RADIUS_DEG;
         const diameter = 2 * skyDistance * Math.tan(C.Math.toRadians(radius));
-        marker.billboard!.width = new C.ConstantProperty(diameter);
-        marker.billboard!.height = new C.ConstantProperty(diameter);
+        // Cesium packs billboard widths into 16 bits. Keep the 64-unit sprite
+        // and apply the physical diameter via its floating-point scale.
+        marker.billboard!.scale = new C.ConstantProperty(diameter / 64);
         const d = vector(
           skyDirection(
             observer.lat,
