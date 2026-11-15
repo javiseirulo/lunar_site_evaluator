@@ -77,7 +77,17 @@ export function SiteCheckPanel({
 }) {
   const config = useAppStore((s) => s.missionConfig);
   const selected = useSelectedSite();
-  const [custom, setCustom] = useState<{ lat: string; lon: string } | null>(null);
+  const [typed, setCustom] = useState<{ lat: string; lon: string } | null>(null);
+  const selectedPoint = useAppStore((s) => s.selectedPoint);
+  // A point picked on the globe (e.g. "Go to coordinates") is checked like a typed one.
+  const custom = useMemo(
+    () =>
+      typed ??
+      (!selected && selectedPoint
+        ? { lat: String(selectedPoint.lat), lon: String(selectedPoint.lon) }
+        : null),
+    [typed, selected, selectedPoint],
+  );
 
   const point = useMemo(() => {
     if (custom) {
@@ -134,17 +144,17 @@ export function SiteCheckPanel({
       <div className="box-head">
         {simple ? 'Does it work for the mission?' : 'Site Check'}
         {!simple && (
-        <button
-          type="button"
-          className="ml-auto border px-1.5 text-[10px] leading-[14px]"
-          onClick={() =>
-            setCustom(
-              custom ? null : { lat: String(point?.lat ?? -89.5), lon: String(point?.lon ?? 0) },
-            )
-          }
-        >
-          {custom ? 'Use selected site' : 'Any lat/lon'}
-        </button>
+          <button
+            type="button"
+            className="ml-auto border px-1.5 text-[10px] leading-[14px]"
+            onClick={() =>
+              setCustom(
+                typed ? null : { lat: String(point?.lat ?? -89.5), lon: String(point?.lon ?? 0) },
+              )
+            }
+          >
+            {custom ? 'Use selected site' : 'Any lat/lon'}
+          </button>
         )}
       </div>
       <div className={cn('box-body flex flex-col gap-2', simple ? 'text-[13px]' : 'text-[11px]')}>
@@ -170,8 +180,7 @@ export function SiteCheckPanel({
         )}
         {!point ? (
           <p className="text-ink-faint text-[10px]">
-            Select a site, or press “Any lat/lon” to check any point of the Moon for the current
-            mission window.
+            Select a site, or go to any coordinates, to check it for the current mission window.
           </p>
         ) : ephem.error ? (
           <p className="text-ink-faint text-[10px]">{ephem.error}</p>
@@ -189,20 +198,14 @@ export function SiteCheckPanel({
                     : 'border-red-500 text-red-400',
                 )}
               >
-                {result.ev.valid
-                  ? simple
-                    ? 'VALID for this mission'
-                    : 'VALID'
-                  : 'NOT VALID'}
+                {result.ev.valid ? (simple ? 'VALID for this mission' : 'VALID') : 'NOT VALID'}
               </strong>
               {!simple && <span className="min-w-0 truncate">{point.name}</span>}
               <span className={cn('num shrink-0', simple ? 'text-[15px] font-bold' : 'ml-auto')}>
                 {simple ? '' : 'score '}
                 {Math.round(result.ev.score * 100)}/100
               </span>
-              <WhyInfo
-                exp={explainEvaluation(result.ev, config, config.surface_days)}
-              />
+              <WhyInfo exp={explainEvaluation(result.ev, config, config.surface_days)} />
             </div>
             {!simple && (
               <p className="text-ink-faint text-[10px]">
@@ -226,7 +229,11 @@ export function SiteCheckPanel({
                         {c.pending ? '–' : c.ok ? '✔' : '✖'} {label(c.key)}
                       </span>
                       <span className="num">
-                        {c.pending ? (simple ? 'not measured yet' : 'pending terrain') : show(c.key, c.value)}
+                        {c.pending
+                          ? simple
+                            ? 'not measured yet'
+                            : 'pending terrain'
+                          : show(c.key, c.value)}
                       </span>
                     </div>
                     <div className="text-ink-faint text-[10px]">
@@ -239,20 +246,20 @@ export function SiteCheckPanel({
             </ul>
             {!simple && (
               <>
-            <p className="text-ink-faint text-[10px]">
-              Score points (of 100):{' '}
-              {result.ev.contributions.length === 0
-                ? '—'
-                : result.ev.contributions
-                    .map((c) => `${label(c.key)} ${Math.round(c.share * 100)}`)
-                    .join(' · ')}
-            </p>
-            <p className="text-ink-faint text-[10px]">
-              If the landing slips ±3 days:{' '}
-              {result.rob.total > 0
-                ? `valid in ${result.rob.valid_count} of ${result.rob.total} shifted windows`
-                : '—'}
-            </p>
+                <p className="text-ink-faint text-[10px]">
+                  Score points (of 100):{' '}
+                  {result.ev.contributions.length === 0
+                    ? '—'
+                    : result.ev.contributions
+                        .map((c) => `${label(c.key)} ${Math.round(c.share * 100)}`)
+                        .join(' · ')}
+                </p>
+                <p className="text-ink-faint text-[10px]">
+                  If the landing slips ±3 days:{' '}
+                  {result.rob.total > 0
+                    ? `valid in ${result.rob.valid_count} of ${result.rob.total} shifted windows`
+                    : '—'}
+                </p>
               </>
             )}
           </>

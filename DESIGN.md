@@ -18,9 +18,10 @@
 ## Normal vs Expert (the core rule)
 - **One switch** (header, `proMode` in the store, labelled Normal | Expert). Mission's difficulty is the same switch.
 - **Normal:** three pages (Explore, Mission, Learn); Explore shows only the 3D globe, one amber action per screen, plain-language
-  numbers ("Day 12 of 365", "in 3 days"), a site list instead of requirement forms.
+  numbers ("Day 12 of 365", "in 3 days"), a neutral site list (no scores or colours: results only appear in the right column
+  after picking a site, with an 'i' that explains why), "Go to coordinates" for any lat/lon, a live illumination chart.
 - **Expert:** + Sites, Street View, Data pages; requirements form, map layers, Mission Timing, Site Check,
-  UTC times, coordinates, site finder, full footer. Nothing is removed from Expert; it is only hidden in Normal.
+  UTC times, site scores in the list, pin by coordinates, site finder, full footer. Nothing is removed from Expert; it is only hidden in Normal.
 
 ## Typography
 - **Display / labels / buttons:** system monospace (`SF Mono`, Menlo), bold, uppercase + wide tracking for

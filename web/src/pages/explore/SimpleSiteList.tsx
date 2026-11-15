@@ -38,7 +38,10 @@ export function SimpleSiteList({ className }: { className?: string }) {
                 )}
               >
                 <span
-                  className={cn('size-2 shrink-0 border', selected ? 'border-black' : 'border-ink-muted')}
+                  className={cn(
+                    'size-2 shrink-0 border',
+                    selected ? 'border-black' : 'border-ink-muted',
+                  )}
                   aria-hidden
                 />
                 <span className="truncate">{s.name}</span>
