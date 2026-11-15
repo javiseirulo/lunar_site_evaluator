@@ -1,4 +1,4 @@
-"""Real ``web/public/data/layers.json`` (contract ``LayersManifest``, ``contracts/layers.schema.json``).
+"""Real ``web/public/data/layers.json`` (contract ``LayersManifest``, layers.schema.json).
 
     uv run python -m export.layers [--psr-tif PATH/LPSR_80S_20MPP_ADJ.TIF]
 
@@ -44,7 +44,9 @@ def write_gray8(path: Path, gray: np.ndarray, valid: np.ndarray) -> None:
     raw = b"".join(b"\x00" + px[r].tobytes() for r in range(h))
 
     def chunk(kind: bytes, data: bytes) -> bytes:
-        return struct.pack(">I", len(data)) + kind + data + struct.pack(">I", zlib.crc32(kind + data))
+        return (
+            struct.pack(">I", len(data)) + kind + data + struct.pack(">I", zlib.crc32(kind + data))
+        )
 
     path.write_bytes(
         b"\x89PNG\r\n\x1a\n"
@@ -62,14 +64,30 @@ def grid_layers(manifest: dict, out: Path) -> list[dict]:
     index = json.loads((DATA / "grid" / "index.json").read_text())
     g = next(d for d in index["grids"] if d["id"] == "south_5km")
     assert g["bounds_m"] == manifest["bounds_m"], "grid and layers bounds differ"
-    planes = np.fromfile(DATA / g["file"], "<f4").reshape(len(g["metrics"]), g["height"], g["width"])
+    planes = np.fromfile(DATA / g["file"], "<f4").reshape(
+        len(g["metrics"]), g["height"], g["width"]
+    )
     n = manifest["width_px"]
     idx = np.minimum((np.arange(n) + 0.5) * g["height"] / n, g["height"] - 1).astype(int)
     specs = [
-        ("illumination", "illum_pct", "Sunlight", "#09090d", "#9a5b19", "#ffe7a3",
-         "Share of 2027 with the Sun above a flat local horizon (no terrain shadowing yet)."),
-        ("earth_vis", "earth_vis_pct", "Earth visibility", "#0b1026", "#2f6fb0", "#bfe6ff",
-         "Share of 2027 with Earth above a flat horizon + 2° antenna margin (direct-to-Earth link)."),
+        (
+            "illumination",
+            "illum_pct",
+            "Sunlight",
+            "#09090d",
+            "#9a5b19",
+            "#ffe7a3",
+            "Share of 2027 with the Sun above a flat local horizon (no terrain shadowing yet).",
+        ),
+        (
+            "earth_vis",
+            "earth_vis_pct",
+            "Earth visibility",
+            "#0b1026",
+            "#2f6fb0",
+            "#bfe6ff",
+            "Share of 2027 with Earth above a flat horizon + 2° antenna margin.",
+        ),
     ]
     layers = []
     for lid, metric, label, c0, c1, c2, desc in specs:
@@ -80,32 +98,52 @@ def grid_layers(manifest: dict, out: Path) -> list[dict]:
         if hi <= lo:
             hi = lo + 0.01
         write_gray8(out / f"{lid}.png", scale8(np.nan_to_num(v), lo, hi), ok)
-        layers.append({
-            "id": lid, "label": label, "kind": "continuous", "units": "% of time",
-            "value_range": [lo, hi], "palette": [[0, c0], [0.5, c1], [1, c2]],
-            "default_visible": False, "default_opacity": 0.75, "description": desc,
-            "file": f"layers/{lid}.png", "encoding": "gray8",
-            "source": f"{GRID_SOURCE}, metric {metric}; window {index['window']['start_utc']}"
-                      f" to {index['window']['end_utc']}",
-        })
+        layers.append(
+            {
+                "id": lid,
+                "label": label,
+                "kind": "continuous",
+                "units": "% of time",
+                "value_range": [lo, hi],
+                "palette": [[0, c0], [0.5, c1], [1, c2]],
+                "default_visible": False,
+                "default_opacity": 0.75,
+                "description": desc,
+                "file": f"layers/{lid}.png",
+                "encoding": "gray8",
+                "source": f"{GRID_SOURCE}, metric {metric}; window {index['window']['start_utc']}"
+                f" to {index['window']['end_utc']}",
+            }
+        )
     return layers
 
 
 def psr_png(tif: Path, manifest: dict, out: Path) -> None:
+    """Share of PSR 20 m cells per output pixel, from native-resolution strips (never the COG
+    overviews, whose averaging breaks the binary mask; see terrain/psr.py). PSR = share >= 0.5."""
     import rasterio  # optional: only to rebuild PSR
-    from rasterio.enums import Resampling
-    from rasterio.windows import from_bounds
 
-    x0, y0, x1, y1 = manifest["bounds_m"]
+    x0, _, _, y1 = manifest["bounds_m"]
     n = manifest["width_px"]
+    px = (manifest["bounds_m"][2] - x0) / n
     with rasterio.open(tif) as ds:
-        win = from_bounds(x0, y0, x1, y1, ds.transform)
-        # Resampling.max on 0/1 = "any PSR pixel inside the output pixel"; NoData → masked.
-        data = ds.read(1, window=win, out_shape=(n, n), resampling=Resampling.max,
-                       masked=True, boundless=True)
-    valid = ~np.ma.getmaskarray(data) & np.isfinite(data.filled(np.nan))
-    psr = np.nan_to_num(data.filled(0)) > 0
-    write_gray8(out / "psr.png", np.where(psr, 255, 0).astype(np.uint8), valid)
+        t = ds.transform
+        cols = np.clip(((t.c + (np.arange(ds.width) + 0.5) * t.a - x0) // px).astype(int), 0, n - 1)
+        hits = np.zeros((n, n))
+        count = np.zeros((n, n))
+        for start in range(0, ds.height, 512):
+            rows = min(512, ds.height - start)
+            v = ds.read(1, window=((start, start + rows), (0, ds.width)))
+            yr = t.f + (start + np.arange(rows) + 0.5) * t.e
+            r = np.clip(((y1 - yr) // px).astype(int), 0, n - 1)
+            ok = np.isfinite(v)
+            rr = np.broadcast_to(r[:, None], v.shape)[ok]
+            cc = np.broadcast_to(cols[None, :], v.shape)[ok]
+            np.add.at(count, (rr, cc), 1)
+            np.add.at(hits, (rr, cc), v[ok])
+    valid = count > 0
+    share = np.divide(hits, count, out=np.zeros_like(hits), where=valid)
+    write_gray8(out / "psr.png", np.where(share >= 0.5, 255, 0).astype(np.uint8), valid)
 
 
 def main() -> int:
@@ -125,15 +163,21 @@ def main() -> int:
         raise SystemExit("layers/psr.png missing: pass --psr-tif")
 
     psr = {
-        "id": "psr", "label": "Permanent shadow", "kind": "categorical", "units": "",
-        "value_range": [0, 1], "palette": [[0, "#00000000"], [1, "#7c6cff"]],
+        "id": "psr",
+        "label": "Permanent shadow",
+        "kind": "categorical",
+        "units": "",
+        "value_range": [0, 1],
+        "palette": [[0, "#00000000"], [1, "#7c6cff"]],
         "categories": {"0": "Sometimes lit", "1": "Permanently shadowed"},
-        "default_visible": False, "default_opacity": 0.8,
+        "default_visible": False,
+        "default_opacity": 0.8,
         "description": "Mapped permanently shadowed regions (cold traps, possible ice); a pixel is"
-                       " PSR if any 20 m source cell in it is.",
-        "file": "layers/psr.png", "encoding": "gray8",
+        " PSR if at least half of its 20 m source cells are.",
+        "file": "layers/psr.png",
+        "encoding": "gray8",
         "source": f"NASA PGDA LOLA 20 m PSR mask, LPSR_80S_20MPP_ADJ.TIF ({PSR_URL});"
-                  " Barker et al. (2023); any-positive reduction in python/export/layers.py",
+        " Barker et al. (2023); majority (>=50 %) reduction to 512² in python/export/layers.py",
     }
     manifest["layers"] = [*terrain["layers"], psr, *grid_layers(manifest, out)]
     jsonschema.validate(manifest, json.loads((CONTRACTS / "layers.schema.json").read_text()))

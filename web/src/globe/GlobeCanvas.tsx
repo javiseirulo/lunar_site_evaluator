@@ -53,6 +53,8 @@ import { useSunDirection } from './sunLight';
 import { NIGHT_FILL, useNightLayer } from './nightLayer';
 import { NightControls, Terminator } from './DayNight';
 import { PatchTrigger, PolarPatch, SunLight } from './PolarPatch';
+import { ActiveLegend } from '@/layers';
+import { GlobalHeat } from './LayerOverlays'; // Javi: whole-Moon heat maps of active layers
 import { EXAGGERATION_LABEL, PatchControls } from './PatchControls';
 import { loadTerrain, patchOn, useTerrain, useTerrainLift, type LiftFn } from './terrainStore';
 import { OUTCOME_COLORS, loadHistoricSites, useHistoric } from './historicSites';
@@ -235,6 +237,8 @@ export default function GlobeCanvas() {
             onSurfaceClick={(lat, lon) => setFocus({ kind: 'point', lat, lon })}
           />
         </Suspense>
+        {/* Javi: global heat map (grid/global_1deg.bin) for active sunlight / Earth layers. */}
+        <GlobalHeat />
         <Pins focus={focus} onSiteClick={onSiteClick} onCustomClick={onCustomClick} />
         <HistoricMarkers
           focusId={focus?.kind === 'historic' ? focus.id : null}
@@ -284,6 +288,8 @@ export default function GlobeCanvas() {
         <NightControls hasSun={!!sunDir} />
         <PatchControls />
       </div>
+      {/* Javi: legend of the active map layers (Expert only, like the layers panel). */}
+      {expert && <ActiveLegend className="pointer-events-none absolute top-2 right-2" />}
       {exaggerated && (
         <div
           role="note"

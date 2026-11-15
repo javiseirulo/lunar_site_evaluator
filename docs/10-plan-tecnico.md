@@ -7,6 +7,8 @@
 
 ## 0. Estado real (actualizado 2026-11-14)
 
+> **Capas reales y en 3D (@javiseirulo, 2026-11-15):** `layers.json` ya es real (`mock: false`, `python -m export.layers`): elevación y pendiente (PNG LOLA de Pablo), sombra permanente (máscara PSR 20 m de PGDA reducida a 512²), luz solar y visibilidad de la Tierra (`grid/south_5km.bin`). Capa mock `score` eliminada (no hay score por celda). Las capas activas se pintan sobre el parche polar 3D de Marta y, para luz/Tierra, como mapa de calor global (`grid/global_1deg.bin`) en la esfera (`web/src/globe/LayerOverlays.tsx`). Horizonte plano en luz/Tierra hasta que haya horizontes por celda.
+
 > **Actualización de integración de Pablo, 2026-11-15:** dev `0b8f028` ya incluye
 > export real de los 59 sitios y sus series, rejillas de métricas, Explore con
 > filtros, Mission jugable y alunizajes históricos (#80–#89). Las tablas de v0
