@@ -64,4 +64,4 @@ Nota para Marta: tu decisión de "requisitos sin pesos" encaja. La validez de `@
 1. **Export real** (`python/export/all.py`): `sites.json`, `timeseries/` y `manifest.json` con `mock: false` sobre el catálogo, para que toda la web deje de usar mocks.
 2. Mapa de calor global de 1° y polar de 5 km (`grid/*.bin`).
 3. ~~Al llegar los horizontes de Pablo: volver a lanzar el export y quitar `pending_metrics`.~~ Hecho 2026-11-15: terreno real en los polos, slope en los 59 sitios, `psr_dist_km` pendiente solo en 18 sin cobertura; ventana por defecto 2027-10-12.
-4. Pendiente: umbral de pendiente 10° acordado en el log (2026-11-14) frente a 8° en `DEFAULT_MISSION_CONFIG`.
+4. ~~Umbral de pendiente 10° frente a 8° en `DEFAULT_MISSION_CONFIG`.~~ Hecho 2026-11-15 (#101): `slope_deg` máx. 10° (Artemis HLS) en web y Python.
