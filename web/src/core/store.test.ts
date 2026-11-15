@@ -249,3 +249,16 @@ describe('guarded selection (requestSelection)', () => {
     expect(useAppStore.getState().pendingSelection).toBeNull();
   });
 });
+
+describe('pendingPin', () => {
+  it('holds a requested pin until the globe clears it', () => {
+    const s = useAppStore.getState();
+    s.requestPin({ name: 'A', lat: -89, lon: 10 });
+    const first = useAppStore.getState().pendingPin;
+    expect(first).toEqual({ name: 'A', lat: -89, lon: 10 });
+    s.requestPin({ name: 'A', lat: -89, lon: 10 });
+    expect(useAppStore.getState().pendingPin).not.toBe(first);
+    s.clearPendingPin();
+    expect(useAppStore.getState().pendingPin).toBeNull();
+  });
+});

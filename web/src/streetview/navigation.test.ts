@@ -47,8 +47,8 @@ describe('street view pointer gestures', () => {
   });
 });
 it('limits walking and zoom and normalises wheel units', () => {
-  expect(canWalk(200)).toBe(true);
-  expect(canWalk(201)).toBe(false);
+  expect(canWalk(500)).toBe(true);
+  expect(canWalk(500.01)).toBe(false);
   expect(canWalk(NaN)).toBe(false);
   expect(canWalk(0.5)).toBe(false);
   expect(limitFov(1)).toBe(25);

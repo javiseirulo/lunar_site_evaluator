@@ -1,5 +1,6 @@
 /** Street View renderer. Selection/time remain in core. AI-assisted: OpenAI Codex. */
-import type { SkySample } from '@/core';
+import type { ViewerSky } from './sky';
+import { SUN_RADIUS_DEG } from '@/ephem';
 import { DEFAULT_OBSERVER_HEIGHT_M, limitLook, skyDirection } from './geometry';
 import {
   canWalk,
@@ -58,7 +59,7 @@ export interface LunarScene {
   look: (dh: number, dp: number) => void;
   faceBody: (body: 'sun' | 'earth') => void;
   setHeight: (height: number) => void;
-  setSky: (sample: SkySample | null) => void;
+  setSky: (sample: ViewerSky | null) => void;
   setReadingLight: (enabled: boolean) => void;
   setNames: (enabled: boolean) => void;
   relocate: (point: Observer) => Promise<void>;
@@ -136,7 +137,7 @@ export async function createLunarScene(
     let fov = limitFov(initialView.fov);
     let pose = limitLook(initialView.heading, initialView.pitch);
     let moving = false;
-    let sky: SkySample | null = null;
+    let sky: ViewerSky | null = null;
     let namesEnabled = allowNames;
     let features: Landmark[] = [];
     let anchors: { feature: Landmark; position: import('cesium').Cartesian3 }[] = [];
@@ -286,12 +287,24 @@ export async function createLunarScene(
     callbacks.ground(ground);
     // Sharpen after the first picture. Leaf tiles (error 1) are what made the wait so long.
     if (!preview) tiles.maximumScreenSpaceError = 4;
+    // Camera-facing schematic discs at a common sky distance. Metre-sized billboards
+    // keep the angular diameter stable across field of view and screen resolution.
+    const skyDistance = 1e8;
+    const disc =
+      'data:image/svg+xml,' +
+      encodeURIComponent(
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64"><circle cx="32" cy="32" r="32" fill="white"/></svg>',
+      );
     const markers = ['Sun', 'Earth'].map((name, index) =>
       viewer.entities.add({
         name,
         show: false,
         position: position(observer, ground),
-        point: { pixelSize: index ? 8 : 7, color: index ? C.Color.LIGHTBLUE : C.Color.YELLOW },
+        billboard: {
+          image: disc,
+          sizeInMeters: true,
+          color: index ? C.Color.LIGHTBLUE : C.Color.YELLOW,
+        },
         label: {
           text: name,
           font: '12px sans-serif',
@@ -302,7 +315,7 @@ export async function createLunarScene(
         },
       }),
     );
-    const setSky = (sample: SkySample | null) => {
+    const setSky = (sample: ViewerSky | null) => {
       sky = sample;
       const visibleSky = moving ? null : sample;
       const state = lightingState(visibleSky);
@@ -315,8 +328,14 @@ export async function createLunarScene(
             : new C.Cartesian3(0.94, 0.96, 1),
       );
       markers.forEach((marker, index) => {
-        marker.show = visibleSky !== null;
-        if (!visibleSky) return;
+        marker.show =
+          !!visibleSky && (index ? visibleSky.earthDiscFraction : visibleSky.sunFraction) > 0;
+        if (!visibleSky || !marker.show) return;
+        const radius = index ? visibleSky.earthRadiusDeg : SUN_RADIUS_DEG;
+        const diameter = 2 * skyDistance * Math.tan(C.Math.toRadians(radius));
+        // Cesium packs billboard widths into 16 bits. Keep the 64-unit sprite
+        // and apply the physical diameter via its floating-point scale.
+        marker.billboard!.scale = new C.ConstantProperty(diameter / 64);
         const d = vector(
           skyDirection(
             observer.lat,
@@ -328,7 +347,7 @@ export async function createLunarScene(
         marker.position = new C.ConstantPositionProperty(
           C.Cartesian3.add(
             position(observer, ground + height),
-            C.Cartesian3.multiplyByScalar(d, 1e8, new C.Cartesian3()),
+            C.Cartesian3.multiplyByScalar(d, skyDistance, new C.Cartesian3()),
             new C.Cartesian3(),
           ),
         );
@@ -560,7 +579,9 @@ export async function createLunarScene(
         callbacks.observer(target.point); // immediately invalidate the old site's sky
         callbacks.hint(`Moving ${Math.round(target.distance)} m…`);
         const started = performance.now();
-        const duration = matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 1000;
+        const duration = matchMedia('(prefers-reduced-motion: reduce)').matches
+          ? 0
+          : Math.min(2400, 700 + target.distance * 3.4);
         const advance = (now: number) => {
           if (disposed) return;
           const t = duration ? Math.min(1, (now - started) / duration) : 1;
