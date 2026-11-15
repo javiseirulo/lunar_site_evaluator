@@ -140,3 +140,9 @@
 - Test de coherencia: apollo_11 (flat) reproduce `timeseries/apollo_11.json` en 2027 (sunlitFraction a <0,002, noche y corte de Tierra a ≤2 h).
 - UI: `PointStatsView.tsx` en la ficha de punto y de pin propio; tarjeta lateral (`SiteDetail`) con las estadísticas del pin seleccionado, "Stand here in Street View" y borrar pin (`pinSelection.ts`). Se probó una tabla "Compare points" y Marta la descartó (2026-11-15).
 - Pendiente: mapa de calor con rejilla (v4); pendiente (slope) de puntos libres; no verificado visualmente en navegador.
+
+## 2026-11-16 — controles del globo en Explore (#161)
+
+- Tras el rediseño de pantalla completa (release #130), Layers y las coordenadas estaban en una pestaña "Map" y el astronauta arriba a la derecha. Se restauran sobre el mapa: coordenadas arriba a la izquierda, Layers abajo a la izquierda, astronauta abajo a la derecha.
+- Mecanismo: `ExplorePage` registra el hueco libre entre paneles (`chromeSlot`) y el globo coloca ahí sus controles con un portal; sin hueco, quedan sobre todo el globo como antes. Se quita la pestaña "Map" del panel izquierdo.
+- Toca `src/pages/ExplorePage.tsx` (de Javi2): coordinar el PR con él.

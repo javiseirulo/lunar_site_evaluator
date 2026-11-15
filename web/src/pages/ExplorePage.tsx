@@ -5,9 +5,7 @@ import { SimChart } from '@/core/shell/SimChart';
 import { PolarMap } from '@/layers';
 import { GlobeView, SiteDetail, SiteList } from '@/globe';
 import { useHistoric } from '@/globe/historicSites';
-import { LayersMenu } from '@/globe/LayersMenu';
-import { PatchControls } from '@/globe/PatchControls';
-import { PinForm } from '@/globe/PinForm';
+import { useChromeSlot } from '@/globe/chromeSlot';
 import { LandingDate, MissionTimingPanel, SiteCheckPanel } from '@/scoring';
 import { SimpleSiteList } from './explore/SimpleSiteList';
 import { EndSimulationDialog } from './explore/EndSimulationDialog';
@@ -58,7 +56,7 @@ function SimulateHint() {
 const FRAME = 'border-edge-hi border-2 bg-panel shadow-[4px_4px_0_#000]';
 const FLAT = 'border-0 bg-transparent shadow-none';
 
-type LeftTab = 'needs' | 'window' | 'sites' | 'map';
+type LeftTab = 'needs' | 'window' | 'sites';
 type RightTab = 'now' | 'sun' | 'check';
 
 function Pages<T extends string>({
@@ -95,25 +93,6 @@ function Pages<T extends string>({
   );
 }
 
-function MapPage() {
-  const proMode = useAppStore((s) => s.proMode);
-  const requestPin = useAppStore((s) => s.requestPin);
-  return (
-    <div className="flex flex-col gap-2 px-2 py-2">
-      <PinForm
-        embedded
-        title={proMode ? 'Pin by coordinates' : 'Go to coordinates'}
-        submitLabel={proMode ? 'Add pin' : 'Go there'}
-        onAdd={requestPin}
-      />
-      <div className="border-edge-hi border-t-2 pt-2">
-        <LayersMenu embedded hasSun expert={proMode} />
-      </div>
-      <PatchControls />
-    </div>
-  );
-}
-
 function LeftPanel() {
   const proMode = useAppStore((s) => s.proMode);
   const [tab, setTab] = useState<LeftTab>(proMode ? 'needs' : 'sites');
@@ -124,12 +103,8 @@ function LeftPanel() {
         { id: 'needs', label: 'Needs' },
         { id: 'window', label: 'Window' },
         { id: 'sites', label: 'Sites' },
-        { id: 'map', label: 'Map' },
       ]
-    : [
-        { id: 'sites', label: 'Sites' },
-        { id: 'map', label: 'Map' },
-      ];
+    : [{ id: 'sites', label: 'Sites' }];
 
   return (
     <aside
@@ -145,7 +120,6 @@ function LeftPanel() {
           ) : (
             <SimpleSiteList className={FLAT} />
           ))}
-        {shown === 'map' && <MapPage />}
       </div>
     </aside>
   );
@@ -200,6 +174,7 @@ function RightPanel() {
 
 export default function ExplorePage() {
   const proMode = useAppStore((s) => s.proMode);
+  const setChromeSlot = useChromeSlot((s) => s.setSlot);
 
   return (
     <>
@@ -208,7 +183,7 @@ export default function ExplorePage() {
         <div className="absolute inset-0">
           {WEBGL ? (
             <GlobeBoundary fallback={<PolarMap className="size-full" neutral={!proMode} />}>
-              <GlobeView hideChrome />
+              <GlobeView />
             </GlobeBoundary>
           ) : (
             <PolarMap className="size-full" neutral={!proMode} />
@@ -217,6 +192,11 @@ export default function ExplorePage() {
 
         <div className="pointer-events-none absolute inset-0 grid grid-cols-1 grid-rows-[minmax(0,1fr)_auto] gap-3 p-3 md:grid-cols-[minmax(200px,20%)_minmax(0,1fr)_minmax(210px,22%)]">
           <LeftPanel />
+          {/* Free map area between the panels: the globe puts its coordinate, Layers and astronaut controls here. */}
+          <div
+            ref={setChromeSlot}
+            className="pointer-events-none absolute inset-0 md:relative md:inset-auto md:col-start-2 md:row-start-1"
+          />
           <RightPanel />
           <div className="pointer-events-auto flex flex-col gap-2 self-end md:col-start-2 md:row-start-2">
             {!proMode && <LandingDate />}
