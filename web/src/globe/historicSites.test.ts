@@ -51,16 +51,22 @@ describe('historicSummary', () => {
       site('d', 47, 'failed'),
     ]);
     expect(s).toEqual({ total: 4, southOf80: 1, byOutcome: { success: 1, partial: 2, failed: 1 } });
-    expect(summaryText(s)).toBe('4 landings shown · 1 south of 80°S');
+    expect(summaryText(s)).toBe('4 sites (1 crash) · 1 south of 80°S');
   });
 
-  it('reflects the real file as it is', () => {
+  it('keeps every row of the real file and finds the known south-polar landings', () => {
     const file = JSON.parse(
       readFileSync(join(__dirname, '..', '..', 'public', 'data', 'historic_sites.json'), 'utf8'),
     ) as { sites: HistoricSite[] };
-    const s = historicSummary(parseHistoricSites({ version: 1, sites: file.sites }));
-    expect(s.total).toBe(file.sites.length);
-    expect(s.southOf80).toBe(file.sites.filter((x) => x.lat < -80).length);
+    const sites = parseHistoricSites({ version: 1, sites: file.sites });
+    expect(sites).toHaveLength(file.sites.length); // nothing silently dropped
+    // Fixed expectation (not the same formula as the code): only IM-1 and IM-2 lie south of 80°S.
+    const south = sites
+      .filter((x) => x.lat < -80)
+      .map((x) => x.id)
+      .sort();
+    expect(south).toEqual(['im1_odysseus', 'im2_athena']);
+    expect(historicSummary(sites).southOf80).toBe(2);
   });
 });
 
@@ -73,6 +79,26 @@ describe('loadHistoricSites', () => {
     );
     expect(useHistoric.getState().status).toBe('ready');
     expect(useHistoric.getState().sites).toHaveLength(1);
+  });
+
+  it('fetches once for concurrent and repeated calls', async () => {
+    let calls = 0;
+    const f = () => {
+      calls += 1;
+      return Promise.resolve(response({ version: 1, sites: [site('a', 1, 'success')] }));
+    };
+    await Promise.all([loadHistoricSites(f), loadHistoricSites(f)]);
+    await loadHistoricSites(f);
+    expect(calls).toBe(1);
+  });
+
+  it('retries after an error (the switch calls it again)', async () => {
+    await loadHistoricSites(() => Promise.reject(new Error('offline')));
+    expect(useHistoric.getState().status).toBe('error');
+    await loadHistoricSites(() =>
+      Promise.resolve(response({ version: 1, sites: [site('a', 1, 'success')] })),
+    );
+    expect(useHistoric.getState().status).toBe('ready');
   });
 
   it('marks the layer unavailable when the file is missing or broken', async () => {

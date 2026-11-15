@@ -81,3 +81,7 @@
 - Globo: interruptor "Past landings" (apagado por defecto, "unavailable" si falla la carga) con leyenda por resultado y contador calculado ("25 landings shown · 2 south of 80°S"); marcadores triangulares coloreados por resultado; etiqueta al pasar el ratón; clic → tarjeta propia (agencia, país, fecha, resultado, tipo, nota, enlace "Source"), sin `selectSite`.
 - Decisión de Marta: los alunizajes históricos siguen contando como candidatos en Explore (en el mismo punto puede verse el pin y el triángulo).
 - Verificado: lint, typecheck, 121 tests, build; en navegador, interruptor y leyenda. Marcadores 3D sin comprobar (panel oculto).
+- `/review` de #86 y #89 (6 especialistas + Red Team + adversarial; nada crítico). Arreglado:
+  - #86 (contrato): `source` solo `https`; el test exige que cada `historic_landing` de `sites.json` esté en `historic_sites.json` y que los id compartidos sean `historic_landing`.
+  - #89: el cargador valida todo lo que muestra la tarjeta y avisa en consola de filas descartadas; cursor y tarjeta se limpian al apagar la capa; leyenda con borde (contraste); los choques ya no dicen "Crashed · Crash site".
+  - Decisiones de Marta: sin triángulo encima de un candidato visible (su tarjeta muestra "Past landing"); 7 misiones más (Luna 13, Luna 20, Surveyor 3/5/6/7, HAKUTO-R M2) → 32; contador "32 sites (5 crashes) · 2 south of 80°S"; el interruptor reintenta la carga tras un error.

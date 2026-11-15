@@ -98,6 +98,7 @@ export default function GlobeCanvas() {
   const addPin = useCustomPins((s) => s.addPin);
   const removePin = useCustomPins((s) => s.removePin);
   const historic = useHistoric((s) => s.sites);
+  const historicVisible = useHistoric((s) => s.visible);
 
   // Past landings: load once; on failure the switch shows "unavailable" and the globe carries on.
   useEffect(() => {
@@ -122,6 +123,8 @@ export default function GlobeCanvas() {
 
   const card = useMemo<CardContent | null>(() => {
     if (!focus) return null;
+    const pastOf = (id: string) =>
+      historicVisible ? (historic.find((h) => h.id === id) ?? null) : null;
     if (focus.kind === 'point') return focus;
     if (focus.kind === 'site') {
       const e = evaluations?.find((x) => x.site.id === focus.id);
@@ -133,19 +136,23 @@ export default function GlobeCanvas() {
           rank: topRank.get(e.site.id) ?? null,
           summary: meetsText(e),
           note: miss?.text ?? null,
+          past: pastOf(e.site.id),
         };
       }
       // Selected elsewhere (list, 2D map) with no requirement active.
       const site = sites?.find((s) => s.id === focus.id);
-      return site ? { kind: 'site', site, rank: null, summary: null, note: null } : null;
+      return site
+        ? { kind: 'site', site, rank: null, summary: null, note: null, past: pastOf(site.id) }
+        : null;
     }
     if (focus.kind === 'historic') {
+      if (!historicVisible) return null; // layer switched off: no card for a marker that is not drawn
       const h = historic.find((x) => x.id === focus.id);
       return h ? { kind: 'historic', site: h } : null;
     }
     const pin = pins.find((p) => p.id === focus.id);
     return pin ? { kind: 'custom', pin } : null;
-  }, [focus, evaluations, topRank, sites, pins, historic]);
+  }, [focus, evaluations, topRank, sites, pins, historic, historicVisible]);
 
   const onSiteClick = (id: string) => {
     const { selectedSiteId, selectSite } = useAppStore.getState();
@@ -528,14 +535,28 @@ function HistoricMarkers({
   const status = useHistoric((s) => s.status);
   const [hoverId, setHoverId] = useState<string | null>(null);
   const shown = visible && status === 'ready';
+  // Where a candidate pin is already drawn (same id), skip the triangle so the pin stays clickable;
+  // the candidate's card shows the past landing instead.
+  const { evaluations, loading } = useCandidates();
+  const showNonMatching = useRequirements((s) => s.showNonMatching);
+  const pinned = useMemo(
+    () =>
+      new Set(
+        loading
+          ? []
+          : (evaluations ?? []).filter((e) => e.candidate || showNonMatching).map((e) => e.site.id),
+      ),
+    [evaluations, loading, showNonMatching],
+  );
 
+  // Hidden markers never fire pointer-out, so the cursor also depends on the layer being shown.
   useEffect(() => {
-    if (!hoverId) return;
+    if (!hoverId || !shown) return;
     document.body.style.cursor = 'pointer';
     return () => {
       document.body.style.cursor = '';
     };
-  }, [hoverId]);
+  }, [hoverId, shown]);
 
   const hovered =
     shown && hoverId && hoverId !== focusId ? sites.find((s) => s.id === hoverId) : null;
@@ -550,17 +571,19 @@ function HistoricMarkers({
   return (
     <group>
       {shown &&
-        sites.map((h) => (
-          <HistoricMarker
-            key={h.id}
-            lat={h.lat}
-            lon={h.lon}
-            color={OUTCOME_COLORS[h.outcome]}
-            selected={h.id === focusId}
-            onClick={() => onClick(h.id)}
-            onHover={(over) => setHoverId((cur) => (over ? h.id : cur === h.id ? null : cur))}
-          />
-        ))}
+        sites
+          .filter((h) => !pinned.has(h.id))
+          .map((h) => (
+            <HistoricMarker
+              key={h.id}
+              lat={h.lat}
+              lon={h.lon}
+              color={OUTCOME_COLORS[h.outcome]}
+              selected={h.id === focusId}
+              onClick={() => onClick(h.id)}
+              onHover={(over) => setHoverId((cur) => (over ? h.id : cur === h.id ? null : cur))}
+            />
+          ))}
       <HoverLabel label={label} />
     </group>
   );

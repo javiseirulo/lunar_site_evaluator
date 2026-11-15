@@ -7,6 +7,7 @@ import {
   OUTCOME_COLORS,
   OUTCOME_LABELS,
   historicSummary,
+  loadHistoricSites,
   summaryText,
   useHistoric,
 } from './historicSites';
@@ -29,12 +30,19 @@ export function HistoricControls() {
           type="button"
           role="switch"
           aria-checked={visible && !unavailable}
-          disabled={unavailable || status !== 'ready'}
+          disabled={status === 'idle' || status === 'loading'}
           className="switch disabled:cursor-default disabled:opacity-40"
-          onClick={() => setVisible(!visible)}
+          onClick={() => {
+            // After a failed load the switch retries instead of staying dead (e.g. slow network in a demo).
+            if (unavailable) void loadHistoricSites().then(() => setVisible(true));
+            else setVisible(!visible);
+          }}
+          aria-label={unavailable ? 'Past landings unavailable: retry' : undefined}
         />
         Past landings
-        {unavailable && <span className="text-ink-muted ml-auto font-normal">unavailable</span>}
+        {unavailable && (
+          <span className="text-ink-muted ml-auto font-normal">unavailable · retry</span>
+        )}
         {status === 'loading' && (
           <span className="text-ink-muted ml-auto font-normal">loading…</span>
         )}
@@ -45,7 +53,12 @@ export function HistoricControls() {
             {ORDER.map((o) => (
               <li key={o} className="flex items-center gap-2">
                 <svg viewBox="0 0 10 10" className="size-2.5" aria-hidden>
-                  <path d="M5 0 L10 10 L0 10 Z" fill={OUTCOME_COLORS[o]} />
+                  <path
+                    d="M5 0.6 L9.4 9.4 L0.6 9.4 Z"
+                    fill={OUTCOME_COLORS[o]}
+                    stroke="#2c2822"
+                    strokeWidth="0.8"
+                  />
                 </svg>
                 {OUTCOME_LABELS[o]}
                 <span className="num text-ink-muted ml-auto">{summary.byOutcome[o]}</span>

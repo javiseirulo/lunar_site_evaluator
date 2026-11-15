@@ -29,6 +29,71 @@
       "source": "https://lroc.im-ldi.com/images/938"
     },
     {
+      "id": "luna_13",
+      "name": "Luna 13",
+      "agency": "Soviet space program",
+      "country": "USSR",
+      "date_utc": "1966-12-24T00:00:00Z",
+      "lat": 18.87,
+      "lon": -62.05,
+      "outcome": "success",
+      "kind": "lander",
+      "note": "Second Soviet soft landing; tested the soil with a penetrometer. Position from historical sources, not LROC-imaged.",
+      "source": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_artifact_impacts.html"
+    },
+    {
+      "id": "surveyor_3",
+      "name": "Surveyor 3",
+      "agency": "NASA",
+      "country": "USA",
+      "date_utc": "1967-04-20T00:00:00Z",
+      "lat": -3.0162,
+      "lon": -23.418,
+      "outcome": "success",
+      "kind": "lander",
+      "note": "Dug the first trench on the Moon; Apollo 12 astronauts later visited it and brought parts home.",
+      "source": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_artifact_impacts.html"
+    },
+    {
+      "id": "surveyor_5",
+      "name": "Surveyor 5",
+      "agency": "NASA",
+      "country": "USA",
+      "date_utc": "1967-09-11T00:00:00Z",
+      "lat": 1.4551,
+      "lon": 23.1943,
+      "outcome": "success",
+      "kind": "lander",
+      "note": "First chemical analysis of lunar soil on site, in Mare Tranquillitatis.",
+      "source": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_artifact_impacts.html"
+    },
+    {
+      "id": "surveyor_6",
+      "name": "Surveyor 6",
+      "agency": "NASA",
+      "country": "USA",
+      "date_utc": "1967-11-10T00:00:00Z",
+      "lat": 0.4742,
+      "lon": -1.4275,
+      "outcome": "success",
+      "kind": "lander",
+      "note": "Made the first lift-off from the Moon: a short hop of a few metres.",
+      "source": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_artifact_impacts.html"
+    },
+    {
+      "id": "surveyor_7",
+      "name": "Surveyor 7",
+      "agency": "NASA",
+      "country": "USA",
+      "date_utc": "1968-01-10T00:00:00Z",
+      "lat": -40.9812,
+      "lon": -11.5127,
+      "outcome": "success",
+      "kind": "lander",
+      "note": "Only Surveyor in the highlands, on the rim region of Tycho crater.",
+      "source": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_artifact_impacts.html"
+    },
+    {
       "id": "apollo_11",
       "name": "Apollo 11",
       "agency": "NASA",
@@ -52,6 +117,32 @@
       "outcome": "success",
       "kind": "crewed",
       "note": "Pinpoint landing next to the Surveyor 3 probe in Oceanus Procellarum.",
+      "source": "https://lroc.im-ldi.com/images/938"
+    },
+    {
+      "id": "luna_16",
+      "name": "Luna 16",
+      "agency": "Soviet space program",
+      "country": "USSR",
+      "date_utc": "1970-09-20T00:00:00Z",
+      "lat": -0.5137,
+      "lon": 56.3638,
+      "outcome": "success",
+      "kind": "sample_return",
+      "note": "First robotic sample return from the Moon, from Mare Fecunditatis.",
+      "source": "https://lroc.im-ldi.com/images/938"
+    },
+    {
+      "id": "luna_17",
+      "name": "Luna 17 (Lunokhod 1)",
+      "agency": "Soviet space program",
+      "country": "USSR",
+      "date_utc": "1970-11-17T00:00:00Z",
+      "lat": 38.23764,
+      "lon": -35.00163,
+      "outcome": "success",
+      "kind": "rover",
+      "note": "Delivered Lunokhod 1, the first rover to drive on another world.",
       "source": "https://lroc.im-ldi.com/images/938"
     },
     {
@@ -81,6 +172,19 @@
       "source": "https://lroc.im-ldi.com/images/938"
     },
     {
+      "id": "luna_20",
+      "name": "Luna 20",
+      "agency": "Soviet space program",
+      "country": "USSR",
+      "date_utc": "1972-02-21T00:00:00Z",
+      "lat": 3.7863,
+      "lon": 56.6242,
+      "outcome": "success",
+      "kind": "sample_return",
+      "note": "Returned samples from the highlands near Apollonius crater.",
+      "source": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_artifact_impacts.html"
+    },
+    {
       "id": "apollo_16",
       "name": "Apollo 16",
       "agency": "NASA",
@@ -104,32 +208,6 @@
       "outcome": "success",
       "kind": "crewed",
       "note": "Last crewed landing to date, in the Taurus-Littrow valley.",
-      "source": "https://lroc.im-ldi.com/images/938"
-    },
-    {
-      "id": "luna_16",
-      "name": "Luna 16",
-      "agency": "Soviet space program",
-      "country": "USSR",
-      "date_utc": "1970-09-20T00:00:00Z",
-      "lat": -0.5137,
-      "lon": 56.3638,
-      "outcome": "success",
-      "kind": "sample_return",
-      "note": "First robotic sample return from the Moon, from Mare Fecunditatis.",
-      "source": "https://lroc.im-ldi.com/images/938"
-    },
-    {
-      "id": "luna_17",
-      "name": "Luna 17 (Lunokhod 1)",
-      "agency": "Soviet space program",
-      "country": "USSR",
-      "date_utc": "1970-11-17T00:00:00Z",
-      "lat": 38.23764,
-      "lon": -35.00163,
-      "outcome": "success",
-      "kind": "rover",
-      "note": "Delivered Lunokhod 1, the first rover to drive on another world.",
       "source": "https://lroc.im-ldi.com/images/938"
     },
     {
@@ -185,6 +263,32 @@
       "source": "https://lroc.im-ldi.com/images/1087"
     },
     {
+      "id": "beresheet",
+      "name": "Beresheet",
+      "agency": "SpaceIL / IAI",
+      "country": "Israel",
+      "date_utc": "2019-04-11T00:00:00Z",
+      "lat": 32.5956,
+      "lon": 19.3496,
+      "outcome": "failed",
+      "kind": "impact",
+      "note": "First privately funded landing attempt; crashed in Mare Serenitatis.",
+      "source": "https://lroc.im-ldi.com/images/1101"
+    },
+    {
+      "id": "chandrayaan_2_vikram",
+      "name": "Chandrayaan-2 (Vikram)",
+      "agency": "ISRO",
+      "country": "India",
+      "date_utc": "2019-09-06T00:00:00Z",
+      "lat": -70.881,
+      "lon": 22.784,
+      "outcome": "failed",
+      "kind": "impact",
+      "note": "Lost during descent; the impact site was found with help from an amateur image analyst.",
+      "source": "https://lroc.im-ldi.com/images/1131"
+    },
+    {
       "id": "change_5",
       "name": "Chang'e 5",
       "agency": "CNSA",
@@ -198,17 +302,30 @@
       "source": "https://lroc.im-ldi.com/images/1172"
     },
     {
-      "id": "change_6",
-      "name": "Chang'e 6",
-      "agency": "CNSA",
-      "country": "China",
-      "date_utc": "2024-06-01T00:00:00Z",
-      "lat": -41.6385,
-      "lon": -153.9852,
-      "outcome": "success",
-      "kind": "sample_return",
-      "note": "First sample return from the far side, in the Apollo basin.",
-      "source": "https://lroc.im-ldi.com/images/1374"
+      "id": "hakuto_r_m1",
+      "name": "HAKUTO-R Mission 1",
+      "agency": "ispace",
+      "country": "Japan",
+      "date_utc": "2023-04-25T16:40:00Z",
+      "lat": 47.581,
+      "lon": 44.094,
+      "outcome": "failed",
+      "kind": "impact",
+      "note": "Ran out of propellant during descent toward Atlas crater. Position is a preliminary LROC estimate.",
+      "source": "https://lroc.im-ldi.com/images/1302"
+    },
+    {
+      "id": "luna_25",
+      "name": "Luna 25",
+      "agency": "Roscosmos",
+      "country": "Russia",
+      "date_utc": "2023-08-19T11:58:00Z",
+      "lat": -57.865,
+      "lon": 61.36,
+      "outcome": "failed",
+      "kind": "impact",
+      "note": "Crashed after a faulty orbit-lowering burn, leaving a crater about 10 m across.",
+      "source": "https://lroc.im-ldi.com/images/1311"
     },
     {
       "id": "chandrayaan_3",
@@ -250,6 +367,19 @@
       "source": "https://lroc.im-ldi.com/images/1360"
     },
     {
+      "id": "change_6",
+      "name": "Chang'e 6",
+      "agency": "CNSA",
+      "country": "China",
+      "date_utc": "2024-06-01T00:00:00Z",
+      "lat": -41.6385,
+      "lon": -153.9852,
+      "outcome": "success",
+      "kind": "sample_return",
+      "note": "First sample return from the far side, in the Apollo basin.",
+      "source": "https://lroc.im-ldi.com/images/1374"
+    },
+    {
       "id": "blue_ghost_m1",
       "name": "Blue Ghost Mission 1",
       "agency": "Firefly Aerospace (NASA CLPS)",
@@ -276,56 +406,17 @@
       "source": "https://lroc.im-ldi.com/images/1408"
     },
     {
-      "id": "beresheet",
-      "name": "Beresheet",
-      "agency": "SpaceIL / IAI",
-      "country": "Israel",
-      "date_utc": "2019-04-11T00:00:00Z",
-      "lat": 32.5956,
-      "lon": 19.3496,
-      "outcome": "failed",
-      "kind": "impact",
-      "note": "First privately funded landing attempt; crashed in Mare Serenitatis.",
-      "source": "https://lroc.im-ldi.com/images/1101"
-    },
-    {
-      "id": "chandrayaan_2_vikram",
-      "name": "Chandrayaan-2 (Vikram)",
-      "agency": "ISRO",
-      "country": "India",
-      "date_utc": "2019-09-06T00:00:00Z",
-      "lat": -70.881,
-      "lon": 22.784,
-      "outcome": "failed",
-      "kind": "impact",
-      "note": "Lost during descent; the impact site was found with help from an amateur image analyst.",
-      "source": "https://lroc.im-ldi.com/images/1131"
-    },
-    {
-      "id": "hakuto_r_m1",
-      "name": "HAKUTO-R Mission 1",
+      "id": "hakuto_r_m2",
+      "name": "HAKUTO-R Mission 2 (Resilience)",
       "agency": "ispace",
       "country": "Japan",
-      "date_utc": "2023-04-25T16:40:00Z",
-      "lat": 47.581,
-      "lon": 44.094,
+      "date_utc": "2025-06-05T00:00:00Z",
+      "lat": 60.4445,
+      "lon": -4.588,
       "outcome": "failed",
       "kind": "impact",
-      "note": "Ran out of propellant during descent toward Atlas crater. Position is a preliminary LROC estimate.",
-      "source": "https://lroc.im-ldi.com/images/1302"
-    },
-    {
-      "id": "luna_25",
-      "name": "Luna 25",
-      "agency": "Roscosmos",
-      "country": "Russia",
-      "date_utc": "2023-08-19T11:58:00Z",
-      "lat": -57.865,
-      "lon": 61.36,
-      "outcome": "failed",
-      "kind": "impact",
-      "note": "Crashed after a faulty orbit-lowering burn, leaving a crater about 10 m across.",
-      "source": "https://lroc.im-ldi.com/images/1311"
+      "note": "Second ispace attempt; hit the surface in Mare Frigoris during descent.",
+      "source": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_artifact_impacts.html"
     }
   ]
 }

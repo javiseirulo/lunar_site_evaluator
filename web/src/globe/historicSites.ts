@@ -26,6 +26,8 @@ export const useHistoric = create<HistoricState>()((set) => ({
 }));
 
 const OUTCOMES: HistoricOutcome[] = ['success', 'partial', 'failed'];
+const KINDS: HistoricKind[] = ['lander', 'rover', 'crewed', 'sample_return', 'impact'];
+const text = (v: unknown) => typeof v === 'string' && v.trim().length > 0;
 
 /** Checks the file's shape and returns its sites; throws with a short reason if it is not usable. */
 export function parseHistoricSites(json: unknown): HistoricSite[] {
@@ -33,20 +35,35 @@ export function parseHistoricSites(json: unknown): HistoricSite[] {
   if (!file || file.version !== 1 || !Array.isArray(file.sites)) {
     throw new Error('historic_sites.json: expected { version: 1, sites: [...] }');
   }
-  return file.sites.filter((s): s is HistoricSite => {
+  const dropped: string[] = [];
+  const sites = file.sites.filter((s): s is HistoricSite => {
     const h = s as Partial<HistoricSite>;
-    return (
-      typeof h.id === 'string' &&
-      typeof h.name === 'string' &&
+    // Everything the card and labels read must be there, so a bad row can never crash the globe.
+    const ok =
+      text(h.id) &&
+      text(h.name) &&
+      text(h.agency) &&
+      text(h.country) &&
+      text(h.note) &&
+      typeof h.date_utc === 'string' &&
+      !Number.isNaN(Date.parse(h.date_utc)) &&
+      typeof h.source === 'string' &&
+      /^https:\/\//.test(h.source) &&
+      KINDS.includes(h.kind as HistoricKind) &&
       typeof h.lat === 'number' &&
       Number.isFinite(h.lat) &&
       typeof h.lon === 'number' &&
       Number.isFinite(h.lon) &&
       Math.abs(h.lat) <= 90 &&
       Math.abs(h.lon) <= 180 &&
-      OUTCOMES.includes(h.outcome as HistoricOutcome)
-    );
+      OUTCOMES.includes(h.outcome as HistoricOutcome);
+    if (!ok) dropped.push(String(h.id ?? '?'));
+    return ok;
   });
+  // Visible in the console so the legend count is never silently short.
+  if (dropped.length)
+    console.warn(`historic_sites.json: skipped invalid entries: ${dropped.join(', ')}`);
+  return sites;
 }
 
 let inflight: Promise<void> | null = null;
@@ -70,7 +87,7 @@ export function loadHistoricSites(fetchImpl: typeof fetch = fetch): Promise<void
   return inflight;
 }
 
-/** Latitude that separates the south polar region (docs/10 §10: lat ≤ −80 is south_pole). */
+/** South polar region boundary (docs/10 §10). The counter counts sites strictly south of it. */
 export const SOUTH_POLE_LAT = -80;
 
 export interface HistoricSummary {
@@ -90,9 +107,10 @@ export function historicSummary(sites: HistoricSite[]): HistoricSummary {
   return { total: sites.length, southOf80, byOutcome };
 }
 
-/** "25 landings shown · 2 south of 80°S" */
+/** "32 sites (5 crashes) · 2 south of 80°S" (crash sites are counted, and said so). */
 export function summaryText(s: HistoricSummary): string {
-  return `${s.total} landing${s.total === 1 ? '' : 's'} shown · ${s.southOf80} south of 80°S`;
+  const crashes = s.byOutcome.failed;
+  return `${s.total} site${s.total === 1 ? '' : 's'} (${crashes} crash${crashes === 1 ? '' : 'es'}) · ${s.southOf80} south of ${Math.abs(SOUTH_POLE_LAT)}°S`;
 }
 
 /** Marker colours by outcome (distinct from the gold of candidate sites). */

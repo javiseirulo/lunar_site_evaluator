@@ -13,16 +13,19 @@ import { PAPER } from './paper';
 
 export type CardContent =
   /** rank: 1–5 in the top five; summary: "Meets X of Y requirements"; note: first unmet check. */
-  | { kind: 'site'; site: Site; rank: number | null; summary: string | null; note: string | null }
+  | {
+      kind: 'site';
+      site: Site;
+      rank: number | null;
+      summary: string | null;
+      note: string | null;
+      /** Same place in historic_sites.json, shown while "Past landings" is on. */
+      past?: HistoricSite | null;
+    }
   | { kind: 'custom'; pin: CustomPin }
   /** A past landing or impact (not a candidate: it never selects a site). */
   | { kind: 'historic'; site: HistoricSite }
   | { kind: 'point'; lat: number; lon: number };
-
-/**
- * The globe sits inside `.space`, which flips text tokens to light colours. Cards and forms over
- * it are paper sheets, so they reset the tokens to the page's light theme.
- */
 
 /** Small paper sheet with a title row and a close button (card and pin form). */
 export function Sheet({
@@ -118,6 +121,12 @@ export function GlobeCard({
           <p className="text-ink-faint text-[12px]">Full details in the site sheet.</p>
         )}
         {content.kind === 'historic' && <HistoricDetails site={content.site} />}
+        {content.kind === 'site' && content.past && (
+          <div className="border-edge border-t pt-2">
+            <p className="text-heading text-[12px] font-medium">Past landing</p>
+            <HistoricDetails site={content.past} />
+          </div>
+        )}
         {content.kind === 'custom' && (
           <>
             <p className="text-ink-faint text-[12px]">
@@ -195,11 +204,12 @@ function HistoricDetails({ site }: { site: HistoricSite }) {
       <dt className="text-ink-muted">Outcome</dt>
       <dd className="flex items-center gap-1.5">
         <span
-          className="inline-block size-2.5 rounded-full"
+          className="inline-block size-2.5 rounded-full ring-1 ring-black/40"
           style={{ background: OUTCOME_COLORS[site.outcome] }}
           aria-hidden
         />
-        {OUTCOME_LABELS[site.outcome]} · {KIND_LABELS[site.kind]}
+        {OUTCOME_LABELS[site.outcome]}
+        {site.kind !== 'impact' && ` · ${KIND_LABELS[site.kind]}`}
       </dd>
       <dd className="text-ink col-span-2 mt-1">{site.note}</dd>
       <dd className="col-span-2">
