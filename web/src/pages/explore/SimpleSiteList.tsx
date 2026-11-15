@@ -2,7 +2,7 @@
  * Normal-mode site picker for Explore: every site, one tap to select.
  * Expert mode uses the requirements-driven list in `@/globe` instead.
  */
-import { useAppStore, useData } from '@/core';
+import { useAppStore, useData, useScoresStale } from '@/core';
 import { cn } from '@/lib/utils';
 import { YourPoints } from '@/globe';
 
@@ -10,8 +10,12 @@ export function SimpleSiteList({ className }: { className?: string }) {
   const sites = useData((s) => s.sites);
   const selectedSiteId = useAppStore((s) => s.selectedSiteId);
   const requestSelection = useAppStore((s) => s.requestSelection);
+  const stale = useScoresStale();
   if (!sites) return null;
-  const sorted = [...sites].sort((a, b) => b.score - a.score);
+  // Catalogue scores are for the default window only: keep the order stable for other dates.
+  const sorted = stale
+    ? [...sites].sort((a, b) => a.name.localeCompare(b.name))
+    : [...sites].sort((a, b) => b.score - a.score);
 
   return (
     <section className={cn('box flex min-h-0 flex-col', className)} aria-labelledby="sites-heading">

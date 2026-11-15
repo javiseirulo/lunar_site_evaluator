@@ -8,7 +8,7 @@ import { useHistoric } from '@/globe/historicSites';
 import { LayersMenu } from '@/globe/LayersMenu';
 import { PatchControls } from '@/globe/PatchControls';
 import { PinForm } from '@/globe/PinForm';
-import { MissionTimingPanel, SiteCheckPanel } from '@/scoring';
+import { LandingDate, MissionTimingPanel, SiteCheckPanel } from '@/scoring';
 import { SimpleSiteList } from './explore/SimpleSiteList';
 import { EndSimulationDialog } from './explore/EndSimulationDialog';
 
@@ -218,7 +218,8 @@ export default function ExplorePage() {
         <div className="pointer-events-none absolute inset-0 grid grid-cols-1 grid-rows-[minmax(0,1fr)_auto] gap-3 p-3 md:grid-cols-[minmax(200px,20%)_minmax(0,1fr)_minmax(210px,22%)]">
           <LeftPanel />
           <RightPanel />
-          <div className="pointer-events-auto self-end md:col-start-2 md:row-start-2">
+          <div className="pointer-events-auto flex flex-col gap-2 self-end md:col-start-2 md:row-start-2">
+            {!proMode && <LandingDate />}
             <TimeBar />
           </div>
         </div>
