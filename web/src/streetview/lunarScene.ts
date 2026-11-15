@@ -155,17 +155,23 @@ export async function createLunarScene(
     const resource = await C.IonResource.fromAssetId(2684829, { accessToken: token });
     if (disposed) throw new DOMException('Cancelled', 'AbortError');
     const preview = options.detail === 'preview';
+    // A screen-space error of 1 downloads the leaf tiles before the first picture.
+    // Start coarser, skip intermediate levels, and let the center of the view load first.
     const tiles = await C.Cesium3DTileset.fromUrl(resource, {
-      maximumScreenSpaceError: preview ? 16 : 1,
+      maximumScreenSpaceError: preview ? 16 : 8,
       cacheBytes: preview
-        ? 64 * 1024 * 1024
+        ? 128 * 1024 * 1024
         : matchMedia('(pointer: coarse)').matches
           ? 128 * 1024 * 1024
           : 256 * 1024 * 1024,
-      maximumCacheOverflowBytes: preview ? 32 * 1024 * 1024 : 128 * 1024 * 1024,
-      foveatedScreenSpaceError: preview,
-      dynamicScreenSpaceError: preview,
-      cullRequestsWhileMoving: preview,
+      maximumCacheOverflowBytes: preview ? 64 * 1024 * 1024 : 128 * 1024 * 1024,
+      skipLevelOfDetail: true,
+      immediatelyLoadDesiredLevelOfDetail: false,
+      loadSiblings: false,
+      progressiveResolutionHeightFraction: 0.3,
+      foveatedScreenSpaceError: true,
+      dynamicScreenSpaceError: true,
+      cullRequestsWhileMoving: true,
     });
     if (disposed) {
       tiles.destroy();
@@ -225,9 +231,31 @@ export async function createLunarScene(
         throw new Error('Surface height unavailable');
       return sampled.map((p) => p!.height);
     };
-    ground = (await sampleGround([observer]))[0]!;
+    // Place the camera on tiles already in view, instead of waiting for the leaf tiles.
+    await new Promise<void>((resolve) => {
+      let settled = false;
+      const finish = () => {
+        if (settled) return;
+        settled = true;
+        window.clearTimeout(timer);
+        tiles.initialTilesLoaded.removeEventListener(finish);
+        resolve();
+      };
+      const timer = window.setTimeout(finish, 2_500);
+      tiles.initialTilesLoaded.addEventListener(finish);
+      if (tiles.tilesLoaded) finish();
+    });
+    if (disposed) throw new DOMException('Cancelled', 'AbortError');
+    viewer.scene.requestRender();
+    await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+    const quick = viewer.scene.sampleHeight(
+      C.Cartographic.fromDegrees(observer.lon, observer.lat, 30_000),
+    );
+    ground = Number.isFinite(quick) ? quick! : (await sampleGround([observer]))[0]!;
     let exactGround = ground;
     callbacks.ground(ground);
+    // Sharpen after the first picture. Leaf tiles (error 1) are what made the wait so long.
+    if (!preview) tiles.maximumScreenSpaceError = 4;
     const markers = ['Sun', 'Earth'].map((name, index) =>
       viewer.entities.add({
         name,

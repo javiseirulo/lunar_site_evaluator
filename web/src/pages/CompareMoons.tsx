@@ -1,55 +1,28 @@
 /**
- * A close view of the Moon with the landing craft on the site. Longitude is what actually
+ * A close view of the Moon with a small mark on the site. Longitude is what actually
  * turns the ground: south-polar sites share a latitude, so a latitude-only camera looks still.
  */
 import { useEffect, useLayoutEffect, useRef } from 'react';
 import { buildSpinner } from '@/intro/moonSphere';
 import { loadMoonTexture } from '@/intro/moonTexture';
 
-const SIZE = 220;
-const ZOOM = 5;
+const SIZE = 512;
+const ZOOM = 2.2;
 const DEG = Math.PI / 180;
 
 function shortest(from: number, to: number) {
   return ((to - from + 540) % 360) - 180;
 }
 
-/** The same lander as Past landings: violet cabin, gold body, pale legs. Drawn at the site. */
-function drawLander(ctx: CanvasRenderingContext2D, x: number, y: number) {
-  ctx.save();
-  ctx.translate(x, y);
-  ctx.scale(1.6, 1.6);
-  ctx.lineJoin = 'round';
-  ctx.lineCap = 'round';
-  ctx.lineWidth = 1.1;
-  ctx.strokeStyle = '#b8b0c9';
+/** A small mark on the site, so the ground stays readable. */
+function drawDot(ctx: CanvasRenderingContext2D, x: number, y: number) {
   ctx.beginPath();
-  ctx.moveTo(-4, 2);
-  ctx.lineTo(-8, 11);
-  ctx.moveTo(4, 2);
-  ctx.lineTo(8, 11);
-  ctx.moveTo(0, 3);
-  ctx.lineTo(0, 11);
-  ctx.stroke();
-  ctx.fillStyle = '#c9a24a';
-  ctx.strokeStyle = '#2c2822';
-  ctx.lineWidth = 0.7;
-  ctx.beginPath();
-  ctx.moveTo(-5.2, -2);
-  ctx.lineTo(5.2, -2);
-  ctx.lineTo(4.2, 4);
-  ctx.lineTo(-4.2, 4);
-  ctx.closePath();
+  ctx.arc(x, y, 5, 0, Math.PI * 2);
+  ctx.fillStyle = '#ff3b30';
   ctx.fill();
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = '#ffffff';
   ctx.stroke();
-  ctx.fillStyle = '#6e5aa8';
-  ctx.fillRect(-3.1, -8.2, 6.2, 5.4);
-  ctx.strokeRect(-3.1, -8.2, 6.2, 5.4);
-  ctx.fillStyle = '#d9ccff';
-  ctx.beginPath();
-  ctx.arc(0, -5.4, 1.15, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.restore();
 }
 
 export function SiteMoon({
@@ -83,7 +56,7 @@ export function SiteMoon({
     const image = ctx.createImageData(SIZE, SIZE);
     const view = { ...goal.current };
 
-    loadMoonTexture('moon-1k.jpg')
+    loadMoonTexture('moon-2k.jpg')
       .then((tex) => {
         if (cancelled) return;
         let spinner = buildSpinner(tex, SIZE, view.lat, 20, view.sunEl, ZOOM);
@@ -102,7 +75,7 @@ export function SiteMoon({
           }
           spinner.draw(image.data, view.lon * DEG);
           ctx.putImageData(image, 0, 0);
-          drawLander(ctx, SIZE / 2, SIZE / 2);
+          drawDot(ctx, SIZE / 2, SIZE / 2);
           const moving =
             Math.abs(target.lat - view.lat) > 0.04 ||
             Math.abs(shortest(view.lon, target.lon)) > 0.04 ||
@@ -130,8 +103,8 @@ export function SiteMoon({
       width={SIZE}
       height={SIZE}
       role="img"
-      aria-label={`The Moon with a lander at ${label}`}
-      className="mx-auto block size-[220px] bg-black"
+      aria-label={`The Moon marked at ${label}`}
+      className="absolute inset-0 h-full w-full bg-black object-contain"
     />
   );
 }

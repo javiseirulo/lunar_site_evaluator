@@ -31,6 +31,7 @@ import {
 import { Canvas, useFrame, useThree, type ThreeEvent } from '@react-three/fiber';
 import { useNavigate } from 'react-router';
 import { AstronautControl, SurfacePicker, type SurfaceBridgeApi } from './GlobeSurfaceBridge';
+import { registerExplorePin } from './exploreBridge';
 import { Html, OrbitControls, Stars, useGLTF, useTexture } from '@react-three/drei';
 import {
   CanvasTexture,
@@ -125,7 +126,7 @@ const ORIGIN = new Vector3();
 /** Stops DOM events in overlays from reaching the R3F canvas (which would raycast the Moon). */
 const stop = (e: SyntheticEvent) => e.stopPropagation();
 
-export default function GlobeCanvas() {
+export default function GlobeCanvas({ hideChrome = false }: { hideChrome?: boolean }) {
   const [cameraStart] = useState(() => {
     const point = useAppStore.getState().selectedPoint;
     return point ? latLonToVec3(point.lat, point.lon, 3) : INITIAL_CAMERA;
@@ -286,6 +287,16 @@ export default function GlobeCanvas() {
       );
     return pin;
   };
+  const pinRef = useRef(createPin);
+  pinRef.current = createPin;
+  useEffect(() => {
+    registerExplorePin((pin) => {
+      pinRef.current(pin.lat, pin.lon, pin.name || undefined);
+      const safeLat = Math.max(-89.5, Math.min(89.5, pin.lat));
+      flightRef.current = new Vector3(...latLonToVec3(safeLat, pin.lon, PIN_VIEW_DISTANCE));
+    });
+    return () => registerExplorePin(null);
+  }, []);
 
   const onSurfaceClick = (lat: number, lon: number) => {
     if (placingAstronaut) {
@@ -359,26 +370,32 @@ export default function GlobeCanvas() {
         armed={placingAstronaut}
         onArmed={setPlacingAstronaut}
       />
-      <div className="absolute top-2 left-2 flex flex-col items-start gap-2">
-        {/* Coordinate entry is open in Normal too (kids can go anywhere); Normal only gets plainer wording. */}
-        <PinForm
-          buttonLabel={expert ? 'Pin by coordinates' : 'Go to coordinates'}
-          title={expert ? 'Pin by coordinates' : 'Go to coordinates'}
-          submitLabel={expert ? 'Add pin' : 'Go there'}
-          onAdd={({ name, lat, lon }) => {
-            createPin(lat, lon, name);
-            // Fly above the new pin (avoid the exact pole, where the orbit is undefined).
-            const safeLat = Math.max(-89.5, Math.min(89.5, lat));
-            flightRef.current = new Vector3(...latLonToVec3(safeLat, lon, PIN_VIEW_DISTANCE));
-          }}
-        />
-        <PatchControls />
-      </div>
-      <div className="absolute bottom-2 left-2 z-[60]">
-        <LayersMenu hasSun={!!sunDir} expert={expert} />
-      </div>
+      {!hideChrome && (
+        <div className="absolute top-2 left-2 flex flex-col items-start gap-2">
+          {/* Coordinate entry is open in Normal too (kids can go anywhere); Normal only gets plainer wording. */}
+          <PinForm
+            buttonLabel={expert ? 'Pin by coordinates' : 'Go to coordinates'}
+            title={expert ? 'Pin by coordinates' : 'Go to coordinates'}
+            submitLabel={expert ? 'Add pin' : 'Go there'}
+            onAdd={({ name, lat, lon }) => {
+              createPin(lat, lon, name);
+              // Fly above the new pin (avoid the exact pole, where the orbit is undefined).
+              const safeLat = Math.max(-89.5, Math.min(89.5, lat));
+              flightRef.current = new Vector3(...latLonToVec3(safeLat, lon, PIN_VIEW_DISTANCE));
+            }}
+          />
+          <PatchControls />
+        </div>
+      )}
+      {!hideChrome && (
+        <div className="absolute bottom-2 left-2 z-[60]">
+          <LayersMenu hasSun={!!sunDir} expert={expert} />
+        </div>
+      )}
       {/* Javi: legend of the active map layers (Expert only, like the layers panel). */}
-      {expert && <ActiveLegend className="pointer-events-none absolute top-2 right-2" />}
+      {expert && (
+        <ActiveLegend className="pointer-events-none absolute top-3 right-[19.5rem] hidden lg:block" />
+      )}
       {exaggerated && (
         <div
           role="note"

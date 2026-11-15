@@ -39,7 +39,7 @@ function H({ id, children }: { id: string; children: React.ReactNode }) {
   return (
     <h2
       id={id}
-      className="border-edge mb-1.5 scroll-mt-4 border-b pb-0.5 text-[14px] font-bold text-heading"
+      className="border-edge mb-2 scroll-mt-4 border-b pb-1 text-[18px] font-bold text-heading"
     >
       {children}
     </h2>
@@ -67,8 +67,16 @@ function Beside({
   return (
     <section>
       <H id={id}>{title}</H>
-      <div className="mt-2 grid items-center gap-4 md:grid-cols-2">
-        <div className={imageFirst ? 'md:order-2' : undefined}>{children}</div>
+      <div
+        className={`mt-3 grid items-start gap-x-8 gap-y-4 ${
+          imageFirst
+            ? 'md:grid-cols-[minmax(200px,0.72fr)_minmax(0,1.4fr)]'
+            : 'md:grid-cols-[minmax(0,1.4fr)_minmax(200px,0.72fr)]'
+        }`}
+      >
+        <div className={`text-ink text-[16px] leading-[1.65] ${imageFirst ? 'md:order-2' : ''}`}>
+          {children}
+        </div>
         <Figure
           src={src}
           alt={alt}
@@ -102,8 +110,8 @@ export default function AboutPage() {
 
       <article className="box">
         <div className="box-head">Data &amp; Method</div>
-        <div className="box-body space-y-8 text-[12px]">
-          <h1 className="text-[18px] font-bold text-heading">Data, method and credits</h1>
+        <div className="box-body space-y-10 text-[16px] leading-[1.65]">
+          <h1 className="text-[22px] font-bold text-heading">Data, method and credits</h1>
 
           {isMock && (
             <p className="border-warn/60 bg-warn/10 text-warn border px-2 py-1.5 text-[11px]">
@@ -160,7 +168,7 @@ export default function AboutPage() {
               ))}
             </ul>
             {manifest && (
-              <p className="text-ink-faint mt-1.5 text-[10px]">
+              <p className="text-ink-muted mt-3 text-[14px]">
                 Loaded data: {manifest.sources.join('; ')} (generated{' '}
                 <span className="num">{manifest.generated_utc}</span>)
               </p>
@@ -168,7 +176,7 @@ export default function AboutPage() {
           </Beside>
 
           <section id="ai">
-            <h2 className="border-edge mb-1 border-b text-[13px] font-bold text-heading">
+            <h2 className="border-edge mb-2 border-b pb-1 text-[18px] font-bold text-heading">
               Use of AI
             </h2>
             <p className="text-ink-muted">
@@ -179,7 +187,7 @@ export default function AboutPage() {
           </section>
 
           <section id="credits">
-            <h2 className="border-edge mb-1 border-b text-[13px] font-bold text-heading">
+            <h2 className="border-edge mb-2 border-b pb-1 text-[18px] font-bold text-heading">
               Credits
             </h2>
             <p className="text-ink-muted">

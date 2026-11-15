@@ -1,9 +1,13 @@
-import { Component, type ReactNode } from 'react';
+import { Component, useEffect, useState, type ReactNode } from 'react';
 import { useAppStore } from '@/core';
 import { TimeBar } from '@/core/shell/TimeBar';
 import { SimChart } from '@/core/shell/SimChart';
 import { PolarMap } from '@/layers';
 import { GlobeView, SiteDetail, SiteList } from '@/globe';
+import { LayersMenu } from '@/globe/LayersMenu';
+import { PatchControls } from '@/globe/PatchControls';
+import { PinForm } from '@/globe/PinForm';
+import { submitExplorePin } from '@/globe/exploreBridge';
 import { MissionTimingPanel, SiteCheckPanel } from '@/scoring';
 import { SimpleSiteList } from './explore/SimpleSiteList';
 import { EndSimulationDialog } from './explore/EndSimulationDialog';
@@ -37,77 +41,85 @@ class GlobeBoundary extends Component<
   }
 }
 
-/** Normal mode before Simulate: the verdict box with its title and one faint line, nothing else. */
+/** Normal mode, once a site is chosen and before Simulate: one line under the site card. */
 function SimulateHint() {
   return (
-    <section className="box" aria-label="Site check">
-      <div className="box-head">Does it work for the mission?</div>
-      <p className="box-body text-ink-faint text-[13px]">
+    <section className="border-edge-hi border-t-2 px-5 py-3" aria-label="Site check">
+      <h2 className="font-mono text-[13px] font-bold tracking-[0.12em] text-heading uppercase">
+        Does it work for the mission?
+      </h2>
+      <p className="text-ink-faint mt-1 text-[13px]">
         Press Simulate to check if it works for the mission
       </p>
     </section>
   );
 }
 
+const FRAME = 'border-edge-hi border-2 bg-panel shadow-[4px_4px_0_#000]';
+const FLAT = 'border-0 bg-transparent shadow-none';
+
 export default function ExplorePage() {
   const proMode = useAppStore((s) => s.proMode);
   const simulationStarted = useAppStore((s) => s.simulationStarted);
+  const selectedSiteId = useAppStore((s) => s.selectedSiteId);
+  const selectedPoint = useAppStore((s) => s.selectedPoint);
+  const hasSubject = Boolean(selectedSiteId || selectedPoint);
 
   return (
     <>
       <EndSimulationDialog />
-      <div
-        className={
-          proMode
-            ? 'grid grid-cols-1 gap-4 md:grid-cols-[250px_minmax(0,1fr)] lg:grid-cols-[250px_minmax(0,1fr)_270px]'
-            : 'grid grid-cols-1 gap-4 md:grid-cols-[minmax(0,1fr)_300px] lg:grid-cols-[240px_minmax(0,1fr)_300px]'
-        }
-      >
-        {/* Left: sites */}
-        <aside
-          className={
-            proMode
-              ? 'order-3 flex flex-col gap-4 md:order-1'
-              : 'order-3 flex flex-col gap-4 md:order-3 md:col-span-2 lg:order-1 lg:col-span-1'
-          }
-        >
-          {proMode ? <SiteList /> : <SimpleSiteList />}
-        </aside>
+      <div className="border-edge-hi relative min-h-0 flex-1 overflow-hidden border-2 bg-black">
+        <div className="absolute inset-0">
+          {WEBGL ? (
+            <GlobeBoundary fallback={<PolarMap className="size-full" neutral={!proMode} />}>
+              <GlobeView />
+            </GlobeBoundary>
+          ) : (
+            <PolarMap className="size-full" neutral={!proMode} />
+          )}
+        </div>
 
-        {/* Centre: map + clock */}
-        <section className="order-1 flex min-w-0 flex-col gap-4 md:order-2">
-          <div className="box overflow-hidden">
-            <div className="space relative p-4">
-              <div className="mx-auto aspect-square w-full max-w-[560px]">
-                {/* Without WebGL (old devices, locked-down browsers) fall back to the flat polar map. */}
-                {WEBGL ? (
-                  <GlobeBoundary fallback={<PolarMap className="size-full" neutral={!proMode} />}>
-                    <GlobeView />
-                  </GlobeBoundary>
-                ) : (
-                  <PolarMap className="size-full" neutral={!proMode} />
-                )}
-              </div>
+        <div className="pointer-events-none absolute inset-0 grid grid-cols-1 grid-rows-[minmax(0,1fr)_auto] gap-3 p-3 md:grid-cols-[minmax(220px,22%)_minmax(0,1fr)_minmax(240px,24%)]">
+          <aside
+            className={`${FRAME} pointer-events-auto mt-12 flex min-h-0 flex-col overflow-hidden`}
+          >
+            <div className="min-h-0 flex-1 overflow-hidden">
+              {proMode ? (
+                <SiteList className={`${FLAT} h-full overflow-y-auto`} />
+              ) : (
+                <SimpleSiteList className={`${FLAT} h-full`} />
+              )}
             </div>
             {proMode && (
-              <p className="space text-ink-muted border-edge border-t px-4 py-2 text-[12px]">
-                Drag to rotate, scroll to zoom. Markers are candidate sites coloured by score; dim =
-                fails a hard filter.
-              </p>
+              <div className="border-edge-hi max-h-[42%] shrink-0 overflow-y-auto border-t-2">
+                <MissionTimingPanel className={FLAT} />
+              </div>
             )}
-          </div>
-          {proMode && <MissionTimingPanel />}
-          <TimeBar />
-        </section>
+          </aside>
 
-        {/* Right: site card (+ validity check in Expert) */}
-        <aside className="order-2 flex flex-col gap-4 md:order-3 lg:col-span-1">
-          <SiteDetail />
-          <SimChart />
-          {/* Validity for the current mission window (Javi, @/scoring; docs/10 J6–J7). */}
-          {/* Normal: the verdict appears only once Simulate was pressed for this selection. */}
-          {proMode || simulationStarted ? <SiteCheckPanel simple={!proMode} /> : <SimulateHint />}
-        </aside>
+          <aside
+            className={`${FRAME} pointer-events-auto flex max-h-full min-h-0 flex-col self-start overflow-y-auto md:col-start-3 md:row-start-1`}
+          >
+            <SiteDetail className={FLAT} />
+            {hasSubject && (
+              <div className="border-edge-hi border-t-2">
+                <SimChart className={FLAT} />
+              </div>
+            )}
+            {hasSubject &&
+              (proMode || simulationStarted ? (
+                <div className="border-edge-hi border-t-2">
+                  <SiteCheckPanel simple={!proMode} className={FLAT} />
+                </div>
+              ) : (
+                <SimulateHint />
+              ))}
+          </aside>
+
+          <div className="pointer-events-auto md:col-start-2 md:row-start-2">
+            <TimeBar />
+          </div>
+        </div>
       </div>
     </>
   );
