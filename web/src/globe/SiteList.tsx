@@ -484,7 +484,16 @@ function Results() {
 /** Right-hand card: the selected own pin if there is one, otherwise the selected catalogue site. */
 export function SiteDetail({ className }: { className?: string }) {
   const pinId = usePinSelection((s) => s.pinId);
-  const pin = useCustomPins((s) => s.pins.find((p) => p.id === pinId) ?? null);
+  const point = useAppStore((s) => s.selectedPoint);
+  const siteId = useAppStore((s) => s.selectedSiteId);
+  // Shown while the pin is the active point: deselecting it in "Your points" hides the card, and
+  // selecting it again (list or globe) brings it back.
+  const pin = useCustomPins(
+    (s) =>
+      s.pins.find(
+        (p) => p.id === pinId && siteId === null && point?.lat === p.lat && point?.lon === p.lon,
+      ) ?? null,
+  );
   return pin ? <PinDetail pin={pin} className={className} /> : <SiteBody className={className} />;
 }
 
