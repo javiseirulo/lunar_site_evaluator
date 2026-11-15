@@ -1,10 +1,16 @@
 import { describe, expect, it } from 'vitest';
 import { DEFAULT_MISSION_CONFIG } from './defaults';
 import { evaluateSite } from './evaluate';
-import { explainEvaluation, formatNeed, formatRequirementValue } from './explain';
+import { explainEvaluation, formatNeed, formatRequirementValue, pendingNote } from './explain';
 
 const cfg = DEFAULT_MISSION_CONFIG;
-const best = { slope_deg: 0.9, illum_pct: 1, max_dark_hours: 0, earth_vis_pct: 1, max_blackout_hours: 0 };
+const best = {
+  slope_deg: 0.9,
+  illum_pct: 1,
+  max_dark_hours: 0,
+  earth_vis_pct: 1,
+  max_blackout_hours: 0,
+};
 
 describe('explainEvaluation', () => {
   it('generic part comes from the config', () => {
@@ -37,14 +43,26 @@ describe('explainEvaluation', () => {
   it('says a pending metric is not measured yet', () => {
     const ev = evaluateSite({ metrics: best, pending: ['slope_deg'] }, cfg);
     const x = explainEvaluation(ev, cfg, 7);
-    expect(x.reasons).toContain('Slope: not measured yet.');
+    expect(x.headline).toMatch(/^Score so far/);
+    expect(x.reasons.join(' ')).toContain('Slope: not measured here, so left out.');
+    expect(x.reasons.join(' ')).toContain('not a final verdict');
     const none = explainEvaluation(evaluateSite({ metrics: {} }, cfg), cfg, 7);
     expect(none.headline).toBe('Not enough data yet:');
   });
 
+  it('pendingNote names what is missing and how many requirements count', () => {
+    const ev = evaluateSite({ metrics: best, pending: ['slope_deg'] }, cfg);
+    expect(pendingNote(ev.checks)).toBe(
+      'Slope not measured here — score uses the other 4 requirements',
+    );
+    expect(pendingNote(evaluateSite({ metrics: best }, cfg).checks)).toBeNull();
+  });
+
   it('partial and just-met points', () => {
     const ev = evaluateSite({ metrics: { ...best, illum_pct: 0.5 } }, cfg);
-    expect(explainEvaluation(ev, cfg, 7).reasons.join(' ')).toContain('Sunlight 50% (needs ≥ 50%): just meets');
+    expect(explainEvaluation(ev, cfg, 7).reasons.join(' ')).toContain(
+      'Sunlight 50% (needs ≥ 50%): just meets',
+    );
   });
 
   it('formats', () => {

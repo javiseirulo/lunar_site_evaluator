@@ -6,7 +6,8 @@
 import { useState } from 'react';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router';
 import { useAppStore } from '../store';
-import { useData, useSelectedSite, useTimeseries } from '../data';
+import { useData, useTimeseries } from '../data';
+import { useActiveSeries } from '@/ephem/activeSeries';
 import { visibleTabs, modeForPath, pathForMode } from '../navigation';
 import { formatHours, formatUtc } from '../format';
 import { dayOfWindow, friendlyHours } from '../metrics';
@@ -129,15 +130,16 @@ function NextUp() {
   const sites = useData((s) => s.sites);
   const isMock = useData((s) => s.isMock);
   const range = useData((s) => s.manifest?.time_range);
-  const selected = useSelectedSite();
+  const active = useActiveSeries();
   const currentTimeUTC = useAppStore((s) => s.currentTimeUTC);
   const proMode = useAppStore((s) => s.proMode);
 
   const best = sites
     ? [...sites].filter((s) => s.valid).sort((a, b) => b.score - a.score)[0]
     : null;
-  const subject = selected ?? best ?? null;
-  const ts = useTimeseries(subject?.id);
+  const subject = active.site ?? best ?? null;
+  const bestTs = useTimeseries(active.site ? null : best?.id);
+  const ts = active.site ? active.ts : bestTs;
   const sample = ts ? sampleAt(ts, currentTimeUTC) : null;
   const toSun = nextChange(ts, ts?.lit, currentTimeUTC);
   const toEarth = nextChange(ts, ts?.earth_visible, currentTimeUTC);
@@ -154,6 +156,13 @@ function NextUp() {
           {sample.earthVisible !== null &&
             ` and ${changeClause('Earth', sample.earthVisible ? 'set' : 'rise', toEarth, span, fmt)}`}
           .
+        </p>
+      )}
+      {active.kind === 'point' && !ts && (
+        <p className="min-w-0 sm:flex-1">
+          {active.error
+            ? 'Ephemeris unavailable for this point.'
+            : 'Computing the sky at your point…'}
         </p>
       )}
       <span className="ml-auto flex items-center gap-4">

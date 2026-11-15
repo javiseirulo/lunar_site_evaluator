@@ -7,7 +7,7 @@
 import { useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import { useAppStore } from '../store';
-import { useTimeseries } from '../data';
+import { useActiveSeries } from '@/ephem/activeSeries';
 import { formatUtc } from '../format';
 import { indexAt } from '../timeseries';
 import { onRuns, rollingWindow, valueRange } from '../simChart';
@@ -27,10 +27,10 @@ const EARTH = '#5ab4ff';
 const shortDate = (iso: string) => formatUtc(iso).slice(0, 10);
 
 export function SimChart({ className }: { className?: string }) {
-  const siteId = useAppStore((s) => s.selectedSiteId);
   const currentTimeUTC = useAppStore((s) => s.currentTimeUTC);
   const proMode = useAppStore((s) => s.proMode);
-  const ts = useTimeseries(siteId);
+  const active = useActiveSeries();
+  const ts = active.ts;
 
   const n = ts?.t_utc.length ?? 0;
   const hasEarth = proMode && !!ts?.earth_el;
@@ -74,7 +74,7 @@ export function SimChart({ className }: { className?: string }) {
     // idx changes at most once per sample; the slice is tiny, so no per-frame heavy work.
   }, [ts, n, idx, range, hasEarth]);
 
-  if (!siteId) {
+  if (!active.site) {
     return (
       <section className={cn('box px-4 py-3', className)} aria-label="Live Sun illumination">
         <p className="text-ink-faint font-mono text-[11px] tracking-[0.12em] uppercase">
@@ -86,7 +86,13 @@ export function SimChart({ className }: { className?: string }) {
   if (!ts || !view) {
     return (
       <section className={cn('box px-4 py-3', className)} aria-label="Live Sun illumination">
-        <p className="text-ink-faint font-mono text-[11px] tracking-[0.12em] uppercase">Loading…</p>
+        <p className="text-ink-faint font-mono text-[11px] tracking-[0.12em] uppercase">
+          {active.kind === 'point'
+            ? active.error
+              ? 'Ephemeris unavailable'
+              : 'Computing…'
+            : 'Loading…'}
+        </p>
       </section>
     );
   }
@@ -173,6 +179,9 @@ export function SimChart({ className }: { className?: string }) {
         <p className="text-ink-faint mt-1 font-mono text-[10px] tracking-[0.12em] uppercase">
           <span className="text-sun">— Sun</span> <span className="text-earth">— Earth</span>
         </p>
+      )}
+      {active.flatHorizon && (
+        <p className="text-ink-faint mt-1 text-[11px]">Flat horizon, no terrain.</p>
       )}
     </section>
   );
