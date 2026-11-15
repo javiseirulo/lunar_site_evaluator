@@ -686,7 +686,7 @@ extrapolar los mocks. Falta confirmar DE421/DE440. Detalle y límites:
   - v0: globo 3D con pins, marcador del polo, clic → ficha / `selectSite`, coordenadas de cualquier punto y pins propios. ✅ Hecho.
   - v1: formulario de requisitos + filtrado y orden en vivo + ventana de misión (`missionStats.ts` con tests). Con esto, Explore queda completo.
   - v2: parche polar con heightmap (mock primero, luego el de Pablo), curvatura real, luz según `currentTimeUTC`, capas de `layers.json` encima y transición animada al Street View.
-  - v3: rejilla: estadísticas de un punto libre en la ficha (tesela bajo demanda).
+  - v3: ✅ estadísticas de un punto libre en la ficha, calculadas con `@/ephem` (punto libre con `buildTimeseries`, horizonte plano salvo sitios del catálogo, misma evaluación que los candidatos) + panel "Compare points" con los pins propios (#117). La rejilla queda solo para el mapa de calor (v4).
   - v4: candidatos generados + mapa de calor, desde el resumen mensual por celda.
   - v5 (opcional): capa de misiones pasadas con `historic_sites.json`.
   - **Hito:** material de la demo listo el **domingo 15 a las 13:00** (presentación a las 16:00).
