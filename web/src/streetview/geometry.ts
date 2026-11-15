@@ -2,6 +2,7 @@ import terrainSettings from '../../../config/terrain-processing.json';
 /** Lunar local sky geometry. AI-assisted implementation: OpenAI Codex. */
 import type { Timeseries } from '@lunar/contracts';
 import { sampleAt } from '@/core/timeseries';
+import { wrap360 } from '@/ephem';
 
 export interface Vector3 {
   x: number;
@@ -49,7 +50,7 @@ export function sampleSiteSky(ts: Timeseries | null, siteId: string, timeUtc: st
 }
 
 export function limitLook(heading: number, pitch: number) {
-  return { heading: ((heading % 360) + 360) % 360, pitch: Math.max(-85, Math.min(85, pitch)) };
+  return { heading: wrap360(heading), pitch: Math.max(-85, Math.min(85, pitch)) };
 }
 
 /** Javi J0: scientific observer default; visual overrides never recalculate visibility. */

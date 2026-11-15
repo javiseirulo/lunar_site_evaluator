@@ -1,8 +1,8 @@
 /**
  * The single shared app store (owner: Javi2).
  *
- * The four contract fields (selectedSiteId, currentTimeUTC, activeLayers, mode) are the
- * ONLY interface between web modules. Read them with selectors, change them with actions:
+ * Modules share the contract state (selection, optional free point, UTC, layers,
+ * mode and mission configuration). Read selectors and change it through actions:
  *
  *   const siteId = useAppStore((s) => s.selectedSiteId);
  *   const selectSite = useAppStore((s) => s.selectSite);
@@ -16,6 +16,10 @@ import { DEFAULT_MISSION_CONFIG } from '@/scoring/defaults';
 export const DEFAULT_TIME_UTC = '2027-01-01T00:00:00Z';
 
 export interface AppState extends AppEvents {
+  /** Internal intent counter: late data loading must not replace a chosen time. */
+  timeRevision: number;
+  selectedPoint: { lat: number; lon: number } | null;
+  setSelectedPoint: (point: { lat: number; lon: number } | null) => void;
   /** Per-layer opacity 0–1 (layer UI state, read by the map/globe when drawing). */
   layerOpacity: Record<string, number>;
   /** True once layer defaults from layers.json have been applied. */
@@ -53,7 +57,9 @@ function readPro(): boolean {
 
 export const useAppStore = create<AppState>()((set, get) => ({
   selectedSiteId: null,
+  selectedPoint: null,
   currentTimeUTC: DEFAULT_TIME_UTC,
+  timeRevision: 0,
   activeLayers: [],
   mode: 'explore',
   layerOpacity: {},
@@ -61,8 +67,22 @@ export const useAppStore = create<AppState>()((set, get) => ({
   proMode: readPro(),
   missionConfig: DEFAULT_MISSION_CONFIG,
 
-  selectSite: (id) => set({ selectedSiteId: id }),
-  setTime: (isoUtc) => set({ currentTimeUTC: isoUtc }),
+  selectSite: (id) => set({ selectedSiteId: id, selectedPoint: null }),
+  setSelectedPoint: (point) => {
+    if (
+      point &&
+      (!Number.isFinite(point.lat + point.lon) ||
+        Math.abs(point.lat) > 90 ||
+        Math.abs(point.lon) > 180)
+    )
+      throw new RangeError('Invalid lunar coordinates');
+    set((state) =>
+      state.selectedPoint?.lat === point?.lat && state.selectedPoint?.lon === point?.lon
+        ? state
+        : { selectedPoint: point ? { lat: point.lat, lon: point.lon } : null },
+    );
+  },
+  setTime: (isoUtc) => set((s) => ({ currentTimeUTC: isoUtc, timeRevision: s.timeRevision + 1 })),
   setMode: (mode) => set({ mode }),
 
   toggleLayer: (id) => get().setLayerActive(id, !get().activeLayers.includes(id)),
