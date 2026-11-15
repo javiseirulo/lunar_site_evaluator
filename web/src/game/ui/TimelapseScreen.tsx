@@ -91,6 +91,9 @@ export function TimelapseScreen() {
     }
 
     const t0 = performance.now();
+    // The shared clock moves in whole hours only: setTime notifies every app subscriber, so it
+    // must not run on every animation frame. The fractional hour stays local (smooth sky).
+    let lastWhole = -1;
     const tick = (now: number) => {
       // Reduced motion: no playback, show the end state straight away.
       const h =
@@ -101,7 +104,11 @@ export function TimelapseScreen() {
         settle();
         return;
       }
-      useAppStore.getState().setTime(isoAtHour(landingUtc, h));
+      const whole = Math.floor(h);
+      if (whole !== lastWhole) {
+        lastWhole = whole;
+        useAppStore.getState().setTime(isoAtHour(landingUtc, whole));
+      }
       setHourF(h);
       raf = requestAnimationFrame(tick);
     };
@@ -173,7 +180,11 @@ export function TimelapseScreen() {
         </div>
       </header>
 
-      {view === 'cockpit' && ts ? (
+      {view === 'cockpit' && !ts ? (
+        <p className="text-ink-muted flex flex-1 items-center justify-center font-mono text-[11px] tracking-widest uppercase">
+          Loading telemetry…
+        </p>
+      ) : view === 'cockpit' && ts ? (
         <CockpitView
           ts={ts}
           startIndex={hand.startIndex}
@@ -186,7 +197,6 @@ export function TimelapseScreen() {
         />
       ) : (
         <MapView
-          siteId={card.siteId}
           sunUp={sample ? sample.lit : null}
           linkUp={linkUp}
           darkRun={runs?.dark[hour] ?? 0}

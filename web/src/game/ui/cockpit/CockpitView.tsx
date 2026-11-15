@@ -88,6 +88,9 @@ export function CockpitView({
           <WindowFx fx={fx} />
           <CauseStamp fx={fx} when={`Day ${day} · hour ${shownHour}`} />
         </div>
+        <p className="mt-1 text-right font-mono text-[10px] leading-none text-[#8b97ad]">
+          Sky not to scale — height exaggerated
+        </p>
       </div>
 
       {/* Control panel. */}
@@ -102,9 +105,11 @@ export function CockpitView({
                 : 'Systems nominal'}
           </span>
         </div>
-        <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3 lg:grid-cols-5 [&>*]:min-w-0">
+        {/* 2 columns on phones (clock full width); 3 from sm with the clock spanning two rows,
+            so five gauges fill a 3×2 grid with no empty cell and nothing overflows at 760 px. */}
+        <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3 [&>*]:min-w-0">
           <ClockGauge
-            className="col-span-2 sm:col-span-1"
+            className="col-span-2 sm:col-span-1 sm:row-span-2"
             day={day}
             days={DAYS}
             hour={shownHour}

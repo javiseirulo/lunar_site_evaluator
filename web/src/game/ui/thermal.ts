@@ -3,7 +3,9 @@
  * stays the engine's "dark run > 100 h"). Not a thermophysical model: no regolith conduction,
  * no topography, no latitude-specific calibration.
  *
- * - Sun up: radiative equilibrium, T = T_PEAK_K · max(sin(sun_el), MIN_SIN)^0.25.
+ * - Sun up: radiative equilibrium, T = T_PEAK_K · max(sin(sun_el), MIN_SIN)^0.25, but never
+ *   below T_NIGHT_K nor below the value the surface would have cooled to in that hour (a
+ *   grazing Sun cannot make it colder than the night, and sunrise never jumps down).
  * - Sun down: exponential cooling from the last value toward T_NIGHT_K with time constant
  *   COOL_TAU_H.
  *
@@ -28,7 +30,7 @@ const DEG = Math.PI / 180;
 
 /** Radiative-equilibrium temperature (K) for a sunlit surface with the Sun at `sunElDeg`. */
 export function sunlitTempK(sunElDeg: number): number {
-  return T_PEAK_K * Math.max(Math.sin(sunElDeg * DEG), MIN_SIN) ** 0.25;
+  return Math.max(T_NIGHT_K, T_PEAK_K * Math.max(Math.sin(sunElDeg * DEG), MIN_SIN) ** 0.25);
 }
 
 /** Temperature (K) after `hours` of darkness starting from `fromK`. */
@@ -43,7 +45,9 @@ export function temperatureSeries(
   initialK: number = T_NIGHT_K,
 ): number[] {
   let t = initialK;
-  return lit.map((l, i) => (t = l ? sunlitTempK(sunElDeg[i] ?? 0) : coolTempK(t, 1)));
+  return lit.map(
+    (l, i) => (t = l ? Math.max(sunlitTempK(sunElDeg[i] ?? 0), coolTempK(t, 1)) : coolTempK(t, 1)),
+  );
 }
 
 /**

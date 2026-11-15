@@ -108,8 +108,6 @@ function EndOverlay({ verdict, when, days }: { verdict: Verdict; when: string; d
 }
 
 interface MapViewProps {
-  /** Chosen site: drawn as an unnamed marker on the map. */
-  siteId: string;
   sunUp: boolean | null;
   linkUp: boolean | null;
   darkRun: number;
@@ -123,7 +121,6 @@ interface MapViewProps {
 }
 
 export function MapView({
-  siteId,
   sunUp,
   linkUp,
   darkRun,
@@ -138,8 +135,8 @@ export function MapView({
   const lost = ended && !verdict.win;
   return (
     <div className="relative flex flex-1 flex-col gap-3 md:flex-row">
+      {/* No chosen-site marker: its polar position would give the site away before the verdict. */}
       <StaticMap
-        siteId={siteId}
         className={clsx(
           'w-full max-w-[420px] self-center transition-[filter] md:w-[46%]',
           lost && 'grayscale',

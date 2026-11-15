@@ -5,15 +5,24 @@
  *
  * The site illustrations (`sites/*.png`) are not used: they have their own Sun and Earth
  * painted in, which would contradict the real positions drawn here.
+ *
+ * Not to scale: heights are exaggerated (see `sky.ts`), and the discs are only roughly sized,
+ * but Earth is drawn clearly larger than the Sun as seen from the Moon (~1.9° vs ~0.53°).
+ * Earth above the horizon but under the antenna mask is drawn dimmed: no link yet.
  */
 import { memo, useId, useMemo } from 'react';
 import { mulberry32 } from '../../engine/random';
+import { DEFAULT_REQUIREMENTS } from '../../engine/requirements';
 import type { Terrain } from '../assets';
 import { HORIZON_Y, placeBody, type SkyPoint, type SkyState } from './sky';
 
 const W = 400;
 const H = 200;
 const HORIZON = HORIZON_Y * H;
+const MASK_DEG = DEFAULT_REQUIREMENTS.antenna_margin_deg;
+/** Disc radii (window px): Earth ~3× the Sun, as seen from the Moon. */
+const EARTH_R = 11;
+const SUN_R = 4;
 
 /** Ridge depth below the horizon line per terrain (the ridge never rises above the horizon). */
 const RIDGE: Record<Terrain, { amp: number; step: number; jag: number }> = {
@@ -104,6 +113,8 @@ function WindowSceneImpl({ sky, heading, terrain }: WindowSceneProps) {
     heading,
   );
   const lit = sky.lit;
+  // Above the horizon but below the antenna mask: visible, yet no link.
+  const masked = earth.up && sky.earthEl < MASK_DEG;
   const sunX = sun.x * W;
   const sunY = sun.y * H;
   const earthX = earth.x * W;
@@ -161,22 +172,43 @@ function WindowSceneImpl({ sky, heading, terrain }: WindowSceneProps) {
         style={{ opacity: lit && sun.inView ? 0.9 : 0, transition: fade }}
       />
 
-      {/* Earth: small and blue, night side shaded. */}
-      <g style={{ opacity: earth.up && earth.inView ? 1 : 0, transition: 'opacity 0.6s' }}>
-        <circle cx={earthX} cy={earthY} r="6" fill="#2f6fd6" stroke="#000" strokeWidth="1" />
+      {/* Earth: blue, night side shaded; dimmed while under the antenna mask. */}
+      <g
+        style={{
+          opacity: earth.up && earth.inView ? (masked ? 0.45 : 1) : 0,
+          transition: 'opacity 0.6s',
+        }}
+      >
+        <circle cx={earthX} cy={earthY} r={EARTH_R} fill="#2f6fd6" stroke="#000" strokeWidth="1" />
         <path
-          d={`M${earthX - 3},${earthY - 3} q2,-2 5,0 M${earthX - 4},${earthY + 2} q3,1 5,-1`}
+          d={`M${earthX - 6},${earthY - 5} q4,-3 9,0 M${earthX - 7},${earthY + 3} q5,2 9,-2`}
           stroke="#e9f4ff"
-          strokeWidth="1.2"
+          strokeWidth="1.4"
           fill="none"
         />
-        <path d={`M${earthX},${earthY - 6} a6,6 0 0 1 0,12 z`} fill="#000" opacity="0.35" />
+        <path
+          d={`M${earthX},${earthY - EARTH_R} a${EARTH_R},${EARTH_R} 0 0 1 0,${EARTH_R * 2} z`}
+          fill="#000"
+          opacity="0.35"
+        />
       </g>
+      {masked && earth.inView && (
+        <text
+          x={Math.min(W - 4, Math.max(4, earthX))}
+          y={Math.max(10, earthY - EARTH_R - 4)}
+          textAnchor="middle"
+          fill="#8fd3ff"
+          fontFamily="monospace"
+          fontSize="8"
+        >
+          {`below antenna mask (${MASK_DEG}°)`}
+        </text>
+      )}
 
       {/* Sun. */}
       <g style={{ opacity: sun.up && sun.inView ? 1 : 0, transition: 'opacity 0.6s' }}>
-        <circle cx={sunX} cy={sunY} r="14" fill="#ffd27a" opacity="0.35" />
-        <circle cx={sunX} cy={sunY} r="9" fill="#fff4cf" stroke="#ffb43c" strokeWidth="2" />
+        <circle cx={sunX} cy={sunY} r={SUN_R * 2.2} fill="#ffd27a" opacity="0.35" />
+        <circle cx={sunX} cy={sunY} r={SUN_R} fill="#fff4cf" stroke="#ffb43c" strokeWidth="1.5" />
       </g>
 
       {/* Far ridge and near ground. */}

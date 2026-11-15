@@ -249,7 +249,7 @@ export function TempGauge({ tempK, fault }: { tempK: number | null; fault?: bool
           </span>
         </div>
       </div>
-      <p className="font-mono text-[8px] leading-none text-[#5d6880] italic">simplified model</p>
+      <p className="font-mono text-[10px] leading-none text-[#8b97ad] italic">simplified model</p>
     </Instrument>
   );
 }

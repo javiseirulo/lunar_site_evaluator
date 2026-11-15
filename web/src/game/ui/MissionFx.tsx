@@ -62,15 +62,18 @@ const CSS = `
 .mission-scanlines {
   background-image: repeating-linear-gradient(0deg, #00000038 0 1px, transparent 1px 3px);
 }
-.mission-cockpit { transition: transform 0.5s ease-out; transform-origin: 50% 80%; }
+.mission-cockpit > .mission-bezel:first-child { transition: transform 0.5s ease-out; transform-origin: 50% 80%; }
 .mission-cockpit .mission-panel { transition: filter 1.2s ease-out; }
 .mission-cockpit[data-fx='cold'] .mission-panel { filter: brightness(0.7) saturate(0.7); }
-.mission-cockpit[data-fx='slope'] { transform: rotate(-7deg); animation: mission-shake 0.3s linear 5; }
+/* Slope failure: only the window tilts (and shrinks a little), so the gauges stay in view. */
+.mission-cockpit[data-fx='slope'] > .mission-bezel:first-child {
+  transform: rotate(-3deg) scale(0.95); animation: mission-shake 0.3s linear 5;
+}
 @keyframes mission-shake {
-  0%, 100% { transform: rotate(-7deg) translate(0, 0); }
-  25% { transform: rotate(-9deg) translate(-4px, 2px); }
-  50% { transform: rotate(-5.5deg) translate(3px, -2px); }
-  75% { transform: rotate(-8deg) translate(-2px, -1px); }
+  0%, 100% { transform: rotate(-3deg) scale(0.95) translate(0, 0); }
+  25% { transform: rotate(-4deg) scale(0.95) translate(-3px, 2px); }
+  50% { transform: rotate(-2deg) scale(0.95) translate(2px, -2px); }
+  75% { transform: rotate(-3.5deg) scale(0.95) translate(-2px, -1px); }
 }
 @keyframes mission-fault {
   0%, 49% { border-color: #ff3b30; box-shadow: 0 0 12px #ff3b30aa; }
@@ -97,9 +100,9 @@ const CSS = `
 .mission-timer[data-low='true'] { animation: mission-pulse 1s ease-in-out infinite; }
 @media (prefers-reduced-motion: reduce) {
   .mission-frame[data-flash='true'], .mission-blink, .mission-instrument[data-fault='true'],
-  .mission-static, .mission-alarm-lamp, .mission-cockpit[data-fx='slope'],
+  .mission-static, .mission-alarm-lamp, .mission-cockpit[data-fx='slope'] > .mission-bezel,
   .mission-timer[data-low='true'] { animation: none; }
-  .mission-cockpit, .mission-cockpit .mission-panel { transition: none; }
+  .mission-cockpit > .mission-bezel, .mission-cockpit .mission-panel { transition: none; }
 }
 `;
 

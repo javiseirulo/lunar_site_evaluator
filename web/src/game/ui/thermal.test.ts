@@ -20,11 +20,33 @@ describe('thermal model (simplified)', () => {
     expect(COOL_TAU_H).toBe(20);
   });
 
-  it('sunlit: 390 K at the zenith, ^0.25 law, floored for a grazing Sun', () => {
+  it('sunlit: 390 K at the zenith, ^0.25 law, never below the 95 K night floor', () => {
     expect(sunlitTempK(90)).toBeCloseTo(390, 6);
     expect(sunlitTempK(30)).toBeCloseTo(390 * 0.5 ** 0.25, 6);
-    expect(sunlitTempK(-5)).toBeCloseTo(390 * MIN_SIN ** 0.25, 6);
+    expect(390 * MIN_SIN ** 0.25).toBeLessThan(T_NIGHT_K); // the raw law would undercut it
+    expect(sunlitTempK(-5)).toBe(T_NIGHT_K);
+    expect(sunlitTempK(0.05)).toBe(T_NIGHT_K);
     expect(sunlitTempK(1.5)).toBeGreaterThan(sunlitTempK(0.5));
+  });
+
+  it('never drops below 95 K and does not jump down at sunrise or sunset', () => {
+    // Day at 20°, then a long night, then a grazing sunrise, then day again.
+    const lit = [
+      ...Array<boolean>(30).fill(true),
+      ...Array<boolean>(40).fill(false),
+      ...Array<boolean>(5).fill(true),
+    ];
+    const el = [...Array<number>(30).fill(20), ...Array<number>(40).fill(-3), 0.2, 0.4, 1, 3, 6];
+    const t = temperatureSeries(lit, el);
+    expect(Math.min(...t)).toBeGreaterThanOrEqual(T_NIGHT_K);
+    // Sunset (index 30): cools from the day value, no step down below the cooling curve.
+    expect(t[30]).toBeCloseTo(coolTempK(t[29]!, 1), 6);
+    // Sunrise (from index 70) with a grazing Sun: never colder than one more hour of night
+    // cooling would give, then warming once the Sun is high enough.
+    for (let i = 70; i < t.length; i++) {
+      expect(t[i]!).toBeGreaterThanOrEqual(coolTempK(t[i - 1]!, 1) - 1e-9);
+    }
+    expect(t[t.length - 1]!).toBeGreaterThan(t[69]!);
   });
 
   it('dark: cools exponentially toward 95 K with tau 20 h', () => {
