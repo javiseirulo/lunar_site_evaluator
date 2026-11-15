@@ -4,6 +4,7 @@
  */
 import { useAppStore, useData } from '@/core';
 import { cn } from '@/lib/utils';
+import { YourPoints } from '@/globe';
 
 export function SimpleSiteList({ className }: { className?: string }) {
   const sites = useData((s) => s.sites);
@@ -50,6 +51,7 @@ export function SimpleSiteList({ className }: { className?: string }) {
           );
         })}
       </ul>
+      <YourPoints />
     </section>
   );
 }

@@ -46,6 +46,7 @@ import { useAppStore, useData } from '@/core';
 import { GlobeCard, type CardContent } from './GlobeCard';
 import { PinForm } from './PinForm';
 import { useCustomPins } from './customPins';
+import { removeCustomPin, useFlyRequest } from './pointList';
 import { latLonToVec3, vec3ToLatLon } from './geo';
 import { flightAt, planFlight, type Flight } from './flight';
 import { HistoricControls } from './HistoricControls';
@@ -152,6 +153,27 @@ export default function GlobeCanvas() {
     [],
   );
 
+  // A row picked in the "Your points" list: fly there and show that pin's card.
+  useEffect(
+    () =>
+      useFlyRequest.subscribe((s, prev) => {
+        const r = s.request;
+        if (!r || r === prev.request) return;
+        setFocus({ kind: 'custom', id: r.id });
+        const safeLat = Math.max(-89.5, Math.min(89.5, r.lat));
+        flightRef.current = new Vector3(...latLonToVec3(safeLat, r.lon, PIN_VIEW_DISTANCE));
+      }),
+    [],
+  );
+
+  // A clicked ground point becomes the free point right away, so the simulation can run for it.
+  const clickPoint = (lat: number, lon: number) => {
+    const app = useAppStore.getState();
+    app.selectSite(null);
+    app.setSelectedPoint({ lat, lon });
+    setFocus({ kind: 'point', lat, lon });
+  };
+
   const card = useMemo<CardContent | null>(() => {
     if (!focus) return null;
     const pastOf = (id: string) =>
@@ -234,10 +256,7 @@ export default function GlobeCanvas() {
         <SunLight direction={sunDir ?? FIXED_LIGHT_DIR} intensity={sunDir ? 2.6 : 2} />
         <Stars radius={60} depth={30} count={3000} factor={3} saturation={0} fade />
         <Suspense fallback={<PlaceholderMoon />}>
-          <Moon
-            onReady={() => setTextureReady(true)}
-            onSurfaceClick={(lat, lon) => setFocus({ kind: 'point', lat, lon })}
-          />
+          <Moon onReady={() => setTextureReady(true)} onSurfaceClick={clickPoint} />
         </Suspense>
         {/* Javi: global heat map (grid/global_1deg.bin) for active sunlight / Earth layers. */}
         <GlobalHeat />
@@ -252,14 +271,13 @@ export default function GlobeCanvas() {
           onClose={closeCard}
           onCreatePin={(lat, lon) => createPin(lat, lon)}
           onDeletePin={(id) => {
-            removePin(id);
+            const pin = pins.find((p) => p.id === id);
+            if (pin) removeCustomPin(pin);
+            else removePin(id);
             setFocus(null);
           }}
         />
-        <PolarPatch
-          onSurfaceClick={(lat, lon) => setFocus({ kind: 'point', lat, lon })}
-          clickTolerancePx={CLICK_TOLERANCE_PX}
-        />
+        <PolarPatch onSurfaceClick={clickPoint} clickTolerancePx={CLICK_TOLERANCE_PX} />
         <PatchTrigger />
         <PoleMarker flightRef={flightRef} />
         <OrbitControls

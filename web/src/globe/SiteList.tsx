@@ -37,6 +37,7 @@ import {
   type SortBy,
 } from './missionStats';
 import { useActiveSeries } from '@/ephem/activeSeries';
+import { YourPoints } from './YourPoints';
 import { useRequirements } from './requirementsStore';
 import { useCandidates, useMissionWindow, useSiteStats } from './useCandidates';
 
@@ -344,9 +345,12 @@ function Results() {
 
   if (!active) {
     return (
-      <p className="border-edge text-ink-muted border-t px-5 py-4 text-[14px]">
-        Add a mission requirement to find landing sites.
-      </p>
+      <>
+        <p className="border-edge text-ink-muted border-t px-5 py-4 text-[14px]">
+          Add a mission requirement to find landing sites.
+        </p>
+        <YourPoints />
+      </>
     );
   }
 
@@ -462,6 +466,7 @@ function Results() {
       )}
 
       <p className="text-ink-muted px-5 pt-3 text-[12px]">{ASSUMPTION}</p>
+      <YourPoints />
     </div>
   );
 }
