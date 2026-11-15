@@ -7,7 +7,8 @@
  * No score from sites.json.
  * Local state: the info card (what was clicked), custom pins (customPins.ts) and the camera flight.
  * Custom pins and clicked points never change `selectedSiteId` (docs/10 §"Coordenadas personalizadas").
- * Fixed light for now: Sun direction from the timeseries arrives in v2.
+ * Lighting follows the Mission Clock: Sun direction from @/ephem (sunLight.ts); with no ephemeris
+ * for the date it falls back to a fixed light and says so.
  *
  * Mouse: left-drag moves, right-drag rotates, wheel zooms. A click (no drag) on a site pin selects
  * it (click again or ✕ to deselect); on bare ground it shows that point's coordinates.
@@ -44,6 +45,7 @@ import { PinForm } from './PinForm';
 import { useCustomPins } from './customPins';
 import { latLonToVec3, vec3ToLatLon } from './geo';
 import { HistoricControls } from './HistoricControls';
+import { useSunDirection } from './sunLight';
 import { OUTCOME_COLORS, loadHistoricSites, useHistoric } from './historicSites';
 import { useRequirements } from './requirementsStore';
 import { useCandidates } from './useCandidates';
@@ -63,6 +65,8 @@ const POLE_VIEW = { lat: -89, distance: 1.3 };
 /** Camera distance from the Moon's centre after flying to a pin added by coordinates. */
 const PIN_VIEW_DISTANCE = 1.4;
 const INITIAL_CAMERA = latLonToVec3(-30, 0, 3);
+/** Light used when there is no ephemeris for the Mission Clock date. */
+const FIXED_LIGHT: [number, number, number] = [4, 1.5, 3];
 /** Camera never closer than this to the Moon's centre (surface = 1). */
 const MIN_CAMERA_RADIUS = 1.01;
 /** Mouse speed multiplier (1 = three.js default). Lower = slower, finer control. */
@@ -91,6 +95,9 @@ export default function GlobeCanvas() {
   const flightRef = useRef<Vector3 | null>(null);
   const controlsRef = useRef<Controls>(null);
   const [textureReady, setTextureReady] = useState(false);
+  const now = useAppStore((s) => s.currentTimeUTC);
+  const sun = useSunDirection(now);
+  const sunDir = sun.dir;
 
   const sites = useData((s) => s.sites);
   const { evaluations, topRank } = useCandidates();
@@ -187,8 +194,12 @@ export default function GlobeCanvas() {
     >
       <Canvas camera={{ position: INITIAL_CAMERA, fov: 45, near: 0.001, far: 200 }} dpr={[1, 2]}>
         <color attach="background" args={['#000000']} />
-        <ambientLight intensity={0.35} />
-        <directionalLight position={[4, 1.5, 3]} intensity={2} />
+        {/* No atmosphere: almost no fill light, so the night side is dark. */}
+        <ambientLight intensity={sunDir ? 0.04 : 0.35} />
+        <directionalLight
+          position={sunDir ? [sunDir[0] * 5, sunDir[1] * 5, sunDir[2] * 5] : FIXED_LIGHT}
+          intensity={sunDir ? 2.6 : 2}
+        />
         <Stars radius={60} depth={30} count={3000} factor={3} saturation={0} fade />
         <Suspense fallback={<PlaceholderMoon />}>
           <Moon
@@ -236,6 +247,14 @@ export default function GlobeCanvas() {
         />
         <HistoricControls />
       </div>
+      {sun.status === 'no_ephemeris' && (
+        <div
+          role="status"
+          className="pointer-events-none absolute right-2 bottom-2 rounded-[2px] bg-black/70 px-2 py-1 text-[11px] text-white"
+        >
+          No ephemeris for this date · fixed lighting
+        </div>
+      )}
       {!textureReady && (
         <div
           role="status"
