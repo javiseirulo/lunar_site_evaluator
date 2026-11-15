@@ -148,7 +148,7 @@ describe.runIf(existsSync(join(DATA, HISTORIC)))('historic_sites.json follows th
       expect(Number.isNaN(Date.parse(s.date_utc)), s.id).toBe(false);
       expect(OUTCOMES, s.id).toContain(s.outcome);
       expect(KINDS, s.id).toContain(s.kind);
-      expect(s.source, s.id).toMatch(/^https?:\/\/\S+$/);
+      expect(s.source, s.id).toMatch(/^https:\/\/\S+$/);
     }
   });
 
