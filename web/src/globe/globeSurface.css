@@ -27,15 +27,21 @@
   flex-direction: column-reverse;
   pointer-events: none;
 }
+/* Same square, colours and shadow as the Layers button (.box, 56 px). */
 .astronaut-button {
   pointer-events: auto;
-  width: 54px;
-  height: 66px;
-  background: #111925e8;
-  border: 1px solid #8898a5;
-  border-radius: 4px;
+  width: 56px;
+  height: 56px;
+  padding: 3px;
+  background: var(--color-panel);
+  border: 2px solid #24406e;
+  border-radius: 0;
+  box-shadow: 4px 4px 0 #000;
   cursor: grab;
   position: relative;
+}
+.astronaut-button:hover {
+  background: var(--color-panel-2);
 }
 .astronaut-button[aria-pressed='true'] {
   outline: 2px solid #f2c55c;
