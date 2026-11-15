@@ -454,7 +454,7 @@ export interface HistoricSite {
   kind: HistoricKind;
   /** One line of context, in English. */
   note: string;
-  /** URL of the source of the coordinates. */
+  /** https URL of the source of the coordinates. */
   source: string;
 }
 

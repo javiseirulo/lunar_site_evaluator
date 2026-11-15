@@ -37,7 +37,7 @@
           "outcome": { "enum": ["success", "partial", "failed"] },
           "kind": { "enum": ["lander", "rover", "crewed", "sample_return", "impact"] },
           "note": { "type": "string", "minLength": 1 },
-          "source": { "type": "string", "pattern": "^https?://" }
+          "source": { "type": "string", "pattern": "^https://" }
         }
       }
     }
