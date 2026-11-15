@@ -80,3 +80,5 @@ La **idea** no puede venir de la IA.
 | 2026-11-15 | javocruz | Cursor Grok 4.7 | El astronauta que se arrastra a la Luna queda en la esquina superior izquierda de la ficha de Explore, sin bajar la ficha ni usar el favicon | `globeSurface.css`, `ExplorePage.tsx` (declarar como código asistido por IA) |
 | 2026-11-15 | javocruz | Cursor Grok 4.7 | Los paneles de Explore crecen con el contenido y hacen scroll si no caben, para ver todas las capas. Un aterrizaje pasado pulsado en la Luna también sale en la ficha de la derecha | `ExplorePage.tsx`, `SiteList.tsx`, `GlobeCanvas.tsx`, `historicSites.ts` (declarar como código asistido por IA) |
 | 2026-11-15 | javocruz | Claude Code (Opus 5.5) | Revisión de seguridad antes de pasar a main, recrear la rama `dev` y parche de drei `<Html>` para el aviso de desmontaje de React 19 | Parche de dependencia y documentación asistidos por IA |
+
+- 2026-11-15 · Pablo suministró la ilustración de astronauta creada con ChatGPT. Codex adaptó la interacción, conservó el canal alfa y la firma visible ChatGPT. El recurso es ilustrativo.
