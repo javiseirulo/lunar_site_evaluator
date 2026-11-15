@@ -50,10 +50,10 @@ import { PinForm } from './PinForm';
 import { useCustomPins } from './customPins';
 import { latLonToVec3, vec3ToLatLon } from './geo';
 import { flightAt, planFlight, type Flight } from './flight';
-import { HistoricControls } from './HistoricControls';
 import { useSunDirection } from './sunLight';
 import { NIGHT_FILL, useNightLayer } from './nightLayer';
-import { NightControls, Terminator } from './DayNight';
+import { Terminator } from './DayNight';
+import { LayersMenu } from './LayersMenu';
 import { PatchTrigger, PolarPatch, SunLight } from './PolarPatch';
 import { ActiveLegend } from '@/layers';
 import { GlobalHeat } from './LayerOverlays'; // Javi: whole-Moon heat maps of active layers
@@ -310,16 +310,17 @@ export default function GlobeCanvas() {
             }}
           />
         )}
-        <HistoricControls />
-        <NightControls hasSun={!!sunDir} />
         <PatchControls />
+      </div>
+      <div className="absolute bottom-2 left-2">
+        <LayersMenu hasSun={!!sunDir} expert={expert} />
       </div>
       {/* Javi: legend of the active map layers (Expert only, like the layers panel). */}
       {expert && <ActiveLegend className="pointer-events-none absolute top-2 right-2" />}
       {exaggerated && (
         <div
           role="note"
-          className="pointer-events-none absolute bottom-2 left-2 rounded-[2px] bg-black/70 px-2 py-1 text-[11px] text-white"
+          className="pointer-events-none absolute bottom-2 left-[72px] rounded-[2px] bg-black/70 px-2 py-1 text-[11px] text-white"
         >
           {EXAGGERATION_LABEL}
         </div>
