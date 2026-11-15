@@ -57,6 +57,7 @@ export function HistoricDetails() {
           </li>
         ))}
       </ul>
+      <p className="text-ink-muted text-[11px]">Lander icon: AI-assisted 3D model</p>
       <p className="text-heading num mt-1 font-medium" aria-live="polite">
         {summaryText(summary)}
       </p>

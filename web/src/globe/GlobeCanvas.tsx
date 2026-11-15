@@ -29,18 +29,21 @@ import {
 import { Canvas, useFrame, useThree, type ThreeEvent } from '@react-three/fiber';
 import { useNavigate } from 'react-router';
 import { AstronautControl, SurfacePicker, type SurfaceBridgeApi } from './GlobeSurfaceBridge';
-import { Html, OrbitControls, Stars, useTexture } from '@react-three/drei';
+import { Html, OrbitControls, Stars, useGLTF, useTexture } from '@react-three/drei';
 import {
   CanvasTexture,
   Color,
   DoubleSide,
   Group,
-  SphereGeometry,
+  Material,
+  Mesh,
+  MeshStandardMaterial,
   MOUSE,
   Matrix4,
-  Mesh,
+  Object3D,
   Quaternion,
   SRGBColorSpace,
+  SphereGeometry,
   Sprite,
   Vector3,
 } from 'three';
@@ -78,6 +81,11 @@ const PIN_SIZE = 0.012;
 const CUSTOM_PIN_COLOR = new Color('#8cc4ff');
 /** Sites that miss a requirement: faint grey, so they give context without competing. */
 const MISS_PIN_COLOR = new Color('#9aa0aa');
+/** Past-landing lander (GLB). Its height is ~2.27 units, the same as the old pyramid cone. */
+const LANDER_URL = `${import.meta.env.BASE_URL}models/past_landing_lander.glb`;
+/** Emissive share of each non-accent material's base colour, so the lander reads on the night side. */
+const LANDER_EMISSIVE = 0.3;
+useGLTF.preload(LANDER_URL);
 /** Sites that meet every requirement. */
 const CANDIDATE_PIN_COLOR = new Color('#f2c55c');
 const POLE_MARKER_MIN_DISTANCE = 2;
@@ -740,6 +748,8 @@ function HistoricMarker({
 
   return (
     <group ref={group} position={position}>
+      <HistoricLander color={color} />
+      {/* Invisible click target: the old cone's footprint, so small markers stay easy to press. */}
       <mesh
         position={[0, 1.2, 0]}
         onClick={(e: ThreeEvent<MouseEvent>) => {
@@ -754,7 +764,7 @@ function HistoricMarker({
         onPointerOut={() => onHover(false)}
       >
         <coneGeometry args={[1, 2.4, 3]} />
-        <meshBasicMaterial color={color} toneMapped={false} />
+        <meshBasicMaterial transparent opacity={0} depthWrite={false} />
       </mesh>
       {selected && (
         <mesh rotation={[-Math.PI / 2, 0, 0]}>
@@ -764,6 +774,41 @@ function HistoricMarker({
       )}
     </group>
   );
+}
+
+/**
+ * Clones the cached GLB scene for one marker. Materials are cloned too (the cache is never mutated);
+ * geometry stays shared with the cache, so only these materials need disposing.
+ */
+function buildLander(source: Object3D, outcomeColor: string) {
+  const root = source.clone(true);
+  const owned = new Map<Material, MeshStandardMaterial>();
+  root.traverse((obj) => {
+    const mesh = obj as Mesh;
+    if (!mesh.isMesh || Array.isArray(mesh.material)) return;
+    const original = mesh.material as MeshStandardMaterial;
+    let copy = owned.get(original);
+    if (!copy) {
+      copy = original.clone();
+      if (copy.name === 'outcome_accent') {
+        copy.color.set(outcomeColor);
+        copy.emissive.set(outcomeColor);
+      } else {
+        copy.emissive.copy(copy.color).multiplyScalar(LANDER_EMISSIVE);
+      }
+      owned.set(original, copy);
+    }
+    mesh.material = copy;
+  });
+  return { root, materials: [...owned.values()] };
+}
+
+/** The lander model for one past-landing marker, standing on the origin with +Y as its axis. */
+function HistoricLander({ color }: { color: string }) {
+  const { scene } = useGLTF(LANDER_URL);
+  const lander = useMemo(() => buildLander(scene, color), [scene, color]);
+  useEffect(() => () => lander.materials.forEach((m) => m.dispose()), [lander]);
+  return <primitive object={lander.root} />;
 }
 
 /** Always-mounted anchor for the info card next to the clicked pin or point. */

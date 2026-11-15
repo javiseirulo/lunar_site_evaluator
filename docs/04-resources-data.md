@@ -131,3 +131,7 @@ Contactos de soporte: Microsoft samfal@microsoft.com · Google cloudstartupsuppo
 | 2026-11-15 | @javocruz | Textura de la Luna de la intro (`web/public/landing/moon-2k.jpg`): reducción a 2048×1024 de `lroc_color_poles_4k.tif` del CGI Moon Kit, NASA Scientific Visualization Studio — https://svs.gsfc.nasa.gov/4720 (ya registrada arriba para el globo) | Se dibuja como esfera en un canvas (`web/src/intro/moonSphere.ts`); atribución visible en el pie de la intro |
 | 2026-11-15 | @javocruz | Fuentes **Inter** y **DM Mono** (SIL Open Font License 1.1) vía paquetes `@fontsource`; son las que usa nasa.gov (Inter para texto, DM Mono Light para cifras) | Solo en la página de intro. Añadir a *References* |
 | 2026-11-15 | @javocruz | `web/public/landing/mist.png`: niebla generada por script propio (`web/scripts/gen-landing-mist.mjs`), arte original sin imágenes externas | Sin licencia que citar |
+
+## 2026-11-15 — modelo 3D del lander (Past landings)
+
+- (martaplatero2002-star, 2026-11-15) `web/public/models/past_landing_lander.glb`: modelo 3D del lander generado con IA y aportado por Marta; sustituye las pirámides de Past landings en el globo. Sin datos NASA ni texturas de terceros; no se cita licencia externa. Uso de IA declarado en docs/si-usage-log.md y nota visible en la leyenda de la capa.
