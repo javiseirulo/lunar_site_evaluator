@@ -28,3 +28,4 @@
 - 2026-11-14: `uv run python -m export.all` sustituye los mocks por datos reales (59 sitios × 8760 h 2027, horizonte plano, ~29 MB). Validez/score sobre la ventana del manifest (año entero): 0/59 válidos por umbrales de 7 días; slope/PSR pendientes de terreno.
 - 2026-11-15: SiteCheckPanel colocado en Explore (columna derecha, bajo la ficha); estilo con etiquetas legibles. Cambio de 1 línea en pages/ExplorePage.tsx (página de Marta), avisada en el PR.
 - 2026-11-15: `export.grids` publica `grid/global_1deg.bin` (1.3 MB) y `grid/south_5km.bin` (0.3 MB) + `grid/index.json`; `loadGrid`/`sampleGrid` en `@/ephem`; nota "cómo pintarlo" para Marta en diseno-efemerides-scoring §5.
+- 2026-11-15: export con terreno real (41 horizontes LOLA, slope/elev/PSR de `terrain/catalog.json`); ventana por defecto → 2027-10-12 (42/59 válidos); paridad TS/Python con horizonte en 2 sitios.

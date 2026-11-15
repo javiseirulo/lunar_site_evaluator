@@ -28,7 +28,7 @@ python/ephem (SPICE, offline)  ──►  web/public/data/ephem/<año>.bin  ─�
 - Luna esférica de R = 1737,4 km y observador a 5 m del suelo. Ejes locales este-norte-arriba; la Tierra con paralaje exacta.
 - **Sol**: se mide qué fracción del disco (radio 0,2666°) está sobre el horizonte. Así un sol rasante del polo cuenta medio, no todo o nada. `lit` = al menos la mitad del disco visible.
 - **Tierra visible** = elevación de la Tierra > horizonte + 2° de margen de antena.
-- **Horizonte**: mientras no llegan los perfiles de Pablo, horizonte plano. Fuera de los polos es razonable; en los polos subestima las sombras del relieve, y lo decimos en la UI.
+- **Horizonte**: en los 41 sitios polares, perfil real de Pablo (`horizon/<id>.json`, LOLA, 0,1°, 310 km; `horizon_source` = su `source`) con `elev_m` = su `observer_ground_m` (el mismo `elev_m` de `sites.json` que usa la web). Fuera de los polos, y en las rejillas, horizonte plano "flat (no terrain)".
 
 ## 4. Validez y score (decisiones de diseño)
 - **Válido = cumple todos los requisitos de la misión** (`MissionConfig.requirements`): luz mínima, noche más larga, visibilidad de la Tierra, apagón de comunicaciones más largo, pendiente, etc. En el umbral exacto pasa. Es un "sí o no" explicable: cada requisito lleva su margen ("noche más larga 142 h > 100 h").
@@ -63,4 +63,5 @@ Nota para Marta: tu decisión de "requisitos sin pesos" encaja. La validez de `@
 ## 7. Qué falta (siguiente)
 1. **Export real** (`python/export/all.py`): `sites.json`, `timeseries/` y `manifest.json` con `mock: false` sobre el catálogo, para que toda la web deje de usar mocks.
 2. Mapa de calor global de 1° y polar de 5 km (`grid/*.bin`).
-3. Al llegar los horizontes de Pablo: volver a lanzar el export y quitar `pending_metrics`.
+3. ~~Al llegar los horizontes de Pablo: volver a lanzar el export y quitar `pending_metrics`.~~ Hecho 2026-11-15: terreno real en los polos, slope en los 59 sitios, `psr_dist_km` pendiente solo en 18 sin cobertura; ventana por defecto 2027-10-12.
+4. Pendiente: umbral de pendiente 10° acordado en el log (2026-11-14) frente a 8° en `DEFAULT_MISSION_CONFIG`.
