@@ -120,7 +120,7 @@ export function CardTable() {
             </>
           ) : (
             <>
-              Bars show each site&apos;s average over a whole year. Your mission is one 7-day week.
+              Bars show each site&apos;s average over a whole year. Your mission lasts {days} days.
               Fuller and greener is safer.
             </>
           )}

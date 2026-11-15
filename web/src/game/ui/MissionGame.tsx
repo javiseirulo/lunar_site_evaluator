@@ -9,7 +9,7 @@
 import { useCallback, useEffect, useRef, type ReactNode } from 'react';
 import { motion, MotionConfig, useReducedMotion } from 'motion/react';
 import { clsx } from 'clsx';
-import { useAppStore } from '@/core';
+import { useAppStore, useData } from '@/core';
 import { useGameAudio } from '../audio/useGameAudio';
 import { DESCENT_MS, useGame, type Phase } from '../state/gameStore';
 import { AlertScreen } from './AlertScreen';
@@ -61,6 +61,26 @@ const LANDING_TIME_PHASES: readonly Phase[] = [
   'descent',
 ];
 
+/** True if `siteId` is in the site catalogue shared with the rest of the app. */
+function isCatalogSite(siteId: string): boolean {
+  const sites = useData.getState().sites;
+  return !!sites && sites.some((s) => s.id === siteId);
+}
+
+/**
+ * Leaving the game must not strand the rest of the app on a Historical mission: its landing
+ * date (e.g. 1969) is outside the data window, so the TimeBar would play from 1969 and Street
+ * View would reject the time; and its site id exists only inside the game.
+ */
+function releaseSharedState() {
+  const app = useAppStore.getState();
+  if (app.selectedSiteId && !isCatalogSite(app.selectedSiteId)) app.selectSite(null);
+  const range = useData.getState().manifest?.time_range;
+  if (range && (app.currentTimeUTC < range.start_utc || app.currentTimeUTC >= range.end_utc)) {
+    app.resetClock(range.start_utc);
+  }
+}
+
 /** The descent fades to black over its last part, so the recon screen takes over cleanly. */
 const DESCENT_FADE_FROM = 0.72;
 const DESCENT_FADE_MS = 650;
@@ -85,7 +105,13 @@ export function MissionGame() {
 
   // Leaving the page ends the game: a later visit starts from the menu (fresh deadline, and
   // the ?seed params apply again) instead of resuming a stale mission.
-  useEffect(() => () => useGame.getState().quit(), []);
+  useEffect(
+    () => () => {
+      useGame.getState().quit();
+      releaseSharedState();
+    },
+    [],
+  );
 
   // Keep the real site name secret until the verdict: the site-wide header prints the name of
   // the selected site, so the selection is cleared during play and set at the verdict.
@@ -95,6 +121,9 @@ export function MissionGame() {
   useEffect(() => {
     const want = sharedSelectionFor(phase, chosenSiteId);
     if (want === undefined) return;
+    // Historical missions use ids that only exist inside the game (e.g. `apollo_11__als1`);
+    // selecting one would send Street View / Explore to a site they cannot find.
+    if (want !== null && !isCatalogSite(want)) return;
     const app = useAppStore.getState();
     if (app.selectedSiteId !== want) app.selectSite(want);
   }, [phase, chosenSiteId]);
