@@ -11,16 +11,16 @@ export function GameButtons() {
   return (
     <div className="flex flex-wrap items-center gap-2">
       {canRetry && (
-        <button type="button" className="btn btn-go h-8 px-4 text-[12px]" onClick={() => retry()}>
+        <button type="button" className="btn btn-go h-10 px-4 text-[12px]" onClick={() => retry()}>
           <RotateCcw className="size-4" aria-hidden />
           Try again
         </button>
       )}
-      <button type="button" className="btn h-8 px-4 text-[12px]" onClick={() => newGame()}>
+      <button type="button" className="btn h-10 px-4 text-[12px]" onClick={() => newGame()}>
         <Shuffle className="size-4" aria-hidden />
         New mission
       </button>
-      <button type="button" className="btn h-8 px-3 text-[12px]" onClick={quit}>
+      <button type="button" className="btn h-10 px-3 text-[12px]" onClick={quit}>
         <Home className="size-4" aria-hidden />
         Menu
       </button>

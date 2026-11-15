@@ -8,7 +8,7 @@ import { useAppStore, useData } from '@/core';
 import { sfx } from '../audio/sfx';
 import { useGame } from '../state/gameStore';
 import { handSiteImages } from './assets';
-import { dealTimeline } from './format';
+import { dealTimeline, slotForKey } from './format';
 import { SiteCard } from './SiteCard';
 
 /** Time the pick animation plays before the game moves on. */
@@ -63,6 +63,22 @@ export function CardTable() {
 
   const choosing = phase === 'choosing' && picked === null;
 
+  // Number keys 1–4 pick the matching landing site (ignored while the exit dialog is open).
+  useEffect(() => {
+    if (!choosing) return;
+    const slots = cards.map((c) => c.slot);
+    const onKey = (e: globalThis.KeyboardEvent) => {
+      if (e.repeat || e.altKey || e.ctrlKey || e.metaKey) return;
+      if (document.querySelector('dialog[open]')) return;
+      const slot = slotForKey(e.key, slots);
+      if (slot === null) return;
+      e.preventDefault();
+      pick(slot);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [choosing, cards, pick]);
+
   return (
     <div className="flex flex-1 flex-col gap-2">
       <p className="text-ink-muted text-center font-mono text-[11px] tracking-widest uppercase">
@@ -70,7 +86,7 @@ export function CardTable() {
           ? 'Scanning reachable landing sites…'
           : picked !== null
             ? `Landing site ${picked} locked in. Engines burning!`
-            : 'Pick one landing site: read the bars, trust the data.'}
+            : 'Pick one landing site: read the bars, trust the data. Keys 1–4 work too.'}
       </p>
       <div className="grid grid-cols-2 gap-3 px-1 pt-5 pb-2 md:grid-cols-4">
         {cards.map((card, i) => (

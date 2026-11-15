@@ -49,7 +49,7 @@ export function MenuScreen() {
           type="button"
           onClick={() => start()}
           data-sfx="hover"
-          className="mission-pixel group flex cursor-pointer flex-col border-4 border-black bg-navy-800 text-left hover:border-warn focus-visible:border-warn"
+          className="mission-pixel group flex cursor-pointer flex-col border-4 border-black bg-navy-800 text-left transition-[translate,border-color] duration-150 hover:-translate-y-1 hover:border-warn focus-visible:-translate-y-1 focus-visible:border-warn focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-warn active:translate-y-0"
         >
           <GameImage
             src={MODE_SOUTH_POLE}
@@ -61,7 +61,10 @@ export function MenuScreen() {
             <span className="font-mono text-[15px] font-bold tracking-wider text-white uppercase">
               South Pole mission
             </span>
-            <Play className="text-warn size-5 group-hover:scale-125" aria-hidden />
+            <Play
+              className="text-warn size-5 transition-transform group-hover:scale-125"
+              aria-hidden
+            />
           </span>
         </button>
 
@@ -106,7 +109,7 @@ export function MenuScreen() {
               aria-pressed={difficulty === d.id}
               onClick={() => setDifficulty(d.id)}
               className={clsx(
-                'cursor-pointer px-5 py-1.5 font-mono text-[12px] font-bold tracking-wider uppercase',
+                'min-h-10 cursor-pointer px-5 font-mono text-[12px] font-bold tracking-wider uppercase transition-colors focus-visible:outline-2 focus-visible:-outline-offset-4 focus-visible:outline-current',
                 difficulty === d.id
                   ? 'bg-warn text-black'
                   : 'bg-black text-ink-muted hover:text-white',

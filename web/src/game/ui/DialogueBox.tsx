@@ -153,7 +153,11 @@ export function DialogueBox({ lines, speaker, onDone, onSkip, className }: Dialo
           {index + 1} / {lines.length} · Click, Enter or Space
         </span>
         {onSkip && (
-          <button type="button" className="btn inline-flex items-center gap-1" onClick={onSkip}>
+          <button
+            type="button"
+            className="btn inline-flex h-10 items-center gap-1"
+            onClick={onSkip}
+          >
             <FastForward className="size-3" aria-hidden />
             Skip
           </button>

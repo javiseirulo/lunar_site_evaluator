@@ -162,7 +162,7 @@ export function TimelapseScreen() {
               aria-pressed={view === id}
               onClick={() => setView(id)}
               className={clsx(
-                'flex cursor-pointer items-center gap-1 px-2.5 py-1 font-mono text-[11px] font-bold tracking-wider uppercase',
+                'flex min-h-10 cursor-pointer items-center gap-1 px-2.5 font-mono text-[11px] font-bold tracking-wider uppercase',
                 view === id ? 'bg-warn text-black' : 'text-ink-muted bg-black hover:text-white',
               )}
             >
@@ -203,7 +203,7 @@ export function TimelapseScreen() {
       <div className="flex justify-end">
         <button
           type="button"
-          className="btn h-8 px-3 text-[12px]"
+          className="btn h-10 px-3 text-[12px]"
           disabled={ended}
           onClick={() => {
             skipRef.current = true;

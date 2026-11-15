@@ -1,6 +1,6 @@
 /** The Mission mini-game: one screen per phase of `useGame`. */
 import { useEffect, useRef, type ReactNode } from 'react';
-import { MotionConfig } from 'motion/react';
+import { motion, MotionConfig } from 'motion/react';
 import { useAppStore } from '@/core';
 import { useGameAudio } from '../audio/useGameAudio';
 import { useGame, type Phase } from '../state/gameStore';
@@ -27,6 +27,11 @@ const EXIT_PHASES: readonly Phase[] = [
   'travel',
   'timelapse',
 ];
+
+/** alert, dealing and choosing are one screen (the cards deal in place). */
+function screenKey(phase: Phase): string {
+  return phase === 'dealing' || phase === 'choosing' ? 'alert' : phase;
+}
 
 export function MissionGame() {
   const phase = useGame((s) => s.phase);
@@ -88,7 +93,7 @@ export function MissionGame() {
         className="mission-root bg-navy-950 text-ink relative flex min-h-[544px] w-full flex-col overflow-hidden font-sans"
       >
         <div className="flex min-h-10 items-center justify-between gap-2 pb-1.5">
-          <span className="font-mono text-[10px] tracking-[0.3em] text-ink-faint uppercase">
+          <span className="min-w-0 truncate font-mono text-[10px] tracking-[0.3em] text-ink-faint uppercase">
             {EXIT_PHASES.includes(phase) ? 'Mission in progress' : ''}
           </span>
           <div className="flex items-center gap-1.5">
@@ -96,7 +101,17 @@ export function MissionGame() {
             {EXIT_PHASES.includes(phase) && <ExitControl />}
           </div>
         </div>
-        {screen}
+        {/* Enter-only transition: the old screen leaves at once (an exit animation would
+            re-render it with the next phase's state), the new one fades and rises in. */}
+        <motion.div
+          key={screenKey(phase)}
+          className="flex min-w-0 flex-1 flex-col"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.28, ease: 'easeOut' }}
+        >
+          {screen}
+        </motion.div>
       </div>
     </MotionConfig>
   );

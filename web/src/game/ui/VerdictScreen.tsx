@@ -1,6 +1,6 @@
 /** Result of the chosen card: stars on a win, cause + lesson on a loss, and the real site name. */
-import { useEffect } from 'react';
-import { motion } from 'motion/react';
+import { useEffect, useState, type ReactNode } from 'react';
+import { motion, useReducedMotion } from 'motion/react';
 import { Star } from 'lucide-react';
 import { clsx } from 'clsx';
 import { useData } from '@/core';
@@ -10,6 +10,7 @@ import { useGame } from '../state/gameStore';
 import { verdictImage } from './assets';
 import { CAUSE_HEADLINE, lessonFor } from './content';
 import { GameButtons } from './GameButtons';
+import { countUp } from './format';
 import { GameImage } from './GameImage';
 import { verdictSummary } from './reveal';
 
@@ -72,6 +73,43 @@ function Stars({ count }: { count: number }) {
   );
 }
 
+const COUNT_MS = 1100;
+
+/** A number that counts up from 0 (shows the final value straight away with reduced motion). */
+function CountUp({ to, suffix = '' }: { to: number; suffix?: string }) {
+  const reduced = useReducedMotion() ?? false;
+  const [value, setValue] = useState(reduced ? to : 0);
+  useEffect(() => {
+    if (reduced) return;
+    const t0 = performance.now();
+    let raf = 0;
+    const step = (now: number) => {
+      const v = countUp(now - t0, COUNT_MS, to);
+      setValue(v);
+      if (v !== to) raf = requestAnimationFrame(step);
+    };
+    raf = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(raf);
+  }, [to, reduced]);
+  return (
+    <span className="tabular-nums">
+      {reduced ? to : value}
+      {suffix}
+    </span>
+  );
+}
+
+function Stat({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <div className="flex min-w-0 flex-col items-center border-2 border-black bg-black/50 px-1 py-1.5 text-center">
+      <span className="font-mono text-[18px] leading-none font-bold text-white">{children}</span>
+      <span className="text-ink-muted mt-1 font-mono text-[9.5px] leading-tight tracking-wider uppercase">
+        {label}
+      </span>
+    </div>
+  );
+}
+
 export function VerdictScreen() {
   const hand = useGame((s) => s.hand);
   const chosenSlot = useGame((s) => s.chosenSlot);
@@ -90,6 +128,9 @@ export function VerdictScreen() {
 
   const v = card.verdict;
   const siteName = site?.name ?? card.siteId;
+  // Shortfalls judged over the whole mission (failHour = last hour) did survive every hour.
+  const hoursSurvived =
+    v.win || v.failHour === null || v.failHour >= MISSION_HOURS - 1 ? MISSION_HOURS : v.failHour;
 
   return (
     <motion.div
@@ -100,14 +141,25 @@ export function VerdictScreen() {
         v.win ? 'border-good bg-[#06140c]' : 'border-bad bg-[#14060a]',
       )}
     >
-      <GameImage
-        src={verdictImage(v.win ? 'win' : (v.cause ?? 'slope'))}
-        alt={v.win ? 'Lander safe on the surface' : 'Lander mission failure'}
-        label="Scene pending"
-        className="mission-pixel h-48 w-full shrink-0 border-4 border-black md:h-auto md:w-2/5"
-      />
+      <div className="mission-pixel relative h-48 w-full shrink-0 overflow-hidden border-4 border-black md:h-auto md:min-h-64 md:w-2/5">
+        {/* Slow push-in on the scene. */}
+        <motion.div
+          className="absolute inset-0"
+          initial={{ scale: 1 }}
+          animate={{ scale: 1.08 }}
+          transition={{ duration: 9, ease: 'easeOut' }}
+        >
+          <GameImage
+            src={verdictImage(v.win ? 'win' : (v.cause ?? 'slope'))}
+            alt={v.win ? 'Lander safe on the surface' : 'Lander mission failure'}
+            label="Scene pending"
+            className="size-full"
+          />
+        </motion.div>
+      </div>
       <div className="flex min-w-0 flex-1 flex-col gap-3">
         <h2
+          aria-live="polite"
           className={clsx(
             'font-mono text-2xl font-bold tracking-widest uppercase',
             v.win ? 'text-good' : 'text-bad',
@@ -128,6 +180,18 @@ export function VerdictScreen() {
             {v.cause ? CAUSE_HEADLINE[v.cause] : 'The mission did not survive.'}
           </p>
         )}
+
+        <div className="grid grid-cols-3 gap-2">
+          <Stat label={`of ${MISSION_HOURS} h survived`}>
+            <CountUp to={hoursSurvived} />
+          </Stat>
+          <Stat label="Sunlight">
+            <CountUp to={Math.round(v.metrics.illum_pct * 100)} suffix="%" />
+          </Stat>
+          <Stat label="Earth link">
+            <CountUp to={Math.round(v.metrics.comm_pct * 100)} suffix="%" />
+          </Stat>
+        </div>
 
         <p className="text-ink">
           You landed at <span className="text-warn font-bold">{siteName}</span>{' '}

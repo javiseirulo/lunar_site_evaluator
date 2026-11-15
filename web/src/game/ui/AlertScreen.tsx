@@ -2,6 +2,8 @@
  * The emergency stage for `alert`, `dealing` and `choosing`: red alarm frame (flashing while
  * the alert is fresh), emergency briefing, countdown, and the card table once a hand is dealt.
  */
+import { useState } from 'react';
+import { motion } from 'motion/react';
 import { AlertTriangle, Loader2 } from 'lucide-react';
 import { useGame } from '../state/gameStore';
 import { emergencyImage, scientistImage } from './assets';
@@ -15,6 +17,8 @@ export function AlertScreen({ dealStatus }: { dealStatus: DealStatus }) {
   const phase = useGame((s) => s.phase);
   const emergency = emergencyById(useGame((s) => s.emergencyId));
   const quit = useGame((s) => s.quit);
+  // A brief screen shake when the emergency first appears (not on a retry, which skips the alert).
+  const [shake] = useState(() => phase === 'alert');
 
   if (phase === 'alert' && dealStatus !== 'loading') {
     return (
@@ -30,7 +34,7 @@ export function AlertScreen({ dealStatus }: { dealStatus: DealStatus }) {
             ? 'None of the landing times in the loaded data gives a hand with both a safe and an unsafe site.'
             : 'The landing-site data failed to load. Check your connection and try again.'}
         </p>
-        <button type="button" className="btn" onClick={quit}>
+        <button type="button" className="btn h-10" onClick={quit}>
           Back to menu
         </button>
       </div>
@@ -38,9 +42,12 @@ export function AlertScreen({ dealStatus }: { dealStatus: DealStatus }) {
   }
 
   return (
-    <div
+    <motion.div
       data-flash={phase === 'alert'}
       className="mission-frame mission-scan flex flex-1 flex-col gap-3 border-4 bg-[#12060a] p-3"
+      initial={false}
+      animate={shake ? { x: [0, -9, 8, -6, 5, -3, 2, 0] } : undefined}
+      transition={{ duration: 0.5, ease: 'easeOut' }}
     >
       <header className="flex flex-wrap items-center gap-3">
         <AlertTriangle className="text-bad size-6 shrink-0" aria-hidden />
@@ -87,6 +94,6 @@ export function AlertScreen({ dealStatus }: { dealStatus: DealStatus }) {
       ) : (
         <CardTable />
       )}
-    </div>
+    </motion.div>
   );
 }
