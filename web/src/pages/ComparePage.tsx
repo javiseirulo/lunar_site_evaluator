@@ -117,27 +117,11 @@ function CompareView() {
   };
 
   return (
-    <div className="border-edge-hi flex h-full min-h-0 flex-1 flex-col gap-2 overflow-hidden border-2 p-2">
+    <div className="border-edge-hi flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto border-2 p-2">
       <div className="flex shrink-0 flex-wrap items-center gap-x-3 gap-y-2">
         <h1 className="font-mono text-[13px] font-bold tracking-[0.12em] text-heading uppercase">
           Compare
         </h1>
-        <button
-          type="button"
-          className="btn"
-          onClick={() =>
-            setParams(
-              {
-                ids: randomSpread(sites)
-                  .map((site) => site.id)
-                  .join(','),
-              },
-              { replace: true },
-            )
-          }
-        >
-          Randomize
-        </button>
         {[0, 1, 2].map((slot) => (
           <label key={slot} className="flex items-center gap-1.5">
             <span className="label">Site {slot + 1}</span>
@@ -164,10 +148,26 @@ function CompareView() {
             </select>
           </label>
         ))}
+        <button
+          type="button"
+          className="btn ml-auto"
+          onClick={() =>
+            setParams(
+              {
+                ids: randomSpread(sites)
+                  .map((site) => site.id)
+                  .join(','),
+              },
+              { replace: true },
+            )
+          }
+        >
+          Randomize
+        </button>
       </div>
 
       {chosen.length > 0 && (
-        <div className="grid min-h-0 flex-1 grid-cols-1 gap-2 md:grid-cols-3">
+        <div className="grid min-h-[30rem] flex-1 grid-cols-1 gap-2 md:grid-cols-3">
           {chosen.map((site, index) => (
             <SiteColumn key={index} site={site} />
           ))}
