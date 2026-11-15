@@ -169,7 +169,7 @@ export async function createLunarScene(
     const shader = new C.CustomShader({
       lightingModel: C.LightingModel.UNLIT,
       uniforms: {
-        u_reading: { type: C.UniformType.FLOAT, value: 1 },
+        u_reading: { type: C.UniformType.FLOAT, value: 0 },
         u_tint: { type: C.UniformType.VEC3, value: new C.Cartesian3(0.94, 0.96, 1) },
       },
       fragmentShaderText: `void fragmentMain(FragmentInput fsInput, inout czm_modelMaterial material) {

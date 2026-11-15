@@ -1,4 +1,5 @@
 import { useData } from '@/core';
+import { Figure, figureSrc } from '@/core/shell/Figure';
 
 /**
  * Data, method and credits. Keep in sync with docs/04-resources-data.md and the submission's
@@ -76,6 +77,15 @@ export default function AboutPage() {
               of the lunar sphere. From that we derive how often a site is sunlit, how often Earth
               is visible, and the longest stretch of darkness.
             </p>
+            <Figure
+              src={figureSrc('shackleton-rim.png')}
+              alt="A sunlit arc of Shackleton crater's rim, with the crater floor left in darkness."
+            >
+              Shackleton's rim, seen by the Lunar Reconnaissance Orbiter Camera. The Sun stays so
+              low that the floor never lights up while parts of the rim do. The horizon at a landing
+              site is this kind of terrain, plus the curve of the Moon. NASA/GSFC/Arizona State
+              University.
+            </Figure>
           </section>
 
           <section id="sources">
@@ -92,6 +102,14 @@ export default function AboutPage() {
                 </li>
               ))}
             </ul>
+            <Figure
+              src={figureSrc('lola-south-pole.jpg')}
+              alt="The lunar south pole colored by height, with Shackleton and de Gerlache labeled near the center."
+            >
+              South polar heights from LOLA. Low ground is blue, high ground is red and white.
+              Shackleton and de Gerlache, two of the places scored here, are labeled near the
+              middle. NASA Scientific Visualization Studio.
+            </Figure>
             {manifest && (
               <p className="text-ink-faint mt-1.5 text-[10px]">
                 Loaded data: {manifest.sources.join('; ')} (generated{' '}

@@ -1,5 +1,6 @@
 import { Link, useNavigate } from 'react-router';
 import { useAppStore, useData, useSelectedSite } from '@/core';
+import { figureSrc } from '@/core/shell/Figure';
 import { SpinningMoon } from '@/intro/SpinningMoon';
 
 const PLACES: { to: string; title: string; line: string }[] = [
@@ -89,6 +90,40 @@ export function LandingPage() {
         <div className="space flex flex-col justify-center p-5 sm:p-7">
           <SpinningMoon className="mx-auto aspect-square w-full max-w-[440px]" />
         </div>
+      </section>
+
+      <section
+        aria-label="The two things a south-pole site needs"
+        className="grid items-start gap-3 md:grid-cols-2"
+      >
+        <figure className="box overflow-hidden">
+          <img
+            src={figureSrc('ridge-shadow.jpg')}
+            alt="A long shadow cast across the ground near Shackleton crater."
+            className="block w-full bg-black"
+          />
+          <figcaption className="text-ink-muted px-4 py-3 text-[14px] leading-snug">
+            Near Shackleton, the low Sun throws a shadow across the ground. Step into it and the
+            power goes.{' '}
+            <Link to="/learn#sun" className="lnk">
+              Why the light is so uneven
+            </Link>
+          </figcaption>
+        </figure>
+        <figure className="box overflow-hidden">
+          <img
+            src={figureSrc('south-pole-sunlight.jpg')}
+            alt="The lunar south pole in low sunlight, with Shackleton and de Gerlache labeled."
+            className="block w-full bg-black"
+          />
+          <figcaption className="text-ink-muted px-4 py-3 text-[14px] leading-snug">
+            Shackleton and de Gerlache under that same low Sun. Lit ground and darkness sit side by
+            side.{' '}
+            <Link to="/learn#pole" className="lnk">
+              Why the south pole
+            </Link>
+          </figcaption>
+        </figure>
       </section>
 
       {proMode && (

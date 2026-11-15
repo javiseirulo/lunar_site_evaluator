@@ -46,7 +46,7 @@ export default function LunarViewport({
   const [ground, setGround] = useState<number | null>(null);
   const [retry, setRetry] = useState(0);
   const [height, setHeight] = useState(initialView.height);
-  const [reading, setReading] = useState(true);
+  const [reading, setReading] = useState(false);
   const [names, setNames] = useState(true);
   const [hint, setHint] = useState('Click or tap nearby ground to walk · up to 200 m per step.');
   const [view, setView] = useState(initialView);
@@ -162,7 +162,7 @@ export default function LunarViewport({
                 onClick={() => {
                   setStatus('loading');
                   setHeight(initialCamera.current.height);
-                  setReading(true);
+                  setReading(false);
                   setNames(true);
                   setRetry((n) => n + 1);
                 }}

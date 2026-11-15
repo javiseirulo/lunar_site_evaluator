@@ -18,7 +18,34 @@ import {
   TEAM,
   WHY_HARD,
 } from './content';
+import { figureSrc } from '@/core/shell/Figure';
 import { LINK, PILL } from './ui';
+
+/** One public-domain picture for each point in "Why the south pole is hard", same order. */
+const WHY_HARD_PICTURES: { src: string; alt: string; credit: string }[] = [
+  {
+    src: figureSrc('south-pole-terminator.jpg'),
+    alt: 'The southern Moon with the Sun grazing the edge, so craters throw long shadows.',
+    credit:
+      'The Sun setting over the southern Moon. NASA Scientific Visualization Studio, from LOLA.',
+  },
+  {
+    src: figureSrc('earth-from-shackleton.jpg'),
+    alt: 'Earth above the sunlit rim of Shackleton crater.',
+    credit: 'Earth from the rim of Shackleton. NASA Scientific Visualization Studio.',
+  },
+  {
+    src: figureSrc('south-pole-heights.jpg'),
+    alt: 'The southern Moon colored by height, blue in the low South Pole-Aitken basin.',
+    credit:
+      'Height, not sunlight: blue is low, red is high. NASA Scientific Visualization Studio, from LOLA.',
+  },
+  {
+    src: figureSrc('shackleton-floor.jpg'),
+    alt: 'Shackleton crater with its floor in shadow and the rim catching the light.',
+    credit: 'Shackleton’s floor, which the Sun never reaches. NASA/Goddard, from LOLA.',
+  },
+];
 
 const BODY = 'text-base leading-relaxed text-white/75 md:text-lg';
 const H2 = 'lp-display text-3xl leading-[1.05] text-white md:text-5xl';
@@ -114,12 +141,25 @@ function WhyHard() {
   return (
     <Block title={WHY_HARD.title}>
       <div className="grid gap-x-10 gap-y-10 sm:grid-cols-2">
-        {WHY_HARD.items.map((it) => (
-          <div key={it.title} className="border-t border-white/20 pt-5">
-            <h3 className="text-lg font-semibold tracking-[-0.02em] text-white">{it.title}</h3>
-            <p className="mt-2 text-white/70">{it.text}</p>
-          </div>
-        ))}
+        {WHY_HARD.items.map((it, i) => {
+          const picture = WHY_HARD_PICTURES[i];
+          return (
+            <div key={it.title} className="border-t border-white/20 pt-5">
+              {picture && (
+                <figure className="mb-4">
+                  <img
+                    src={picture.src}
+                    alt={picture.alt}
+                    className="block max-h-64 w-full border border-white/15 bg-black object-contain"
+                  />
+                  <figcaption className="mt-2 text-xs text-white/45">{picture.credit}</figcaption>
+                </figure>
+              )}
+              <h3 className="text-lg font-semibold tracking-[-0.02em] text-white">{it.title}</h3>
+              <p className="mt-2 text-white/70">{it.text}</p>
+            </div>
+          );
+        })}
       </div>
     </Block>
   );
