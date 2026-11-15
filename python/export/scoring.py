@@ -23,7 +23,7 @@ DEFAULT_MISSION_CONFIG: dict[str, Any] = {
     "surface_days": 7,
     "antenna_margin_deg": 2,
     "requirements": {
-        "slope_deg": {"threshold": 8, "objective": 2},
+        "slope_deg": {"threshold": 10, "objective": 2},  # Artemis HLS < 10° (decisions log)
         "illum_pct": {"threshold": 0.5, "objective": 0.85},
         "max_dark_hours": {"threshold": 100, "objective": 24},
         "earth_vis_pct": {"threshold": 0.5, "objective": 0.95},

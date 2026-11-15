@@ -1,7 +1,7 @@
 {
   "version": 1,
   "mock": false,
-  "generated_utc": "2026-11-15T10:11:11Z",
+  "generated_utc": "2026-11-15T10:18:19Z",
   "weights": {
     "illum_pct": 0.2,
     "earth_vis_pct": 0.2,
@@ -23,7 +23,7 @@
       "lon": -156.448,
       "elev_m": 1734.48,
       "valid": true,
-      "score": 0.987,
+      "score": 0.99,
       "metrics": {
         "illum_pct": 0.81,
         "earth_vis_pct": 0.4,
@@ -42,11 +42,11 @@
       "checks": [
         {
           "key": "slope_deg",
-          "threshold": 8,
+          "threshold": 10,
           "objective": 2,
           "ok": true,
           "value": 2.38,
-          "margin": 0.7025
+          "margin": 0.762
         },
         {
           "key": "illum_pct",
@@ -90,7 +90,7 @@
       "lon": 52.125,
       "elev_m": 1415.49,
       "valid": true,
-      "score": 0.848,
+      "score": 0.886,
       "metrics": {
         "illum_pct": 0.43,
         "earth_vis_pct": 0.39,
@@ -109,11 +109,11 @@
       "checks": [
         {
           "key": "slope_deg",
-          "threshold": 8,
+          "threshold": 10,
           "objective": 2,
           "ok": true,
           "value": 6.55,
-          "margin": 0.18125000000000002
+          "margin": 0.34500000000000003
         },
         {
           "key": "illum_pct",
@@ -176,11 +176,11 @@
       "checks": [
         {
           "key": "slope_deg",
-          "threshold": 8,
+          "threshold": 10,
           "objective": 2,
           "ok": true,
           "value": 0.95,
-          "margin": 0.88125
+          "margin": 0.905
         },
         {
           "key": "illum_pct",
@@ -243,11 +243,11 @@
       "checks": [
         {
           "key": "slope_deg",
-          "threshold": 8,
+          "threshold": 10,
           "objective": 2,
           "ok": true,
           "value": 1.12,
-          "margin": 0.86
+          "margin": 0.8879999999999999
         },
         {
           "key": "illum_pct",
@@ -310,11 +310,11 @@
       "checks": [
         {
           "key": "slope_deg",
-          "threshold": 8,
+          "threshold": 10,
           "objective": 2,
           "ok": true,
           "value": 1.24,
-          "margin": 0.845
+          "margin": 0.876
         },
         {
           "key": "illum_pct",
@@ -358,7 +358,7 @@
       "lon": 124.1359,
       "elev_m": 1598.86,
       "valid": true,
-      "score": 0.882,
+      "score": 0.912,
       "metrics": {
         "illum_pct": 0.47,
         "earth_vis_pct": 0.45,
@@ -377,11 +377,11 @@
       "checks": [
         {
           "key": "slope_deg",
-          "threshold": 8,
+          "threshold": 10,
           "objective": 2,
           "ok": true,
           "value": 5.53,
-          "margin": 0.30874999999999997
+          "margin": 0.44699999999999995
         },
         {
           "key": "illum_pct",
@@ -425,7 +425,7 @@
       "lon": -2.11241,
       "elev_m": 4969.08,
       "valid": true,
-      "score": 0.929,
+      "score": 0.947,
       "metrics": {
         "illum_pct": 0.78,
         "earth_vis_pct": 0.53,
@@ -444,11 +444,11 @@
       "checks": [
         {
           "key": "slope_deg",
-          "threshold": 8,
+          "threshold": 10,
           "objective": 2,
           "ok": true,
           "value": 4.13,
-          "margin": 0.48375
+          "margin": 0.587
         },
         {
           "key": "illum_pct",
@@ -492,7 +492,7 @@
       "lon": 31.78053,
       "elev_m": 6301.53,
       "valid": true,
-      "score": 0.997,
+      "score": 0.998,
       "metrics": {
         "illum_pct": 0.2,
         "earth_vis_pct": 0.37,
@@ -511,11 +511,11 @@
       "checks": [
         {
           "key": "slope_deg",
-          "threshold": 8,
+          "threshold": 10,
           "objective": 2,
           "ok": true,
           "value": 2.09,
-          "margin": 0.73875
+          "margin": 0.791
         },
         {
           "key": "illum_pct",
@@ -559,7 +559,7 @@
       "lon": -24.24,
       "elev_m": 1678.14,
       "valid": true,
-      "score": 0.96,
+      "score": 0.97,
       "metrics": {
         "illum_pct": 0.58,
         "earth_vis_pct": 0.4,
@@ -578,11 +578,11 @@
       "checks": [
         {
           "key": "slope_deg",
-          "threshold": 8,
+          "threshold": 10,
           "objective": 2,
           "ok": true,
           "value": 3.19,
-          "margin": 0.6012500000000001
+          "margin": 0.681
         },
         {
           "key": "illum_pct",
@@ -626,7 +626,7 @@
       "lon": 36.917,
       "elev_m": 6766.87,
       "valid": true,
-      "score": 0.911,
+      "score": 0.933,
       "metrics": {
         "illum_pct": 0.78,
         "earth_vis_pct": 0.57,
@@ -645,11 +645,11 @@
       "checks": [
         {
           "key": "slope_deg",
-          "threshold": 8,
+          "threshold": 10,
           "objective": 2,
           "ok": true,
           "value": 4.68,
-          "margin": 0.41500000000000004
+          "margin": 0.532
         },
         {
           "key": "illum_pct",
@@ -712,11 +712,11 @@
       "checks": [
         {
           "key": "slope_deg",
-          "threshold": 8,
+          "threshold": 10,
           "objective": 2,
           "ok": true,
           "value": 1.86,
-          "margin": 0.7675
+          "margin": 0.8140000000000001
         },
         {
           "key": "illum_pct",
@@ -779,11 +779,11 @@
       "checks": [
         {
           "key": "slope_deg",
-          "threshold": 8,
+          "threshold": 10,
           "objective": 2,
           "ok": true,
           "value": 0.64,
-          "margin": 0.92
+          "margin": 0.9359999999999999
         },
         {
           "key": "illum_pct",
@@ -846,11 +846,11 @@
       "checks": [
         {
           "key": "slope_deg",
-          "threshold": 8,
+          "threshold": 10,
           "objective": 2,
           "ok": true,
           "value": 1.79,
-          "margin": 0.77625
+          "margin": 0.8210000000000001
         },
         {
           "key": "illum_pct",
@@ -913,11 +913,11 @@
       "checks": [
         {
           "key": "slope_deg",
-          "threshold": 8,
+          "threshold": 10,
           "objective": 2,
           "ok": true,
           "value": 2.01,
-          "margin": 0.74875
+          "margin": 0.799
         },
         {
           "key": "illum_pct",
@@ -961,7 +961,7 @@
       "lon": 65.4,
       "elev_m": 533.35,
       "valid": true,
-      "score": 0.563,
+      "score": 0.605,
       "metrics": {
         "illum_pct": 0.39,
         "earth_vis_pct": 0.25,
@@ -980,11 +980,11 @@
       "checks": [
         {
           "key": "slope_deg",
-          "threshold": 8,
+          "threshold": 10,
           "objective": 2,
           "ok": true,
           "value": 7.02,
-          "margin": 0.12250000000000005
+          "margin": 0.29800000000000004
         },
         {
           "key": "illum_pct",
@@ -1028,7 +1028,7 @@
       "lon": -148.2,
       "elev_m": -1675.21,
       "valid": false,
-      "score": 0.075,
+      "score": 0.107,
       "metrics": {
         "illum_pct": 0.17,
         "earth_vis_pct": 0.0,
@@ -1047,11 +1047,11 @@
       "checks": [
         {
           "key": "slope_deg",
-          "threshold": 8,
+          "threshold": 10,
           "objective": 2,
           "ok": true,
           "value": 5.74,
-          "margin": 0.2825
+          "margin": 0.426
         },
         {
           "key": "illum_pct",
@@ -1114,11 +1114,11 @@
       "checks": [
         {
           "key": "slope_deg",
-          "threshold": 8,
+          "threshold": 10,
           "objective": 2,
           "ok": true,
           "value": 0.83,
-          "margin": 0.89625
+          "margin": 0.917
         },
         {
           "key": "illum_pct",
@@ -1162,7 +1162,7 @@
       "lon": -116.502,
       "elev_m": 2754.83,
       "valid": true,
-      "score": 0.967,
+      "score": 0.975,
       "metrics": {
         "illum_pct": 0.69,
         "earth_vis_pct": 0.42,
@@ -1181,11 +1181,11 @@
       "checks": [
         {
           "key": "slope_deg",
-          "threshold": 8,
+          "threshold": 10,
           "objective": 2,
           "ok": true,
           "value": 3.0,
-          "margin": 0.625
+          "margin": 0.7
         },
         {
           "key": "illum_pct",
@@ -1248,11 +1248,11 @@
       "checks": [
         {
           "key": "slope_deg",
-          "threshold": 8,
+          "threshold": 10,
           "objective": 2,
           "ok": true,
           "value": 0.3,
-          "margin": 0.9625
+          "margin": 0.97
         },
         {
           "key": "illum_pct",
@@ -1296,7 +1296,7 @@
       "lon": 115.7,
       "elev_m": -2619.65,
       "valid": false,
-      "score": 0.099,
+      "score": 0.124,
       "metrics": {
         "illum_pct": 0.18,
         "earth_vis_pct": 0.0,
@@ -1315,11 +1315,11 @@
       "checks": [
         {
           "key": "slope_deg",
-          "threshold": 8,
+          "threshold": 10,
           "objective": 2,
           "ok": true,
           "value": 5.03,
-          "margin": 0.37124999999999997
+          "margin": 0.497
         },
         {
           "key": "illum_pct",
@@ -1363,7 +1363,7 @@
       "lon": -94.61,
       "elev_m": 1552.45,
       "valid": true,
-      "score": 0.993,
+      "score": 0.995,
       "metrics": {
         "illum_pct": 0.77,
         "earth_vis_pct": 0.44,
@@ -1382,11 +1382,11 @@
       "checks": [
         {
           "key": "slope_deg",
-          "threshold": 8,
+          "threshold": 10,
           "objective": 2,
           "ok": true,
           "value": 2.21,
-          "margin": 0.72375
+          "margin": 0.779
         },
         {
           "key": "illum_pct",
@@ -1430,7 +1430,7 @@
       "lon": -114.06,
       "elev_m": 1692.8,
       "valid": true,
-      "score": 0.959,
+      "score": 0.969,
       "metrics": {
         "illum_pct": 0.79,
         "earth_vis_pct": 0.44,
@@ -1449,11 +1449,11 @@
       "checks": [
         {
           "key": "slope_deg",
-          "threshold": 8,
+          "threshold": 10,
           "objective": 2,
           "ok": true,
           "value": 3.24,
-          "margin": 0.595
+          "margin": 0.6759999999999999
         },
         {
           "key": "illum_pct",
@@ -1497,7 +1497,7 @@
       "lon": -149.472,
       "elev_m": 1560.57,
       "valid": false,
-      "score": 0.19,
+      "score": 0.193,
       "metrics": {
         "illum_pct": 0.51,
         "earth_vis_pct": 0.0,
@@ -1516,11 +1516,11 @@
       "checks": [
         {
           "key": "slope_deg",
-          "threshold": 8,
+          "threshold": 10,
           "objective": 2,
           "ok": true,
           "value": 2.29,
-          "margin": 0.71375
+          "margin": 0.771
         },
         {
           "key": "illum_pct",
@@ -1564,7 +1564,7 @@
       "lon": 128.442,
       "elev_m": 1148.64,
       "valid": true,
-      "score": 0.987,
+      "score": 0.99,
       "metrics": {
         "illum_pct": 0.46,
         "earth_vis_pct": 0.42,
@@ -1583,11 +1583,11 @@
       "checks": [
         {
           "key": "slope_deg",
-          "threshold": 8,
+          "threshold": 10,
           "objective": 2,
           "ok": true,
           "value": 2.39,
-          "margin": 0.7012499999999999
+          "margin": 0.7609999999999999
         },
         {
           "key": "illum_pct",
@@ -1650,11 +1650,11 @@
       "checks": [
         {
           "key": "slope_deg",
-          "threshold": 8,
+          "threshold": 10,
           "objective": 2,
           "ok": false,
           "value": 13.29,
-          "margin": -0.6612499999999999
+          "margin": -0.3289999999999999
         },
         {
           "key": "illum_pct",
@@ -1698,7 +1698,7 @@
       "lon": 90.0,
       "elev_m": -3723.33,
       "valid": false,
-      "score": 0.198,
+      "score": 0.199,
       "metrics": {
         "illum_pct": 0.28,
         "earth_vis_pct": 0.11,
@@ -1717,11 +1717,11 @@
       "checks": [
         {
           "key": "slope_deg",
-          "threshold": 8,
+          "threshold": 10,
           "objective": 2,
           "ok": true,
           "value": 2.05,
-          "margin": 0.74375
+          "margin": 0.795
         },
         {
           "key": "illum_pct",
@@ -1765,7 +1765,7 @@
       "lon": 25.5,
       "elev_m": -302.55,
       "valid": true,
-      "score": 0.828,
+      "score": 0.871,
       "metrics": {
         "illum_pct": 0.29,
         "earth_vis_pct": 0.34,
@@ -1784,11 +1784,11 @@
       "checks": [
         {
           "key": "slope_deg",
-          "threshold": 8,
+          "threshold": 10,
           "objective": 2,
           "ok": true,
           "value": 7.17,
-          "margin": 0.10375000000000001
+          "margin": 0.28300000000000003
         },
         {
           "key": "illum_pct",
@@ -1832,7 +1832,7 @@
       "lon": 103.7,
       "elev_m": -64.47,
       "valid": false,
-      "score": 0.116,
+      "score": 0.137,
       "metrics": {
         "illum_pct": 0.11,
         "earth_vis_pct": 0.13,
@@ -1851,11 +1851,11 @@
       "checks": [
         {
           "key": "slope_deg",
-          "threshold": 8,
+          "threshold": 10,
           "objective": 2,
           "ok": true,
           "value": 4.52,
-          "margin": 0.43500000000000005
+          "margin": 0.548
         },
         {
           "key": "illum_pct",
@@ -1918,11 +1918,11 @@
       "checks": [
         {
           "key": "slope_deg",
-          "threshold": 8,
+          "threshold": 10,
           "objective": 2,
           "ok": false,
           "value": 10.83,
-          "margin": -0.35375
+          "margin": -0.083
         },
         {
           "key": "illum_pct",
@@ -1966,7 +1966,7 @@
       "lon": -86.7,
       "elev_m": -2319.22,
       "valid": true,
-      "score": 0.569,
+      "score": 0.589,
       "metrics": {
         "illum_pct": 0.22,
         "earth_vis_pct": 0.3,
@@ -1985,11 +1985,11 @@
       "checks": [
         {
           "key": "slope_deg",
-          "threshold": 8,
+          "threshold": 10,
           "objective": 2,
           "ok": true,
           "value": 4.43,
-          "margin": 0.44625000000000004
+          "margin": 0.557
         },
         {
           "key": "illum_pct",
@@ -2052,11 +2052,11 @@
       "checks": [
         {
           "key": "slope_deg",
-          "threshold": 8,
+          "threshold": 10,
           "objective": 2,
           "ok": true,
           "value": 1.8,
-          "margin": 0.775
+          "margin": 0.82
         },
         {
           "key": "illum_pct",
@@ -2100,7 +2100,7 @@
       "lon": -65.1,
       "elev_m": -1149.72,
       "valid": true,
-      "score": 0.845,
+      "score": 0.884,
       "metrics": {
         "illum_pct": 0.3,
         "earth_vis_pct": 0.36,
@@ -2119,11 +2119,11 @@
       "checks": [
         {
           "key": "slope_deg",
-          "threshold": 8,
+          "threshold": 10,
           "objective": 2,
           "ok": true,
           "value": 6.66,
-          "margin": 0.16749999999999998
+          "margin": 0.33399999999999996
         },
         {
           "key": "illum_pct",
@@ -2167,7 +2167,7 @@
       "lon": 173.2,
       "elev_m": 13.86,
       "valid": false,
-      "score": 0.185,
+      "score": 0.189,
       "metrics": {
         "illum_pct": 0.24,
         "earth_vis_pct": 0.0,
@@ -2186,11 +2186,11 @@
       "checks": [
         {
           "key": "slope_deg",
-          "threshold": 8,
+          "threshold": 10,
           "objective": 2,
           "ok": true,
           "value": 2.45,
-          "margin": 0.69375
+          "margin": 0.755
         },
         {
           "key": "illum_pct",
@@ -2253,11 +2253,11 @@
       "checks": [
         {
           "key": "slope_deg",
-          "threshold": 8,
+          "threshold": 10,
           "objective": 2,
           "ok": true,
           "value": 0.93,
-          "margin": 0.88375
+          "margin": 0.907
         },
         {
           "key": "illum_pct",
@@ -2301,7 +2301,7 @@
       "lon": 112.7,
       "elev_m": -2572.33,
       "valid": false,
-      "score": 0.174,
+      "score": 0.18,
       "metrics": {
         "illum_pct": 0.37,
         "earth_vis_pct": 0.0,
@@ -2320,11 +2320,11 @@
       "checks": [
         {
           "key": "slope_deg",
-          "threshold": 8,
+          "threshold": 10,
           "objective": 2,
           "ok": true,
           "value": 2.79,
-          "margin": 0.65125
+          "margin": 0.721
         },
         {
           "key": "illum_pct",
@@ -2368,7 +2368,7 @@
       "lon": 176.6,
       "elev_m": -2829.35,
       "valid": false,
-      "score": 0.155,
+      "score": 0.166,
       "metrics": {
         "illum_pct": 0.36,
         "earth_vis_pct": 0.0,
@@ -2387,11 +2387,11 @@
       "checks": [
         {
           "key": "slope_deg",
-          "threshold": 8,
+          "threshold": 10,
           "objective": 2,
           "ok": true,
           "value": 3.36,
-          "margin": 0.5800000000000001
+          "margin": 0.664
         },
         {
           "key": "illum_pct",
@@ -2454,11 +2454,11 @@
       "checks": [
         {
           "key": "slope_deg",
-          "threshold": 8,
+          "threshold": 10,
           "objective": 2,
           "ok": false,
           "value": 11.19,
-          "margin": -0.39874999999999994
+          "margin": -0.11899999999999995
         },
         {
           "key": "illum_pct",
@@ -2502,7 +2502,7 @@
       "lon": 29.1957,
       "elev_m": 5321.5,
       "valid": true,
-      "score": 0.993,
+      "score": 0.994,
       "metrics": {
         "illum_pct": 0.44,
         "earth_vis_pct": 0.67,
@@ -2521,11 +2521,11 @@
       "checks": [
         {
           "key": "slope_deg",
-          "threshold": 8,
+          "threshold": 10,
           "objective": 2,
           "ok": true,
           "value": 2.22,
-          "margin": 0.7224999999999999
+          "margin": 0.7779999999999999
         },
         {
           "key": "illum_pct",
@@ -2588,11 +2588,11 @@
       "checks": [
         {
           "key": "slope_deg",
-          "threshold": 8,
+          "threshold": 10,
           "objective": 2,
           "ok": true,
           "value": 1.61,
-          "margin": 0.79875
+          "margin": 0.8390000000000001
         },
         {
           "key": "illum_pct",
@@ -2655,11 +2655,11 @@
       "checks": [
         {
           "key": "slope_deg",
-          "threshold": 8,
+          "threshold": 10,
           "objective": 2,
           "ok": true,
           "value": 1.05,
-          "margin": 0.86875
+          "margin": 0.8949999999999999
         },
         {
           "key": "illum_pct",
@@ -2703,7 +2703,7 @@
       "lon": 126.48,
       "elev_m": 448.44,
       "valid": false,
-      "score": 0.297,
+      "score": 0.311,
       "metrics": {
         "illum_pct": 0.84,
         "earth_vis_pct": 0.45,
@@ -2722,11 +2722,11 @@
       "checks": [
         {
           "key": "slope_deg",
-          "threshold": 8,
+          "threshold": 10,
           "objective": 2,
           "ok": true,
           "value": 3.68,
-          "margin": 0.54
+          "margin": 0.632
         },
         {
           "key": "illum_pct",
@@ -2789,11 +2789,11 @@
       "checks": [
         {
           "key": "slope_deg",
-          "threshold": 8,
+          "threshold": 10,
           "objective": 2,
           "ok": true,
           "value": 0.83,
-          "margin": 0.89625
+          "margin": 0.917
         },
         {
           "key": "illum_pct",
@@ -2856,11 +2856,11 @@
       "checks": [
         {
           "key": "slope_deg",
-          "threshold": 8,
+          "threshold": 10,
           "objective": 2,
           "ok": true,
           "value": 0.49,
-          "margin": 0.93875
+          "margin": 0.951
         },
         {
           "key": "illum_pct",
@@ -2923,11 +2923,11 @@
       "checks": [
         {
           "key": "slope_deg",
-          "threshold": 8,
+          "threshold": 10,
           "objective": 2,
           "ok": true,
           "value": 0.6,
-          "margin": 0.925
+          "margin": 0.9400000000000001
         },
         {
           "key": "illum_pct",
@@ -2990,11 +2990,11 @@
       "checks": [
         {
           "key": "slope_deg",
-          "threshold": 8,
+          "threshold": 10,
           "objective": 2,
           "ok": true,
           "value": 1.0,
-          "margin": 0.875
+          "margin": 0.9
         },
         {
           "key": "illum_pct",
@@ -3057,11 +3057,11 @@
       "checks": [
         {
           "key": "slope_deg",
-          "threshold": 8,
+          "threshold": 10,
           "objective": 2,
           "ok": true,
           "value": 1.44,
-          "margin": 0.8200000000000001
+          "margin": 0.8560000000000001
         },
         {
           "key": "illum_pct",
@@ -3124,11 +3124,11 @@
       "checks": [
         {
           "key": "slope_deg",
-          "threshold": 8,
+          "threshold": 10,
           "objective": 2,
           "ok": true,
           "value": 1.1,
-          "margin": 0.8625
+          "margin": 0.89
         },
         {
           "key": "illum_pct",
@@ -3191,11 +3191,11 @@
       "checks": [
         {
           "key": "slope_deg",
-          "threshold": 8,
+          "threshold": 10,
           "objective": 2,
           "ok": true,
           "value": 0.1,
-          "margin": 0.9875
+          "margin": 0.99
         },
         {
           "key": "illum_pct",
@@ -3258,11 +3258,11 @@
       "checks": [
         {
           "key": "slope_deg",
-          "threshold": 8,
+          "threshold": 10,
           "objective": 2,
           "ok": true,
           "value": 0.56,
-          "margin": 0.9299999999999999
+          "margin": 0.944
         },
         {
           "key": "illum_pct",
@@ -3325,11 +3325,11 @@
       "checks": [
         {
           "key": "slope_deg",
-          "threshold": 8,
+          "threshold": 10,
           "objective": 2,
           "ok": true,
           "value": 0.11,
-          "margin": 0.98625
+          "margin": 0.9890000000000001
         },
         {
           "key": "illum_pct",
@@ -3392,11 +3392,11 @@
       "checks": [
         {
           "key": "slope_deg",
-          "threshold": 8,
+          "threshold": 10,
           "objective": 2,
           "ok": true,
           "value": 0.4,
-          "margin": 0.95
+          "margin": 0.96
         },
         {
           "key": "illum_pct",
@@ -3459,11 +3459,11 @@
       "checks": [
         {
           "key": "slope_deg",
-          "threshold": 8,
+          "threshold": 10,
           "objective": 2,
           "ok": true,
           "value": 0.47,
-          "margin": 0.94125
+          "margin": 0.953
         },
         {
           "key": "illum_pct",
@@ -3526,11 +3526,11 @@
       "checks": [
         {
           "key": "slope_deg",
-          "threshold": 8,
+          "threshold": 10,
           "objective": 2,
           "ok": true,
           "value": 0.18,
-          "margin": 0.9775
+          "margin": 0.982
         },
         {
           "key": "illum_pct",
@@ -3593,11 +3593,11 @@
       "checks": [
         {
           "key": "slope_deg",
-          "threshold": 8,
+          "threshold": 10,
           "objective": 2,
           "ok": true,
           "value": 0.34,
-          "margin": 0.9575
+          "margin": 0.966
         },
         {
           "key": "illum_pct",
@@ -3660,11 +3660,11 @@
       "checks": [
         {
           "key": "slope_deg",
-          "threshold": 8,
+          "threshold": 10,
           "objective": 2,
           "ok": true,
           "value": 0.87,
-          "margin": 0.89125
+          "margin": 0.913
         },
         {
           "key": "illum_pct",
@@ -3708,7 +3708,7 @@
       "lon": 25.251,
       "elev_m": -913.31,
       "valid": true,
-      "score": 0.827,
+      "score": 0.87,
       "metrics": {
         "illum_pct": 0.49,
         "earth_vis_pct": 1.0,
@@ -3727,11 +3727,11 @@
       "checks": [
         {
           "key": "slope_deg",
-          "threshold": 8,
+          "threshold": 10,
           "objective": 2,
           "ok": true,
           "value": 7.2,
-          "margin": 0.09999999999999998
+          "margin": 0.27999999999999997
         },
         {
           "key": "illum_pct",
@@ -3794,11 +3794,11 @@
       "checks": [
         {
           "key": "slope_deg",
-          "threshold": 8,
+          "threshold": 10,
           "objective": 2,
           "ok": true,
           "value": 0.04,
-          "margin": 0.995
+          "margin": 0.9960000000000001
         },
         {
           "key": "illum_pct",
@@ -3861,11 +3861,11 @@
       "checks": [
         {
           "key": "slope_deg",
-          "threshold": 8,
+          "threshold": 10,
           "objective": 2,
           "ok": true,
           "value": 0.35,
-          "margin": 0.95625
+          "margin": 0.9650000000000001
         },
         {
           "key": "illum_pct",
@@ -3928,11 +3928,11 @@
       "checks": [
         {
           "key": "slope_deg",
-          "threshold": 8,
+          "threshold": 10,
           "objective": 2,
           "ok": true,
           "value": 0.18,
-          "margin": 0.9775
+          "margin": 0.982
         },
         {
           "key": "illum_pct",

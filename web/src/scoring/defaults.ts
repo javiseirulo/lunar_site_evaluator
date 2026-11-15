@@ -17,7 +17,8 @@ export const DEFAULT_MISSION_CONFIG: MissionConfig = {
   surface_days: 7,
   antenna_margin_deg: 2,
   requirements: {
-    slope_deg: { threshold: 8, objective: 2 },
+    // 10°: Artemis HLS "surface slope for landing (100 m) < 10°" (docs/decisions/log.md, 2026-11-14).
+    slope_deg: { threshold: 10, objective: 2 },
     illum_pct: { threshold: 0.5, objective: 0.85 },
     max_dark_hours: { threshold: 100, objective: 24 },
     earth_vis_pct: { threshold: 0.5, objective: 0.95 },
