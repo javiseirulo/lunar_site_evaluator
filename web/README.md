@@ -66,7 +66,22 @@ Avoid rounded corners, blur and soft shadows. No agency logos or insignia.
 
 ## Deploy
 
-Static build in `web/dist`. `vercel.json` rewrites client routes to `index.html` (set the Vercel project root to `web/`).
+**Live:** https://lunar-site-evaluator.vercel.app (public, no login). Vercel project `lunar-site-evaluator`
+on @javocruz's account. The static build in `web/dist` is uploaded as-is (the app imports `contracts/`, so
+Vercel can't build `web/` on its own); `vercel.json` rewrites client routes to `index.html`.
+
+Redeploy (needs Node 22 and `vercel login`; from the repo root, on the commit you want live):
+
+```bash
+cd web && pnpm build && cp vercel.json dist/ && cd dist
+npx vercel@latest link --yes --project lunar-site-evaluator
+rm -f .env.local .gitignore   # link writes a token here: never publish it
+npx vercel@latest deploy --prod --yes
+```
+
+If `vercel login` or deploy hangs with "couldn't reach api.vercel.com", a VPN (e.g. Cloudflare WARP) is
+blocking Vercel's API: switch it off while deploying. Check after deploying: `/`, `/explore`, `/data/manifest.json`
+must return 200 without login.
 
 ## Lunar Street View
 

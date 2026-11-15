@@ -43,6 +43,8 @@ docs/                   base de conocimiento (Markdown)
 scripts/                check-gstack.sh, sync-docs.sh
 ```
 
+**🌐 App pública:** https://lunar-site-evaluator.vercel.app
+
 ## 🛠️ App web (`web/`) — arrancar en local
 ```bash
 pnpm install   # pnpm descarga Node 22 solo para este repo (.npmrc)
