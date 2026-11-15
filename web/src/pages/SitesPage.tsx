@@ -139,12 +139,12 @@ export default function SitesPage() {
             )}
           </span>
         </div>
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto overscroll-x-contain">
           <table className="border-edge w-full min-w-[720px] border-collapse border text-[12px]">
             <thead>
               <tr className="bg-navy-700 text-left">
                 <th className="w-8 px-2 py-2" />
-                <th className="px-2 py-2">
+                <th className="sticky left-0 z-10 bg-navy-700 px-2 py-2">
                   <button
                     type="button"
                     className="label text-ink hover:underline"
@@ -183,7 +183,12 @@ export default function SitesPage() {
                       aria-label={`Tick ${s.name} to compare`}
                     />
                   </td>
-                  <td className="px-2 py-2">
+                  <td
+                    className={cn(
+                      'sticky left-0 z-10 px-2 py-2',
+                      i % 2 ? 'bg-navy-850' : 'bg-navy-900',
+                    )}
+                  >
                     <button
                       type="button"
                       className="lnk font-bold"

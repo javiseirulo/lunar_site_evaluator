@@ -88,7 +88,7 @@ function TabBar() {
   const selectedSiteId = useAppStore((s) => s.selectedSiteId);
   const proMode = useAppStore((s) => s.proMode);
   return (
-    <nav aria-label="Main" className="flex overflow-x-auto [scrollbar-width:none]">
+    <nav aria-label="Main" className="flex max-w-full flex-wrap">
       {TABS.filter((t) => proMode || !t.expert).map((t) => (
         <NavLink
           key={t.label}

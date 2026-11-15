@@ -312,7 +312,7 @@ export default function GlobeCanvas() {
         )}
         <PatchControls />
       </div>
-      <div className="absolute bottom-2 left-2">
+      <div className="absolute bottom-2 left-2 z-[60]">
         <LayersMenu hasSun={!!sunDir} expert={expert} />
       </div>
       {/* Javi: legend of the active map layers (Expert only, like the layers panel). */}
