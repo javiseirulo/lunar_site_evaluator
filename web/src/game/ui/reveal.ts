@@ -13,9 +13,12 @@ import { dayOfMission } from './timelapse';
 const SECRET_PHASES: readonly Phase[] = [
   'intro',
   'alert',
+  'briefing',
+  'approach',
   'dealing',
   'choosing',
-  'travel',
+  'descent',
+  'recon',
   'timelapse',
 ];
 

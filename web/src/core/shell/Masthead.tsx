@@ -20,7 +20,7 @@ export function Masthead() {
     <header className="portal">
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
         <Link
-          to="/"
+          to="/home"
           className="mr-2 flex items-center gap-2.5"
           aria-label="Lunar Site Evaluator home"
         >
@@ -89,7 +89,7 @@ function TabBar() {
   const selectedSiteId = useAppStore((s) => s.selectedSiteId);
   const proMode = useAppStore((s) => s.proMode);
   return (
-    <nav aria-label="Main" className="flex overflow-x-auto [scrollbar-width:none]">
+    <nav aria-label="Main" className="flex max-w-full flex-wrap">
       {visibleTabs(proMode).map((t) => (
         <NavLink
           key={t.label}

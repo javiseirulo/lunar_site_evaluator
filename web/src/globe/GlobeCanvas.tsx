@@ -17,28 +17,35 @@
  * <Html> under React 19 throws "removeChild … not a child of this node" and breaks the tree.
  */
 import {
+  Component,
   Suspense,
   useEffect,
   useMemo,
   useRef,
   useState,
   type ComponentRef,
+  type ReactNode,
   type RefObject,
   type SyntheticEvent,
 } from 'react';
 import { Canvas, useFrame, useThree, type ThreeEvent } from '@react-three/fiber';
-import { Html, OrbitControls, Stars, useTexture } from '@react-three/drei';
+import { useNavigate } from 'react-router';
+import { AstronautControl, SurfacePicker, type SurfaceBridgeApi } from './GlobeSurfaceBridge';
+import { Html, OrbitControls, Stars, useGLTF, useTexture } from '@react-three/drei';
 import {
   CanvasTexture,
   Color,
   DoubleSide,
   Group,
-  SphereGeometry,
+  Material,
+  Mesh,
+  MeshStandardMaterial,
   MOUSE,
   Matrix4,
-  Mesh,
+  Object3D,
   Quaternion,
   SRGBColorSpace,
+  SphereGeometry,
   Sprite,
   Vector3,
 } from 'three';
@@ -49,10 +56,10 @@ import { useCustomPins } from './customPins';
 import { removeCustomPin, useFlyRequest } from './pointList';
 import { latLonToVec3, vec3ToLatLon } from './geo';
 import { flightAt, planFlight, type Flight } from './flight';
-import { HistoricControls } from './HistoricControls';
 import { useSunDirection } from './sunLight';
 import { NIGHT_FILL, useNightLayer } from './nightLayer';
-import { NightControls, Terminator } from './DayNight';
+import { Terminator } from './DayNight';
+import { LayersMenu } from './LayersMenu';
 import { PatchTrigger, PolarPatch, SunLight } from './PolarPatch';
 import { ActiveLegend } from '@/layers';
 import { GlobalHeat } from './LayerOverlays'; // Javi: whole-Moon heat maps of active layers
@@ -77,6 +84,11 @@ const PIN_SIZE = 0.012;
 const CUSTOM_PIN_COLOR = new Color('#8cc4ff');
 /** Sites that miss a requirement: faint grey, so they give context without competing. */
 const MISS_PIN_COLOR = new Color('#9aa0aa');
+/** Past-landing lander (GLB). Its height is ~2.27 units, the same as the old pyramid cone. */
+const LANDER_URL = `${import.meta.env.BASE_URL}models/past_landing_lander.glb`;
+/** Emissive share of each non-accent material's base colour, so the lander reads on the night side. */
+const LANDER_EMISSIVE = 0.3;
+useGLTF.preload(LANDER_URL);
 /** Sites that meet every requirement. */
 const CANDIDATE_PIN_COLOR = new Color('#f2c55c');
 const POLE_MARKER_MIN_DISTANCE = 2;
@@ -113,6 +125,20 @@ const ORIGIN = new Vector3();
 const stop = (e: SyntheticEvent) => e.stopPropagation();
 
 export default function GlobeCanvas() {
+  const [cameraStart] = useState(() => {
+    const point = useAppStore.getState().selectedPoint;
+    return point ? latLonToVec3(point.lat, point.lon, 3) : INITIAL_CAMERA;
+  });
+  const navigate = useNavigate();
+  const surfaceApiRef = useRef<SurfaceBridgeApi | null>(null);
+  const [placingAstronaut, setPlacingAstronaut] = useState(false);
+  useEffect(() => {
+    const cancel = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setPlacingAstronaut(false);
+    };
+    window.addEventListener('keydown', cancel);
+    return () => window.removeEventListener('keydown', cancel);
+  }, []);
   const flightRef = useRef<Vector3 | null>(null);
   const controlsRef = useRef<Controls>(null);
   const [textureReady, setTextureReady] = useState(false);
@@ -138,6 +164,9 @@ export default function GlobeCanvas() {
   }, []);
 
   const [focus, setFocus] = useState<Focus>(() => {
+    const point = useAppStore.getState().selectedPoint;
+    if (point && useAppStore.getState().selectedSiteId === 'free')
+      return { kind: 'point', ...point };
     const id = useAppStore.getState().selectedSiteId;
     return id ? { kind: 'site', id } : null;
   });
@@ -240,6 +269,13 @@ export default function GlobeCanvas() {
     return pin;
   };
 
+  const onSurfaceClick = (lat: number, lon: number) => {
+    if (placingAstronaut) {
+      setPlacingAstronaut(false);
+      surfaceApiRef.current?.enter({ lat, lon });
+    } else clickPoint(lat, lon);
+  };
+
   return (
     <div
       className="relative size-full overflow-hidden bg-black"
@@ -247,7 +283,7 @@ export default function GlobeCanvas() {
       aria-label="3D Moon globe with candidate landing sites. Left-drag to move, right-drag to rotate, scroll to zoom, click the ground for coordinates."
     >
       <Canvas
-        camera={{ position: INITIAL_CAMERA, fov: 45, near: 0.001, far: 200 }}
+        camera={{ position: cameraStart, fov: 45, near: 0.001, far: 200 }}
         dpr={[1, 2]}
         shadows
       >
@@ -262,7 +298,7 @@ export default function GlobeCanvas() {
         <SunLight direction={sunDir ?? FIXED_LIGHT_DIR} intensity={sunDir ? 2.6 : 2} />
         <Stars radius={60} depth={30} count={3000} factor={3} saturation={0} fade />
         <Suspense fallback={<PlaceholderMoon />}>
-          <Moon onReady={() => setTextureReady(true)} onSurfaceClick={clickPoint} />
+          <Moon onReady={() => setTextureReady(true)} onSurfaceClick={onSurfaceClick} />
         </Suspense>
         {/* Javi: global heat map (grid/global_1deg.bin) for active sunlight / Earth layers. */}
         <GlobalHeat />
@@ -283,7 +319,7 @@ export default function GlobeCanvas() {
             setFocus(null);
           }}
         />
-        <PolarPatch onSurfaceClick={clickPoint} clickTolerancePx={CLICK_TOLERANCE_PX} />
+        <PolarPatch onSurfaceClick={onSurfaceClick} clickTolerancePx={CLICK_TOLERANCE_PX} />
         <PatchTrigger />
         <PoleMarker flightRef={flightRef} />
         <OrbitControls
@@ -298,7 +334,13 @@ export default function GlobeCanvas() {
           zoomSpeed={MOUSE_SPEED}
         />
         <CameraRig flightRef={flightRef} controlsRef={controlsRef} />
+        <SurfacePicker apiRef={surfaceApiRef} onEnter={navigate} />
       </Canvas>
+      <AstronautControl
+        apiRef={surfaceApiRef}
+        armed={placingAstronaut}
+        onArmed={setPlacingAstronaut}
+      />
       <div className="absolute top-2 left-2 flex flex-col items-start gap-2">
         {/* Coordinate entry is open in Normal too (kids can go anywhere); Normal only gets plainer wording. */}
         <PinForm
@@ -312,16 +354,17 @@ export default function GlobeCanvas() {
             flightRef.current = new Vector3(...latLonToVec3(safeLat, lon, PIN_VIEW_DISTANCE));
           }}
         />
-        <HistoricControls />
-        <NightControls hasSun={!!sunDir} />
         <PatchControls />
+      </div>
+      <div className="absolute bottom-2 left-2 z-[60]">
+        <LayersMenu hasSun={!!sunDir} expert={expert} />
       </div>
       {/* Javi: legend of the active map layers (Expert only, like the layers panel). */}
       {expert && <ActiveLegend className="pointer-events-none absolute top-2 right-2" />}
       {exaggerated && (
         <div
           role="note"
-          className="pointer-events-none absolute bottom-2 left-2 rounded-[2px] bg-black/70 px-2 py-1 text-[11px] text-white"
+          className="pointer-events-none absolute bottom-2 left-[72px] rounded-[2px] bg-black/70 px-2 py-1 text-[11px] text-white"
         >
           {EXAGGERATION_LABEL}
         </div>
@@ -346,7 +389,8 @@ export default function GlobeCanvas() {
   );
 }
 
-function PlaceholderMoon() {
+/** Grey sphere shown while the Moon texture loads (also used by CinematicCanvas). */
+export function PlaceholderMoon() {
   return (
     <mesh>
       <sphereGeometry args={[1, 64, 32]} />
@@ -355,7 +399,8 @@ function PlaceholderMoon() {
   );
 }
 
-function Moon({
+/** Textured Moon sphere (also used by CinematicCanvas). */
+export function Moon({
   onReady,
   onSurfaceClick,
 }: {
@@ -386,6 +431,7 @@ function Moon({
   return (
     <mesh
       geometry={geometry}
+      userData={{ lunarSurface: true }}
       onClick={(e) => {
         if (e.delta > CLICK_TOLERANCE_PX) return; // it was a drag (pan/rotate)
         const [lat, lon] = vec3ToLatLon(e.point.x, e.point.y, e.point.z);
@@ -740,6 +786,8 @@ function HistoricMarker({
 
   return (
     <group ref={group} position={position}>
+      <LanderOrCone color={color} />
+      {/* Invisible click target: the old cone's footprint, so small markers stay easy to press. */}
       <mesh
         position={[0, 1.2, 0]}
         onClick={(e: ThreeEvent<MouseEvent>) => {
@@ -754,7 +802,7 @@ function HistoricMarker({
         onPointerOut={() => onHover(false)}
       >
         <coneGeometry args={[1, 2.4, 3]} />
-        <meshBasicMaterial color={color} toneMapped={false} />
+        <meshBasicMaterial transparent opacity={0} depthWrite={false} />
       </mesh>
       {selected && (
         <mesh rotation={[-Math.PI / 2, 0, 0]}>
@@ -764,6 +812,78 @@ function HistoricMarker({
       )}
     </group>
   );
+}
+
+/**
+ * Clones the cached GLB scene for one marker. Materials are cloned too (the cache is never mutated);
+ * geometry stays shared with the cache, so only these materials need disposing.
+ */
+function buildLander(source: Object3D, outcomeColor: string) {
+  const root = source.clone(true);
+  const owned = new Map<Material, MeshStandardMaterial>();
+  root.traverse((obj) => {
+    const mesh = obj as Mesh;
+    if (!mesh.isMesh || Array.isArray(mesh.material)) return;
+    // Clicks and hover go to the invisible cone, so the 34 model meshes are never ray-tested.
+    mesh.raycast = () => null;
+    const original = mesh.material as MeshStandardMaterial;
+    let copy = owned.get(original);
+    if (!copy) {
+      copy = original.clone();
+      if (copy.name === 'outcome_accent') {
+        copy.color.set(outcomeColor);
+        copy.emissive.set(outcomeColor);
+      } else {
+        copy.emissive.copy(copy.color).multiplyScalar(LANDER_EMISSIVE);
+      }
+      owned.set(original, copy);
+    }
+    mesh.material = copy;
+  });
+  return { root, materials: [...owned.values()] };
+}
+
+/** Plain cone shown while the lander model loads, or instead of it if the file cannot be loaded. */
+function LanderCone({ color }: { color: string }) {
+  return (
+    <mesh position={[0, 1.2, 0]} raycast={() => null}>
+      <coneGeometry args={[1, 2.4, 3]} />
+      <meshBasicMaterial color={color} toneMapped={false} />
+    </mesh>
+  );
+}
+
+/** A failed model load must never take the whole globe down (it would fall back to the 2D map). */
+class LanderBoundary extends Component<
+  { fallback: ReactNode; children: ReactNode },
+  { failed: boolean }
+> {
+  state = { failed: false };
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+  render() {
+    return this.state.failed ? this.props.fallback : this.props.children;
+  }
+}
+
+function LanderOrCone({ color }: { color: string }) {
+  const cone = <LanderCone color={color} />;
+  return (
+    <LanderBoundary fallback={cone}>
+      <Suspense fallback={cone}>
+        <HistoricLander color={color} />
+      </Suspense>
+    </LanderBoundary>
+  );
+}
+
+/** The lander model for one past-landing marker, standing on the origin with +Y as its axis. */
+function HistoricLander({ color }: { color: string }) {
+  const { scene } = useGLTF(LANDER_URL);
+  const lander = useMemo(() => buildLander(scene, color), [scene, color]);
+  useEffect(() => () => lander.materials.forEach((m) => m.dispose()), [lander]);
+  return <primitive object={lander.root} />;
 }
 
 /** Always-mounted anchor for the info card next to the clicked pin or point. */
@@ -885,17 +1005,19 @@ function CameraRig({
       }
       siteFlight.current = { flight, elapsed: 0 };
     };
-    // A site already selected when the globe opens is flown to as soon as the sites are loaded.
+    // An observed point already sets cameraStart when returning from Street View.
+    // Otherwise fly to a selected site as soon as the catalogue is loaded.
     let pending: (() => void) | null = null;
     const initial = useAppStore.getState().selectedSiteId;
-    if (initial) {
+    if (initial && !useAppStore.getState().selectedPoint) {
       if (useData.getState().sites) fly(initial);
       else
         pending = useData.subscribe((d) => {
           if (!d.sites) return;
           pending?.();
           pending = null;
-          if (useAppStore.getState().selectedSiteId === initial) fly(initial);
+          const app = useAppStore.getState();
+          if (app.selectedSiteId === initial && !app.selectedPoint) fly(initial);
         });
     }
     const unsub = useAppStore.subscribe((s, prev) => {
@@ -967,7 +1089,8 @@ function CameraRig({
       if (e >= 1) {
         svFlight.current = null;
         useStreetViewFlight.getState().clear();
-        useAppStore.getState().setMode('streetview');
+        if (sv.req.onArrive) sv.req.onArrive();
+        else useAppStore.getState().setMode('streetview');
       }
       return; // controls and the minimum radius stay out of the way while flying down
     }

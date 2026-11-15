@@ -37,6 +37,27 @@ interface CockpitViewProps {
   runs: MissionRuns | null;
 }
 
+/** Thin mission-time bar along the bottom edge of the window. */
+function WindowTimeBar({ day, days, progress }: { day: number; days: number; progress: number }) {
+  const pct = Math.round(Math.min(1, Math.max(0, progress)) * 100);
+  return (
+    <div
+      role="progressbar"
+      aria-label="Mission time"
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-valuenow={pct}
+      aria-valuetext={`Day ${day} of ${days}`}
+      className="pointer-events-none absolute inset-x-0 bottom-0 z-10 bg-black/55"
+    >
+      <span className="absolute -top-3.5 right-1.5 font-mono text-[9px] leading-none font-bold text-[#8fe39a] [text-shadow:0_1px_0_#000]">
+        Day {day} of {days}
+      </span>
+      <span className="block h-1 bg-[#8fe39a]" style={{ width: `${progress * 100}%` }} />
+    </div>
+  );
+}
+
 const RIVETS = ['top-1 left-1', 'top-1 right-1', 'bottom-1 left-1', 'bottom-1 right-1'];
 
 export function CockpitView({
@@ -86,6 +107,7 @@ export function CockpitView({
           )}
           <div aria-hidden className="mission-scanlines pointer-events-none absolute inset-0" />
           <WindowFx fx={fx} />
+          <WindowTimeBar day={day} days={DAYS} progress={progress} />
           <CauseStamp fx={fx} when={`Day ${day} · hour ${shownHour}`} />
         </div>
         <p className="mt-1 text-right font-mono text-[10px] leading-none text-[#8b97ad]">

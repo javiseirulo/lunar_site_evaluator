@@ -148,11 +148,11 @@ function CompareView() {
           </div>
 
           {chosen.length > 0 && (
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto overscroll-x-contain">
               <table className="border-edge w-full min-w-[560px] border-collapse border text-[12px]">
                 <thead>
                   <tr className="bg-navy-700">
-                    <th className="w-40 px-3 py-2" />
+                    <th className="sticky left-0 z-10 w-40 bg-navy-700 px-3 py-2" />
                     {chosen.map((s) => (
                       <th key={s.id} className="px-3 py-2 text-left">
                         <span className="block text-[14px] text-heading font-medium">{s.name}</span>
@@ -174,7 +174,12 @@ function CompareView() {
                           i % 2 ? 'bg-navy-850' : 'bg-navy-900',
                         )}
                       >
-                        <th className="text-ink-muted px-3 py-2 text-left font-normal">
+                        <th
+                          className={cn(
+                            'sticky left-0 z-10 px-3 py-2 text-left font-normal text-ink-muted',
+                            i % 2 ? 'bg-navy-850' : 'bg-navy-900',
+                          )}
+                        >
                           <span className="inline-flex items-center gap-1.5">
                             {row.label}
                             {row.help && <Hint text={row.help} />}

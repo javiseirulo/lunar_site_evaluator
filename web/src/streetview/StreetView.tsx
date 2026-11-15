@@ -1,7 +1,8 @@
 /** Pablo's viewer: real shared ephemerides, sourced catalogue, local camera. */
 import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react';
-import { useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import { dataUrl, formatUtc, useAppStore } from '@/core';
+import { CESIUM_APPLICATION_TOKEN } from './cesiumAccess';
 import { useEphem, useHorizon } from '@/ephem';
 import { observerSky, type TerrainSite } from './sky';
 import { surfaceDistance } from './navigation';
@@ -26,6 +27,7 @@ export function StreetView() {
 }
 
 function ObserverView({ siteId }: { siteId: string }) {
+  const navigate = useNavigate();
   const time = useAppStore((s) => s.currentTimeUTC);
   const setTime = useAppStore((s) => s.setTime);
   const selectSite = useAppStore((s) => s.selectSite);
@@ -42,7 +44,7 @@ function ObserverView({ siteId }: { siteId: string }) {
   const [activePoint, setActivePoint] = useState<Observer | null>(startingPoint);
   const [view, setView] = useState<ViewState>(shared.view);
   const [meshGround, setMeshGround] = useState<number | null>(null);
-  const [token, setToken] = useState(() => import.meta.env.VITE_CESIUM_ION_TOKEN?.trim() ?? '');
+  const [token, setToken] = useState(CESIUM_APPLICATION_TOKEN);
   const [draft, setDraft] = useState('');
   const [configure, setConfigure] = useState(false);
   const [accessRevision, setAccessRevision] = useState(0);
@@ -99,6 +101,10 @@ function ObserverView({ siteId }: { siteId: string }) {
     setMeshGround(null);
   }, []);
   const onView = useCallback((state: ViewState) => setView(state), []);
+  const returnToMap = useCallback(() => {
+    if (activeObserver) useAppStore.getState().setSelectedPoint(activeObserver);
+    navigate('/explore?view=3d');
+  }, [activeObserver, navigate]);
   const initialObserver = useMemo(() => startingPoint ?? observer, [startingPoint, observer]);
   const shareUrl = useMemo(
     () =>
@@ -125,7 +131,7 @@ function ObserverView({ siteId }: { siteId: string }) {
           Location
           <select
             aria-label="Lunar catalogue location"
-            value={site ? siteId : ''}
+            value={site ? siteId : siteId === 'free' ? 'free' : ''}
             onChange={(event) => {
               const id = event.target.value;
               selectSite(id);
@@ -134,6 +140,11 @@ function ObserverView({ siteId }: { siteId: string }) {
             <option value="" disabled>
               Choose a location
             </option>
+            {siteId === 'free' && (
+              <option value="free" disabled>
+                Custom location
+              </option>
+            )}
             {catalog.sites.map((s) => (
               <option key={s.id} value={s.id}>
                 {s.name}
@@ -141,6 +152,9 @@ function ObserverView({ siteId }: { siteId: string }) {
             ))}
           </select>
         </label>
+        <button className="btn" onClick={returnToMap}>
+          Back to 3D map
+        </button>
         {activeObserver && (
           <span className="font-mono">
             {activeObserver.lat.toFixed(5)}° · {activeObserver.lon.toFixed(5)}° E
@@ -154,7 +168,7 @@ function ObserverView({ siteId }: { siteId: string }) {
         )}
       </div>
       {shared.error && <p role="alert">{shared.error}</p>}
-      {!site && (
+      {!site && siteId !== 'free' && (
         <p role="alert">This catalogue id was not found. Select a sourced location above.</p>
       )}
       <div className="lunar-main">
@@ -208,6 +222,7 @@ function ObserverView({ siteId }: { siteId: string }) {
                 token={token}
                 sample={sample}
                 initialView={shared.view ?? DEFAULT_VIEW}
+                onReturn={returnToMap}
                 onObserver={onObserver}
                 onView={onView}
                 onGround={setMeshGround}
@@ -222,7 +237,7 @@ function ObserverView({ siteId }: { siteId: string }) {
           {sample?.terrainMatched
             ? 'LOLA terrain horizon'
             : sample
-              ? 'flat (no terrain)'
+              ? 'Terrain visibility not calculated'
               : '2026–2055'}
         </summary>
         <div aria-live="polite">

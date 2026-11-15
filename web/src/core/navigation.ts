@@ -54,7 +54,7 @@ export function visibleTabs(proMode: boolean): typeof TABS {
 
 /** Every page, for the footer in Expert mode. */
 export const ALL_PAGES: { label: string; path: string }[] = [
-  { label: 'Home', path: '/' },
+  { label: 'Home', path: '/home' },
   { label: 'Explore', path: '/explore' },
   { label: 'All sites', path: '/sites' },
   { label: 'Compare', path: '/compare' },

@@ -2,7 +2,7 @@
  * mm:ss until the store's `deadline`; calls `timeUp()` once when it reaches zero. Ticks each
  * of the last 10 seconds, buzzes at zero, turns red and pulses in the last 30 s, and announces
  * 60 / 30 / 10 seconds left to screen readers. Shows "--:--" until the cards are revealed
- * (deadline 0) and freezes while the store's clock is paused (exit dialog open).
+ * (deadline 0) and freezes while the store's clock is paused (exit dialog open) or held (descent).
  */
 import { useEffect, useRef, useState } from 'react';
 import { Timer } from 'lucide-react';
@@ -20,7 +20,8 @@ export function Countdown() {
   const deadline = useGame((s) => s.deadline);
   // A locked-in pick freezes the clock (the store also ignores timeUp then).
   const locked = useGame((s) => s.pendingSlot !== null);
-  const pausedAt = useGame((s) => s.pausedAt);
+  // Frozen while the exit dialog is open (pausedAt) or during the descent (heldAt).
+  const pausedAt = useGame((s) => s.pausedAt ?? s.heldAt);
   const started = deadline > 0;
   const [now, setNow] = useState(() => Date.now());
   const [announce, setAnnounce] = useState('');

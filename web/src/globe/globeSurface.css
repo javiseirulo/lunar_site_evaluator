@@ -1,0 +1,55 @@
+.globe-surface-control {
+  position: absolute;
+  /* Stay clear of the Layers button in the bottom-left corner. */
+  left: 78px;
+  right: 10px;
+  bottom: 10px;
+  z-index: 45;
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  flex-direction: column-reverse;
+  pointer-events: none;
+}
+.astronaut-button {
+  pointer-events: auto;
+  width: 54px;
+  height: 66px;
+  background: #111925e8;
+  border: 1px solid #8898a5;
+  border-radius: 4px;
+  cursor: grab;
+  position: relative;
+}
+.astronaut-button[aria-pressed='true'] {
+  outline: 2px solid #f2c55c;
+}
+.astronaut-button img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.astronaut-button span {
+  position: absolute;
+  bottom: 1px;
+  right: 3px;
+  color: #ced5de;
+  font-size: 8px;
+}
+.globe-surface-control p {
+  max-width: min(210px, 100%);
+  background: #101925df;
+  color: #edf2f8;
+  padding: 6px 8px;
+  font-size: 11px;
+  line-height: 1.4;
+}
+.astronaut-ghost {
+  position: fixed;
+  width: 54px;
+  height: 66px;
+  transform: translate(-50%, -85%);
+  z-index: 2000;
+  pointer-events: none;
+  object-fit: contain;
+}

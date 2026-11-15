@@ -153,29 +153,87 @@
   align-items: start;
   gap: 8px;
 }
-.lunar-north,
+.lunar-body-controls {
+  display: flex;
+  flex-wrap: wrap;
+  max-width: 180px;
+  justify-content: end;
+  gap: 4px;
+}
+.lunar-body-controls small {
+  width: 100%;
+  text-align: right;
+  color: #b6c4d0;
+  font-size: 10px;
+}
+.lunar-message {
+  z-index: 2;
+}
+.lunar-save-panel {
+  position: absolute;
+  z-index: 20;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 290px;
+  max-width: calc(100% - 24px);
+  padding: 18px;
+  background: #f4f0e6;
+  color: #2c2822;
+  border: 1px solid #d9d0c0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 8px 30px #0008;
+}
+.lunar-save-panel label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.lunar-save-panel input {
+  background: white;
+  color: #2c2822;
+  border: 1px solid #8a8174;
+  padding: 9px;
+  min-height: 44px;
+}
+.lunar-save-panel > div {
+  display: flex;
+  justify-content: end;
+  gap: 8px;
+}
+.lunar-save-panel .btn {
+  min-height: 44px;
+}
+@media (max-width: 600px) {
+  .lunar-toolbar {
+    right: 8px;
+    top: 8px;
+    gap: 4px;
+  }
+  .lunar-body-controls {
+    max-width: 145px;
+  }
+  .lunar-body-controls .lunar-close {
+    padding: 6px;
+    font-size: 10px;
+  }
+  .lunar-toolbar > .lunar-close {
+    padding: 6px;
+    font-size: 10px;
+  }
+  .lunar-environment {
+    top: 112px;
+    max-width: calc(100% - 24px);
+  }
+}
+
 .lunar-options summary {
   border: 1px solid #8694a452;
   background: #0b101be6;
   color: #eef1f5;
   cursor: pointer;
-}
-.lunar-north {
-  display: flex;
-  min-width: 44px;
-  min-height: 44px;
-  align-items: center;
-  flex-direction: column;
-  justify-content: center;
-  gap: 1px;
-}
-.lunar-north span {
-  display: inline-block;
-  font-size: 13px;
-}
-.lunar-north small {
-  font-size: 9px;
-  color: #abb8c8;
 }
 .lunar-options summary {
   padding: 13px 9px;
@@ -301,9 +359,9 @@
 }
 @media (max-width: 600px) {
   .lunar-environment {
-    top: 8px;
+    top: 82px;
     left: 8px;
-    max-width: calc(100% - 140px);
+    max-width: calc(100% - 16px);
     font-size: 10px;
   }
   .lunar-environment small {
