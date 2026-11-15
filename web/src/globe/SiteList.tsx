@@ -119,23 +119,38 @@ const fromInput = (v: string) => {
 // Sidebar
 // ---------------------------------------------------------------------------
 
-export function SiteList({ className }: { className?: string }) {
+export function SiteList({
+  className,
+  part = 'all',
+}: {
+  className?: string;
+  /** Explore shows each piece on its own page. */
+  part?: 'all' | 'requirements' | 'sites';
+}) {
   const sites = useData((s) => s.sites);
   if (!sites) return null;
 
   return (
     <section
-      className={cn('box flex min-h-0 flex-col overflow-y-auto', className)}
-      aria-labelledby="req-heading"
+      className={cn(
+        'box flex min-h-0 flex-col',
+        part !== 'requirements' && 'overflow-y-auto',
+        className,
+      )}
+      aria-labelledby={part === 'sites' ? undefined : 'req-heading'}
     >
-      <div className="px-5 pt-4 pb-1">
-        <h2 id="req-heading" className="text-[18px]">
-          Mission requirements
-        </h2>
-      </div>
-      <RequirementFields />
-      <MissionWindowFields />
-      <Results />
+      {part !== 'sites' && (
+        <>
+          <div className="px-5 pt-4 pb-1">
+            <h2 id="req-heading" className="text-[18px]">
+              Mission requirements
+            </h2>
+          </div>
+          <RequirementFields />
+        </>
+      )}
+      {part === 'all' && <MissionWindowFields />}
+      {part !== 'requirements' && <Results />}
     </section>
   );
 }
@@ -545,11 +560,25 @@ function PinDetail({
 
 function SiteBody({ className }: { className?: string }) {
   const site = useSelectedSite();
+  const point = useAppStore((s) => s.selectedPoint);
   const proMode = useAppStore((s) => s.proMode);
   const req = useRequirements((s) => s.req);
   const stats = useSiteStats(site?.id ?? null);
   const loadError = useData((s) => (site ? s.timeseriesErrors[site.id] : undefined));
   const window = useMissionWindow();
+
+  if (!site && point) {
+    return (
+      <section className={cn('box p-5', className)} aria-label="Your point">
+        <h2 className="text-[20px] leading-tight">Your point</h2>
+        <p className="text-ink-muted num mt-1 text-[12px]">{formatLatLon(point.lat, point.lon)}</p>
+        <p className="text-ink mt-2 text-[13px]">
+          Press Play to watch its sunlight and Earth view.
+        </p>
+        <NowSection siteId={null} expert={proMode} />
+      </section>
+    );
+  }
 
   if (!site) {
     return (
@@ -658,10 +687,11 @@ function SiteBody({ className }: { className?: string }) {
   );
 }
 
-function NowSection({ siteId, expert }: { siteId: string; expert: boolean }) {
+function NowSection({ siteId, expert }: { siteId: string | null; expert: boolean }) {
   const active = useActiveSeries();
   const ts = active.ts;
-  const loadError = useData((s) => s.timeseriesErrors[siteId]) ?? active.error;
+  const siteError = useData((s) => (siteId ? s.timeseriesErrors[siteId] : undefined));
+  const loadError = siteError ?? active.error;
   const now = useAppStore((s) => s.currentTimeUTC);
   const sky = ts ? sampleAt(ts, now) : null;
   const span = ts ? seriesSpanLabel(ts) : '';

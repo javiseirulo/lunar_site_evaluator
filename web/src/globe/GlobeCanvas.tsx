@@ -369,6 +369,7 @@ export default function GlobeCanvas({ hideChrome = false }: { hideChrome?: boole
         apiRef={surfaceApiRef}
         armed={placingAstronaut}
         onArmed={setPlacingAstronaut}
+        className={hideChrome ? 'is-staged' : undefined}
       />
       {!hideChrome && (
         <div className="absolute top-2 left-2 flex flex-col items-start gap-2">
@@ -393,13 +394,17 @@ export default function GlobeCanvas({ hideChrome = false }: { hideChrome?: boole
         </div>
       )}
       {/* Javi: legend of the active map layers (Expert only, like the layers panel). */}
-      {expert && (
+      {expert && !hideChrome && (
         <ActiveLegend className="pointer-events-none absolute top-3 right-[19.5rem] hidden lg:block" />
       )}
       {exaggerated && (
         <div
           role="note"
-          className="pointer-events-none absolute bottom-2 left-[72px] rounded-[2px] bg-black/70 px-2 py-1 text-[11px] text-white"
+          className={
+            hideChrome
+              ? 'pointer-events-none absolute top-3 left-1/2 -translate-x-1/2 rounded-[2px] bg-black/70 px-2 py-1 text-[11px] text-white'
+              : 'pointer-events-none absolute bottom-2 left-[72px] rounded-[2px] bg-black/70 px-2 py-1 text-[11px] text-white'
+          }
         >
           {EXAGGERATION_LABEL}
         </div>
@@ -407,7 +412,11 @@ export default function GlobeCanvas({ hideChrome = false }: { hideChrome?: boole
       {sun.status === 'no_ephemeris' && (
         <div
           role="status"
-          className="pointer-events-none absolute right-2 bottom-2 rounded-[2px] bg-black/70 px-2 py-1 text-[11px] text-white"
+          className={
+            hideChrome
+              ? 'pointer-events-none absolute top-3 left-1/2 -translate-x-1/2 rounded-[2px] bg-black/70 px-2 py-1 text-[11px] text-white'
+              : 'pointer-events-none absolute right-2 bottom-2 rounded-[2px] bg-black/70 px-2 py-1 text-[11px] text-white'
+          }
         >
           No ephemeris for this date · fixed lighting
         </div>

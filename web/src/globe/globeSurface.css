@@ -1,3 +1,10 @@
+.globe-surface-control.is-staged {
+  left: 50%;
+  right: auto;
+  bottom: 200px;
+  width: max-content;
+  transform: translateX(-50%);
+}
 .globe-surface-control {
   position: absolute;
   /* Stay clear of the Layers button in the bottom-left corner. */
