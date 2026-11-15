@@ -67,9 +67,12 @@ export function CockpitView({
   const progress = won ? 1 : Math.min(1, (hourF + 1) / MISSION_HOURS);
 
   return (
-    <div data-fx={fx ?? undefined} className="mission-cockpit flex flex-1 flex-col gap-2">
+    <div
+      data-fx={fx ?? undefined}
+      className="mission-cockpit flex w-full min-w-0 flex-1 flex-col items-center gap-2"
+    >
       {/* Window. */}
-      <div className="mission-bezel relative mx-auto w-full max-w-[760px] p-2.5 sm:p-3">
+      <div className="mission-bezel relative w-full max-w-[760px] min-w-0 p-2.5 sm:p-3">
         {RIVETS.map((pos) => (
           <span key={pos} aria-hidden className={`mission-rivet ${pos}`} />
         ))}
@@ -88,7 +91,7 @@ export function CockpitView({
       </div>
 
       {/* Control panel. */}
-      <div className="mission-panel mission-bezel mx-auto flex w-full max-w-[760px] flex-col gap-1.5 p-2">
+      <div className="mission-panel mission-bezel flex w-full max-w-[760px] min-w-0 flex-col gap-1.5 p-2">
         <div className="flex items-center gap-2 font-mono text-[10px] font-bold tracking-widest uppercase">
           <Lamp on color={lost ? BAD : GOOD} alarm={lost} />
           <span style={{ color: lost ? BAD : won ? GOOD : '#8b97ad' }}>
@@ -99,7 +102,7 @@ export function CockpitView({
                 : 'Systems nominal'}
           </span>
         </div>
-        <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3 lg:grid-cols-5">
+        <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3 lg:grid-cols-5 [&>*]:min-w-0">
           <ClockGauge
             className="col-span-2 sm:col-span-1"
             day={day}

@@ -150,10 +150,10 @@ describe('review fixes', () => {
     expect(starsFor(1)).toBe(3);
   });
 
-  it('a run failure reports the limit and the failing hour, not the longest run', () => {
+  it('a run failure reports the limit (the failing hour is in failHour), not the longest run', () => {
     // Always dark: the run exceeds 100 h at hour 100 even though the longest run is 168 h.
     const v = simulate(makeSite(1), makeTs(new Array(HOURS).fill(0), new Array(HOURS).fill(1)), 0);
     expect(v).toMatchObject({ win: false, cause: 'cold', failHour: 100 });
-    expect(v.detail).toBe('Night lasted over 100 h (failed at hour 100)');
+    expect(v.detail).toBe('Night lasted over 100 h');
   });
 });

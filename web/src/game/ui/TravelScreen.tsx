@@ -41,18 +41,16 @@ function LanderGlyph() {
 export function TravelScreen() {
   const hand = useGame((s) => s.hand);
   const chosenSlot = useGame((s) => s.chosenSlot);
-  const card = hand?.cards.find((c) => c.slot === chosenSlot);
   const reduced = useReducedMotion() ?? false;
-  const siteId = card?.siteId;
   const landingUtc = hand?.landingUtc;
 
-  // The pick already shared the choice; only write if something else changed it since.
+  // The pick already shared the landing time; only write if something else changed it since.
+  // The site is not selected in the shared store until the verdict (its name would leak).
   useEffect(() => {
-    if (!siteId || !landingUtc) return;
+    if (!landingUtc) return;
     const app = useAppStore.getState();
-    if (app.selectedSiteId !== siteId) app.selectSite(siteId);
     if (app.currentTimeUTC !== landingUtc) app.setTime(landingUtc);
-  }, [siteId, landingUtc]);
+  }, [landingUtc]);
 
   useEffect(() => {
     const id = window.setTimeout(

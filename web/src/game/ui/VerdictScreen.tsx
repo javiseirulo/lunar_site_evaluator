@@ -4,14 +4,15 @@ import { Star } from 'lucide-react';
 import { clsx } from 'clsx';
 import { useData } from '@/core';
 import { DEFAULT_REQUIREMENTS } from '../engine/requirements';
-import type { Verdict } from '../engine/simulate';
 import { useGame } from '../state/gameStore';
 import { verdictImage } from './assets';
 import { CAUSE_HEADLINE, lessonFor } from './content';
 import { GameButtons } from './GameButtons';
 import { GameImage } from './GameImage';
+import { verdictSummary } from './reveal';
 
-const MISSION_HOURS = DEFAULT_REQUIREMENTS.surface_days * 24;
+const DAYS = DEFAULT_REQUIREMENTS.surface_days;
+const MISSION_HOURS = DAYS * 24;
 
 /** Three big stars, the middle one raised, filled up to `count`. */
 function Stars({ count }: { count: number }) {
@@ -46,12 +47,6 @@ function Stars({ count }: { count: number }) {
       })}
     </div>
   );
-}
-
-function failedWhen(v: Verdict): string {
-  if (v.failHour === null) return '';
-  if (v.failHour === 0) return 'Failed on touchdown.';
-  return `Failed at hour ${v.failHour} of ${MISSION_HOURS}.`;
 }
 
 export function VerdictScreen() {
@@ -116,8 +111,7 @@ export function VerdictScreen() {
           <span className="text-ink-faint">(Landing site {card.slot})</span>.
         </p>
         <p className="font-mono text-[11.5px] text-ink-muted">
-          {v.detail}
-          {!v.win && ` ${failedWhen(v)}`}
+          {verdictSummary(v.detail, v.win ? null : v.failHour, MISSION_HOURS, DAYS)}
         </p>
         <div className="border-2 border-black bg-black/50 p-2 text-[12px] text-ink">
           <span className="text-warn font-mono font-bold uppercase">Lesson: </span>

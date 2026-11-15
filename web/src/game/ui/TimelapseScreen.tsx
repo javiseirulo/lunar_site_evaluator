@@ -171,6 +171,7 @@ export function TimelapseScreen() {
         />
       ) : (
         <MapView
+          siteId={card.siteId}
           sunUp={sample ? sample.lit : null}
           linkUp={linkUp}
           darkRun={runs?.dark[hour] ?? 0}

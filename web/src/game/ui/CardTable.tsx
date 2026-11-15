@@ -44,12 +44,9 @@ export function CardTable() {
         useGame.getState().choose(picked);
         const after = useGame.getState();
         if (after.phase !== 'travel' || after.chosenSlot !== picked) return;
-        const card = hand.cards.find((c) => c.slot === picked);
-        if (!card) return;
-        // Share the choice with the rest of the app (map, globe, timeline).
-        const app = useAppStore.getState();
-        app.selectSite(card.siteId);
-        app.setTime(hand.landingUtc);
+        // Share the landing time with the rest of the app. The site itself stays secret until
+        // the verdict (see reveal.ts), so it is NOT selected in the shared store here.
+        useAppStore.getState().setTime(hand.landingUtc);
       },
       reduced ? 0 : PICK_MS,
     );

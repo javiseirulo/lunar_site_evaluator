@@ -1,10 +1,12 @@
 /** The Mission mini-game: one screen per phase of `useGame`. */
 import { useEffect, type ReactNode } from 'react';
 import { MotionConfig } from 'motion/react';
+import { useAppStore } from '@/core';
 import { useGame, type Phase } from '../state/gameStore';
 import { AlertScreen } from './AlertScreen';
 import { ExitControl } from './ExitControl';
 import { parseGameParams } from './gameParams';
+import { sharedSelectionFor } from './reveal';
 import { IntroScreen } from './IntroScreen';
 import { MenuScreen } from './MenuScreen';
 import { MissionFx } from './MissionFx';
@@ -34,6 +36,18 @@ export function MissionGame() {
     const { difficulty, ...config } = parseGameParams(window.location.search);
     useGame.getState().configure(config, difficulty);
   }, []);
+
+  // Keep the real site name secret until the verdict: the site-wide header prints the name of
+  // the selected site, so the selection is cleared during play and set at the verdict.
+  const chosenSiteId = useGame(
+    (s) => s.hand?.cards.find((c) => c.slot === s.chosenSlot)?.siteId ?? null,
+  );
+  useEffect(() => {
+    const want = sharedSelectionFor(phase, chosenSiteId);
+    if (want === undefined) return;
+    const app = useAppStore.getState();
+    if (app.selectedSiteId !== want) app.selectSite(want);
+  }, [phase, chosenSiteId]);
 
   let screen: ReactNode;
   switch (phase) {
