@@ -27,8 +27,9 @@ export function pathForMode(mode: AppMode, siteId?: string | null): string {
 }
 
 /**
- * Header order: Mission first, then Learn and Method beside it, then the map pages.
- * `aside` pages sit after a divider. Mode tabs keep the selected site in their URL.
+ * Header order: Explore, Street View, Mission, then Compare and All sites (Expert), and Learn and
+ * Method after the divider. `aside` pages sit after the divider. Mode tabs keep the selected site
+ * in their URL.
  * Pages that aren't modes (sites, compare, learn, about) don't change `mode`.
  */
 export const TABS: {
@@ -40,13 +41,13 @@ export const TABS: {
   /** Drawn after the divider, still in this order. */
   aside?: boolean;
 }[] = [
-  { label: 'Mission', path: '/game', mode: 'game' },
-  { label: 'Learn', path: '/learn' },
-  { label: 'Method', path: '/about' },
   { label: 'Explore', path: '/explore', mode: 'explore' },
   { label: 'Street View', path: '/streetview', mode: 'streetview' },
-  { label: 'Compare', path: '/compare', expert: true, aside: true },
-  { label: 'All sites', path: '/sites', expert: true, aside: true },
+  { label: 'Mission', path: '/game', mode: 'game' },
+  { label: 'Compare', path: '/compare', expert: true },
+  { label: 'All sites', path: '/sites', expert: true },
+  { label: 'Learn', path: '/learn', aside: true },
+  { label: 'Method', path: '/about', aside: true },
 ];
 
 /** Tabs shown in the given mode: Normal hides the `expert` ones (Compare among them). */

@@ -39,3 +39,17 @@ not an instruction to omit that disclosure.
 Some original sprites contain a dark header/caption strip and image sizes vary.
 This import preserves those source details; any cleanup or optimisation is a
 separate change to review with the Mission owner.
+
+## Additions 2026-11-15 (issue #127 / #114)
+
+AI-generated with Higgsfield by the team (Pablo, Marta) from the prompts in
+`docs/team/martaplatero2002-star/higgsfield-mission-prompts.md` and
+`docs/team/manuelcgg165/historic-portraits-prompt.md`. Same disclosure rule as above.
+
+| File | Use | Processing |
+| --- | --- | --- |
+| `cockpit/cockpit-frame.png` | Cabin interior around the timelapse window (`CockpitView`) | Cropped to 1160×680 around the window; the flat `#00FF00` glass keyed to transparent (window only, indicator lamps kept) |
+| `cockpit/panel-bg.webp` | Texture behind the cockpit gauges | Scaled to 1400 px, WebP |
+| `characters/historic/*.png` (13) | Historical-mode narrators: Apollo 11, 12, 14, 15, 16, 17; Blue Ghost M1, Chandrayaan-2 Vikram, Chandrayaan-3, HAKUTO-R M1 and M2, IM-2 Athena, Luna 25 | Unchanged (512×512 RGBA) |
+
+Missions without a portrait yet keep falling back to Dr. Regolith.

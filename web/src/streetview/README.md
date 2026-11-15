@@ -39,7 +39,7 @@ Street View route. The URL takes the current UTC when that flight finishes.
   it reports an error instead of substituting a sphere as if it were terrain.
 - Left drag / one finger looks around; wheel / pinch zooms. Keyboard arrows
   remain, with no on-screen arrow buttons. Click/tap nearby ground to move
-  1–200 m; explicit coordinates allow global relocation. Observer height is a
+  1–500 m; explicit coordinates allow global relocation. Observer height is a
   local visual setting (0.5–20 m); it does not recompute pipeline visibility.
 - Right-click ground / double tap (within 400 ms) saves a named coordinate in
   Marta's existing per-browser pin store. A single touch tap waits 400 ms before
@@ -122,10 +122,10 @@ without coverage. These current facts supersede earlier consumer-pending notes.
 
 Left drag / one-finger drag looks around; wheel / pinch changes field of view
 (25–90 degrees). On-screen arrows are removed; keyboard arrows remain.
-Click or tap visible ground 1–200 m away to walk. The route samples the actual
-visual mesh every ≤5 m, then eases for one second (instant with reduced motion).
+Click or tap visible ground 1–500 m away to walk. The route samples the actual
+visual mesh every ≤5 m, then eases for up to 2.4 seconds (instant with reduced motion).
 Far mountains and sky are rejected. Global relocation is explicit under
-**View options → Go anywhere on the Moon**. **Expand view** works on mobile too.
+**View options → Go anywhere on the Moon**. The fullscreen icon uses native fullscreen when available and a viewport-filling layout on mobile browsers that lack it. The map, sky and QR controls stay inside the viewer.
 
 Relief reading light is off by default so the source imagery stays visible.
 It is artificial, camera-relative fill derived from geometric normals, with a

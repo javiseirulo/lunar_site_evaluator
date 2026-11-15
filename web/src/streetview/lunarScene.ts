@@ -1,5 +1,6 @@
 /** Street View renderer. Selection/time remain in core. AI-assisted: OpenAI Codex. */
-import type { SkySample } from '@/core';
+import type { ViewerSky } from './sky';
+import { SUN_RADIUS_DEG } from '@/ephem';
 import { DEFAULT_OBSERVER_HEIGHT_M, limitLook, skyDirection } from './geometry';
 import {
   canWalk,
@@ -25,7 +26,17 @@ export interface Observer {
   lat: number;
   lon: number;
 }
+export class MissingSurfaceHeight extends Error {
+  constructor(
+    readonly nearby?: Observer,
+    readonly distanceM = 0,
+  ) {
+    super('Surface height unavailable');
+  }
+}
+
 export interface SceneCallbacks {
+  findNearbyGround?: boolean;
   ground: (height: number) => void;
   error: () => void;
   observer: (point: Observer) => void;
@@ -48,7 +59,7 @@ export interface LunarScene {
   look: (dh: number, dp: number) => void;
   faceBody: (body: 'sun' | 'earth') => void;
   setHeight: (height: number) => void;
-  setSky: (sample: SkySample | null) => void;
+  setSky: (sample: ViewerSky | null) => void;
   setReadingLight: (enabled: boolean) => void;
   setNames: (enabled: boolean) => void;
   relocate: (point: Observer) => Promise<void>;
@@ -126,7 +137,7 @@ export async function createLunarScene(
     let fov = limitFov(initialView.fov);
     let pose = limitLook(initialView.heading, initialView.pitch);
     let moving = false;
-    let sky: SkySample | null = null;
+    let sky: ViewerSky | null = null;
     let namesEnabled = allowNames;
     let features: Landmark[] = [];
     let anchors: { feature: Landmark; position: import('cesium').Cartesian3 }[] = [];
@@ -218,7 +229,7 @@ export async function createLunarScene(
         window.clearTimeout(timer);
       }
     };
-    const sampleGround = async (points: Observer[]) => {
+    const probeGround = async (points: Observer[]) => {
       // Start the radial ray above the Moon's highest peaks, beyond Cesium's
       // Earth-oriented 9 km default ray origin. The returned height is unchanged.
       const sampled = await withDeadline(
@@ -227,8 +238,11 @@ export async function createLunarScene(
         ),
       );
       if (disposed) throw new DOMException('Cancelled', 'AbortError');
-      if (sampled.some((p) => !Number.isFinite(p?.height)))
-        throw new Error('Surface height unavailable');
+      return sampled;
+    };
+    const sampleGround = async (points: Observer[]) => {
+      const sampled = await probeGround(points);
+      if (sampled.some((p) => !Number.isFinite(p?.height))) throw new MissingSurfaceHeight();
       return sampled.map((p) => p!.height);
     };
     // Place the camera on tiles already in view, instead of waiting for the leaf tiles.
@@ -251,17 +265,46 @@ export async function createLunarScene(
     const quick = viewer.scene.sampleHeight(
       C.Cartographic.fromDegrees(observer.lon, observer.lat, 30_000),
     );
-    ground = Number.isFinite(quick) ? quick! : (await sampleGround([observer]))[0]!;
+    try {
+      ground = Number.isFinite(quick) ? quick! : (await sampleGround([observer]))[0]!;
+    } catch (error) {
+      if (!(error instanceof MissingSurfaceHeight) || !callbacks.findNearbyGround) throw error;
+      // Sample distinct points within 43 m. Keep the requested observer until the
+      // visitor explicitly opens a measured alternative; never fill a missing height.
+      const candidates: Observer[] = [];
+      for (const dLat of [0.001, -0.001]) {
+        const lat = observer.lat + dLat;
+        if (Math.abs(lat) > 90) continue;
+        for (const dLon of [-0.001, 0.001]) {
+          candidates.push({ lat, lon: ((observer.lon + dLon + 540) % 360) - 180 });
+        }
+      }
+      const nearby = await probeGround(candidates);
+      const point = candidates[nearby.findIndex((p) => Number.isFinite(p?.height))];
+      throw new MissingSurfaceHeight(point, point ? surfaceDistance(observer, point) : 0);
+    }
     let exactGround = ground;
     callbacks.ground(ground);
     // Sharpen after the first picture. Leaf tiles (error 1) are what made the wait so long.
     if (!preview) tiles.maximumScreenSpaceError = 4;
+    // Camera-facing schematic discs at a common sky distance. Metre-sized billboards
+    // keep the angular diameter stable across field of view and screen resolution.
+    const skyDistance = 1e8;
+    const disc =
+      'data:image/svg+xml,' +
+      encodeURIComponent(
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64"><circle cx="32" cy="32" r="32" fill="white"/></svg>',
+      );
     const markers = ['Sun', 'Earth'].map((name, index) =>
       viewer.entities.add({
         name,
         show: false,
         position: position(observer, ground),
-        point: { pixelSize: index ? 8 : 7, color: index ? C.Color.LIGHTBLUE : C.Color.YELLOW },
+        billboard: {
+          image: disc,
+          sizeInMeters: true,
+          color: index ? C.Color.LIGHTBLUE : C.Color.YELLOW,
+        },
         label: {
           text: name,
           font: '12px sans-serif',
@@ -272,7 +315,7 @@ export async function createLunarScene(
         },
       }),
     );
-    const setSky = (sample: SkySample | null) => {
+    const setSky = (sample: ViewerSky | null) => {
       sky = sample;
       const visibleSky = moving ? null : sample;
       const state = lightingState(visibleSky);
@@ -285,8 +328,14 @@ export async function createLunarScene(
             : new C.Cartesian3(0.94, 0.96, 1),
       );
       markers.forEach((marker, index) => {
-        marker.show = visibleSky !== null;
-        if (!visibleSky) return;
+        marker.show =
+          !!visibleSky && (index ? visibleSky.earthDiscFraction : visibleSky.sunFraction) > 0;
+        if (!visibleSky || !marker.show) return;
+        const radius = index ? visibleSky.earthRadiusDeg : SUN_RADIUS_DEG;
+        const diameter = 2 * skyDistance * Math.tan(C.Math.toRadians(radius));
+        // Cesium packs billboard widths into 16 bits. Keep the 64-unit sprite
+        // and apply the physical diameter via its floating-point scale.
+        marker.billboard!.scale = new C.ConstantProperty(diameter / 64);
         const d = vector(
           skyDirection(
             observer.lat,
@@ -298,7 +347,7 @@ export async function createLunarScene(
         marker.position = new C.ConstantPositionProperty(
           C.Cartesian3.add(
             position(observer, ground + height),
-            C.Cartesian3.multiplyByScalar(d, 1e8, new C.Cartesian3()),
+            C.Cartesian3.multiplyByScalar(d, skyDistance, new C.Cartesian3()),
             new C.Cartesian3(),
           ),
         );
@@ -530,7 +579,9 @@ export async function createLunarScene(
         callbacks.observer(target.point); // immediately invalidate the old site's sky
         callbacks.hint(`Moving ${Math.round(target.distance)} m…`);
         const started = performance.now();
-        const duration = matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 1000;
+        const duration = matchMedia('(prefers-reduced-motion: reduce)').matches
+          ? 0
+          : Math.min(2400, 700 + target.distance * 3.4);
         const advance = (now: number) => {
           if (disposed) return;
           const t = duration ? Math.min(1, (now - started) / duration) : 1;

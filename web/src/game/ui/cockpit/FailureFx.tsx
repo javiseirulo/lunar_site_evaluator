@@ -46,7 +46,9 @@ export function WindowFx({ fx }: { fx: CockpitFx }) {
   if (fx === 'cold') return <Frost />;
   if (fx === 'blackout') {
     return (
-      <div className="pointer-events-none absolute top-3 right-3 flex items-center gap-1 border-2 border-[#ff3b30] bg-black/80 px-1.5 py-0.5 font-mono text-[10px] font-bold tracking-widest text-[#ff3b30] uppercase">
+      // Top-centre: the illustrated cabin frame covers the glass's top corners (the window is
+      // a trapezoid, narrower at the top), so a corner badge would be hidden.
+      <div className="pointer-events-none absolute top-2 left-1/2 z-10 flex -translate-x-1/2 items-center gap-1 border-2 border-[#ff3b30] bg-black/80 px-1.5 py-0.5 font-mono text-[10px] font-bold tracking-widest text-[#ff3b30] uppercase">
         <WifiOff className="mission-blink size-3.5" aria-hidden />
         Earth lost
       </div>

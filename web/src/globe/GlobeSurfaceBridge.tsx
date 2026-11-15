@@ -79,7 +79,7 @@ export function AstronautControl({
       {ghost && (
         <img
           className="astronaut-ghost"
-          src={`${import.meta.env.BASE_URL}streetview/astronaut-ai.png`}
+          src={`${import.meta.env.BASE_URL}streetview/astronaut.png`}
           alt=""
           style={{ left: ghost.x, top: ghost.y }}
         />
@@ -88,23 +88,29 @@ export function AstronautControl({
         type="button"
         className="astronaut-button"
         aria-label="Place astronaut for Street View"
+        title={
+          armed
+            ? 'Choose a point on the Moon · Esc to cancel'
+            : 'Drag the astronaut onto the Moon, or tap to place'
+        }
         aria-pressed={armed}
         style={{ touchAction: 'none' }}
         onPointerDown={(e) => {
-          if (e.button !== 0) return;
+          if (!e.isPrimary || e.button !== 0) return;
           e.preventDefault();
           e.currentTarget.setPointerCapture(e.pointerId);
           start.current = { x: e.clientX, y: e.clientY };
         }}
         onPointerMove={(e) => {
           if (
+            e.isPrimary &&
             start.current &&
             Math.hypot(e.clientX - start.current.x, e.clientY - start.current.y) > 6
           )
             setGhost({ x: e.clientX, y: e.clientY });
         }}
         onPointerUp={(e) => {
-          if (!start.current) return;
+          if (!e.isPrimary || !start.current) return;
           const dragged = Math.hypot(e.clientX - start.current.x, e.clientY - start.current.y) > 6;
           start.current = null;
           setGhost(null);
@@ -134,14 +140,12 @@ export function AstronautControl({
           }
         }}
       >
-        <img
-          src={`${import.meta.env.BASE_URL}streetview/astronaut-ai.png`}
-          alt=""
-          draggable={false}
-        />
-        <span>AI</span>
+        <img src={`${import.meta.env.BASE_URL}streetview/astronaut.png`} alt="" draggable={false} />
+        <small className="astronaut-credit">ChatGPT</small>
       </button>
-      <p role="status">{armed ? 'Choose a point on the Moon · Esc to cancel' : hint}</p>
+      <p className="sr-only" role="status">
+        {armed ? 'Choose a point on the Moon · Esc to cancel' : hint}
+      </p>
     </div>
   );
 }

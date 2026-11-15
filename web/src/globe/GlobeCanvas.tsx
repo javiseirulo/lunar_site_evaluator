@@ -28,6 +28,7 @@ import {
   type RefObject,
   type SyntheticEvent,
 } from 'react';
+import { createPortal } from 'react-dom';
 import { Canvas, useFrame, useThree, type ThreeEvent } from '@react-three/fiber';
 import { useNavigate } from 'react-router';
 import { AstronautControl, SurfacePicker, type SurfaceBridgeApi } from './GlobeSurfaceBridge';
@@ -61,6 +62,7 @@ import { NIGHT_FILL, useNightLayer } from './nightLayer';
 import { Terminator } from './DayNight';
 import { usePinSelection } from './pinSelection';
 import { LayersMenu } from './LayersMenu';
+import { useChromeSlot } from './chromeSlot';
 import { PatchTrigger, PolarPatch, SunLight } from './PolarPatch';
 import { ActiveLegend } from '@/layers';
 import { GlobalHeat } from './LayerOverlays'; // Javi: whole-Moon heat maps of active layers
@@ -131,6 +133,9 @@ export default function GlobeCanvas({ hideChrome = false }: { hideChrome?: boole
     return point ? latLonToVec3(point.lat, point.lon, 3) : INITIAL_CAMERA;
   });
   const navigate = useNavigate();
+  // Controls go to the page's free map area when it registers one (Explore); else over the globe.
+  const chromeSlot = useChromeSlot((s) => s.slot);
+  const inSlot = (node: ReactNode) => (chromeSlot ? createPortal(node, chromeSlot) : node);
   const surfaceApiRef = useRef<SurfaceBridgeApi | null>(null);
   const [placingAstronaut, setPlacingAstronaut] = useState(false);
   useEffect(() => {
@@ -373,62 +378,68 @@ export default function GlobeCanvas({ hideChrome = false }: { hideChrome?: boole
         <CameraRig flightRef={flightRef} controlsRef={controlsRef} />
         <SurfacePicker apiRef={surfaceApiRef} onEnter={navigate} />
       </Canvas>
-      <AstronautControl
-        apiRef={surfaceApiRef}
-        armed={placingAstronaut}
-        onArmed={setPlacingAstronaut}
-        className={hideChrome ? 'is-staged' : undefined}
-      />
-      {!hideChrome && (
-        <div className="absolute top-2 left-2 flex flex-col items-start gap-2">
-          {/* Coordinate entry is open in Normal too (kids can go anywhere); Normal only gets plainer wording. */}
-          <PinForm
-            buttonLabel={expert ? 'Pin by coordinates' : 'Go to coordinates'}
-            title={expert ? 'Pin by coordinates' : 'Go to coordinates'}
-            submitLabel={expert ? 'Add pin' : 'Go there'}
-            onAdd={({ name, lat, lon }) => {
-              createPin(lat, lon, name);
-              // Fly above the new pin (avoid the exact pole, where the orbit is undefined).
-              const safeLat = Math.max(-89.5, Math.min(89.5, lat));
-              flightRef.current = new Vector3(...latLonToVec3(safeLat, lon, PIN_VIEW_DISTANCE));
-            }}
-          />
-          <PatchControls />
-        </div>
+      {inSlot(
+        <AstronautControl
+          apiRef={surfaceApiRef}
+          armed={placingAstronaut}
+          onArmed={setPlacingAstronaut}
+          className={hideChrome ? 'is-staged' : undefined}
+        />,
       )}
-      {!hideChrome && (
-        <div className="absolute bottom-2 left-2 z-[60]">
-          <LayersMenu hasSun={!!sunDir} expert={expert} />
-        </div>
-      )}
+      {!hideChrome &&
+        inSlot(
+          <div className="pointer-events-auto absolute top-2 left-2 flex flex-col items-start gap-2">
+            {/* Coordinate entry is open in Normal too (kids can go anywhere); Normal only gets plainer wording. */}
+            <PinForm
+              buttonLabel={expert ? 'Pin by coordinates' : 'Go to coordinates'}
+              title={expert ? 'Pin by coordinates' : 'Go to coordinates'}
+              submitLabel={expert ? 'Add pin' : 'Go there'}
+              onAdd={({ name, lat, lon }) => {
+                createPin(lat, lon, name);
+                // Fly above the new pin (avoid the exact pole, where the orbit is undefined).
+                const safeLat = Math.max(-89.5, Math.min(89.5, lat));
+                flightRef.current = new Vector3(...latLonToVec3(safeLat, lon, PIN_VIEW_DISTANCE));
+              }}
+            />
+            <PatchControls />
+          </div>,
+        )}
+      {!hideChrome &&
+        inSlot(
+          <div className="pointer-events-auto absolute bottom-2 left-2 z-[60]">
+            <LayersMenu hasSun={!!sunDir} expert={expert} />
+          </div>,
+        )}
       {/* Javi: legend of the active map layers (Expert only, like the layers panel). */}
       {expert && !hideChrome && (
         <ActiveLegend className="pointer-events-none absolute top-3 right-[19.5rem] hidden lg:block" />
       )}
-      {exaggerated && (
-        <div
-          role="note"
-          className={
-            hideChrome
-              ? 'pointer-events-none absolute top-3 left-1/2 -translate-x-1/2 rounded-[2px] bg-black/70 px-2 py-1 text-[11px] text-white'
-              : 'pointer-events-none absolute bottom-2 left-[72px] rounded-[2px] bg-black/70 px-2 py-1 text-[11px] text-white'
-          }
-        >
-          {EXAGGERATION_LABEL}
-        </div>
-      )}
-      {sun.status === 'no_ephemeris' && (
-        <div
-          role="status"
-          className={
-            hideChrome
-              ? 'pointer-events-none absolute top-3 left-1/2 -translate-x-1/2 rounded-[2px] bg-black/70 px-2 py-1 text-[11px] text-white'
-              : 'pointer-events-none absolute right-2 bottom-2 rounded-[2px] bg-black/70 px-2 py-1 text-[11px] text-white'
-          }
-        >
-          No ephemeris for this date · fixed lighting
-        </div>
-      )}
+      {exaggerated &&
+        inSlot(
+          <div
+            role="note"
+            className={
+              hideChrome
+                ? 'pointer-events-none absolute top-3 left-1/2 -translate-x-1/2 rounded-[2px] bg-black/70 px-2 py-1 text-[11px] text-white'
+                : 'pointer-events-none absolute bottom-2 left-[72px] rounded-[2px] bg-black/70 px-2 py-1 text-[11px] text-white'
+            }
+          >
+            {EXAGGERATION_LABEL}
+          </div>,
+        )}
+      {sun.status === 'no_ephemeris' &&
+        inSlot(
+          <div
+            role="status"
+            className={
+              hideChrome
+                ? 'pointer-events-none absolute top-3 left-1/2 -translate-x-1/2 rounded-[2px] bg-black/70 px-2 py-1 text-[11px] text-white'
+                : 'pointer-events-none absolute right-2 bottom-2 rounded-[2px] bg-black/70 px-2 py-1 text-[11px] text-white'
+            }
+          >
+            No ephemeris for this date · fixed lighting
+          </div>,
+        )}
       {!textureReady && (
         <div
           role="status"

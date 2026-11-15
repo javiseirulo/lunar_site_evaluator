@@ -21,6 +21,8 @@ export interface TerrainSite extends Observer {
 }
 export interface ViewerSky extends SkySample, Sky {
   sunFraction: number;
+  earthRadiusDeg: number;
+  earthDiscFraction: number;
   sunHorizon: number;
   earthHorizon: number;
   horizonSource: string;
@@ -57,7 +59,11 @@ export function observerSky(
   const sunHorizon = horizonAt(profile, geometry.sun_az, height);
   const earthHorizon = horizonAt(profile, geometry.earth_az, height);
   const fraction = sunDiscFraction(geometry.sun_el, sunHorizon);
+  // Mean Earth radius, km. A straight local skyline approximates clipping across the disc.
+  const earthRadiusDeg = (Math.asin(6371 / geometry.earth_km) * 180) / Math.PI;
   return {
+    earthRadiusDeg,
+    earthDiscFraction: sunDiscFraction(geometry.earth_el, earthHorizon, earthRadiusDeg),
     ...geometry,
     index: -1,
     t_utc: time,
