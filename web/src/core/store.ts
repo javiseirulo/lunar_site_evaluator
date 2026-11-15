@@ -76,6 +76,20 @@ export interface AppState extends AppEvents {
   cancelPending: () => void;
   /** Pause-and-rewind helper shared by TimeBar's reset and the end-simulation confirm. */
   resetClock: (startUtc: string) => void;
+  /**
+   * A pin the Explore side panel asked for (by coordinates). The globe, which owns the camera,
+   * drops it, flies there and clears it with `clearPendingPin`. A new object per request, so the
+   * same coordinates twice still fire.
+   */
+  pendingPin: PendingPin | null;
+  requestPin: (pin: PendingPin) => void;
+  clearPendingPin: () => void;
+}
+
+export interface PendingPin {
+  name: string;
+  lat: number;
+  lon: number;
 }
 
 const PRO_KEY = 'lse.proMode';
@@ -119,6 +133,7 @@ export const useAppStore = create<AppState>()((set, get) => {
     layersInitialised: false,
     proMode: readPro(),
     missionConfig: DEFAULT_MISSION_CONFIG,
+    pendingPin: null,
 
     selectSite: (id) =>
       set((s) =>
@@ -144,6 +159,8 @@ export const useAppStore = create<AppState>()((set, get) => {
       );
     },
     setSimulationStarted: (started) => set({ simulationStarted: started }),
+    requestPin: (pin) => set({ pendingPin: { ...pin } }),
+    clearPendingPin: () => set({ pendingPin: null }),
     setTime: (isoUtc) => set((s) => ({ currentTimeUTC: isoUtc, timeRevision: s.timeRevision + 1 })),
     setMode: (mode) => set({ mode }),
 
