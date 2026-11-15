@@ -99,7 +99,7 @@ function LeftPanel() {
 
   return (
     <aside
-      className={`${FRAME} pointer-events-auto flex max-h-full min-h-0 w-full flex-col self-start overflow-y-auto`}
+      className={`${FRAME} pointer-events-auto flex max-h-[50dvh] min-h-0 w-full flex-col self-start overflow-y-auto md:max-h-full`}
     >
       <Pages options={options} value="sites" onChange={() => undefined} />
       <div>
@@ -170,8 +170,10 @@ export default function ExplorePage() {
     // The page scrolls: a tall 3D map first, the Mission Clock below it.
     <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
       <EndSimulationDialog />
-      <div className="border-edge-hi relative h-[calc(100dvh-8.5rem)] min-h-[26rem] shrink-0 overflow-hidden border-2 bg-black">
-        <div className="absolute inset-0">
+      {/* Wide screens: panels float over a tall map. Narrow screens: the map comes first and the panels
+          follow in the normal flow, so nothing covers the globe or its controls. */}
+      <div className="border-edge-hi relative shrink-0 border-2 bg-black md:h-[calc(100dvh-8.5rem)] md:min-h-[26rem] md:overflow-hidden">
+        <div className="h-[55dvh] min-h-[20rem] md:absolute md:inset-0 md:h-auto md:min-h-0">
           {WEBGL ? (
             <GlobeBoundary fallback={<PolarMap className="size-full" neutral={!proMode} />}>
               <GlobeView />
@@ -181,12 +183,12 @@ export default function ExplorePage() {
           )}
         </div>
 
-        <div className="pointer-events-none absolute inset-0 grid grid-cols-1 grid-rows-[minmax(0,1fr)] gap-3 p-3 md:grid-cols-[minmax(200px,20%)_minmax(0,1fr)_minmax(210px,22%)]">
+        <div className="pointer-events-none grid grid-cols-1 gap-3 p-3 md:absolute md:inset-0 md:grid-rows-[minmax(0,1fr)] md:grid-cols-[minmax(200px,20%)_minmax(0,1fr)_minmax(210px,22%)]">
           <LeftPanel />
           {/* Free map area between the panels: the globe puts its coordinate, Layers and astronaut controls here. */}
           <div
             ref={setChromeSlot}
-            className="pointer-events-none absolute inset-0 md:relative md:inset-auto md:col-start-2 md:row-start-1"
+            className="pointer-events-none absolute inset-x-0 top-0 h-[55dvh] min-h-[20rem] md:relative md:inset-auto md:h-auto md:min-h-0 md:col-start-2 md:row-start-1"
           />
           <RightPanel />
         </div>
