@@ -2,9 +2,10 @@
 
 ## Entrega vigente — 2026-11-15
 
-Rama `pabloizgui/38-streetview-ephemerides`. Guía funcional y científica:
-[ephemeris-integration.md](ephemeris-integration.md); estado y dependencias:
-[tasks.md](tasks.md). Los estados antiguos de abajo se conservan como historial.
+Rama `pabloizgui/46-globe-streetview`, desde dev `f6dd86f` (PR #91, globo v2 #97, despliegue #98 y Mission #90 integrados).
+La nueva integración se describe en [globe-surface-integration.md](globe-surface-integration.md);
+la guía científica sigue en [ephemeris-integration.md](ephemeris-integration.md).
+Estado y dependencias: [tasks.md](tasks.md). Los estados antiguos se conservan como historial.
 
 | Persona | Archivos actuales incluidos en Git | Uso |
 |---|---|---|
@@ -12,15 +13,29 @@ Rama `pabloizgui/38-streetview-ephemerides`. Guía funcional y científica:
 | Javi | `web/public/data/horizon/<id>.json` (41) | Contrato v1.1, coordenadas del catálogo real, 5 m, norte horario, 0,1°, alcance 310 km; sin interpolar perfiles entre sitios |
 | Javi / Marta / Javi2 | `web/public/data/terrain/catalog.json`, `catalog-terrain.csv` | 59 elevaciones/pendientes y PSR con cobertura/error explícitos; fuentes y precisión por punto. Sustituyen a `site-terrain.*` para el catálogo real |
 | Equipo | `web/public/data/terrain/catalog-delivery.json`, `delivery.json` | Convergencia/cobertura, origen y estado de los productos; la configuración antigua es nominal, el perfil describe el cálculo publicado |
-| Javi2 / Marta | `contracts/types.ts`, `web/src/core/store.ts` | `selectedPoint` aditivo; selección de sitio lo limpia. El visor lo publica, sus pins/mapas deben adoptarlo o abrir un enlace reproducible |
+| Javi / Marta | `contracts/types.ts`, `web/src/core/store.ts`, `web/src/core/surfaceNavigation.ts` | `selectedPoint` aditivo; selección de sitio lo limpia. El astronauta y el retorno al globo lo usan; URL reproducible con coordenadas y UTC |
 | Equipo | `web/src/streetview/` | Cámara, controles, cielo SPICE, reloj UTC común y QR; ruta `/streetview/<id>` |
 
-Para ejecutar, seguir las instrucciones de entorno de abajo cambiando la rama
-por la vigente. El token sigue en `web/.env.local` ignorado o variable de build;
-no se incluye en Git ni en los enlaces. No se necesitan otras cuentas Cesium:
-cada navegador consume la cuenta de Pablo con su token público de lectura.
-La configuración actual solo permite localhost/127.0.0.1:5173. Un QR para clase
-necesita una URL de despliegue o LAN permitida por el dueño del token.
+Para ejecutar: `pnpm install`, `pnpm dev`, abrir `/explore?view=3d` y arrastrar
+el astronauta a la Luna. La ruta y el acceso desde fichas existentes se reutilizan.
+El PNG transparente está en `web/public/streetview/astronaut-ai.png`, con origen y
+hash en `assets.json`; es una ilustración IA marcada, sin insignias de agencias.
+
+Por petición explícita posterior de Pablo, el token público de aplicación está
+en `web/src/streetview/cesiumAccess.ts`; sustituye la instrucción anterior de
+mantener este token concreto fuera de Git. No hace falta introducirlo ni crear
+otra cuenta. Tiene solo lectura de Moon y permite localhost/127.0.0.1:5173 según
+confirmación del dueño. `VITE_CESIUM_ION_TOKEN` tiene prioridad para despliegues.
+Las claves privadas siguen fuera de Git; los enlaces/QR no incluyen ninguna.
+Un QR para clase necesita una URL accesible y permitida por el token.
+
+Marta: `web/src/globe/GlobeSurfaceBridge.tsx` añade solo el arrastre/colocación;
+`web/src/core/surfaceNavigation.ts` publica coordenadas y UTC por core. No se añade
+otro motor de transición ni se altera su ficha; se reutiliza `standHere` de Marta
+con un callback opcional para conservar la URL de coordenadas/UTC al aterrizar. `web/src/core/savedPlaces.ts`
+conserva su clave `lunar-globe-custom-pins`, IDs y esquema `{id,name,lat,lon}`;
+`globe/customPins.ts` mantiene sus exports. Los lugares se guardan por navegador,
+no se suben a una cuenta. El retorno pide Explore 3D centrado en el punto actual.
 
 Los GeoTIFF originales y kernels están fuera de Git. Los compañeros pueden
 consumir todos los productos anteriores sin descargar varios GB ni ejecutar

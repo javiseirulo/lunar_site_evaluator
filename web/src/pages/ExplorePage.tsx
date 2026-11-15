@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useSearchParams } from 'react-router';
 import { cn } from '@/lib/utils';
 import { useAppStore } from '@/core';
 import { TimeBar } from '@/core/shell/TimeBar';
@@ -9,7 +10,8 @@ import { MissionTimingPanel, SiteCheckPanel } from '@/scoring';
 type View = '2d' | '3d';
 
 export default function ExplorePage() {
-  const [view, setView] = useState<View>('2d');
+  const [params] = useSearchParams();
+  const [view, setView] = useState<View>(params.get('view') === '3d' ? '3d' : '2d');
   const proMode = useAppStore((s) => s.proMode);
 
   return (

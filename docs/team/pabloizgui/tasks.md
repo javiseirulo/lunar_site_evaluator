@@ -2,9 +2,16 @@
 
 ## Estado vigente — 2026-11-15
 
-Rama `pabloizgui/38-streetview-ephemerides`, PR contra `dev`. El PR #72 ya fue
-integrado por el equipo. Este estado reemplaza las tablas históricas de abajo.
-Guía actual: [ephemeris-integration.md](ephemeris-integration.md).
+Rama `pabloizgui/46-globe-streetview`, desde dev `f6dd86f`, con #91, #97, #98 y #90 integrados.
+Guías actuales: [globe-surface-integration.md](globe-surface-integration.md) y
+[ephemeris-integration.md](ephemeris-integration.md). Sustituye estados históricos.
+
+Añadido: astronauta PNG arrastrable en el globo existente, retorno al mapa 3D,
+Sol/Tierra, guardado por click derecho/doble toque en el formato de Marta,
+nombres más tolerantes y mayor detalle de render. La clave pública de desarrollo
+queda en código por solicitud expresa de Pablo; variable de entorno opcional.
+No se duplica la transición ni el acceso desde ficha que el usuario confirmó existentes.
+
 
 | Tarea de Pablo | Entrega |
 |---|---|
@@ -24,10 +31,15 @@ Guía actual: [ephemeris-integration.md](ephemeris-integration.md).
   regenerando series/métricas/checks/score. Su export real todavía publica horizonte
   plano, elevación 0 y `pending_metrics` para pendiente/PSR. Las rejillas de `grid/`
   también son planas; 41 perfiles puntuales no constituyen una rejilla global.
-- **Marta:** revisar/consumir heightmap y capas en su globo; conectar sus pins
-  libres con `selectedPoint` o el enlace. No se modifica su motor unilateralmente.
-- **Javi2:** revisar `AppEvents.selectedPoint`, coordinar consumidores y configurar
-  la variable Cesium en el build de despliegue.
+- **Marta:** el globo v2 ya consume heightmap/máscara; revisar el nuevo astronauta
+  y el store de pins compartido (formato anterior conservado).
+  Entrada por coordenadas/UTC y retorno al globo implementados en esta rama.
+- **Javi (ahora core/capas):** revisar `selectedPoint`/pins compartidos y cargar
+  `terrain/layers.json` real; el parche de Marta ya consume heights/máscara pero
+  las capas del core siguen mock. Fecha/hora del Mission Clock y altura de la
+  barra lateral son peticiones de Marta, fuera de esta modificación del visor.
+- **Javi2 / despliegue:** configurar un token/origen permitido para el despliegue
+  público de Vercel; el desarrollo local ya usa la clave compartida del código.
 - **Pablo / despliegue:** permitir el dominio definitivo en el token de lectura y
   probar teléfono físico. Un QR localhost no abre el ordenador del profesor desde
   otro teléfono; no hace falta otra cuenta Cesium para cada compañero.

@@ -5,27 +5,27 @@ the selected site, optional free point and UTC from `@/core`, and real Sun/Earth
 vectors from `@/ephem`. Its clock controls and shared links update the common
 UTC; movement publishes the additive `selectedPoint` store field.
 
-## Configure access locally
+## Shared application access
 
-For the team, use Pablo's read-only Moon application token in `web/.env.local`
-(`VITE_CESIUM_ION_TOKEN`). Copy `web/.env.example` only if the local file does
-not already exist, then request the token from Pablo through the team's private
-channel. No individual Cesium account is needed. Vite uses port 5173 strictly.
-The value is embedded in the browser build, so only public `assets:read`
-permissions belong here. The actual token is not committed.
-See [team handoff and dependencies](../../../docs/team/pabloizgui/team-handoff.md).
+The team development key is included in `cesiumAccess.ts` at Pablo's explicit
+request. Teammates can run `pnpm dev` without an ion account or manual token input.
+It is a public `assets:read` application key restricted to Cesium Moon (2684829)
+and localhost/127.0.0.1:5173, as confirmed by the account owner. Vite keeps port
+5173 strictly. A local read request returned HTTP 200; an unrelated origin 403.
 
-Open `/streetview/shackleton_rim_01` through `pnpm dev`. In development, enter a
-public application token in the access panel. It is retained only while this view
-is mounted, never written to storage or logged. Alternatively set
-`VITE_CESIUM_ION_TOKEN` in the ignored `web/.env.local` and restart Vite.
+`VITE_CESIUM_ION_TOKEN` in ignored `web/.env.local` or the build environment
+still overrides the shared key. Restart Vite after changing the environment.
+The development-only access panel can also override the key in memory. Private
+account, token-management and write credentials must never be bundled or committed.
+For another domain/LAN deployment, use an appropriately restricted read key.
+Links and QR codes never include credentials. See
+[team handoff](../../../docs/team/pabloizgui/team-handoff.md) and the
+[official token guide](https://cesium.com/learn/ion/cesium-ion-access-tokens/).
 
-For the token: enable only `assets:read`, select Cesium Moon (`2684829`), restrict
-URLs to the development origin(s), and keep all private scopes disabled.
-For deployment use a separate read token restricted to the production origin.
-Client tokens are visible to the browser; `.env` does not make a bundled token
-secret. Production visitors are never asked to supply an ion account or token.
-Do not give the browser private token-management or asset-write privileges.
+Open `/explore?view=3d` and drag the astronaut onto the visible Moon, or open
+`/streetview/shackleton_rim_01` directly. Tapping/keyboard-activating the astronaut
+arms placement; the next Moon click reuses Marta's globe flight and the existing
+Street View route. The URL takes the current UTC when that flight finishes.
 
 ## Engine behavior
 
@@ -41,6 +41,17 @@ Do not give the browser private token-management or asset-write privileges.
   remain, with no on-screen arrow buttons. Click/tap nearby ground to move
   1–200 m; explicit coordinates allow global relocation. Observer height is a
   local visual setting (0.5–20 m); it does not recompute pipeline visibility.
+- Right-click ground / double tap (within 400 ms) saves a named coordinate in
+  Marta's existing per-browser pin store. A single touch tap waits 400 ms before
+  walking so the second tap can open the save form without moving the observer.
+- Face Sun / Face Earth rotates toward the live ephemeris direction. Back to
+  3D map returns to Explore centered on the current point, including expanded view.
+- Place names use more candidates and alternative leader positions so precise
+  aiming is less necessary. The depth filter tolerates a feature's own near slope within its radius
+  (capped at 20 km); labels describe approximate feature areas, not precise peaks.
+- Terrain requests use screen-space error 1, 4x MSAA and up to 2 device pixels
+  per CSS pixel. Smooth mesh normals are used when supplied. No tint changes;
+  missing source geometry cannot be recovered by rendering settings or textures.
 - Sun/Earth are labeled direction markers. Positions use real hourly SPICE
   vectors from `@/ephem`, interpolated for any location from 2026-01-01 00:00 to
   2055-12-31 23:00 UTC, with local north-clockwise azimuth and Earth parallax.
@@ -49,6 +60,8 @@ Do not give the browser private token-management or asset-write privileges.
 - Mesh textures can have baked-in shadows; rendered imagery is not evidence of
   lighting at the selected time. Visibility uses a matching 5 m catalogue horizon;
   changed location/height uses the labelled geometric horizon instead.
+  “Terrain visibility not calculated” means no matching occlusion profile, even
+  though the visual 3D terrain is loaded. Cesium ion/data credits stay visible.
 - Loading errors are generic to avoid displaying token-bearing URLs. Retry
   recreates the scene. Setup has a 90-second timeout, surface queries 45 seconds; unmount/site change
   cancels setup, disposes GPU resources, listeners and ResizeObserver.
@@ -80,8 +93,10 @@ scripts were not enabled; installation completed with `--ignore-scripts`.
 ENU directions including the pole, unit vectors/elevation, observer identity,
 sampling boundaries and camera angle limits, mouse/touch gestures, movement bounds,
 lighting states, label placement, profile matching and shared-link state. Current
-release evidence is recorded in the
-[integration notes](../../../docs/team/pabloizgui/ephemeris-integration.md).
+globe integration is described in the
+[astronaut notes](../../../docs/team/pabloizgui/globe-surface-integration.md);
+earlier sky, navigation and QR evidence remains in the
+[ephemeris integration notes](../../../docs/team/pabloizgui/ephemeris-integration.md).
 Chrome mobile emulation verifies drag/pinch/tap; ZXing decodes the rendered QR
 SVG back to the captured link. Browser QA also checks returning to Shackleton
 after Explore/Peary. These checks use the authorized native fallback; they do not
@@ -118,7 +133,7 @@ After moving, the sky is recalculated for the new coordinates with `@/ephem`.
 The old terrain profile is invalidated; the UI labels the geometric fallback
 and unknown free-point DEM elevation. Published terrain profiles use 5 m.
 
-Official IAU/USGS names use thin elbow leaders, at most four visible labels,
+Official IAU/USGS names use thin elbow leaders, at most six visible labels,
 with overlap/depth checks. Anchors refer to feature centres, not measured peaks.
 The catalogue and its original KMZ hash are in `terrain/lunar-names.json`.
 

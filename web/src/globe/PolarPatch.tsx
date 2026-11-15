@@ -47,6 +47,7 @@ export function PolarPatch({
   return (
     <mesh
       geometry={geometry}
+      userData={{ lunarSurface: true }}
       // Kept mounted while hidden, so coming back to the pole does not rebuild the mesh.
       visible={shown}
       castShadow
