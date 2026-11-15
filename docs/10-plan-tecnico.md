@@ -7,6 +7,15 @@
 
 ## 0. Estado real (actualizado 2026-11-14)
 
+> **Integración #101 en `dev` (@javiseirulo, 2026-11-15) — qué revisar cada uno:**
+> diseño de toda la web al look de Mission (`DESIGN.md`: navy/ámbar/monoespaciada) con **un único interruptor Normal | Expert** (`proMode` en `@/core`);
+> se quitó el mapa 2D (las capas van en 3D sobre el globo); terreno real de Pablo en `sites.json`; pendiente máx. 10°.
+> - **@martaplatero2002-star:** tu PR #97 entra entero en funcionalidad (Street View desde el globo, capas en el parche polar); cambia solo la estética. `PinForm` (pin por coordenadas) solo se ve en Expert. `SiteCheckPanel` va bajo `SiteDetail` en Explore.
+> - **@pabloizgui:** `export.all` usa tus `horizon/<id>.json` y `terrain/catalog.json`; tus capas salen apagadas por defecto. Falta el token de Cesium en el deploy para Street View ("Terrain is not configured").
+> - **@javocruz:** `layers.json` es real (`mock:false`); panel de capas solo en Expert; todas apagadas por defecto; overlay global con opacidad ≤ 0,45.
+> - **@Manuelcgg165:** en el conflicto de `MissionGame.tsx` con #90 se mantuvo la sincronía: `?difficulty=` fija `proMode` y el selector de dificultad del juego **es** el interruptor global Normal/Expert. Revisa que tu flujo de #90 sigue igual.
+> Detalle: [restyle](team/javiseirulo/restyle-mission-look.md) · [diseño efemérides y scoring](team/javiseirulo/diseno-efemerides-scoring.md) · PR #101.
+
 > **Capas reales y en 3D (@javiseirulo, 2026-11-15):** `layers.json` ya es real (`mock: false`, `python -m export.layers`): elevación y pendiente (PNG LOLA de Pablo), sombra permanente (máscara PSR 20 m de PGDA reducida a 512²), luz solar y visibilidad de la Tierra (`grid/south_5km.bin`). Capa mock `score` eliminada (no hay score por celda). Las capas activas se pintan sobre el parche polar 3D de Marta y, para luz/Tierra, como mapa de calor global (`grid/global_1deg.bin`) en la esfera (`web/src/globe/LayerOverlays.tsx`). Horizonte plano en luz/Tierra hasta que haya horizontes por celda.
 
 > **Actualización de integración de Pablo, 2026-11-15:** dev `0b8f028` ya incluye

@@ -13,7 +13,11 @@ import {
   formatHours,
   formatLatLon,
   formatUtc,
-  hoursUntilChange,
+  lowScoreReason,
+  changeLead,
+  changeWhen,
+  nextChange,
+  seriesSpanLabel,
   pct,
   sampleAt,
   useAppStore,
@@ -505,6 +509,10 @@ export function SiteDetail({ className }: { className?: string }) {
         </p>
       )}
 
+      {lowScoreReason(site) && (
+        <p className="text-ink-muted mt-1 text-[12px]">{lowScoreReason(site)}</p>
+      )}
+
       {evaluation.checks.length > 0 && (
         <div className="mt-4">
           <p className="text-heading text-[15px] font-medium">{meetsText(evaluation)}</p>
@@ -582,6 +590,7 @@ function NowSection({ siteId, expert }: { siteId: string; expert: boolean }) {
   const loadError = useData((s) => s.timeseriesErrors[siteId]);
   const now = useAppStore((s) => s.currentTimeUTC);
   const sky = ts ? sampleAt(ts, now) : null;
+  const span = ts ? seriesSpanLabel(ts) : '';
 
   return (
     <div className="mt-4">
@@ -599,31 +608,37 @@ function NowSection({ siteId, expert }: { siteId: string; expert: boolean }) {
         <dl className="rows border-edge mt-2 border-t text-[14px]">
           <Row label="Sun elevation" value={`${sky.sun_el.toFixed(1)}°`} />
           <Row
-            label={sky.lit ? 'Sunlit · sunset in' : 'Dark · sunrise in'}
-            value={untilChange(hoursUntilChange(ts, ts.lit, now))}
+            label={changeLead(
+              sky.lit ? 'Sunlit · sunset' : 'Dark · sunrise',
+              nextChange(ts, ts.lit, now),
+            )}
+            value={changeWhen(nextChange(ts, ts.lit, now), span, formatHours)}
           />
           <Row
             label={
               sky.earthVisible === null
                 ? 'Earth visibility'
                 : sky.earthVisible
-                  ? 'Earth in view · Earthset in'
-                  : 'Earth hidden · Earthrise in'
+                  ? changeLead('Earth in view · Earthset', nextChange(ts, ts.earth_visible, now))
+                  : changeLead('Earth hidden · Earthrise', nextChange(ts, ts.earth_visible, now))
             }
             value={
               sky.earthVisible === null || !ts.earth_visible
                 ? 'unknown'
-                : untilChange(hoursUntilChange(ts, ts.earth_visible, now))
+                : changeWhen(nextChange(ts, ts.earth_visible, now), span, formatHours)
             }
           />
         </dl>
       )}
+      {ts && sky && ts.earth_visible && ts.earth_visible.every((f) => f === 0) && (
+        <p className="text-ink-muted mt-1 text-[12px]">
+          Earth never rises here in {span}: hidden by terrain or the far side. The data is complete;
+          this site can still be explored.
+        </p>
+      )}
     </div>
   );
 }
-
-/** Countdown to the next change, or a clear note when it never changes in the data. */
-const untilChange = (h: number | null) => (h === null ? 'not in data range' : formatHours(h));
 
 function Row({ label, value }: { label: string; value: string }) {
   return (

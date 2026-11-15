@@ -10,7 +10,7 @@ import { useData, useSelectedSite, useTimeseries } from '../data';
 import { visibleTabs, modeForPath, pathForMode } from '../navigation';
 import { formatHours, formatUtc } from '../format';
 import { dayOfWindow, friendlyHours } from '../metrics';
-import { hoursUntilChange, sampleAt } from '../timeseries';
+import { changeClause, nextChange, sampleAt, seriesSpanLabel } from '../timeseries';
 import { Logo } from './Logo';
 
 export function Masthead() {
@@ -139,24 +139,20 @@ function NextUp() {
   const subject = selected ?? best ?? null;
   const ts = useTimeseries(subject?.id);
   const sample = ts ? sampleAt(ts, currentTimeUTC) : null;
-  const toSun = ts ? hoursUntilChange(ts, ts.lit, currentTimeUTC) : null;
-  const toEarth = ts?.earth_visible ? hoursUntilChange(ts, ts.earth_visible, currentTimeUTC) : null;
-  const when = (h: number | null) =>
-    h === null ? 'not in this window' : proMode ? `in ${formatHours(h)}` : `in ${friendlyHours(h)}`;
+  const toSun = nextChange(ts, ts?.lit, currentTimeUTC);
+  const toEarth = nextChange(ts, ts?.earth_visible, currentTimeUTC);
+  const span = ts ? seriesSpanLabel(ts) : '';
+  const fmt = proMode ? formatHours : friendlyHours;
   const day = range ? dayOfWindow(currentTimeUTC, range.start_utc, range.end_utc) : null;
 
   return (
     <div className="flex flex-col gap-1 pt-3 pb-4 text-ink-muted text-[13px] sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-5">
       {subject && sample && (
         <p className="min-w-0 sm:flex-1">
-          At <span className="text-white">{subject.name}</span>, the Sun{' '}
-          {sample.lit ? 'sets' : 'rises'} {when(toSun)}
-          {sample.earthVisible !== null && (
-            <>
-              {' '}
-              and Earth {sample.earthVisible ? 'sets' : 'rises'} {when(toEarth)}
-            </>
-          )}
+          At <span className="text-white">{subject.name}</span>,{' '}
+          {changeClause('the Sun', sample.lit ? 'set' : 'rise', toSun, span, fmt)}
+          {sample.earthVisible !== null &&
+            ` and ${changeClause('Earth', sample.earthVisible ? 'set' : 'rise', toEarth, span, fmt)}`}
           .
         </p>
       )}

@@ -1,6 +1,8 @@
 # Restyle de toda la web al look de Mission (sesión desatendida, 2026-11-15 ~03:10)
 
-Rama local `javiseirulo/restyle-mission-look` (desde `origin/dev` @ 0e6ddab). **No se ha hecho push ni PR.**
+> **Actualización 2026-11-15:** ya está en `dev` vía **#101** (junto con el PR #97 de Marta y el terreno de Pablo). Lo de abajo es el registro original de la sesión.
+
+Rama original `javiseirulo/restyle-mission-look` (desde `origin/dev` @ 0e6ddab).
 Idea y dirección: Javi (estética de Cristóbal en toda la web, minimalista, Normal/Experto). IA: Claude Code.
 
 ## 0. Verificación del repo (antes de tocar nada)
