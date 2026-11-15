@@ -4,11 +4,15 @@ import { motion } from 'motion/react';
 import { useGame } from '../state/gameStore';
 import { verdictImage } from './assets';
 import { emergencyById } from './content';
+import { alarmAsEmergency } from '../historic/data';
+import { useCurrentMission } from '../historic/useCurrentMission';
 import { GameButtons } from './GameButtons';
 import { GameImage } from './GameImage';
 
 export function TimeoutScreen() {
-  const emergency = emergencyById(useGame((s) => s.emergencyId));
+  const emergencyId = useGame((s) => s.emergencyId);
+  const mission = useCurrentMission();
+  const emergency = mission ? alarmAsEmergency(mission) : emergencyById(emergencyId);
   const headingRef = useRef<HTMLHeadingElement>(null);
   useEffect(() => headingRef.current?.focus({ preventScroll: true }), []);
 

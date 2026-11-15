@@ -1,0 +1,834 @@
+# Mission content for the Historical mode of the Mission game (issue #114).
+#
+# Game rules and idea: @Manuelcgg165 (2026-11-15). Content written with AI help and reviewed by the team:
+# the dialogues are light, kid-friendly dramatisations (declared as such in the game), not quotes.
+#
+# Per mission:
+#   landing_utc  real touchdown (or crash) time, UTC, from the mission records (NSSDC master catalog,
+#                agency reports); the Sun and Earth are computed for this instant with SPICE (DE440).
+#   light        landing-light rule (sun elevation at touchdown, degrees):
+#                  crewed  -> 5..20  (Apollo flew with the Sun 5-14 deg up: long shadows show the rocks)
+#                  optical -> 2..60  (camera / hazard-avoidance landers need light)
+#                  radar   -> none   (1960s-70s automatic landers came down on radar alone)
+#   surface_days how long the mission must survive (7 like South Pole; shorter for 1-day sample returns)
+#   relay        true on the far side: the Earth link goes through a relay satellite (Queqiao)
+#   options      the real site (history: true) and realistic alternatives:
+#                  basis: flown | candidate (documented candidate/backup site) | nearby (another spot in
+#                  the same region, illustrative) ; coordinates from the source or the IAU gazetteer
+#                  (web/public/data/terrain/lunar-names.json). catalog_id = use that South Pole site's
+#                  terrain horizon.
+#   alarm        only where something really went wrong during the descent (scene = existing effect)
+#
+# Sources: NSSDC lunar landing sites https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_sites.html ;
+# NASA "50 years ago, lunar landing sites selected" (ALS-1..5); NASA SP-4214 ch. 12 (Apollo 15-17 site
+# selection); Luna 25 backups (Roscosmos, via Global Security); Chandrayaan-2 backup (ISRO, via Space.com);
+# Chandrayaan-3 ALS (PRL, arXiv:2308.10712, "~450 km west" at the same latitude); IAU/USGS gazetteer.
+
+light_rules:
+  crewed: { min: 5, max: 20 }
+  optical: { min: 2, max: 60 }
+  radar: null
+
+missions:
+  - id: luna_9
+    name: Luna 9
+    country: USSR
+    year: 1966
+    landing_utc: "1966-02-03T18:45:30Z"
+    light: radar
+    surface_days: 3
+    narrator: { name: Luna 9, role: "the bouncy ball lander", art: luna_9 }
+    intro:
+      - "Privet! I am Luna 9, a lander shaped like a beach ball with petals."
+      - "Nobody has EVER landed softly on the Moon. Some scientists think the ground is deep, fluffy dust that will swallow me whole!"
+      - "My plan: an airbag-like bounce, then I open my petals and take the first photos from the surface."
+      - "My batteries last about three days. Pick a spot where I can do my job!"
+    briefing:
+      - "We are over Oceanus Procellarum, a huge dark plain of old lava."
+      - "Four spots are in reach. Choose where I touch down!"
+    fact: "Luna 9 proved the Moon's surface is firm enough to land on: no bottomless dust!"
+    options:
+      - { id: real, name: "Oceanus Procellarum (west of Reiner/Marius)", lat: 7.13, lon: -64.37, basis: flown, history: true }
+      - { id: reiner, name: "Reiner Gamma swirl", lat: 7.385, lon: -58.958, basis: nearby }
+      - { id: marius, name: "Near Marius crater", lat: 11.897, lon: -50.836, basis: nearby }
+      - { id: flamsteed, name: "Near Flamsteed crater", lat: -4.491, lon: -44.34, basis: nearby }
+
+  - id: surveyor_1
+    name: Surveyor 1
+    country: USA
+    year: 1966
+    landing_utc: "1966-06-02T06:17:36Z"
+    light: radar
+    surface_days: 7
+    narrator: { name: Surveyor 1, role: "the three-legged robot", art: surveyor_1 }
+    intro:
+      - "Howdy! Surveyor 1 here: three legs, one camera, zero fear."
+      - "My job is to land gently and check whether astronauts can land here later."
+      - "No crew aboard, so if I wobble, nobody spills their coffee."
+      - "I run on solar power, so I need lots of daylight in the next week."
+    briefing:
+      - "Apollo planners gave us a list of smooth plains to test."
+      - "Pick one where I will get sunshine and keep talking to Earth."
+    fact: "Surveyor 1 sent back over 11,000 pictures and showed Apollo where it was safe to land."
+    options:
+      - { id: real, name: "Flamsteed P (Oceanus Procellarum)", lat: -2.4745, lon: -43.3398, basis: flown, history: true }
+      - { id: als5, name: "Apollo candidate ALS-5", lat: 1.667, lon: -41.667, basis: candidate }
+      - { id: sinus_medii, name: "Sinus Medii", lat: 1.63, lon: 1.03, basis: candidate }
+      - { id: reiner, name: "Reiner Gamma swirl", lat: 7.385, lon: -58.958, basis: nearby }
+
+  - id: luna_13
+    name: Luna 13
+    country: USSR
+    year: 1966
+    landing_utc: "1966-12-24T18:01:00Z"
+    light: radar
+    surface_days: 4
+    narrator: { name: Luna 13, role: "the lander with a soil-poking arm", art: luna_13 }
+    intro:
+      - "Merry Christmas Eve from Luna 13!"
+      - "I brought a little arm that pokes the ground, like a spoon testing pudding."
+      - "My batteries are good for about four days, then I take a long nap."
+      - "Where should I test the lunar pudding?"
+    briefing:
+      - "We are coming down over Oceanus Procellarum again."
+      - "Choose where I land so I can poke the soil in daylight."
+    fact: "Luna 13 measured how hard the lunar soil is: about as firm as packed garden soil."
+    options:
+      - { id: real, name: "Oceanus Procellarum (near Seleucus)", lat: 18.87, lon: -62.05, basis: flown, history: true }
+      - { id: marius, name: "Near Marius crater", lat: 11.897, lon: -50.836, basis: nearby }
+      - { id: gruithuisen, name: "Mons Gruithuisen Gamma", lat: 36.559, lon: -40.721, basis: nearby }
+      - { id: reiner, name: "Reiner Gamma swirl", lat: 7.385, lon: -58.958, basis: nearby }
+
+  - id: surveyor_3
+    name: Surveyor 3
+    country: USA
+    year: 1967
+    landing_utc: "1967-04-20T00:04:17Z"
+    light: radar
+    surface_days: 7
+    narrator: { name: Surveyor 3, role: "the robot with a scoop", art: surveyor_3 }
+    intro:
+      - "Surveyor 3 reporting! This time I carry a little claw to dig trenches."
+      - "Fun secret: my engines will not shut off in time and I will bounce... twice."
+      - "Two and a half years from now, Apollo 12 astronauts will visit me and take some of my parts home!"
+      - "Pick a good spot, so they can find me later."
+    briefing:
+      - "We aim for the eastern Oceanus Procellarum."
+      - "Choose where I land: daylight and a good view of Earth, please."
+    fact: "Apollo 12 landed just 180 m from Surveyor 3 and brought its camera back to Earth."
+    options:
+      - { id: real, name: "Oceanus Procellarum (Surveyor crater)", lat: -3.0162, lon: -23.418, basis: flown, history: true }
+      - { id: als5, name: "Apollo candidate ALS-5", lat: 1.667, lon: -41.667, basis: candidate }
+      - { id: sinus_medii, name: "Sinus Medii", lat: 1.63, lon: 1.03, basis: candidate }
+      - { id: lalande, name: "Near Lalande crater", lat: -4.456, lon: -8.647, basis: nearby }
+
+  - id: surveyor_5
+    name: Surveyor 5
+    country: USA
+    year: 1967
+    landing_utc: "1967-09-11T00:46:44Z"
+    light: radar
+    surface_days: 7
+    narrator: { name: Surveyor 5, role: "the robot chemist", art: surveyor_5 }
+    intro:
+      - "Surveyor 5 here, and I am a chemist!"
+      - "I carry an instrument that tells us what lunar soil is made of."
+      - "Small problem: one of my fuel tanks is leaking. Engineers invented a brand new landing plan on the fly."
+      - "Help me pick a landing spot before the leak gets worse."
+    briefing:
+      - "We are over Mare Tranquillitatis, the future home of Apollo 11."
+      - "Choose a site with sunlight and Earth in view."
+    fact: "Surveyor 5 found the dark lunar plains are made of basalt, like volcanic rock on Earth."
+    alarm:
+      scene: fuel_leak
+      title: "Helium Leak"
+      alarm: "PRESSURE LOSS — NEW DESCENT PLAN"
+      briefing: "A pressure leak means we must fly a brand new descent plan. Pick the site now, before the tanks run low!"
+    options:
+      - { id: real, name: "Mare Tranquillitatis", lat: 1.4551, lon: 23.1943, basis: flown, history: true }
+      - { id: als1, name: "Apollo candidate ALS-1", lat: 2.667, lon: 34.0, basis: candidate }
+      - { id: censorinus, name: "Near Censorinus crater", lat: -0.417, lon: 32.691, basis: nearby }
+      - { id: sinus_medii, name: "Sinus Medii", lat: 1.63, lon: 1.03, basis: candidate }
+
+  - id: surveyor_6
+    name: Surveyor 6
+    country: USA
+    year: 1967
+    landing_utc: "1967-11-10T01:01:06Z"
+    light: radar
+    surface_days: 7
+    narrator: { name: Surveyor 6, role: "the robot that hopped", art: surveyor_6 }
+    intro:
+      - "Surveyor 6 at your service!"
+      - "After landing I will do something no one has done: fire my engines and HOP to a new spot!"
+      - "Just three metres, but hey, the first lift-off from the Moon."
+      - "Pick where I land first, in the middle of the Moon's near side."
+    briefing:
+      - "We are heading for Sinus Medii, the Bay in the Middle."
+      - "Choose a site where I will have daylight for my hop."
+    fact: "Surveyor 6 made the first lift-off from the Moon: a 3-metre hop, a rehearsal for Apollo."
+    options:
+      - { id: real, name: "Sinus Medii", lat: 0.4742, lon: -1.4275, basis: flown, history: true }
+      - { id: als2, name: "Apollo candidate ALS-2", lat: 0.674, lon: 23.473, basis: candidate }
+      - { id: lalande, name: "Near Lalande crater", lat: -4.456, lon: -8.647, basis: nearby }
+      - { id: flamsteed, name: "Near Flamsteed crater", lat: -4.491, lon: -44.34, basis: nearby }
+
+  - id: surveyor_7
+    name: Surveyor 7
+    country: USA
+    year: 1968
+    landing_utc: "1968-01-10T01:05:36Z"
+    light: radar
+    surface_days: 7
+    narrator: { name: Surveyor 7, role: "the scientist robot", art: surveyor_7 }
+    intro:
+      - "Surveyor 7 here! My brothers already proved Apollo can land on the plains."
+      - "So scientists said: let's go somewhere WILD. The rim of Tycho, a young, rocky crater."
+      - "Boulders everywhere. Careful steering needed!"
+      - "Help me choose the landing spot."
+    briefing:
+      - "Tycho is far south, in the bright highlands."
+      - "Pick a site with enough sunlight and Earth in view."
+    fact: "Surveyor 7 saw laser beams fired from Earth: the first laser contact with the Moon."
+    options:
+      - { id: real, name: "North rim of Tycho", lat: -40.9812, lon: -11.5127, basis: flown, history: true }
+      - { id: alphonsus, name: "Alphonsus crater", lat: -13.388, lon: -2.846, basis: candidate }
+      - { id: vitello, name: "Near Vitello crater", lat: -30.419, lon: -37.551, basis: nearby }
+      - { id: gassendi, name: "Gassendi crater", lat: -17.555, lon: -39.964, basis: candidate }
+
+  - id: apollo_11
+    name: Apollo 11
+    country: USA
+    year: 1969
+    landing_utc: "1969-07-20T20:17:40Z"
+    light: crewed
+    surface_days: 7
+    narrator: { name: Neil Armstrong, role: "Commander, Apollo 11", art: apollo_11 }
+    intro:
+      - "Hello, I'm Neil. Buzz and I are riding the lunar module Eagle down to the Moon."
+      - "Nobody has ever walked on the Moon. No pressure!"
+      - "The Sun must be LOW when we land: long shadows show us every rock and crater."
+      - "Too dark and we see nothing. Too bright and the ground looks flat as a pancake."
+    briefing:
+      - "The computer keeps beeping and the ground below is full of boulders."
+      - "Mission control gave us five candidate sites. Four are in reach today. Choose!"
+    fact: "Apollo 11 landed with the Sun about 10 degrees up and only seconds of spare fuel."
+    alarm:
+      scene: guidance
+      title: "Program Alarm 1202"
+      alarm: "1202 — GUIDANCE COMPUTER OVERLOADED"
+      briefing: "The guidance computer is overloaded and keeps restarting! Houston says: keep going. Pick our landing site, fast!"
+    options:
+      - { id: real, name: "ALS-2 Mare Tranquillitatis (Tranquility Base)", lat: 0.67416, lon: 23.47314, basis: flown, history: true }
+      - { id: als1, name: "ALS-1 Eastern Mare Tranquillitatis", lat: 2.667, lon: 34.0, basis: candidate }
+      - { id: als3, name: "ALS-3 Sinus Medii", lat: 0.417, lon: -1.333, basis: candidate }
+      - { id: als5, name: "ALS-5 Oceanus Procellarum", lat: 1.667, lon: -41.667, basis: candidate }
+
+  - id: apollo_12
+    name: Apollo 12
+    country: USA
+    year: 1969
+    landing_utc: "1969-11-19T06:54:35Z"
+    light: crewed
+    surface_days: 7
+    narrator: { name: Pete Conrad, role: "Commander, Apollo 12", art: apollo_12 }
+    intro:
+      - "Whoopie! Pete Conrad here. That may have been a small step for Neil, but it's a long one for me!"
+      - "Our mission: a PINPOINT landing right next to an old robot, Surveyor 3."
+      - "Oh, and our rocket got hit by lightning. Twice. During launch."
+      - "We're fine! Mostly. Let's land with the Sun low behind us."
+    briefing:
+      - "The lightning scrambled our instruments for a while."
+      - "Choose the landing site: the Surveyor 3 crater or one of the backup sites."
+    fact: "Apollo 12 landed within walking distance of Surveyor 3 and brought pieces of it home."
+    alarm:
+      scene: guidance
+      title: "Lightning Strike"
+      alarm: "POWER GLITCH — ALL WARNING LIGHTS ON"
+      briefing: "Lightning knocked our power out for a moment and every warning light came on! Systems are back. Now choose where we land!"
+    options:
+      - { id: real, name: "Surveyor 3 site, Oceanus Procellarum", lat: -3.0128, lon: -23.4219, basis: flown, history: true }
+      - { id: als5, name: "ALS-5 Oceanus Procellarum (backup)", lat: 1.667, lon: -41.667, basis: candidate }
+      - { id: als3, name: "ALS-3 Sinus Medii", lat: 0.417, lon: -1.333, basis: candidate }
+      - { id: fra_mauro, name: "Fra Mauro highlands", lat: -3.6459, lon: -17.4719, basis: candidate }
+
+  - id: luna_16
+    name: Luna 16
+    country: USSR
+    year: 1970
+    landing_utc: "1970-09-20T05:18:00Z"
+    light: radar
+    surface_days: 1
+    narrator: { name: Luna 16, role: "the robot that scoops and flies home", art: luna_16 }
+    intro:
+      - "Hello! I'm Luna 16, a robot with a drill and a tiny rocket on my back."
+      - "My mission: drill some Moon soil, pack it in a capsule and fire it back to Earth."
+      - "I only need ONE day on the surface. Grab and go!"
+      - "Pick a landing spot where my day goes well."
+    briefing:
+      - "We are over Mare Fecunditatis, the Sea of Fertility."
+      - "Choose where I land. Remember: I only stay one day."
+    fact: "Luna 16 actually landed in the lunar night and brought back 101 grams of Moon soil."
+    options:
+      - { id: real, name: "Mare Fecunditatis", lat: -0.5137, lon: 56.3638, basis: flown, history: true }
+      - { id: messier, name: "Near Messier crater", lat: -1.904, lon: 47.653, basis: nearby }
+      - { id: taruntius, name: "Near Taruntius crater", lat: 5.502, lon: 46.543, basis: nearby }
+      - { id: sinus_medii, name: "Sinus Medii", lat: 1.63, lon: 1.03, basis: nearby }
+
+  - id: luna_17
+    name: Luna 17
+    country: USSR
+    year: 1970
+    landing_utc: "1970-11-17T03:47:00Z"
+    light: radar
+    surface_days: 7
+    narrator: { name: Lunokhod 1, role: "the first robot car on the Moon", art: luna_17 }
+    intro:
+      - "Beep beep! I'm Lunokhod 1, the first remote-controlled car on another world."
+      - "Eight wheels, a bathtub-shaped body and a lid full of solar cells."
+      - "Drivers on Earth steer me with a few seconds of delay. Imagine driving a car with your eyes closed!"
+      - "First, my lander Luna 17 needs a good parking spot."
+    briefing:
+      - "We are over Mare Imbrium, the Sea of Showers."
+      - "Choose a site with sunshine for my solar panels and Earth in view for my drivers."
+    fact: "Lunokhod 1 drove over 10 km and worked for almost a year."
+    options:
+      - { id: real, name: "Mare Imbrium", lat: 38.23764, lon: -35.00163, basis: flown, history: true }
+      - { id: sinus_iridum, name: "Sinus Iridum", lat: 45.01, lon: -31.665, basis: nearby }
+      - { id: pico, name: "Near Mons Pico", lat: 45.82, lon: -8.87, basis: nearby }
+      - { id: copernicus, name: "Copernicus crater", lat: 9.621, lon: -20.079, basis: nearby }
+
+  - id: apollo_14
+    name: Apollo 14
+    country: USA
+    year: 1971
+    landing_utc: "1971-02-05T09:18:11Z"
+    light: crewed
+    surface_days: 7
+    narrator: { name: Alan Shepard, role: "Commander, Apollo 14", art: apollo_14 }
+    intro:
+      - "Al Shepard here. First American in space, and now I'm going to the Moon!"
+      - "We're going to Fra Mauro, the site Apollo 13 never reached."
+      - "I've also sneaked a golf club head into my pocket. Don't tell anyone."
+      - "Remember: land with the Sun low, so the shadows show us the rocks."
+    briefing:
+      - "A loose bit of solder is triggering the ABORT signal by itself!"
+      - "Engineers are reprogramming the computer. Meanwhile, choose the site."
+    fact: "Alan Shepard hit two golf balls on the Moon. One went 'miles and miles' (really about 40 m)."
+    alarm:
+      scene: guidance
+      title: "Phantom Abort Signal"
+      alarm: "ABORT SWITCH FAULT — REPROGRAMMING"
+      briefing: "The abort switch is sending fake signals! Engineers are typing a fix right now. Choose our landing site!"
+    options:
+      - { id: real, name: "Fra Mauro highlands", lat: -3.64589, lon: -17.47194, basis: flown, history: true }
+      - { id: littrow, name: "Littrow area", lat: 21.504, lon: 31.394, basis: candidate }
+      - { id: censorinus, name: "Censorinus area", lat: -0.417, lon: 32.691, basis: candidate }
+      - { id: descartes, name: "Descartes highlands", lat: -8.9734, lon: 15.5011, basis: candidate }
+
+  - id: apollo_15
+    name: Apollo 15
+    country: USA
+    year: 1971
+    landing_utc: "1971-07-30T22:16:29Z"
+    light: crewed
+    surface_days: 7
+    narrator: { name: David Scott, role: "Commander, Apollo 15", art: apollo_15 }
+    intro:
+      - "Dave Scott here. This time we bring a car: the Lunar Roving Vehicle!"
+      - "We're aiming for Hadley Rille, a giant winding canyon next to tall mountains."
+      - "The other finalist was the Marius Hills. Scientists argued for months!"
+      - "I'll also drop a hammer and a feather to see which lands first."
+    briefing:
+      - "Mountains on both sides, a canyon in front. Tricky approach!"
+      - "Choose the landing site. Low Sun, remember."
+    fact: "On the Moon, with no air, the hammer and the feather hit the ground at the same time."
+    options:
+      - { id: real, name: "Hadley Rille and the Apennine Mountains", lat: 26.13239, lon: 3.6333, basis: flown, history: true }
+      - { id: marius_hills, name: "Marius Hills", lat: 14.0, lon: -56.0, basis: candidate }
+      - { id: copernicus, name: "Copernicus crater", lat: 9.621, lon: -20.079, basis: candidate }
+      - { id: davy, name: "Davy crater chain", lat: -11.847, lon: -8.149, basis: candidate }
+
+  - id: luna_20
+    name: Luna 20
+    country: USSR
+    year: 1972
+    landing_utc: "1972-02-21T19:19:00Z"
+    light: radar
+    surface_days: 1
+    narrator: { name: Luna 20, role: "the mountain sample robot", art: luna_20 }
+    intro:
+      - "Hi! I'm Luna 20, little sibling of Luna 16."
+      - "Same job, harder place: grab soil from the bright, bumpy highlands."
+      - "My landing spot is between mountains. Steep slopes, so careful!"
+      - "I only need one day. Grab and go!"
+    briefing:
+      - "We are near Mare Crisium, in the highlands just next to it."
+      - "Pick where I land for a good one-day visit."
+    fact: "Luna 20 brought back 55 grams of highland soil, lighter in colour than the dark plains."
+    options:
+      - { id: real, name: "Apollonius highlands", lat: 3.7863, lon: 56.6242, basis: flown, history: true }
+      - { id: apollonius, name: "Near Apollonius crater", lat: 4.505, lon: 60.965, basis: nearby }
+      - { id: firmicus, name: "Near Firmicus crater", lat: 7.246, lon: 63.426, basis: nearby }
+      - { id: taruntius, name: "Near Taruntius crater", lat: 5.502, lon: 46.543, basis: nearby }
+
+  - id: apollo_16
+    name: Apollo 16
+    country: USA
+    year: 1972
+    landing_utc: "1972-04-21T02:23:35Z"
+    light: crewed
+    surface_days: 7
+    narrator: { name: John Young, role: "Commander, Apollo 16", art: apollo_16 }
+    intro:
+      - "John Young here! We're the first to land in the Moon's bright highlands."
+      - "Scientists expect volcanic rocks. Spoiler: they are in for a surprise."
+      - "The other finalist was Alphonsus, a big crater with dark spots."
+      - "Land with the Sun low, and let's go rock hunting."
+    briefing:
+      - "The main engine of our mothership is wobbling. We had to wait in orbit for hours!"
+      - "Now we're cleared to land. Choose the site."
+    fact: "Apollo 16 found no volcanic rocks at Descartes, only rocks smashed by ancient impacts."
+    alarm:
+      scene: propulsion
+      title: "Engine Wobble"
+      alarm: "MAIN ENGINE GIMBAL FAULT — LANDING ON HOLD"
+      briefing: "Our mothership's main engine is shaking! Houston kept us waiting for hours. Now it's go: choose where we land!"
+    options:
+      - { id: real, name: "Descartes highlands", lat: -8.9734, lon: 15.5011, basis: flown, history: true }
+      - { id: alphonsus, name: "Alphonsus crater", lat: -13.388, lon: -2.846, basis: candidate }
+      - { id: gassendi, name: "Gassendi crater", lat: -17.555, lon: -39.964, basis: candidate }
+      - { id: censorinus, name: "Censorinus area", lat: -0.417, lon: 32.691, basis: candidate }
+
+  - id: apollo_17
+    name: Apollo 17
+    country: USA
+    year: 1972
+    landing_utc: "1972-12-11T19:54:57Z"
+    light: crewed
+    surface_days: 7
+    narrator: { name: Gene Cernan, role: "Commander, Apollo 17", art: apollo_17 }
+    intro:
+      - "Gene Cernan here. This is the last Apollo to the Moon, so let's make it count!"
+      - "We bring the first real geologist to the Moon: Jack Schmitt."
+      - "Our target: the Taurus-Littrow valley, walls taller than the Grand Canyon."
+      - "Finalists were Gassendi and Alphonsus too. Low Sun at landing, please!"
+    briefing:
+      - "Narrow valley, big mountains, no room for mistakes."
+      - "Choose the landing site."
+    fact: "Jack Schmitt found orange soil at Taurus-Littrow: tiny glass beads from an old volcanic fountain."
+    options:
+      - { id: real, name: "Taurus-Littrow valley", lat: 20.1911, lon: 30.7723, basis: flown, history: true }
+      - { id: gassendi, name: "Gassendi crater", lat: -17.555, lon: -39.964, basis: candidate }
+      - { id: alphonsus, name: "Alphonsus crater", lat: -13.388, lon: -2.846, basis: candidate }
+      - { id: tycho, name: "Tycho crater", lat: -43.296, lon: -11.215, basis: candidate }
+
+  - id: luna_21
+    name: Luna 21
+    country: USSR
+    year: 1973
+    landing_utc: "1973-01-15T22:35:00Z"
+    light: radar
+    surface_days: 7
+    narrator: { name: Lunokhod 2, role: "the robot car, version two", art: luna_21 }
+    intro:
+      - "Beep boop! Lunokhod 2 here. Faster, smarter, with a third eye on top."
+      - "We land inside Le Monnier, an old crater flooded by lava, near the Apollo 17 valley."
+      - "My drivers on Earth want to beat Lunokhod 1's record."
+      - "Choose a good parking spot for my lander!"
+    briefing:
+      - "We are at the edge of Mare Serenitatis."
+      - "Pick a site with sunshine and Earth in view."
+    fact: "Lunokhod 2 drove about 39 km: a distance record that lasted over 40 years."
+    options:
+      - { id: real, name: "Le Monnier crater", lat: 25.9994, lon: 30.4076, basis: flown, history: true }
+      - { id: littrow, name: "Littrow area", lat: 21.504, lon: 31.394, basis: nearby }
+      - { id: somniorum, name: "Lacus Somniorum", lat: 37.562, lon: 30.805, basis: nearby }
+      - { id: sulpicius, name: "Near Sulpicius Gallus", lat: 19.626, lon: 11.679, basis: nearby }
+
+  - id: luna_24
+    name: Luna 24
+    country: USSR
+    year: 1976
+    landing_utc: "1976-08-18T06:36:00Z"
+    light: radar
+    surface_days: 1
+    narrator: { name: Luna 24, role: "the deep-drilling robot", art: luna_24 }
+    intro:
+      - "Zdravstvuyte! Luna 24 here, the last Soviet Moon robot."
+      - "I carry a drill that goes two metres deep. Twist, twist, twist!"
+      - "Grab the core, fire it home. One day on the surface is enough."
+      - "Pick my landing spot."
+    briefing:
+      - "We are over Mare Crisium, the Sea of Crises. Sounds scary, right?"
+      - "Choose where I land for my one-day drilling job."
+    fact: "Luna 24's soil was the last Moon sample brought to Earth for 44 years."
+    options:
+      - { id: real, name: "Mare Crisium (south-east)", lat: 12.7142, lon: 62.2129, basis: flown, history: true }
+      - { id: agarum, name: "Near Promontorium Agarum", lat: 13.872, lon: 65.734, basis: nearby }
+      - { id: crisium, name: "Centre of Mare Crisium", lat: 16.177, lon: 59.104, basis: nearby }
+      - { id: taruntius, name: "Near Taruntius crater", lat: 5.502, lon: 46.543, basis: nearby }
+
+  - id: change_3
+    name: Chang'e 3
+    country: China
+    year: 2013
+    landing_utc: "2013-12-14T13:11:00Z"
+    light: optical
+    surface_days: 7
+    narrator: { name: Yutu, role: "the Jade Rabbit rover", art: change_3 }
+    intro:
+      - "Ni hao! I'm Yutu, the Jade Rabbit, named after the rabbit that lives on the Moon in Chinese legend."
+      - "First soft landing anywhere on the Moon in 37 years!"
+      - "The plan said Sinus Iridum, the Bay of Rainbows, but the team picked a spot in Mare Imbrium instead."
+      - "My lander uses cameras to dodge rocks, so we need daylight."
+    briefing:
+      - "We are hovering 100 metres up, scanning for a flat spot."
+      - "Choose where we land."
+    fact: "The Chang'e 3 lander kept working for years: one of the longest-lived landers on the Moon."
+    options:
+      - { id: real, name: "Mare Imbrium (Laplace F)", lat: 44.1214, lon: -19.5117, basis: flown, history: true }
+      - { id: sinus_iridum, name: "Sinus Iridum (planned target)", lat: 45.01, lon: -31.665, basis: candidate }
+      - { id: pico, name: "Near Mons Pico", lat: 45.82, lon: -8.87, basis: nearby }
+      - { id: copernicus, name: "Copernicus crater", lat: 9.621, lon: -20.079, basis: nearby }
+
+  - id: change_4
+    name: Chang'e 4
+    country: China
+    year: 2019
+    landing_utc: "2019-01-03T02:26:00Z"
+    light: optical
+    surface_days: 7
+    relay: true
+    narrator: { name: Yutu-2, role: "the far side rover", art: change_4 }
+    intro:
+      - "Ni hao! Yutu-2 here, and I'm going where nobody has landed: the FAR SIDE of the Moon!"
+      - "From there you can never see Earth. So how do we phone home?"
+      - "With Queqiao, a relay satellite parked beyond the Moon. Clever, right?"
+      - "Now pick our spot inside the giant Von Kármán crater."
+    briefing:
+      - "Queqiao is ready to pass our messages to Earth."
+      - "Choose the landing site. Daylight please, our cameras need it!"
+    fact: "Chang'e 4 made the first ever landing on the far side and even sprouted a cotton seed there."
+    options:
+      - { id: real, name: "Von Kármán crater", lat: -45.457, lon: 177.589, basis: flown, history: true }
+      - { id: leibnitz, name: "Leibnitz crater", lat: -38.237, lon: 179.349, basis: nearby }
+      - { id: chaffee, name: "Chaffee crater (Apollo basin)", lat: -39.065, lon: -154.629, basis: nearby }
+      - { id: apollo_basin, name: "Centre of the Apollo basin", lat: -35.687, lon: -151.478, basis: nearby }
+
+  - id: beresheet
+    name: Beresheet
+    country: Israel
+    year: 2019
+    landing_utc: "2019-04-11T19:23:00Z"
+    light: optical
+    surface_days: 2
+    narrator: { name: Beresheet, role: "the little private lander", art: beresheet }
+    intro:
+      - "Shalom! I'm Beresheet, which means 'In the beginning'."
+      - "I'm the first Moon lander built by a small private team, not a big space agency."
+      - "I'm the size of a dishwasher and I took the long, cheap way to the Moon."
+      - "I only need a couple of days to take photos and measure magnetism."
+    briefing:
+      - "We are descending over Mare Serenitatis."
+      - "Something is wrong with a sensor... Quick, choose the site!"
+    fact: "Beresheet crashed, but it made Israel the 7th country to orbit the Moon. Its team tried again."
+    alarm:
+      scene: propulsion
+      title: "Main Engine Shutdown"
+      alarm: "SENSOR GLITCH — MAIN ENGINE OFF"
+      briefing: "A sensor glitch, a reset command... and the main engine switched OFF! In real life Beresheet crashed here. Can you choose a site and save it?"
+    options:
+      - { id: real, name: "Mare Serenitatis (north)", lat: 32.5956, lon: 19.3496, basis: flown, history: true }
+      - { id: sulpicius, name: "Near Sulpicius Gallus", lat: 19.626, lon: 11.679, basis: nearby }
+      - { id: plinius, name: "Near Plinius crater", lat: 15.357, lon: 23.607, basis: nearby }
+      - { id: lacus_mortis, name: "Lacus Mortis", lat: 45.135, lon: 27.319, basis: nearby }
+
+  - id: chandrayaan_2_vikram
+    name: Chandrayaan-2 (Vikram)
+    country: India
+    year: 2019
+    landing_utc: "2019-09-06T20:23:00Z"
+    light: optical
+    surface_days: 7
+    narrator: { name: Vikram, role: "the lander named after Vikram Sarabhai", art: chandrayaan_2_vikram }
+    intro:
+      - "Namaste! I'm Vikram, India's first Moon lander, carrying the little rover Pragyan."
+      - "We're going far south, near the lunar south pole, where ice may hide in dark craters."
+      - "Landing there is hard: long shadows, rough highlands."
+      - "Mission control picked a main site and a backup. Help me decide!"
+    briefing:
+      - "Our descent is drifting off the planned path..."
+      - "Choose the landing site before it's too late!"
+    fact: "Vikram crashed in 2019, but four years later Chandrayaan-3 landed nearby and succeeded."
+    alarm:
+      scene: guidance
+      title: "Trajectory Deviation"
+      alarm: "DESCENT OFF PATH — BRAKING TOO HARD"
+      briefing: "The braking phase went wrong and we are tumbling off our path! In real life Vikram crashed. Choose a site and try to do better!"
+    options:
+      - { id: real, name: "Highlands between Manzinus C and Simpelius N", lat: -70.9027, lon: 22.7811, basis: flown, history: true }
+      - { id: backup, name: "Backup site (ISRO)", lat: -67.7, lon: -18.4, basis: candidate }
+      - { id: manzinus, name: "Manzinus crater", lat: -67.51, lon: 26.374, basis: nearby }
+      - { id: boguslawsky, name: "Boguslawsky crater", lat: -72.901, lon: 43.257, basis: nearby }
+
+  - id: change_5
+    name: Chang'e 5
+    country: China
+    year: 2020
+    landing_utc: "2020-12-01T15:11:00Z"
+    light: optical
+    surface_days: 2
+    narrator: { name: Chang'e 5, role: "the sample-return robot", art: change_5 }
+    intro:
+      - "Ni hao! I'm Chang'e 5. My job: dig, drill, and send Moon rocks home."
+      - "Nobody has brought Moon samples to Earth since 1976!"
+      - "We're going to Mons Rümker, a volcanic area with very YOUNG lava."
+      - "I work fast: two days on the surface and I'm off."
+    briefing:
+      - "We are over Oceanus Procellarum, north of the equator."
+      - "Choose where we land for a two-day sampling job."
+    fact: "Chang'e 5 brought 1.7 kg of samples: lava only about 2 billion years old, young for the Moon."
+    options:
+      - { id: real, name: "Near Mons Rümker", lat: 43.0576, lon: -51.9161, basis: flown, history: true }
+      - { id: rumker, name: "Mons Rümker", lat: 40.761, lon: -58.378, basis: candidate }
+      - { id: gruithuisen, name: "Mons Gruithuisen Gamma", lat: 36.559, lon: -40.721, basis: nearby }
+      - { id: sinus_iridum, name: "Sinus Iridum", lat: 45.01, lon: -31.665, basis: nearby }
+
+  - id: hakuto_r_m1
+    name: HAKUTO-R Mission 1
+    country: Japan
+    year: 2023
+    landing_utc: "2023-04-25T16:40:00Z"
+    light: optical
+    surface_days: 7
+    narrator: { name: HAKUTO-R, role: "the private lander from Japan", art: hakuto_r_m1 }
+    intro:
+      - "Konnichiwa! I'm HAKUTO-R, a private lander carrying a tiny rover from the UAE and a toy-sized robot."
+      - "Our target: Atlas crater, in the north-east of the near side."
+      - "We also prepared backup sites, just in case."
+      - "My laser rangefinder will tell me how high I am. I hope..."
+    briefing:
+      - "Hmm, my altitude reading says 0 metres... but I'm still 5 km up!"
+      - "Choose the landing site, quickly!"
+    fact: "HAKUTO-R crashed because a crater rim confused its altitude sensor. The team learned and tried again."
+    alarm:
+      scene: guidance
+      title: "Altitude Confusion"
+      alarm: "ALTITUDE SENSOR CONFUSED — FUEL DROPPING"
+      briefing: "My altitude sensor thinks I've landed, but I'm still kilometres up! In real life HAKUTO-R crashed. Pick a site and save me!"
+    options:
+      - { id: real, name: "Atlas crater", lat: 47.581, lon: 44.094, basis: flown, history: true }
+      - { id: somniorum, name: "Lacus Somniorum (backup)", lat: 37.562, lon: 30.805, basis: candidate }
+      - { id: sinus_iridum, name: "Sinus Iridum (backup)", lat: 45.01, lon: -31.665, basis: candidate }
+      - { id: lacus_mortis, name: "Lacus Mortis", lat: 45.135, lon: 27.319, basis: nearby }
+
+  - id: luna_25
+    name: Luna 25
+    country: Russia
+    year: 2023
+    landing_utc: "2023-08-21T11:00:00Z"
+    light: optical
+    surface_days: 7
+    narrator: { name: Luna 25, role: "the south pole lander", art: luna_25 }
+    intro:
+      - "Privet! I'm Luna 25, the first Russian Moon lander in 47 years."
+      - "I'm heading near the south pole, north of Boguslawsky crater, to look for ice."
+      - "There are two backup sites too, near Manzinus and Pentland A."
+      - "First I need a final engine burn to lower my orbit."
+    briefing:
+      - "The engine burn is lasting longer than planned..."
+      - "Choose where to land while we still can!"
+    fact: "Luna 25 crashed two days before its planned landing, after an engine burn lasted too long."
+    alarm:
+      scene: propulsion
+      title: "Engine Overburn"
+      alarm: "ENGINE BURN TOO LONG — ORBIT TOO LOW"
+      briefing: "The engine fired 127 seconds instead of 84! In real life Luna 25 crashed. Choose a site and rewrite history!"
+    options:
+      - { id: real, name: "North of Boguslawsky crater", lat: -69.545, lon: 43.544, basis: flown, history: true }
+      - { id: manzinus, name: "South-west of Manzinus (backup)", lat: -68.773, lon: 21.21, basis: candidate }
+      - { id: pentland, name: "South of Pentland A (backup)", lat: -68.65, lon: 11.6, basis: candidate }
+      - { id: moretus, name: "Moretus crater", lat: -70.635, lon: -5.947, basis: nearby }
+
+  - id: chandrayaan_3
+    name: Chandrayaan-3
+    country: India
+    year: 2023
+    landing_utc: "2023-08-23T12:33:00Z"
+    light: optical
+    surface_days: 7
+    narrator: { name: Vikram, role: "Chandrayaan-3's lander (second try!)", art: chandrayaan_3 }
+    intro:
+      - "Namaste again! I'm Vikram, back for a second try!"
+      - "Engineers made my legs stronger, gave me more fuel and a bigger landing zone."
+      - "We're aiming near the south pole. There's also an alternate site 450 km to the west."
+      - "Our rover Pragyan is ready to roll out. Pick our spot!"
+    briefing:
+      - "Descent is going smoothly this time. Fingers crossed!"
+      - "Choose the landing site."
+    fact: "Chandrayaan-3 made India the first country to land near the lunar south pole."
+    options:
+      - { id: real, name: "Shiv Shakti point", lat: -69.3741, lon: 32.32, basis: flown, history: true }
+      - { id: als, name: "Alternate site (~450 km west)", lat: -69.37, lon: -9.8, basis: candidate }
+      - { id: manzinus, name: "Manzinus crater", lat: -67.51, lon: 26.374, basis: nearby }
+      - { id: boguslawsky, name: "Boguslawsky crater", lat: -72.901, lon: 43.257, basis: nearby }
+
+  - id: slim
+    name: SLIM
+    country: Japan
+    year: 2024
+    landing_utc: "2024-01-19T15:20:00Z"
+    light: optical
+    surface_days: 3
+    narrator: { name: SLIM, role: "the Moon Sniper", art: slim }
+    intro:
+      - "Konnichiwa! I'm SLIM, nicknamed the Moon Sniper."
+      - "Most landers aim for a zone kilometres wide. I aim for 100 metres!"
+      - "My target: a small crater called Shioli, on a slope."
+      - "I don't need a long stay. Help me pick the spot."
+    briefing:
+      - "Wait... one of my two main engines just fell off!"
+      - "Choose the landing site, NOW!"
+    fact: "SLIM landed within 55 m of its target... upside down! Its solar panel faced the wrong way, but it still worked."
+    alarm:
+      scene: propulsion
+      title: "Engine Nozzle Lost"
+      alarm: "ONE MAIN ENGINE LOST — THRUST UNBALANCED"
+      briefing: "One engine nozzle fell off during the descent! We're tilting! Choose where we land, precisely!"
+    options:
+      - { id: real, name: "Shioli crater", lat: -13.316, lon: 25.251, basis: flown, history: true }
+      - { id: kant, name: "Near Kant crater", lat: -10.624, lon: 20.198, basis: nearby }
+      - { id: dollond, name: "Near Dollond crater", lat: -10.483, lon: 14.413, basis: nearby }
+      - { id: censorinus, name: "Censorinus area", lat: -0.417, lon: 32.691, basis: nearby }
+
+  - id: im1_odysseus
+    name: IM-1 Odysseus
+    country: USA
+    year: 2024
+    landing_utc: "2024-02-22T23:23:00Z"
+    light: optical
+    surface_days: 7
+    narrator: { name: Odysseus, role: "the first private lander to touch down", art: im1_odysseus }
+    intro:
+      - "Hey there! I'm Odysseus, nicknamed Odie, built by a company from Texas."
+      - "If I make it, I'll be the first American lander since Apollo 17 in 1972!"
+      - "Target: Malapert A, near the south pole."
+      - "Engineers forgot to switch on my laser rangefinders. Oops."
+    briefing:
+      - "We're borrowing a NASA test laser to find our way down!"
+      - "Choose where we land."
+    fact: "Odie landed, but tipped onto its side. It still sent data for a week!"
+    alarm:
+      scene: guidance
+      title: "Lasers Offline"
+      alarm: "RANGEFINDERS OFF — USING BACKUP LASER"
+      briefing: "Our laser rangefinders were never switched on! We're patching in a NASA test instrument. Choose the landing site!"
+    options:
+      - { id: real, name: "Malapert A", lat: -80.13, lon: 1.44, basis: flown, history: true }
+      - { id: malapert_massif, name: "Malapert massif", catalog_id: malapert_massif, basis: nearby }
+      - { id: mons_mouton, name: "Mons Mouton", catalog_id: mons_mouton, basis: nearby }
+      - { id: moretus, name: "Moretus crater", lat: -70.635, lon: -5.947, basis: nearby }
+
+  - id: change_6
+    name: Chang'e 6
+    country: China
+    year: 2024
+    landing_utc: "2024-06-01T22:23:00Z"
+    light: optical
+    surface_days: 2
+    relay: true
+    narrator: { name: Chang'e 6, role: "the far side sample robot", art: change_6 }
+    intro:
+      - "Ni hao! I'm Chang'e 6. My mission: bring back the first EVER rocks from the far side."
+      - "We're going to the Apollo basin. Yes, that's its name. Funny, huh?"
+      - "From the far side we can't see Earth, so Queqiao-2 relays our messages."
+      - "Two days to dig and drill, then off we go."
+    briefing:
+      - "Queqiao-2 is online. We're over the giant South Pole-Aitken basin."
+      - "Choose the landing site."
+    fact: "Chang'e 6 brought back 1.9 kg of far side rocks in 2024."
+    options:
+      - { id: real, name: "Apollo basin (south)", lat: -41.6385, lon: -153.9852, basis: flown, history: true }
+      - { id: chaffee, name: "Chaffee crater", lat: -39.065, lon: -154.629, basis: nearby }
+      - { id: apollo_centre, name: "Centre of the Apollo basin", lat: -35.687, lon: -151.478, basis: nearby }
+      - { id: von_karman, name: "Von Kármán crater", lat: -45.457, lon: 177.589, basis: nearby }
+
+  - id: blue_ghost_m1
+    name: Blue Ghost Mission 1
+    country: USA
+    year: 2025
+    landing_utc: "2025-03-02T08:34:00Z"
+    light: optical
+    surface_days: 7
+    narrator: { name: Blue Ghost, role: "the lander that made it upright", art: blue_ghost_m1 }
+    intro:
+      - "Hi! I'm Blue Ghost, a private lander with ten NASA experiments on board."
+      - "Target: Mons Latreille, a small volcanic hill in Mare Crisium."
+      - "I'll even film a sunset on the Moon. Bring popcorn!"
+      - "Choose a spot where I'll get two weeks of good sunlight."
+    briefing:
+      - "Descent going well. Hazard cameras scanning the ground."
+      - "Choose the landing site."
+    fact: "Blue Ghost landed upright and worked for a full lunar day, then filmed the sunset."
+    options:
+      - { id: real, name: "Mons Latreille (Mare Crisium)", lat: 18.5623, lon: 61.8103, basis: flown, history: true }
+      - { id: agarum, name: "Near Promontorium Agarum", lat: 13.872, lon: 65.734, basis: nearby }
+      - { id: crisium, name: "Centre of Mare Crisium", lat: 16.177, lon: 59.104, basis: nearby }
+      - { id: taruntius, name: "Near Taruntius crater", lat: 5.502, lon: 46.543, basis: nearby }
+
+  - id: im2_athena
+    name: IM-2 Athena
+    country: USA
+    year: 2025
+    landing_utc: "2025-03-06T17:28:00Z"
+    light: optical
+    surface_days: 7
+    narrator: { name: Athena, role: "the ice-hunting lander", art: im2_athena }
+    intro:
+      - "Hello! I'm Athena, Odie's sister. I carry a drill to look for ice."
+      - "Target: Mons Mouton, a flat-topped mountain near the south pole."
+      - "Shadows there are LONG and the light is tricky."
+      - "Choose carefully. My altimeter is feeling a bit noisy today."
+    briefing:
+      - "My altimeter readings are jumping around..."
+      - "Pick the landing site!"
+    fact: "Athena landed in a crater on its side, so its mission ended early: the south pole is hard!"
+    alarm:
+      scene: guidance
+      title: "Noisy Altimeter"
+      alarm: "ALTIMETER NOISE — POSITION UNCERTAIN"
+      briefing: "My altimeter is giving noisy readings and I'm not sure where I am! Choose the landing site, carefully!"
+    options:
+      - { id: real, name: "Mons Mouton plateau", lat: -84.7906, lon: 29.1957, basis: flown, history: true }
+      - { id: connecting_ridge, name: "Connecting ridge", catalog_id: connecting_ridge, basis: nearby }
+      - { id: malapert_massif, name: "Malapert massif", catalog_id: malapert_massif, basis: nearby }
+      - { id: shackleton, name: "Shackleton rim", catalog_id: shackleton_rim_01, basis: nearby }
+
+  - id: hakuto_r_m2
+    name: HAKUTO-R Mission 2
+    country: Japan
+    year: 2025
+    landing_utc: "2025-06-05T19:13:00Z"
+    light: optical
+    surface_days: 7
+    narrator: { name: Resilience, role: "HAKUTO-R's second lander", art: hakuto_r_m2 }
+    intro:
+      - "Konnichiwa! I'm Resilience. My name says it all: we never give up."
+      - "Second try for the HAKUTO-R team, now with a little rover called Tenacious."
+      - "Target: Mare Frigoris, the Sea of Cold, far in the north."
+      - "My laser rangefinder will tell me how high I am... I hope it's quick."
+    briefing:
+      - "The laser is taking too long to measure the ground!"
+      - "Choose the landing site!"
+    fact: "Resilience crashed too, but the team keeps going: 'resilience' is a superpower in space."
+    alarm:
+      scene: guidance
+      title: "Late Laser"
+      alarm: "LASER RANGEFINDER LATE — DESCENT TOO FAST"
+      briefing: "The laser measured the ground too late and we're falling too fast! In real life Resilience crashed. Choose a site and save it!"
+    options:
+      - { id: real, name: "Mare Frigoris", lat: 60.4445, lon: -4.588, basis: flown, history: true }
+      - { id: vallis_alpes, name: "Vallis Alpes", lat: 49.209, lon: 3.631, basis: nearby }
+      - { id: pico, name: "Near Mons Pico", lat: 45.82, lon: -8.87, basis: nearby }
+      - { id: sinus_iridum, name: "Sinus Iridum", lat: 45.01, lon: -31.665, basis: nearby }

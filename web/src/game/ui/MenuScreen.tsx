@@ -1,8 +1,9 @@
 /**
- * Title screen: pick the difficulty, then a mode (South Pole now, Historical later). Drawn over
+ * Title screen: pick the difficulty, then a mode (South Pole, or Historical → mission picker). Drawn over
  * MissionGame's background globe (the spinning Moon).
  */
-import { Lock, Play } from 'lucide-react';
+import { History, Play } from 'lucide-react';
+import { useState } from 'react';
 import { clsx } from 'clsx';
 import { useData } from '@/core';
 import { difficultyHint, type Difficulty } from '../engine/bars';
@@ -11,6 +12,7 @@ import { useAppStore } from '@/core';
 import { useGame } from '../state/gameStore';
 import { MODE_HISTORICAL, MODE_SOUTH_POLE } from './assets';
 import { GameImage } from './GameImage';
+import { MissionPicker } from './MissionPicker';
 
 const DIFFICULTIES: { id: Difficulty; label: string }[] = [
   { id: 'normal', label: 'Normal' },
@@ -26,6 +28,8 @@ export function MenuScreen() {
   const start = useGame((s) => s.start);
   // The hint lists the bars a real card shows (pending metrics are omitted from the cards).
   const sample = useData((s) => (s.sites ? southPoleSites(s.sites)[0] : undefined));
+  const [picking, setPicking] = useState(false);
+  if (picking) return <MissionPicker onBack={() => setPicking(false)} />;
 
   return (
     <div className="relative flex flex-1 flex-col items-center justify-center gap-6 overflow-hidden p-6">
@@ -97,9 +101,9 @@ export function MenuScreen() {
 
         <button
           type="button"
-          disabled
-          aria-label="Historical missions (coming soon)"
-          className="mission-pixel relative flex cursor-not-allowed flex-col border-4 border-black bg-navy-900 text-left opacity-60 grayscale"
+          onClick={() => setPicking(true)}
+          data-sfx="hover"
+          className="mission-pixel group flex cursor-pointer flex-col border-4 border-black bg-navy-800 text-left transition-[translate,border-color] duration-150 hover:-translate-y-1 hover:border-warn focus-visible:-translate-y-1 focus-visible:border-warn focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-warn active:translate-y-0"
         >
           <GameImage
             src={MODE_HISTORICAL}
@@ -111,13 +115,10 @@ export function MenuScreen() {
             <span className="font-mono text-[15px] font-bold tracking-wider text-white uppercase">
               Historical missions
             </span>
-            <Lock className="size-5 text-ink-faint" aria-hidden />
-          </span>
-          <span
-            id="mission-historical-soon"
-            className="absolute top-2 right-2 border-2 border-black bg-warn px-1.5 font-mono text-[10px] font-bold text-black uppercase"
-          >
-            Coming soon
+            <History
+              className="text-warn size-5 transition-transform group-hover:scale-125"
+              aria-hidden
+            />
           </span>
         </button>
       </div>

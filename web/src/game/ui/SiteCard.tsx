@@ -27,6 +27,8 @@ interface SiteCardProps {
   state: CardState;
   clickable: boolean;
   onPick: (slot: number) => void;
+  /** Historical mode: Sun elevation (degrees) at the real touchdown time at this site. */
+  landingSunEl?: number;
 }
 
 const ANIMATE = {
@@ -36,7 +38,19 @@ const ANIMATE = {
 };
 
 export function SiteCard(props: SiteCardProps) {
-  const { card, site, difficulty, image, index, dealt, timeline, state, clickable, onPick } = props;
+  const {
+    card,
+    site,
+    difficulty,
+    image,
+    index,
+    dealt,
+    timeline,
+    state,
+    clickable,
+    onPick,
+    landingSunEl,
+  } = props;
   const label = `Landing site ${card.slot}`;
   const bars = site ? qualityBars(site, difficulty) : [];
 
@@ -100,6 +114,12 @@ export function SiteCard(props: SiteCardProps) {
             label="Illustration pending"
             className="h-24 w-full border-2 border-black"
           />
+          {landingSunEl !== undefined && (
+            <p className="flex items-center justify-between gap-1 border-2 border-black bg-black/50 px-1.5 py-0.5 font-mono text-[11px] text-ink">
+              <span className="text-sun">☀ Sun at touchdown</span>
+              <span className="font-bold text-white">{`${landingSunEl.toFixed(0)}°`}</span>
+            </p>
+          )}
           <div className="flex flex-col gap-1.5">
             {bars.map((b) => (
               <QualityBar key={b.key} bar={b} showValue={difficulty === 'expert'} />

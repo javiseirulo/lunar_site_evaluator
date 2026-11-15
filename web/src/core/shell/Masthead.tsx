@@ -137,7 +137,15 @@ function NextUp() {
     ? [...sites].filter((s) => s.valid).sort((a, b) => b.score - a.score)[0]
     : null;
   const subject = selected ?? best ?? null;
-  const ts = useTimeseries(subject?.id);
+  const loaded = useTimeseries(subject?.id);
+  // Only when the clock is inside the series (the Mission game's Historical mode sets it to 1969...).
+  const now = Date.parse(currentTimeUTC);
+  const ts =
+    loaded &&
+    now >= Date.parse(loaded.t_utc[0] ?? '') &&
+    now <= Date.parse(loaded.t_utc.at(-1) ?? '')
+      ? loaded
+      : null;
   const sample = ts ? sampleAt(ts, currentTimeUTC) : null;
   const toSun = ts ? hoursUntilChange(ts, ts.lit, currentTimeUTC) : null;
   const toEarth = ts?.earth_visible ? hoursUntilChange(ts, ts.earth_visible, currentTimeUTC) : null;

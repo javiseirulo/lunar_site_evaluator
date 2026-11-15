@@ -1,0 +1,519 @@
+{
+  "version": 1,
+  "generated_utc": "2026-11-15T13:11:47Z",
+  "source": "SPICE (DE440, MOON_ME) at each real landing time; content in python/export/historic_missions.yaml (sources listed per mission)",
+  "missions": [
+    {
+      "id": "luna_9",
+      "name": "Luna 9",
+      "country": "USSR",
+      "year": 1966,
+      "landing_utc": "1966-02-03T18:45:30Z",
+      "narrator": {
+        "name": "Luna 9",
+        "role": "the bouncy ball lander",
+        "art": "luna_9"
+      },
+      "alarm": false,
+      "playable": false,
+      "lat": 7.13,
+      "lon": -64.37
+    },
+    {
+      "id": "surveyor_1",
+      "name": "Surveyor 1",
+      "country": "USA",
+      "year": 1966,
+      "landing_utc": "1966-06-02T06:17:36Z",
+      "narrator": {
+        "name": "Surveyor 1",
+        "role": "the three-legged robot",
+        "art": "surveyor_1"
+      },
+      "alarm": false,
+      "playable": false,
+      "lat": -2.4745,
+      "lon": -43.3398
+    },
+    {
+      "id": "luna_13",
+      "name": "Luna 13",
+      "country": "USSR",
+      "year": 1966,
+      "landing_utc": "1966-12-24T18:01:00Z",
+      "narrator": {
+        "name": "Luna 13",
+        "role": "the lander with a soil-poking arm",
+        "art": "luna_13"
+      },
+      "alarm": false,
+      "playable": false,
+      "lat": 18.87,
+      "lon": -62.05
+    },
+    {
+      "id": "surveyor_3",
+      "name": "Surveyor 3",
+      "country": "USA",
+      "year": 1967,
+      "landing_utc": "1967-04-20T00:04:17Z",
+      "narrator": {
+        "name": "Surveyor 3",
+        "role": "the robot with a scoop",
+        "art": "surveyor_3"
+      },
+      "alarm": false,
+      "playable": false,
+      "lat": -3.0162,
+      "lon": -23.418
+    },
+    {
+      "id": "surveyor_5",
+      "name": "Surveyor 5",
+      "country": "USA",
+      "year": 1967,
+      "landing_utc": "1967-09-11T00:46:44Z",
+      "narrator": {
+        "name": "Surveyor 5",
+        "role": "the robot chemist",
+        "art": "surveyor_5"
+      },
+      "alarm": true,
+      "playable": false,
+      "lat": 1.4551,
+      "lon": 23.1943
+    },
+    {
+      "id": "surveyor_6",
+      "name": "Surveyor 6",
+      "country": "USA",
+      "year": 1967,
+      "landing_utc": "1967-11-10T01:01:06Z",
+      "narrator": {
+        "name": "Surveyor 6",
+        "role": "the robot that hopped",
+        "art": "surveyor_6"
+      },
+      "alarm": false,
+      "playable": false,
+      "lat": 0.4742,
+      "lon": -1.4275
+    },
+    {
+      "id": "surveyor_7",
+      "name": "Surveyor 7",
+      "country": "USA",
+      "year": 1968,
+      "landing_utc": "1968-01-10T01:05:36Z",
+      "narrator": {
+        "name": "Surveyor 7",
+        "role": "the scientist robot",
+        "art": "surveyor_7"
+      },
+      "alarm": false,
+      "playable": false,
+      "lat": -40.9812,
+      "lon": -11.5127
+    },
+    {
+      "id": "apollo_11",
+      "name": "Apollo 11",
+      "country": "USA",
+      "year": 1969,
+      "landing_utc": "1969-07-20T20:17:40Z",
+      "narrator": {
+        "name": "Neil Armstrong",
+        "role": "Commander, Apollo 11",
+        "art": "apollo_11"
+      },
+      "alarm": true,
+      "playable": true,
+      "lat": 0.67416,
+      "lon": 23.47314
+    },
+    {
+      "id": "apollo_12",
+      "name": "Apollo 12",
+      "country": "USA",
+      "year": 1969,
+      "landing_utc": "1969-11-19T06:54:35Z",
+      "narrator": {
+        "name": "Pete Conrad",
+        "role": "Commander, Apollo 12",
+        "art": "apollo_12"
+      },
+      "alarm": true,
+      "playable": true,
+      "lat": -3.0128,
+      "lon": -23.4219
+    },
+    {
+      "id": "luna_16",
+      "name": "Luna 16",
+      "country": "USSR",
+      "year": 1970,
+      "landing_utc": "1970-09-20T05:18:00Z",
+      "narrator": {
+        "name": "Luna 16",
+        "role": "the robot that scoops and flies home",
+        "art": "luna_16"
+      },
+      "alarm": false,
+      "playable": false,
+      "lat": -0.5137,
+      "lon": 56.3638
+    },
+    {
+      "id": "luna_17",
+      "name": "Luna 17",
+      "country": "USSR",
+      "year": 1970,
+      "landing_utc": "1970-11-17T03:47:00Z",
+      "narrator": {
+        "name": "Lunokhod 1",
+        "role": "the first robot car on the Moon",
+        "art": "luna_17"
+      },
+      "alarm": false,
+      "playable": false,
+      "lat": 38.23764,
+      "lon": -35.00163
+    },
+    {
+      "id": "apollo_14",
+      "name": "Apollo 14",
+      "country": "USA",
+      "year": 1971,
+      "landing_utc": "1971-02-05T09:18:11Z",
+      "narrator": {
+        "name": "Alan Shepard",
+        "role": "Commander, Apollo 14",
+        "art": "apollo_14"
+      },
+      "alarm": true,
+      "playable": true,
+      "lat": -3.64589,
+      "lon": -17.47194
+    },
+    {
+      "id": "apollo_15",
+      "name": "Apollo 15",
+      "country": "USA",
+      "year": 1971,
+      "landing_utc": "1971-07-30T22:16:29Z",
+      "narrator": {
+        "name": "David Scott",
+        "role": "Commander, Apollo 15",
+        "art": "apollo_15"
+      },
+      "alarm": false,
+      "playable": true,
+      "lat": 26.13239,
+      "lon": 3.6333
+    },
+    {
+      "id": "luna_20",
+      "name": "Luna 20",
+      "country": "USSR",
+      "year": 1972,
+      "landing_utc": "1972-02-21T19:19:00Z",
+      "narrator": {
+        "name": "Luna 20",
+        "role": "the mountain sample robot",
+        "art": "luna_20"
+      },
+      "alarm": false,
+      "playable": false,
+      "lat": 3.7863,
+      "lon": 56.6242
+    },
+    {
+      "id": "apollo_16",
+      "name": "Apollo 16",
+      "country": "USA",
+      "year": 1972,
+      "landing_utc": "1972-04-21T02:23:35Z",
+      "narrator": {
+        "name": "John Young",
+        "role": "Commander, Apollo 16",
+        "art": "apollo_16"
+      },
+      "alarm": true,
+      "playable": true,
+      "lat": -8.9734,
+      "lon": 15.5011
+    },
+    {
+      "id": "apollo_17",
+      "name": "Apollo 17",
+      "country": "USA",
+      "year": 1972,
+      "landing_utc": "1972-12-11T19:54:57Z",
+      "narrator": {
+        "name": "Gene Cernan",
+        "role": "Commander, Apollo 17",
+        "art": "apollo_17"
+      },
+      "alarm": false,
+      "playable": true,
+      "lat": 20.1911,
+      "lon": 30.7723
+    },
+    {
+      "id": "luna_21",
+      "name": "Luna 21",
+      "country": "USSR",
+      "year": 1973,
+      "landing_utc": "1973-01-15T22:35:00Z",
+      "narrator": {
+        "name": "Lunokhod 2",
+        "role": "the robot car, version two",
+        "art": "luna_21"
+      },
+      "alarm": false,
+      "playable": false,
+      "lat": 25.9994,
+      "lon": 30.4076
+    },
+    {
+      "id": "luna_24",
+      "name": "Luna 24",
+      "country": "USSR",
+      "year": 1976,
+      "landing_utc": "1976-08-18T06:36:00Z",
+      "narrator": {
+        "name": "Luna 24",
+        "role": "the deep-drilling robot",
+        "art": "luna_24"
+      },
+      "alarm": false,
+      "playable": false,
+      "lat": 12.7142,
+      "lon": 62.2129
+    },
+    {
+      "id": "change_3",
+      "name": "Chang'e 3",
+      "country": "China",
+      "year": 2013,
+      "landing_utc": "2013-12-14T13:11:00Z",
+      "narrator": {
+        "name": "Yutu",
+        "role": "the Jade Rabbit rover",
+        "art": "change_3"
+      },
+      "alarm": false,
+      "playable": false,
+      "lat": 44.1214,
+      "lon": -19.5117
+    },
+    {
+      "id": "change_4",
+      "name": "Chang'e 4",
+      "country": "China",
+      "year": 2019,
+      "landing_utc": "2019-01-03T02:26:00Z",
+      "narrator": {
+        "name": "Yutu-2",
+        "role": "the far side rover",
+        "art": "change_4"
+      },
+      "alarm": false,
+      "playable": false,
+      "lat": -45.457,
+      "lon": 177.589
+    },
+    {
+      "id": "beresheet",
+      "name": "Beresheet",
+      "country": "Israel",
+      "year": 2019,
+      "landing_utc": "2019-04-11T19:23:00Z",
+      "narrator": {
+        "name": "Beresheet",
+        "role": "the little private lander",
+        "art": "beresheet"
+      },
+      "alarm": true,
+      "playable": false,
+      "lat": 32.5956,
+      "lon": 19.3496
+    },
+    {
+      "id": "chandrayaan_2_vikram",
+      "name": "Chandrayaan-2 (Vikram)",
+      "country": "India",
+      "year": 2019,
+      "landing_utc": "2019-09-06T20:23:00Z",
+      "narrator": {
+        "name": "Vikram",
+        "role": "the lander named after Vikram Sarabhai",
+        "art": "chandrayaan_2_vikram"
+      },
+      "alarm": true,
+      "playable": true,
+      "lat": -70.9027,
+      "lon": 22.7811
+    },
+    {
+      "id": "change_5",
+      "name": "Chang'e 5",
+      "country": "China",
+      "year": 2020,
+      "landing_utc": "2020-12-01T15:11:00Z",
+      "narrator": {
+        "name": "Chang'e 5",
+        "role": "the sample-return robot",
+        "art": "change_5"
+      },
+      "alarm": false,
+      "playable": false,
+      "lat": 43.0576,
+      "lon": -51.9161
+    },
+    {
+      "id": "hakuto_r_m1",
+      "name": "HAKUTO-R Mission 1",
+      "country": "Japan",
+      "year": 2023,
+      "landing_utc": "2023-04-25T16:40:00Z",
+      "narrator": {
+        "name": "HAKUTO-R",
+        "role": "the private lander from Japan",
+        "art": "hakuto_r_m1"
+      },
+      "alarm": true,
+      "playable": true,
+      "lat": 47.581,
+      "lon": 44.094
+    },
+    {
+      "id": "luna_25",
+      "name": "Luna 25",
+      "country": "Russia",
+      "year": 2023,
+      "landing_utc": "2023-08-21T11:00:00Z",
+      "narrator": {
+        "name": "Luna 25",
+        "role": "the south pole lander",
+        "art": "luna_25"
+      },
+      "alarm": true,
+      "playable": true,
+      "lat": -69.545,
+      "lon": 43.544
+    },
+    {
+      "id": "chandrayaan_3",
+      "name": "Chandrayaan-3",
+      "country": "India",
+      "year": 2023,
+      "landing_utc": "2023-08-23T12:33:00Z",
+      "narrator": {
+        "name": "Vikram",
+        "role": "Chandrayaan-3's lander (second try!)",
+        "art": "chandrayaan_3"
+      },
+      "alarm": false,
+      "playable": true,
+      "lat": -69.3741,
+      "lon": 32.32
+    },
+    {
+      "id": "slim",
+      "name": "SLIM",
+      "country": "Japan",
+      "year": 2024,
+      "landing_utc": "2024-01-19T15:20:00Z",
+      "narrator": {
+        "name": "SLIM",
+        "role": "the Moon Sniper",
+        "art": "slim"
+      },
+      "alarm": true,
+      "playable": false,
+      "lat": -13.316,
+      "lon": 25.251
+    },
+    {
+      "id": "im1_odysseus",
+      "name": "IM-1 Odysseus",
+      "country": "USA",
+      "year": 2024,
+      "landing_utc": "2024-02-22T23:23:00Z",
+      "narrator": {
+        "name": "Odysseus",
+        "role": "the first private lander to touch down",
+        "art": "im1_odysseus"
+      },
+      "alarm": true,
+      "playable": false,
+      "lat": -80.13,
+      "lon": 1.44
+    },
+    {
+      "id": "change_6",
+      "name": "Chang'e 6",
+      "country": "China",
+      "year": 2024,
+      "landing_utc": "2024-06-01T22:23:00Z",
+      "narrator": {
+        "name": "Chang'e 6",
+        "role": "the far side sample robot",
+        "art": "change_6"
+      },
+      "alarm": false,
+      "playable": false,
+      "lat": -41.6385,
+      "lon": -153.9852
+    },
+    {
+      "id": "blue_ghost_m1",
+      "name": "Blue Ghost Mission 1",
+      "country": "USA",
+      "year": 2025,
+      "landing_utc": "2025-03-02T08:34:00Z",
+      "narrator": {
+        "name": "Blue Ghost",
+        "role": "the lander that made it upright",
+        "art": "blue_ghost_m1"
+      },
+      "alarm": false,
+      "playable": true,
+      "lat": 18.5623,
+      "lon": 61.8103
+    },
+    {
+      "id": "im2_athena",
+      "name": "IM-2 Athena",
+      "country": "USA",
+      "year": 2025,
+      "landing_utc": "2025-03-06T17:28:00Z",
+      "narrator": {
+        "name": "Athena",
+        "role": "the ice-hunting lander",
+        "art": "im2_athena"
+      },
+      "alarm": true,
+      "playable": true,
+      "lat": -84.7906,
+      "lon": 29.1957
+    },
+    {
+      "id": "hakuto_r_m2",
+      "name": "HAKUTO-R Mission 2",
+      "country": "Japan",
+      "year": 2025,
+      "landing_utc": "2025-06-05T19:13:00Z",
+      "narrator": {
+        "name": "Resilience",
+        "role": "HAKUTO-R's second lander",
+        "art": "hakuto_r_m2"
+      },
+      "alarm": true,
+      "playable": true,
+      "lat": 60.4445,
+      "lon": -4.588
+    }
+  ]
+}
