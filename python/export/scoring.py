@@ -16,8 +16,8 @@ LESS_IS_BETTER = frozenset({"slope_deg", "max_dark_hours", "max_blackout_hours",
 # Same values as web/src/scoring/defaults.ts DEFAULT_MISSION_CONFIG (keep in sync).
 DEFAULT_MISSION_CONFIG: dict[str, Any] = {
     "time_mode": "design",
-    "landing_utc": "2027-11-08T00:00:00Z",
-    "launch_utc": "2027-11-03T00:00:00Z",
+    "landing_utc": "2027-10-12T00:00:00Z",
+    "launch_utc": "2027-10-07T00:00:00Z",
     "trajectory": "hohmann",
     "llo_alt_km": 100,
     "surface_days": 7,

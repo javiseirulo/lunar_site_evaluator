@@ -2,14 +2,17 @@
 
     uv run python -m export.all
 
-Writes ``timeseries/<id>.json`` (hourly, flat 5 m horizon), ``sites.json`` and ``manifest.json``
-for every site of ``export/catalog.yaml`` over 2027 ``[2027-01-01, 2028-01-01)``. Does not touch
-``layers.json``, ``layers/`` or ``terrain/``. Every output is validated against
+Writes ``timeseries/<id>.json`` (hourly; terrain horizon from
+``horizon/<id>.json`` when Pablo published one, else flat 5 m), ``sites.json`` and ``manifest.json``
+for every site of ``export/catalog.yaml`` over 2027 ``[2027-01-01, 2028-01-01)``.
+Reads (never writes)
+``terrain/catalog.json`` (elev_m, slope_deg, psr_dist_km) and ``horizon/``; does not touch
+``layers.json``, ``layers/``, ``terrain/`` or ``horizon/``. Every output is validated against
 ``contracts/*.schema.json``.
 
 Evaluation window (contracts/README v1.1, SitesFile.evaluation): ``Site.metrics`` are over the
 manifest window (all of 2027); ``valid``/``score``/``checks`` are over the default mission window
-``missionWindow(DEFAULT_MISSION_CONFIG)`` (7 days from 2027-11-08), because the default thresholds
+``missionWindow(DEFAULT_MISSION_CONFIG)`` (7 days from 2027-10-12), because the default thresholds
 are sized for a 7-day stay. The web re-evaluates any other window with ``@/scoring``.
 """
 
@@ -28,6 +31,7 @@ import yaml
 from ephem import jsonfmt
 from ephem.kernels import REPO_ROOT
 from ephem.timeseries import build_timeseries, window_metrics
+from ephem.topo import DEFAULT_H_OBS_M
 from ephem.vectors import STEP_S, load_window, read_index
 
 from .scoring import DEFAULT_MISSION_CONFIG, evaluate_site
@@ -47,7 +51,7 @@ EVAL_SLICE = (
     int((_eval_start - _year0).total_seconds() // STEP_S),
     int((_eval_end - _year0).total_seconds() // STEP_S),
 )
-PENDING = ["slope_deg", "psr_dist_km"]  # need terrain (not published yet); placeholder 0
+TERRAIN_KEYS = ("slope_deg", "psr_dist_km")  # from terrain/catalog.json; pending when null
 CORE_KEYS = ["illum_pct", "earth_vis_pct", "slope_deg", "max_dark_hours", "psr_dist_km"]
 
 
@@ -63,8 +67,45 @@ def _r2(x: float) -> float:
     return round(float(x), 2) + 0.0
 
 
-def publish_timeseries(site: dict, t, sun, earth) -> dict:
-    ts = build_timeseries(site, t, sun, earth, antenna_margin_deg=ANTENNA_MARGIN_DEG)
+def load_terrain() -> dict[str, dict]:
+    """``terrain/catalog.json`` (Pablo) by site id; empty if not published."""
+    path = DATA / "terrain" / "catalog.json"
+    if not path.exists():
+        return {}
+    return {s["id"]: s for s in json.loads(path.read_text())["sites"]}
+
+
+def load_horizon(site_id: str, terrain: dict | None) -> dict | None:
+    """Pablo's ``horizon/<id>.json`` (extra fields are allowed by the schema), or None (flat)."""
+    rel = (terrain or {}).get("horizon_file") or f"horizon/{site_id}.json"
+    path = DATA / rel
+    if not path.exists():
+        return None
+    h = json.loads(path.read_text())
+    if h.get("site_id") != site_id:
+        raise ValueError(f"{rel}: site_id {h.get('site_id')!r} != {site_id!r}")
+    _validate(h, "horizon")
+    return h
+
+
+def _num(v: Any) -> float | None:
+    ok = isinstance(v, int | float) and not isinstance(v, bool) and math.isfinite(v)
+    return float(v) if ok else None
+
+
+def site_elev_m(entry: dict, terrain: dict | None) -> float:
+    """Published ``elev_m`` (2 decimals): terrain/catalog.json, else the catalog.yaml value."""
+    elev = _num((terrain or {}).get("elev_m"))
+    return _r2(elev if elev is not None else entry.get("elev_m", 0.0))
+
+
+def publish_timeseries(site: dict, t, sun, earth, horizon: dict | None = None) -> dict:
+    # Same inputs as the web (SiteCheckPanel -> buildTimeseries): elev_m as published in
+    # sites.json, observer height from the profile (default 5 m), h(az) from the profile.
+    h_obs = float(horizon.get("observer_height_m", DEFAULT_H_OBS_M)) if horizon else DEFAULT_H_OBS_M
+    ts = build_timeseries(
+        site, t, sun, earth, horizon=horizon, antenna_margin_deg=ANTENNA_MARGIN_DEG, h_obs_m=h_obs
+    )
     # Files publish 2 decimals (README); lit is re-derived from the published sun_frac so that
     # lit == (sun_frac >= 0.5) holds exactly in the file.
     frac = [_r2(f) for f in ts["sun_frac"]]
@@ -78,15 +119,27 @@ def _slice(ts: dict, i0: int, i1: int) -> dict:
     return {k: (v[i0:i1] if isinstance(v, list) and len(v) == n else v) for k, v in ts.items()}
 
 
-def site_record(entry: dict, ts: dict) -> dict:
+def terrain_metrics(terrain: dict | None) -> tuple[dict[str, float], list[str]]:
+    """``{slope_deg, psr_dist_km}`` (placeholder 0 when unknown) and the pending list."""
+    vals, pending = {}, []
+    for k in TERRAIN_KEYS:
+        v = _num((terrain or {}).get(k))
+        if v is None:
+            pending.append(k)
+        vals[k] = _r2(v) if v is not None else 0.0
+    return vals, pending
+
+
+def site_record(
+    entry: dict, ts: dict, terrain: dict | None = None, i_slice: tuple[int, int] | None = None
+) -> dict:
     wm = {k: _r2(v) for k, v in window_metrics(ts).items()}
-    metrics = {**wm, "slope_deg": 0.0, "psr_dist_km": 0.0}
+    tm, pending = terrain_metrics(terrain)
+    metrics = {**wm, **tm}
     # valid/score/checks: over the default mission window (SitesFile.evaluation), not the year.
-    i0, i1 = EVAL_SLICE
+    i0, i1 = i_slice or EVAL_SLICE
     ew = {k: _r2(v) for k, v in window_metrics(_slice(ts, i0, i1)).items()}
-    ev = evaluate_site(
-        {**ew, "slope_deg": 0.0, "psr_dist_km": 0.0}, DEFAULT_MISSION_CONFIG, pending=PENDING
-    )
+    ev = evaluate_site({**ew, **tm}, DEFAULT_MISSION_CONFIG, pending=pending)
     ordered = {k: metrics[k] for k in CORE_KEYS}
     ordered.update({k: wm[k] for k in ("sun_el_mean_deg", "max_blackout_hours", "sun_earth_pct")})
     return {
@@ -94,7 +147,7 @@ def site_record(entry: dict, ts: dict) -> dict:
         "name": entry["name"],
         "lat": float(entry["lat"]),
         "lon": float(entry["lon"]),
-        "elev_m": float(entry.get("elev_m", 0.0)),
+        "elev_m": site_elev_m(entry, terrain),
         "valid": ev["valid"],
         "score": ev["score"],
         "metrics": ordered,
@@ -104,7 +157,7 @@ def site_record(entry: dict, ts: dict) -> dict:
         "kind": entry["kind"],
         "group": entry["group"],
         "checks": ev["checks"],
-        "pending_metrics": PENDING,
+        "pending_metrics": pending,
     }
 
 
@@ -118,15 +171,22 @@ def main() -> int:
     ts_dir.mkdir(parents=True, exist_ok=True)
     for old in ts_dir.glob("*.json"):
         old.unlink()
-    sites, total = [], 0
+    terrain_by_id = load_terrain()
+    sites, total, n_terrain = [], 0, 0
     for entry in catalog["sites"]:
-        site = {"id": entry["id"], "lat": entry["lat"], "lon": entry["lon"], "elev_m": 0.0}
-        ts = publish_timeseries(site, t, sun, earth)
+        terrain = terrain_by_id.get(entry["id"])
+        horizon = load_horizon(entry["id"], terrain)
+        n_terrain += horizon is not None
+        elev = site_elev_m(entry, terrain)
+        if horizon is not None:  # the profile was cast from this ground height
+            assert abs(float(horizon["observer_ground_m"]) - elev) < 0.01, entry["id"]
+        site = {"id": entry["id"], "lat": entry["lat"], "lon": entry["lon"], "elev_m": elev}
+        ts = publish_timeseries(site, t, sun, earth, horizon)
         _validate(ts, "timeseries")
         text = json.dumps(ts, separators=(",", ":"), allow_nan=False)
         (ts_dir / f"{entry['id']}.json").write_text(text)
         total += len(text)
-        sites.append(site_record(entry, ts))
+        sites.append(site_record(entry, ts, terrain))
 
     sites_file = {
         "version": 1,
@@ -149,9 +209,11 @@ def main() -> int:
         "sources": [
             f"SPICE kernels: {', '.join(Path(k).name for k in idx.get('kernels', []))}",
             f"Frame {idx['spice_frame']}, aberration {idx['abcorr']} (python/ephem/vectors.py)",
-            "Horizon: flat (no terrain), observer 5 m; antenna margin 2 deg",
+            f"Horizon: terrain profiles horizon/<id>.json for {n_terrain} polar sites "
+            "(LOLA, Pablo), flat (no terrain) elsewhere; observer 5 m; antenna margin 2 deg",
             "Sites: python/export/catalog.yaml (cited sources per site)",
-            "slope_deg / psr_dist_km pending terrain (placeholder 0, see pending_metrics)",
+            "elev_m / slope_deg / psr_dist_km: terrain/catalog.json (Pablo); "
+            "psr_dist_km pending where unknown (see pending_metrics)",
         ],
     }
     _validate(manifest, "manifest")

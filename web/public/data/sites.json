@@ -1,7 +1,7 @@
 {
   "version": 1,
   "mock": false,
-  "generated_utc": "2026-11-14T22:49:17Z",
+  "generated_utc": "2026-11-15T10:11:11Z",
   "weights": {
     "illum_pct": 0.2,
     "earth_vis_pct": 0.2,
@@ -11,8 +11,8 @@
     "max_blackout_hours": 0.2
   },
   "evaluation": {
-    "start_utc": "2027-11-08T00:00:00Z",
-    "end_utc": "2027-11-15T00:00:00Z",
+    "start_utc": "2027-10-12T00:00:00Z",
+    "end_utc": "2027-10-19T00:00:00Z",
     "config": "default"
   },
   "sites": [
@@ -21,20 +21,20 @@
       "name": "Shackleton rim (SR1)",
       "lat": -89.7755,
       "lon": -156.448,
-      "elev_m": 0.0,
+      "elev_m": 1734.48,
       "valid": true,
-      "score": 1.0,
+      "score": 0.987,
       "metrics": {
-        "illum_pct": 0.55,
-        "earth_vis_pct": 0.37,
-        "slope_deg": 0.0,
-        "max_dark_hours": 3911.0,
-        "psr_dist_km": 0.0,
+        "illum_pct": 0.81,
+        "earth_vis_pct": 0.4,
+        "slope_deg": 2.38,
+        "max_dark_hours": 203.0,
+        "psr_dist_km": 0.06,
         "sun_el_mean_deg": 0.51,
-        "max_blackout_hours": 412.0,
-        "sun_earth_pct": 0.2
+        "max_blackout_hours": 396.0,
+        "sun_earth_pct": 0.35
       },
-      "reasons": ["slope_deg_pending", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
+      "reasons": ["slope_ok", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
       "source": "De Rosa et al. 2012, Planet. Space Sci. 74:224-246 (doi:10.1016/j.pss.2012.08.002), Table 2, RoI SR1",
       "region": "south_pole",
       "kind": "candidate",
@@ -45,9 +45,8 @@
           "threshold": 8,
           "objective": 2,
           "ok": true,
-          "value": null,
-          "margin": null,
-          "pending": true
+          "value": 2.38,
+          "margin": 0.7025
         },
         {
           "key": "illum_pct",
@@ -82,27 +81,27 @@
           "margin": 1.0
         }
       ],
-      "pending_metrics": ["slope_deg", "psr_dist_km"]
+      "pending_metrics": []
     },
     {
       "id": "shackleton_rim_02",
       "name": "Shackleton rim (SR3)",
       "lat": -89.812,
       "lon": 52.125,
-      "elev_m": 0.0,
+      "elev_m": 1415.49,
       "valid": true,
-      "score": 1.0,
+      "score": 0.848,
       "metrics": {
-        "illum_pct": 0.55,
+        "illum_pct": 0.43,
         "earth_vis_pct": 0.39,
-        "slope_deg": 0.0,
-        "max_dark_hours": 3934.0,
-        "psr_dist_km": 0.0,
-        "sun_el_mean_deg": 0.5,
-        "max_blackout_hours": 401.0,
-        "sun_earth_pct": 0.21
+        "slope_deg": 6.55,
+        "max_dark_hours": 540.0,
+        "psr_dist_km": 0.28,
+        "sun_el_mean_deg": 0.3,
+        "max_blackout_hours": 399.0,
+        "sun_earth_pct": 0.18
       },
-      "reasons": ["slope_deg_pending", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
+      "reasons": ["slope_ok", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
       "source": "De Rosa et al. 2012, Planet. Space Sci. 74:224-246 (doi:10.1016/j.pss.2012.08.002), Table 2, RoI SR3",
       "region": "south_pole",
       "kind": "candidate",
@@ -113,9 +112,8 @@
           "threshold": 8,
           "objective": 2,
           "ok": true,
-          "value": null,
-          "margin": null,
-          "pending": true
+          "value": 6.55,
+          "margin": 0.18125000000000002
         },
         {
           "key": "illum_pct",
@@ -150,27 +148,27 @@
           "margin": 1.0
         }
       ],
-      "pending_metrics": ["slope_deg", "psr_dist_km"]
+      "pending_metrics": []
     },
     {
       "id": "connecting_ridge",
       "name": "Connecting ridge (CR1)",
       "lat": -89.4679,
       "lon": -137.411,
-      "elev_m": 0.0,
+      "elev_m": 1942.4,
       "valid": true,
       "score": 1.0,
       "metrics": {
-        "illum_pct": 0.55,
-        "earth_vis_pct": 0.36,
-        "slope_deg": 0.0,
-        "max_dark_hours": 3371.0,
-        "psr_dist_km": 0.0,
-        "sun_el_mean_deg": 0.53,
-        "max_blackout_hours": 417.0,
-        "sun_earth_pct": 0.2
+        "illum_pct": 0.64,
+        "earth_vis_pct": 0.4,
+        "slope_deg": 0.95,
+        "max_dark_hours": 547.0,
+        "psr_dist_km": 0.18,
+        "sun_el_mean_deg": 0.51,
+        "max_blackout_hours": 394.0,
+        "sun_earth_pct": 0.28
       },
-      "reasons": ["slope_deg_pending", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
+      "reasons": ["slope_ok", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
       "source": "De Rosa et al. 2012, Planet. Space Sci. 74:224-246 (doi:10.1016/j.pss.2012.08.002), Table 2, RoI CR1",
       "region": "south_pole",
       "kind": "candidate",
@@ -181,9 +179,8 @@
           "threshold": 8,
           "objective": 2,
           "ok": true,
-          "value": null,
-          "margin": null,
-          "pending": true
+          "value": 0.95,
+          "margin": 0.88125
         },
         {
           "key": "illum_pct",
@@ -218,27 +215,27 @@
           "margin": 1.0
         }
       ],
-      "pending_metrics": ["slope_deg", "psr_dist_km"]
+      "pending_metrics": []
     },
     {
       "id": "de_gerlache_rim_01",
       "name": "de Gerlache rim (GR1)",
       "lat": -88.6952,
       "lon": -68.2846,
-      "elev_m": 0.0,
+      "elev_m": 1778.99,
       "valid": true,
       "score": 1.0,
       "metrics": {
-        "illum_pct": 0.55,
-        "earth_vis_pct": 0.41,
-        "slope_deg": 0.0,
-        "max_dark_hours": 1974.0,
-        "psr_dist_km": 0.0,
-        "sun_el_mean_deg": 0.59,
-        "max_blackout_hours": 389.0,
-        "sun_earth_pct": 0.22
+        "illum_pct": 0.67,
+        "earth_vis_pct": 0.44,
+        "slope_deg": 1.12,
+        "max_dark_hours": 221.0,
+        "psr_dist_km": 0.04,
+        "sun_el_mean_deg": 0.5,
+        "max_blackout_hours": 370.0,
+        "sun_earth_pct": 0.31
       },
-      "reasons": ["slope_deg_pending", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
+      "reasons": ["slope_ok", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
       "source": "De Rosa et al. 2012, Planet. Space Sci. 74:224-246 (doi:10.1016/j.pss.2012.08.002), Table 2, RoI GR1",
       "region": "south_pole",
       "kind": "candidate",
@@ -249,9 +246,8 @@
           "threshold": 8,
           "objective": 2,
           "ok": true,
-          "value": null,
-          "margin": null,
-          "pending": true
+          "value": 1.12,
+          "margin": 0.86
         },
         {
           "key": "illum_pct",
@@ -286,27 +282,27 @@
           "margin": 1.0
         }
       ],
-      "pending_metrics": ["slope_deg", "psr_dist_km"]
+      "pending_metrics": []
     },
     {
       "id": "de_gerlache_rim_02",
       "name": "de Gerlache Rim 2 (dGR2_K2023)",
       "lat": -88.45,
       "lon": -67.859,
-      "elev_m": 0.0,
+      "elev_m": 1577.86,
       "valid": true,
       "score": 1.0,
       "metrics": {
-        "illum_pct": 0.55,
-        "earth_vis_pct": 0.41,
-        "slope_deg": 0.0,
-        "max_dark_hours": 602.0,
-        "psr_dist_km": 0.0,
+        "illum_pct": 0.77,
+        "earth_vis_pct": 0.45,
+        "slope_deg": 1.24,
+        "max_dark_hours": 262.0,
+        "psr_dist_km": 0.34,
         "sun_el_mean_deg": 0.63,
-        "max_blackout_hours": 387.0,
-        "sun_earth_pct": 0.22
+        "max_blackout_hours": 361.0,
+        "sun_earth_pct": 0.35
       },
-      "reasons": ["slope_deg_pending", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
+      "reasons": ["slope_ok", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
       "source": "Wueller et al. 2026, J. Geophys. Res. Planets 131(3) e2025JE009434, Table A1, CLS dGR2_K2023",
       "region": "south_pole",
       "kind": "candidate",
@@ -317,9 +313,8 @@
           "threshold": 8,
           "objective": 2,
           "ok": true,
-          "value": null,
-          "margin": null,
-          "pending": true
+          "value": 1.24,
+          "margin": 0.845
         },
         {
           "key": "illum_pct",
@@ -354,27 +349,27 @@
           "margin": 1.0
         }
       ],
-      "pending_metrics": ["slope_deg", "psr_dist_km"]
+      "pending_metrics": []
     },
     {
       "id": "peak_near_shackleton",
       "name": "Peak near Shackleton (SV1)",
       "lat": -88.8247,
       "lon": 124.1359,
-      "elev_m": 0.0,
+      "elev_m": 1598.86,
       "valid": true,
-      "score": 1.0,
+      "score": 0.882,
       "metrics": {
-        "illum_pct": 0.55,
-        "earth_vis_pct": 0.34,
-        "slope_deg": 0.0,
-        "max_dark_hours": 1999.0,
-        "psr_dist_km": 0.0,
-        "sun_el_mean_deg": 0.58,
-        "max_blackout_hours": 428.0,
-        "sun_earth_pct": 0.2
+        "illum_pct": 0.47,
+        "earth_vis_pct": 0.45,
+        "slope_deg": 5.53,
+        "max_dark_hours": 406.0,
+        "psr_dist_km": 0.12,
+        "sun_el_mean_deg": 0.26,
+        "max_blackout_hours": 363.0,
+        "sun_earth_pct": 0.22
       },
-      "reasons": ["slope_deg_pending", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
+      "reasons": ["slope_ok", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
       "source": "De Rosa et al. 2012, Planet. Space Sci. 74:224-246 (doi:10.1016/j.pss.2012.08.002), Table 2, RoI SV1",
       "region": "south_pole",
       "kind": "candidate",
@@ -385,9 +380,8 @@
           "threshold": 8,
           "objective": 2,
           "ok": true,
-          "value": null,
-          "margin": null,
-          "pending": true
+          "value": 5.53,
+          "margin": 0.30874999999999997
         },
         {
           "key": "illum_pct",
@@ -422,27 +416,27 @@
           "margin": 1.0
         }
       ],
-      "pending_metrics": ["slope_deg", "psr_dist_km"]
+      "pending_metrics": []
     },
     {
       "id": "malapert_massif",
       "name": "Malapert massif (MP1)",
       "lat": -85.9756,
       "lon": -2.11241,
-      "elev_m": 0.0,
+      "elev_m": 4969.08,
       "valid": true,
-      "score": 1.0,
+      "score": 0.929,
       "metrics": {
-        "illum_pct": 0.5,
-        "earth_vis_pct": 0.58,
-        "slope_deg": 0.0,
-        "max_dark_hours": 433.0,
-        "psr_dist_km": 0.0,
-        "sun_el_mean_deg": 1.29,
-        "max_blackout_hours": 282.0,
-        "sun_earth_pct": 0.29
+        "illum_pct": 0.78,
+        "earth_vis_pct": 0.53,
+        "slope_deg": 4.13,
+        "max_dark_hours": 283.0,
+        "psr_dist_km": 0.11,
+        "sun_el_mean_deg": 1.25,
+        "max_blackout_hours": 309.0,
+        "sun_earth_pct": 0.38
       },
-      "reasons": ["slope_deg_pending", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
+      "reasons": ["slope_ok", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
       "source": "De Rosa et al. 2012, Planet. Space Sci. 74:224-246 (doi:10.1016/j.pss.2012.08.002), Table 2, RoI MP1 (Malapert Peak)",
       "region": "south_pole",
       "kind": "candidate",
@@ -453,9 +447,8 @@
           "threshold": 8,
           "objective": 2,
           "ok": true,
-          "value": null,
-          "margin": null,
-          "pending": true
+          "value": 4.13,
+          "margin": 0.48375
         },
         {
           "key": "illum_pct",
@@ -490,27 +483,27 @@
           "margin": 1.0
         }
       ],
-      "pending_metrics": ["slope_deg", "psr_dist_km"]
+      "pending_metrics": []
     },
     {
       "id": "leibnitz_beta",
       "name": "Mons Mouton, former Leibnitz Beta plateau (LP1)",
       "lat": -85.4596,
       "lon": 31.78053,
-      "elev_m": 0.0,
+      "elev_m": 6301.53,
       "valid": true,
-      "score": 1.0,
+      "score": 0.997,
       "metrics": {
-        "illum_pct": 0.5,
-        "earth_vis_pct": 0.57,
-        "slope_deg": 0.0,
-        "max_dark_hours": 423.0,
+        "illum_pct": 0.2,
+        "earth_vis_pct": 0.37,
+        "slope_deg": 2.09,
+        "max_dark_hours": 3476.0,
         "psr_dist_km": 0.0,
-        "sun_el_mean_deg": 1.45,
-        "max_blackout_hours": 285.0,
-        "sun_earth_pct": 0.29
+        "sun_el_mean_deg": 0.47,
+        "max_blackout_hours": 411.0,
+        "sun_earth_pct": 0.1
       },
-      "reasons": ["slope_deg_pending", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
+      "reasons": ["slope_ok", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
       "source": "De Rosa et al. 2012, Planet. Space Sci. 74:224-246 (doi:10.1016/j.pss.2012.08.002), Table 2, RoI LP1",
       "region": "south_pole",
       "kind": "candidate",
@@ -521,17 +514,16 @@
           "threshold": 8,
           "objective": 2,
           "ok": true,
-          "value": null,
-          "margin": null,
-          "pending": true
+          "value": 2.09,
+          "margin": 0.73875
         },
         {
           "key": "illum_pct",
           "threshold": 0.5,
           "objective": 0.85,
           "ok": true,
-          "value": 1.0,
-          "margin": 1.0
+          "value": 0.97,
+          "margin": 0.94
         },
         {
           "key": "max_dark_hours",
@@ -558,27 +550,27 @@
           "margin": 1.0
         }
       ],
-      "pending_metrics": ["slope_deg", "psr_dist_km"]
+      "pending_metrics": []
     },
     {
       "id": "haworth_rim",
       "name": "Haworth (HW06)",
       "lat": -87.05,
       "lon": -24.24,
-      "elev_m": 0.0,
+      "elev_m": 1678.14,
       "valid": true,
-      "score": 1.0,
+      "score": 0.96,
       "metrics": {
-        "illum_pct": 0.51,
-        "earth_vis_pct": 0.51,
-        "slope_deg": 0.0,
-        "max_dark_hours": 465.0,
-        "psr_dist_km": 0.0,
-        "sun_el_mean_deg": 0.98,
-        "max_blackout_hours": 324.0,
-        "sun_earth_pct": 0.26
+        "illum_pct": 0.58,
+        "earth_vis_pct": 0.4,
+        "slope_deg": 3.19,
+        "max_dark_hours": 562.0,
+        "psr_dist_km": 0.19,
+        "sun_el_mean_deg": 0.76,
+        "max_blackout_hours": 396.0,
+        "sun_earth_pct": 0.25
       },
-      "reasons": ["slope_deg_pending", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
+      "reasons": ["slope_ok", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
       "source": "Wueller et al. 2026, J. Geophys. Res. Planets 131(3) e2025JE009434, Table A1, CLS HW06",
       "region": "south_pole",
       "kind": "candidate",
@@ -589,17 +581,16 @@
           "threshold": 8,
           "objective": 2,
           "ok": true,
-          "value": null,
-          "margin": null,
-          "pending": true
+          "value": 3.19,
+          "margin": 0.6012500000000001
         },
         {
           "key": "illum_pct",
           "threshold": 0.5,
           "objective": 0.85,
           "ok": true,
-          "value": 1.0,
-          "margin": 1.0
+          "value": 0.98,
+          "margin": 0.96
         },
         {
           "key": "max_dark_hours",
@@ -626,27 +617,27 @@
           "margin": 1.0
         }
       ],
-      "pending_metrics": ["slope_deg", "psr_dist_km"]
+      "pending_metrics": []
     },
     {
       "id": "nobile_rim_01",
       "name": "Nobile Rim 1 (NR101)",
       "lat": -85.295,
       "lon": 36.917,
-      "elev_m": 0.0,
+      "elev_m": 6766.87,
       "valid": true,
-      "score": 1.0,
+      "score": 0.911,
       "metrics": {
-        "illum_pct": 0.5,
+        "illum_pct": 0.78,
         "earth_vis_pct": 0.57,
-        "slope_deg": 0.0,
-        "max_dark_hours": 420.0,
-        "psr_dist_km": 0.0,
+        "slope_deg": 4.68,
+        "max_dark_hours": 369.0,
+        "psr_dist_km": 0.16,
         "sun_el_mean_deg": 1.5,
-        "max_blackout_hours": 288.0,
-        "sun_earth_pct": 0.29
+        "max_blackout_hours": 286.0,
+        "sun_earth_pct": 0.38
       },
-      "reasons": ["slope_deg_pending", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
+      "reasons": ["slope_ok", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
       "source": "Wueller et al. 2026, J. Geophys. Res. Planets 131(3) e2025JE009434, Table A1, CLS NR101",
       "region": "south_pole",
       "kind": "candidate",
@@ -657,9 +648,8 @@
           "threshold": 8,
           "objective": 2,
           "ok": true,
-          "value": null,
-          "margin": null,
-          "pending": true
+          "value": 4.68,
+          "margin": 0.41500000000000004
         },
         {
           "key": "illum_pct",
@@ -694,27 +684,27 @@
           "margin": 1.0
         }
       ],
-      "pending_metrics": ["slope_deg", "psr_dist_km"]
+      "pending_metrics": []
     },
     {
       "id": "nobile_rim_02",
       "name": "Nobile Rim 2 (NR207)",
       "lat": -83.918,
       "lon": 59.326,
-      "elev_m": 0.0,
+      "elev_m": 1039.5,
       "valid": true,
-      "score": 1.0,
+      "score": 0.956,
       "metrics": {
         "illum_pct": 0.5,
         "earth_vis_pct": 0.53,
-        "slope_deg": 0.0,
-        "max_dark_hours": 405.0,
-        "psr_dist_km": 0.0,
-        "sun_el_mean_deg": 1.92,
-        "max_blackout_hours": 309.0,
-        "sun_earth_pct": 0.28
+        "slope_deg": 1.86,
+        "max_dark_hours": 382.0,
+        "psr_dist_km": 0.2,
+        "sun_el_mean_deg": 1.91,
+        "max_blackout_hours": 312.0,
+        "sun_earth_pct": 0.26
       },
-      "reasons": ["slope_deg_pending", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
+      "reasons": ["slope_ok", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
       "source": "Wueller et al. 2026, J. Geophys. Res. Planets 131(3) e2025JE009434, Table A1, CLS NR207",
       "region": "south_pole",
       "kind": "candidate",
@@ -725,2661 +715,8 @@
           "threshold": 8,
           "objective": 2,
           "ok": true,
-          "value": null,
-          "margin": null,
-          "pending": true
-        },
-        {
-          "key": "illum_pct",
-          "threshold": 0.5,
-          "objective": 0.85,
-          "ok": true,
-          "value": 1.0,
-          "margin": 1.0
-        },
-        {
-          "key": "max_dark_hours",
-          "threshold": 100,
-          "objective": 24,
-          "ok": true,
-          "value": 0.0,
-          "margin": 1.0
-        },
-        {
-          "key": "earth_vis_pct",
-          "threshold": 0.5,
-          "objective": 0.95,
-          "ok": true,
-          "value": 1.0,
-          "margin": 1.0
-        },
-        {
-          "key": "max_blackout_hours",
-          "threshold": 72,
-          "objective": 12,
-          "ok": true,
-          "value": 0.0,
-          "margin": 1.0
-        }
-      ],
-      "pending_metrics": ["slope_deg", "psr_dist_km"]
-    },
-    {
-      "id": "faustini_rim",
-      "name": "Faustini Rim A (FRA02)",
-      "lat": -87.749,
-      "lon": 95.084,
-      "elev_m": 0.0,
-      "valid": true,
-      "score": 1.0,
-      "metrics": {
-        "illum_pct": 0.53,
-        "earth_vis_pct": 0.37,
-        "slope_deg": 0.0,
-        "max_dark_hours": 498.0,
-        "psr_dist_km": 0.0,
-        "sun_el_mean_deg": 0.81,
-        "max_blackout_hours": 414.0,
-        "sun_earth_pct": 0.19
-      },
-      "reasons": ["slope_deg_pending", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
-      "source": "Wueller et al. 2026, J. Geophys. Res. Planets 131(3) e2025JE009434, Table A1, CLS FRA02",
-      "region": "south_pole",
-      "kind": "candidate",
-      "group": "Artemis III region (2022): Faustini Rim A",
-      "checks": [
-        {
-          "key": "slope_deg",
-          "threshold": 8,
-          "objective": 2,
-          "ok": true,
-          "value": null,
-          "margin": null,
-          "pending": true
-        },
-        {
-          "key": "illum_pct",
-          "threshold": 0.5,
-          "objective": 0.85,
-          "ok": true,
-          "value": 1.0,
-          "margin": 1.0
-        },
-        {
-          "key": "max_dark_hours",
-          "threshold": 100,
-          "objective": 24,
-          "ok": true,
-          "value": 0.0,
-          "margin": 1.0
-        },
-        {
-          "key": "earth_vis_pct",
-          "threshold": 0.5,
-          "objective": 0.95,
-          "ok": true,
-          "value": 1.0,
-          "margin": 1.0
-        },
-        {
-          "key": "max_blackout_hours",
-          "threshold": 72,
-          "objective": 12,
-          "ok": true,
-          "value": 0.0,
-          "margin": 1.0
-        }
-      ],
-      "pending_metrics": ["slope_deg", "psr_dist_km"]
-    },
-    {
-      "id": "amundsen_rim",
-      "name": "Amundsen Rim (AR05)",
-      "lat": -84.229,
-      "lon": 69.877,
-      "elev_m": 0.0,
-      "valid": true,
-      "score": 1.0,
-      "metrics": {
-        "illum_pct": 0.5,
-        "earth_vis_pct": 0.48,
-        "slope_deg": 0.0,
-        "max_dark_hours": 408.0,
-        "psr_dist_km": 0.0,
-        "sun_el_mean_deg": 1.84,
-        "max_blackout_hours": 346.0,
-        "sun_earth_pct": 0.25
-      },
-      "reasons": ["slope_deg_pending", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
-      "source": "Wueller et al. 2026, J. Geophys. Res. Planets 131(3) e2025JE009434, Table A1, CLS AR05",
-      "region": "south_pole",
-      "kind": "candidate",
-      "group": "Artemis III region (2022): Amundsen Rim",
-      "checks": [
-        {
-          "key": "slope_deg",
-          "threshold": 8,
-          "objective": 2,
-          "ok": true,
-          "value": null,
-          "margin": null,
-          "pending": true
-        },
-        {
-          "key": "illum_pct",
-          "threshold": 0.5,
-          "objective": 0.85,
-          "ok": true,
-          "value": 1.0,
-          "margin": 1.0
-        },
-        {
-          "key": "max_dark_hours",
-          "threshold": 100,
-          "objective": 24,
-          "ok": true,
-          "value": 0.0,
-          "margin": 1.0
-        },
-        {
-          "key": "earth_vis_pct",
-          "threshold": 0.5,
-          "objective": 0.95,
-          "ok": true,
-          "value": 1.0,
-          "margin": 1.0
-        },
-        {
-          "key": "max_blackout_hours",
-          "threshold": 72,
-          "objective": 12,
-          "ok": true,
-          "value": 0.0,
-          "margin": 1.0
-        }
-      ],
-      "pending_metrics": ["slope_deg", "psr_dist_km"]
-    },
-    {
-      "id": "cabeus_b",
-      "name": "Peak near Cabeus B (PCB04)",
-      "lat": -83.369,
-      "lon": -67.665,
-      "elev_m": 0.0,
-      "valid": true,
-      "score": 0.69,
-      "metrics": {
-        "illum_pct": 0.51,
-        "earth_vis_pct": 0.5,
-        "slope_deg": 0.0,
-        "max_dark_hours": 401.0,
-        "psr_dist_km": 0.0,
-        "sun_el_mean_deg": 2.13,
-        "max_blackout_hours": 329.0,
-        "sun_earth_pct": 0.25
-      },
-      "reasons": ["slope_deg_pending", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
-      "source": "Wueller et al. 2026, J. Geophys. Res. Planets 131(3) e2025JE009434, Table A1, CLS PCB04",
-      "region": "south_pole",
-      "kind": "candidate",
-      "group": "Artemis III region (2024): Peak near Cabeus B",
-      "checks": [
-        {
-          "key": "slope_deg",
-          "threshold": 8,
-          "objective": 2,
-          "ok": true,
-          "value": null,
-          "margin": null,
-          "pending": true
-        },
-        {
-          "key": "illum_pct",
-          "threshold": 0.5,
-          "objective": 0.85,
-          "ok": true,
-          "value": 0.61,
-          "margin": 0.21999999999999997
-        },
-        {
-          "key": "max_dark_hours",
-          "threshold": 100,
-          "objective": 24,
-          "ok": true,
-          "value": 66.0,
-          "margin": 0.34
-        },
-        {
-          "key": "earth_vis_pct",
-          "threshold": 0.5,
-          "objective": 0.95,
-          "ok": true,
-          "value": 1.0,
-          "margin": 1.0
-        },
-        {
-          "key": "max_blackout_hours",
-          "threshold": 72,
-          "objective": 12,
-          "ok": true,
-          "value": 0.0,
-          "margin": 1.0
-        }
-      ],
-      "pending_metrics": ["slope_deg", "psr_dist_km"]
-    },
-    {
-      "id": "shoemaker_rim",
-      "name": "Shoemaker-Faustini ridge",
-      "lat": -87.1,
-      "lon": 65.4,
-      "elev_m": 0.0,
-      "valid": true,
-      "score": 1.0,
-      "metrics": {
-        "illum_pct": 0.51,
-        "earth_vis_pct": 0.44,
-        "slope_deg": 0.0,
-        "max_dark_hours": 465.0,
-        "psr_dist_km": 0.0,
-        "sun_el_mean_deg": 0.98,
-        "max_blackout_hours": 370.0,
-        "sun_earth_pct": 0.23
-      },
-      "reasons": ["slope_deg_pending", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
-      "source": "Flahaut et al. 2020, Planet. Space Sci. 180:104750 (doi:10.1016/j.pss.2019.104750), Table 2, site 2",
-      "region": "south_pole",
-      "kind": "candidate",
-      "group": "Luna-27 candidate site >80S (Flahaut et al. 2020), site 2 = Site A",
-      "checks": [
-        {
-          "key": "slope_deg",
-          "threshold": 8,
-          "objective": 2,
-          "ok": true,
-          "value": null,
-          "margin": null,
-          "pending": true
-        },
-        {
-          "key": "illum_pct",
-          "threshold": 0.5,
-          "objective": 0.85,
-          "ok": true,
-          "value": 1.0,
-          "margin": 1.0
-        },
-        {
-          "key": "max_dark_hours",
-          "threshold": 100,
-          "objective": 24,
-          "ok": true,
-          "value": 0.0,
-          "margin": 1.0
-        },
-        {
-          "key": "earth_vis_pct",
-          "threshold": 0.5,
-          "objective": 0.95,
-          "ok": true,
-          "value": 1.0,
-          "margin": 1.0
-        },
-        {
-          "key": "max_blackout_hours",
-          "threshold": 72,
-          "objective": 12,
-          "ok": true,
-          "value": 0.0,
-          "margin": 1.0
-        }
-      ],
-      "pending_metrics": ["slope_deg", "psr_dist_km"]
-    },
-    {
-      "id": "sverdrup_rim",
-      "name": "North Sverdrup",
-      "lat": -87.4,
-      "lon": -148.2,
-      "elev_m": 0.0,
-      "valid": false,
-      "score": 0.386,
-      "metrics": {
-        "illum_pct": 0.53,
-        "earth_vis_pct": 0.27,
-        "slope_deg": 0.0,
-        "max_dark_hours": 476.0,
-        "psr_dist_km": 0.0,
-        "sun_el_mean_deg": 0.96,
-        "max_blackout_hours": 481.0,
-        "sun_earth_pct": 0.14
-      },
-      "reasons": ["slope_deg_pending", "illum_low", "dark_long", "earth_ok", "blackout_ok"],
-      "source": "Flahaut et al. 2020, Planet. Space Sci. 180:104750 (doi:10.1016/j.pss.2019.104750), Table 2, site 9",
-      "region": "south_pole",
-      "kind": "candidate",
-      "group": "Luna-27 candidate site >80S (Flahaut et al. 2020), site 9",
-      "checks": [
-        {
-          "key": "slope_deg",
-          "threshold": 8,
-          "objective": 2,
-          "ok": true,
-          "value": null,
-          "margin": null,
-          "pending": true
-        },
-        {
-          "key": "illum_pct",
-          "threshold": 0.5,
-          "objective": 0.85,
-          "ok": false,
-          "value": 0.0,
-          "margin": -1.0
-        },
-        {
-          "key": "max_dark_hours",
-          "threshold": 100,
-          "objective": 24,
-          "ok": false,
-          "value": 168.0,
-          "margin": -0.68
-        },
-        {
-          "key": "earth_vis_pct",
-          "threshold": 0.5,
-          "objective": 0.95,
-          "ok": true,
-          "value": 0.85,
-          "margin": 0.7
-        },
-        {
-          "key": "max_blackout_hours",
-          "threshold": 72,
-          "objective": 12,
-          "ok": true,
-          "value": 26.0,
-          "margin": 0.6388888888888888
-        }
-      ],
-      "pending_metrics": ["slope_deg", "psr_dist_km"]
-    },
-    {
-      "id": "slater_plain",
-      "name": "Slater Plain (SP07)",
-      "lat": -87.131,
-      "lon": 127.857,
-      "elev_m": 0.0,
-      "valid": true,
-      "score": 0.859,
-      "metrics": {
-        "illum_pct": 0.53,
-        "earth_vis_pct": 0.28,
-        "slope_deg": 0.0,
-        "max_dark_hours": 464.0,
-        "psr_dist_km": 0.0,
-        "sun_el_mean_deg": 1.01,
-        "max_blackout_hours": 472.0,
-        "sun_earth_pct": 0.15
-      },
-      "reasons": ["slope_deg_pending", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
-      "source": "Wueller et al. 2026, J. Geophys. Res. Planets 131(3) e2025JE009434, Table A1, CLS SP07",
-      "region": "south_pole",
-      "kind": "candidate",
-      "group": "Artemis III region (2024): Slater Plain",
-      "checks": [
-        {
-          "key": "slope_deg",
-          "threshold": 8,
-          "objective": 2,
-          "ok": true,
-          "value": null,
-          "margin": null,
-          "pending": true
-        },
-        {
-          "key": "illum_pct",
-          "threshold": 0.5,
-          "objective": 0.85,
-          "ok": true,
-          "value": 0.8,
-          "margin": 0.6000000000000001
-        },
-        {
-          "key": "max_dark_hours",
-          "threshold": 100,
-          "objective": 24,
-          "ok": true,
-          "value": 34.0,
-          "margin": 0.66
-        },
-        {
-          "key": "earth_vis_pct",
-          "threshold": 0.5,
-          "objective": 0.95,
-          "ok": true,
-          "value": 0.88,
-          "margin": 0.76
-        },
-        {
-          "key": "max_blackout_hours",
-          "threshold": 72,
-          "objective": 12,
-          "ok": true,
-          "value": 20.0,
-          "margin": 0.7222222222222222
-        }
-      ],
-      "pending_metrics": ["slope_deg", "psr_dist_km"]
-    },
-    {
-      "id": "de_gerlache_kocher",
-      "name": "de Gerlache-Kocher massif (dGKM02)",
-      "lat": -85.777,
-      "lon": -116.502,
-      "elev_m": 0.0,
-      "valid": false,
-      "score": 0.451,
-      "metrics": {
-        "illum_pct": 0.52,
-        "earth_vis_pct": 0.29,
-        "slope_deg": 0.0,
-        "max_dark_hours": 428.0,
-        "psr_dist_km": 0.0,
-        "sun_el_mean_deg": 1.44,
-        "max_blackout_hours": 464.0,
-        "sun_earth_pct": 0.15
-      },
-      "reasons": ["slope_deg_pending", "illum_low", "dark_long", "earth_ok", "blackout_ok"],
-      "source": "Wueller et al. 2026, J. Geophys. Res. Planets 131(3) e2025JE009434, Table A1, CLS dGKM02",
-      "region": "south_pole",
-      "kind": "candidate",
-      "group": "Artemis III region (2022): de Gerlache-Kocher Massif",
-      "checks": [
-        {
-          "key": "slope_deg",
-          "threshold": 8,
-          "objective": 2,
-          "ok": true,
-          "value": null,
-          "margin": null,
-          "pending": true
-        },
-        {
-          "key": "illum_pct",
-          "threshold": 0.5,
-          "objective": 0.85,
-          "ok": false,
-          "value": 0.13,
-          "margin": -0.74
-        },
-        {
-          "key": "max_dark_hours",
-          "threshold": 100,
-          "objective": 24,
-          "ok": false,
-          "value": 146.0,
-          "margin": -0.46
-        },
-        {
-          "key": "earth_vis_pct",
-          "threshold": 0.5,
-          "objective": 0.95,
-          "ok": true,
-          "value": 0.9,
-          "margin": 0.8
-        },
-        {
-          "key": "max_blackout_hours",
-          "threshold": 72,
-          "objective": 12,
-          "ok": true,
-          "value": 17.0,
-          "margin": 0.7638888888888888
-        }
-      ],
-      "pending_metrics": ["slope_deg", "psr_dist_km"]
-    },
-    {
-      "id": "mons_mouton",
-      "name": "Mons Mouton Plateau (MMP02)",
-      "lat": -84.805,
-      "lon": 24.887,
-      "elev_m": 0.0,
-      "valid": true,
-      "score": 1.0,
-      "metrics": {
-        "illum_pct": 0.49,
-        "earth_vis_pct": 0.62,
-        "slope_deg": 0.0,
-        "max_dark_hours": 414.0,
-        "psr_dist_km": 0.0,
-        "sun_el_mean_deg": 1.65,
-        "max_blackout_hours": 256.0,
-        "sun_earth_pct": 0.31
-      },
-      "reasons": ["slope_deg_pending", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
-      "source": "Wueller et al. 2026, J. Geophys. Res. Planets 131(3) e2025JE009434, Table A1, CLS MMP02",
-      "region": "south_pole",
-      "kind": "candidate",
-      "group": "Artemis III region (2024): Mons Mouton Plateau",
-      "checks": [
-        {
-          "key": "slope_deg",
-          "threshold": 8,
-          "objective": 2,
-          "ok": true,
-          "value": null,
-          "margin": null,
-          "pending": true
-        },
-        {
-          "key": "illum_pct",
-          "threshold": 0.5,
-          "objective": 0.85,
-          "ok": true,
-          "value": 1.0,
-          "margin": 1.0
-        },
-        {
-          "key": "max_dark_hours",
-          "threshold": 100,
-          "objective": 24,
-          "ok": true,
-          "value": 0.0,
-          "margin": 1.0
-        },
-        {
-          "key": "earth_vis_pct",
-          "threshold": 0.5,
-          "objective": 0.95,
-          "ok": true,
-          "value": 1.0,
-          "margin": 1.0
-        },
-        {
-          "key": "max_blackout_hours",
-          "threshold": 72,
-          "objective": 12,
-          "ok": true,
-          "value": 0.0,
-          "margin": 1.0
-        }
-      ],
-      "pending_metrics": ["slope_deg", "psr_dist_km"]
-    },
-    {
-      "id": "plain_81s",
-      "name": "South Idel'son L plains",
-      "lat": -84.6,
-      "lon": 115.7,
-      "elev_m": 0.0,
-      "valid": true,
-      "score": 0.633,
-      "metrics": {
-        "illum_pct": 0.51,
-        "earth_vis_pct": 0.23,
-        "slope_deg": 0.0,
-        "max_dark_hours": 411.0,
-        "psr_dist_km": 0.0,
-        "sun_el_mean_deg": 1.77,
-        "max_blackout_hours": 506.0,
-        "sun_earth_pct": 0.12
-      },
-      "reasons": ["slope_deg_pending", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
-      "source": "Flahaut et al. 2020, Planet. Space Sci. 180:104750 (doi:10.1016/j.pss.2019.104750), Table 2, site 12",
-      "region": "south_pole",
-      "kind": "candidate",
-      "group": "Luna-27 candidate site >80S (Flahaut et al. 2020), site 12",
-      "checks": [
-        {
-          "key": "slope_deg",
-          "threshold": 8,
-          "objective": 2,
-          "ok": true,
-          "value": null,
-          "margin": null,
-          "pending": true
-        },
-        {
-          "key": "illum_pct",
-          "threshold": 0.5,
-          "objective": 0.85,
-          "ok": true,
-          "value": 0.73,
-          "margin": 0.45999999999999996
-        },
-        {
-          "key": "max_dark_hours",
-          "threshold": 100,
-          "objective": 24,
-          "ok": true,
-          "value": 45.0,
-          "margin": 0.55
-        },
-        {
-          "key": "earth_vis_pct",
-          "threshold": 0.5,
-          "objective": 0.95,
-          "ok": true,
-          "value": 0.77,
-          "margin": 0.54
-        },
-        {
-          "key": "max_blackout_hours",
-          "threshold": 72,
-          "objective": 12,
-          "ok": true,
-          "value": 39.0,
-          "margin": 0.4583333333333333
-        }
-      ],
-      "pending_metrics": ["slope_deg", "psr_dist_km"]
-    },
-    {
-      "id": "connecting_ridge_extension",
-      "name": "Connecting Ridge Extension (CRE01)",
-      "lat": -89.011,
-      "lon": -94.61,
-      "elev_m": 0.0,
-      "valid": true,
-      "score": 1.0,
-      "metrics": {
-        "illum_pct": 0.55,
-        "earth_vis_pct": 0.38,
-        "slope_deg": 0.0,
-        "max_dark_hours": 2663.0,
-        "psr_dist_km": 0.0,
-        "sun_el_mean_deg": 0.56,
-        "max_blackout_hours": 406.0,
-        "sun_earth_pct": 0.21
-      },
-      "reasons": ["slope_deg_pending", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
-      "source": "Wueller et al. 2026, J. Geophys. Res. Planets 131(3) e2025JE009434, Table A1, CLS CRE01",
-      "region": "south_pole",
-      "kind": "candidate",
-      "group": "Artemis III region (2022): Connecting Ridge Extension",
-      "checks": [
-        {
-          "key": "slope_deg",
-          "threshold": 8,
-          "objective": 2,
-          "ok": true,
-          "value": null,
-          "margin": null,
-          "pending": true
-        },
-        {
-          "key": "illum_pct",
-          "threshold": 0.5,
-          "objective": 0.85,
-          "ok": true,
-          "value": 1.0,
-          "margin": 1.0
-        },
-        {
-          "key": "max_dark_hours",
-          "threshold": 100,
-          "objective": 24,
-          "ok": true,
-          "value": 0.0,
-          "margin": 1.0
-        },
-        {
-          "key": "earth_vis_pct",
-          "threshold": 0.5,
-          "objective": 0.95,
-          "ok": true,
-          "value": 1.0,
-          "margin": 1.0
-        },
-        {
-          "key": "max_blackout_hours",
-          "threshold": 72,
-          "objective": 12,
-          "ok": true,
-          "value": 0.0,
-          "margin": 1.0
-        }
-      ],
-      "pending_metrics": ["slope_deg", "psr_dist_km"]
-    },
-    {
-      "id": "connecting_ridge_c2",
-      "name": "Connecting ridge C2 (illumination maximum)",
-      "lat": -89.3157,
-      "lon": -114.06,
-      "elev_m": 0.0,
-      "valid": true,
-      "score": 1.0,
-      "metrics": {
-        "illum_pct": 0.55,
-        "earth_vis_pct": 0.37,
-        "slope_deg": 0.0,
-        "max_dark_hours": 3318.0,
-        "psr_dist_km": 0.0,
-        "sun_el_mean_deg": 0.53,
-        "max_blackout_hours": 413.0,
-        "sun_earth_pct": 0.2
-      },
-      "reasons": ["slope_deg_pending", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
-      "source": "Glaser et al. 2018, Planet. Space Sci. 162:170-178 (doi:10.1016/j.pss.2017.07.006), Table 1, Connecting Ridge C2 (this study)",
-      "region": "south_pole",
-      "kind": "candidate",
-      "group": "Highly illuminated point (Glaser et al. 2018)",
-      "checks": [
-        {
-          "key": "slope_deg",
-          "threshold": 8,
-          "objective": 2,
-          "ok": true,
-          "value": null,
-          "margin": null,
-          "pending": true
-        },
-        {
-          "key": "illum_pct",
-          "threshold": 0.5,
-          "objective": 0.85,
-          "ok": true,
-          "value": 1.0,
-          "margin": 1.0
-        },
-        {
-          "key": "max_dark_hours",
-          "threshold": 100,
-          "objective": 24,
-          "ok": true,
-          "value": 0.0,
-          "margin": 1.0
-        },
-        {
-          "key": "earth_vis_pct",
-          "threshold": 0.5,
-          "objective": 0.95,
-          "ok": true,
-          "value": 1.0,
-          "margin": 1.0
-        },
-        {
-          "key": "max_blackout_hours",
-          "threshold": 72,
-          "objective": 12,
-          "ok": true,
-          "value": 0.0,
-          "margin": 1.0
-        }
-      ],
-      "pending_metrics": ["slope_deg", "psr_dist_km"]
-    },
-    {
-      "id": "connecting_ridge_cr05",
-      "name": "Connecting Ridge CR05 (PSR access)",
-      "lat": -89.421,
-      "lon": -149.472,
-      "elev_m": 0.0,
-      "valid": true,
-      "score": 1.0,
-      "metrics": {
-        "illum_pct": 0.55,
-        "earth_vis_pct": 0.35,
-        "slope_deg": 0.0,
-        "max_dark_hours": 3352.0,
-        "psr_dist_km": 0.0,
-        "sun_el_mean_deg": 0.53,
-        "max_blackout_hours": 421.0,
-        "sun_earth_pct": 0.2
-      },
-      "reasons": ["slope_deg_pending", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
-      "source": "Wueller et al. 2026, J. Geophys. Res. Planets 131(3) e2025JE009434, Table A1 and Sect. 4, CLS CR05",
-      "region": "south_pole",
-      "kind": "candidate",
-      "group": "Artemis III region (2022): Connecting Ridge",
-      "checks": [
-        {
-          "key": "slope_deg",
-          "threshold": 8,
-          "objective": 2,
-          "ok": true,
-          "value": null,
-          "margin": null,
-          "pending": true
-        },
-        {
-          "key": "illum_pct",
-          "threshold": 0.5,
-          "objective": 0.85,
-          "ok": true,
-          "value": 1.0,
-          "margin": 1.0
-        },
-        {
-          "key": "max_dark_hours",
-          "threshold": 100,
-          "objective": 24,
-          "ok": true,
-          "value": 0.0,
-          "margin": 1.0
-        },
-        {
-          "key": "earth_vis_pct",
-          "threshold": 0.5,
-          "objective": 0.95,
-          "ok": true,
-          "value": 1.0,
-          "margin": 1.0
-        },
-        {
-          "key": "max_blackout_hours",
-          "threshold": 72,
-          "objective": 12,
-          "ok": true,
-          "value": 0.0,
-          "margin": 1.0
-        }
-      ],
-      "pending_metrics": ["slope_deg", "psr_dist_km"]
-    },
-    {
-      "id": "peak_near_shackleton_pns02",
-      "name": "Peak Near Shackleton PNS02 (cold-PSR access)",
-      "lat": -89.061,
-      "lon": 128.442,
-      "elev_m": 0.0,
-      "valid": true,
-      "score": 1.0,
-      "metrics": {
-        "illum_pct": 0.55,
-        "earth_vis_pct": 0.35,
-        "slope_deg": 0.0,
-        "max_dark_hours": 2662.0,
-        "psr_dist_km": 0.0,
-        "sun_el_mean_deg": 0.56,
-        "max_blackout_hours": 425.0,
-        "sun_earth_pct": 0.19
-      },
-      "reasons": ["slope_deg_pending", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
-      "source": "Wueller et al. 2026, J. Geophys. Res. Planets 131(3) e2025JE009434, Table A1 and Sect. 4, CLS PNS02",
-      "region": "south_pole",
-      "kind": "candidate",
-      "group": "Artemis III region (2022): Peak Near Shackleton",
-      "checks": [
-        {
-          "key": "slope_deg",
-          "threshold": 8,
-          "objective": 2,
-          "ok": true,
-          "value": null,
-          "margin": null,
-          "pending": true
-        },
-        {
-          "key": "illum_pct",
-          "threshold": 0.5,
-          "objective": 0.85,
-          "ok": true,
-          "value": 1.0,
-          "margin": 1.0
-        },
-        {
-          "key": "max_dark_hours",
-          "threshold": 100,
-          "objective": 24,
-          "ok": true,
-          "value": 0.0,
-          "margin": 1.0
-        },
-        {
-          "key": "earth_vis_pct",
-          "threshold": 0.5,
-          "objective": 0.95,
-          "ok": true,
-          "value": 1.0,
-          "margin": 1.0
-        },
-        {
-          "key": "max_blackout_hours",
-          "threshold": 72,
-          "objective": 12,
-          "ok": true,
-          "value": 0.0,
-          "margin": 1.0
-        }
-      ],
-      "pending_metrics": ["slope_deg", "psr_dist_km"]
-    },
-    {
-      "id": "malapert_mp2",
-      "name": "Malapert peak (MP2)",
-      "lat": -86.0265,
-      "lon": 2.757964,
-      "elev_m": 0.0,
-      "valid": true,
-      "score": 1.0,
-      "metrics": {
-        "illum_pct": 0.5,
-        "earth_vis_pct": 0.57,
-        "slope_deg": 0.0,
-        "max_dark_hours": 434.0,
-        "psr_dist_km": 0.0,
-        "sun_el_mean_deg": 1.28,
-        "max_blackout_hours": 284.0,
-        "sun_earth_pct": 0.29
-      },
-      "reasons": ["slope_deg_pending", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
-      "source": "De Rosa et al. 2012, Planet. Space Sci. 74:224-246 (doi:10.1016/j.pss.2012.08.002), Table 2, RoI MP2 (Malapert Peak)",
-      "region": "south_pole",
-      "kind": "candidate",
-      "group": "Artemis III region (2022, 2024): Malapert Massif; ESA RoI MP2",
-      "checks": [
-        {
-          "key": "slope_deg",
-          "threshold": 8,
-          "objective": 2,
-          "ok": true,
-          "value": null,
-          "margin": null,
-          "pending": true
-        },
-        {
-          "key": "illum_pct",
-          "threshold": 0.5,
-          "objective": 0.85,
-          "ok": true,
-          "value": 1.0,
-          "margin": 1.0
-        },
-        {
-          "key": "max_dark_hours",
-          "threshold": 100,
-          "objective": 24,
-          "ok": true,
-          "value": 0.0,
-          "margin": 1.0
-        },
-        {
-          "key": "earth_vis_pct",
-          "threshold": 0.5,
-          "objective": 0.95,
-          "ok": true,
-          "value": 1.0,
-          "margin": 1.0
-        },
-        {
-          "key": "max_blackout_hours",
-          "threshold": 72,
-          "objective": 12,
-          "ok": true,
-          "value": 0.0,
-          "margin": 1.0
-        }
-      ],
-      "pending_metrics": ["slope_deg", "psr_dist_km"]
-    },
-    {
-      "id": "south_amundsen",
-      "name": "South Amundsen",
-      "lat": -85.0,
-      "lon": 90.0,
-      "elev_m": 0.0,
-      "valid": true,
-      "score": 1.0,
-      "metrics": {
-        "illum_pct": 0.51,
-        "earth_vis_pct": 0.37,
-        "slope_deg": 0.0,
-        "max_dark_hours": 416.0,
-        "psr_dist_km": 0.0,
-        "sun_el_mean_deg": 1.62,
-        "max_blackout_hours": 411.0,
-        "sun_earth_pct": 0.19
-      },
-      "reasons": ["slope_deg_pending", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
-      "source": "Flahaut et al. 2020, Planet. Space Sci. 180:104750 (doi:10.1016/j.pss.2019.104750), Table 2, site 1",
-      "region": "south_pole",
-      "kind": "candidate",
-      "group": "Luna-27 candidate site >80S (Flahaut et al. 2020), site 1",
-      "checks": [
-        {
-          "key": "slope_deg",
-          "threshold": 8,
-          "objective": 2,
-          "ok": true,
-          "value": null,
-          "margin": null,
-          "pending": true
-        },
-        {
-          "key": "illum_pct",
-          "threshold": 0.5,
-          "objective": 0.85,
-          "ok": true,
-          "value": 1.0,
-          "margin": 1.0
-        },
-        {
-          "key": "max_dark_hours",
-          "threshold": 100,
-          "objective": 24,
-          "ok": true,
-          "value": 0.0,
-          "margin": 1.0
-        },
-        {
-          "key": "earth_vis_pct",
-          "threshold": 0.5,
-          "objective": 0.95,
-          "ok": true,
-          "value": 1.0,
-          "margin": 1.0
-        },
-        {
-          "key": "max_blackout_hours",
-          "threshold": 72,
-          "objective": 12,
-          "ok": true,
-          "value": 0.0,
-          "margin": 1.0
-        }
-      ],
-      "pending_metrics": ["slope_deg", "psr_dist_km"]
-    },
-    {
-      "id": "shackleton_vicinity_25e",
-      "name": "Near Shackleton (25.5E)",
-      "lat": -89.5,
-      "lon": 25.5,
-      "elev_m": 0.0,
-      "valid": true,
-      "score": 1.0,
-      "metrics": {
-        "illum_pct": 0.55,
-        "earth_vis_pct": 0.4,
-        "slope_deg": 0.0,
-        "max_dark_hours": 3369.0,
-        "psr_dist_km": 0.0,
-        "sun_el_mean_deg": 0.5,
-        "max_blackout_hours": 392.0,
-        "sun_earth_pct": 0.22
-      },
-      "reasons": ["slope_deg_pending", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
-      "source": "Flahaut et al. 2020, Planet. Space Sci. 180:104750 (doi:10.1016/j.pss.2019.104750), Table 2, site 3",
-      "region": "south_pole",
-      "kind": "candidate",
-      "group": "Luna-27 candidate site >80S (Flahaut et al. 2020), site 3",
-      "checks": [
-        {
-          "key": "slope_deg",
-          "threshold": 8,
-          "objective": 2,
-          "ok": true,
-          "value": null,
-          "margin": null,
-          "pending": true
-        },
-        {
-          "key": "illum_pct",
-          "threshold": 0.5,
-          "objective": 0.85,
-          "ok": true,
-          "value": 1.0,
-          "margin": 1.0
-        },
-        {
-          "key": "max_dark_hours",
-          "threshold": 100,
-          "objective": 24,
-          "ok": true,
-          "value": 0.0,
-          "margin": 1.0
-        },
-        {
-          "key": "earth_vis_pct",
-          "threshold": 0.5,
-          "objective": 0.95,
-          "ok": true,
-          "value": 1.0,
-          "margin": 1.0
-        },
-        {
-          "key": "max_blackout_hours",
-          "threshold": 72,
-          "objective": 12,
-          "ok": true,
-          "value": 0.0,
-          "margin": 1.0
-        }
-      ],
-      "pending_metrics": ["slope_deg", "psr_dist_km"]
-    },
-    {
-      "id": "faustini_ridge",
-      "name": "Faustini ridge",
-      "lat": -87.6,
-      "lon": 103.7,
-      "elev_m": 0.0,
-      "valid": true,
-      "score": 1.0,
-      "metrics": {
-        "illum_pct": 0.53,
-        "earth_vis_pct": 0.35,
-        "slope_deg": 0.0,
-        "max_dark_hours": 488.0,
-        "psr_dist_km": 0.0,
-        "sun_el_mean_deg": 0.86,
-        "max_blackout_hours": 428.0,
-        "sun_earth_pct": 0.18
-      },
-      "reasons": ["slope_deg_pending", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
-      "source": "Flahaut et al. 2020, Planet. Space Sci. 180:104750 (doi:10.1016/j.pss.2019.104750), Table 2, site 4",
-      "region": "south_pole",
-      "kind": "candidate",
-      "group": "Luna-27 candidate site >80S (Flahaut et al. 2020), site 4",
-      "checks": [
-        {
-          "key": "slope_deg",
-          "threshold": 8,
-          "objective": 2,
-          "ok": true,
-          "value": null,
-          "margin": null,
-          "pending": true
-        },
-        {
-          "key": "illum_pct",
-          "threshold": 0.5,
-          "objective": 0.85,
-          "ok": true,
-          "value": 1.0,
-          "margin": 1.0
-        },
-        {
-          "key": "max_dark_hours",
-          "threshold": 100,
-          "objective": 24,
-          "ok": true,
-          "value": 0.0,
-          "margin": 1.0
-        },
-        {
-          "key": "earth_vis_pct",
-          "threshold": 0.5,
-          "objective": 0.95,
-          "ok": true,
-          "value": 1.0,
-          "margin": 1.0
-        },
-        {
-          "key": "max_blackout_hours",
-          "threshold": 72,
-          "objective": 12,
-          "ok": true,
-          "value": 0.0,
-          "margin": 1.0
-        }
-      ],
-      "pending_metrics": ["slope_deg", "psr_dist_km"]
-    },
-    {
-      "id": "shackleton_vicinity_101e",
-      "name": "Near Shackleton (101.4E)",
-      "lat": -88.6,
-      "lon": 101.4,
-      "elev_m": 0.0,
-      "valid": true,
-      "score": 1.0,
-      "metrics": {
-        "illum_pct": 0.55,
-        "earth_vis_pct": 0.36,
-        "slope_deg": 0.0,
-        "max_dark_hours": 635.0,
-        "psr_dist_km": 0.0,
-        "sun_el_mean_deg": 0.61,
-        "max_blackout_hours": 415.0,
-        "sun_earth_pct": 0.2
-      },
-      "reasons": ["slope_deg_pending", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
-      "source": "Flahaut et al. 2020, Planet. Space Sci. 180:104750 (doi:10.1016/j.pss.2019.104750), Table 2, site 5",
-      "region": "south_pole",
-      "kind": "candidate",
-      "group": "Luna-27 candidate site >80S (Flahaut et al. 2020), site 5",
-      "checks": [
-        {
-          "key": "slope_deg",
-          "threshold": 8,
-          "objective": 2,
-          "ok": true,
-          "value": null,
-          "margin": null,
-          "pending": true
-        },
-        {
-          "key": "illum_pct",
-          "threshold": 0.5,
-          "objective": 0.85,
-          "ok": true,
-          "value": 1.0,
-          "margin": 1.0
-        },
-        {
-          "key": "max_dark_hours",
-          "threshold": 100,
-          "objective": 24,
-          "ok": true,
-          "value": 0.0,
-          "margin": 1.0
-        },
-        {
-          "key": "earth_vis_pct",
-          "threshold": 0.5,
-          "objective": 0.95,
-          "ok": true,
-          "value": 1.0,
-          "margin": 1.0
-        },
-        {
-          "key": "max_blackout_hours",
-          "threshold": 72,
-          "objective": 12,
-          "ok": true,
-          "value": 0.0,
-          "margin": 1.0
-        }
-      ],
-      "pending_metrics": ["slope_deg", "psr_dist_km"]
-    },
-    {
-      "id": "ibn_bajja_sw",
-      "name": "South-west Ibn Bajja plains",
-      "lat": -86.4,
-      "lon": -86.7,
-      "elev_m": 0.0,
-      "valid": true,
-      "score": 0.604,
-      "metrics": {
-        "illum_pct": 0.52,
-        "earth_vis_pct": 0.4,
-        "slope_deg": 0.0,
-        "max_dark_hours": 443.0,
-        "psr_dist_km": 0.0,
-        "sun_el_mean_deg": 1.21,
-        "max_blackout_hours": 396.0,
-        "sun_earth_pct": 0.2
-      },
-      "reasons": ["slope_deg_pending", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
-      "source": "Flahaut et al. 2020, Planet. Space Sci. 180:104750 (doi:10.1016/j.pss.2019.104750), Table 2, site 6",
-      "region": "south_pole",
-      "kind": "candidate",
-      "group": "Luna-27 candidate site >80S (Flahaut et al. 2020), site 6 = Site B",
-      "checks": [
-        {
-          "key": "slope_deg",
-          "threshold": 8,
-          "objective": 2,
-          "ok": true,
-          "value": null,
-          "margin": null,
-          "pending": true
-        },
-        {
-          "key": "illum_pct",
-          "threshold": 0.5,
-          "objective": 0.85,
-          "ok": true,
-          "value": 0.54,
-          "margin": 0.08000000000000007
-        },
-        {
-          "key": "max_dark_hours",
-          "threshold": 100,
-          "objective": 24,
-          "ok": true,
-          "value": 77.0,
-          "margin": 0.23
-        },
-        {
-          "key": "earth_vis_pct",
-          "threshold": 0.5,
-          "objective": 0.95,
-          "ok": true,
-          "value": 1.0,
-          "margin": 1.0
-        },
-        {
-          "key": "max_blackout_hours",
-          "threshold": 72,
-          "objective": 12,
-          "ok": true,
-          "value": 0.0,
-          "margin": 1.0
-        }
-      ],
-      "pending_metrics": ["slope_deg", "psr_dist_km"]
-    },
-    {
-      "id": "cabeus_b_south",
-      "name": "South of Cabeus B",
-      "lat": -84.0,
-      "lon": -60.5,
-      "elev_m": 0.0,
-      "valid": true,
-      "score": 0.821,
-      "metrics": {
-        "illum_pct": 0.51,
-        "earth_vis_pct": 0.52,
-        "slope_deg": 0.0,
-        "max_dark_hours": 406.0,
-        "psr_dist_km": 0.0,
-        "sun_el_mean_deg": 1.92,
-        "max_blackout_hours": 317.0,
-        "sun_earth_pct": 0.26
-      },
-      "reasons": ["slope_deg_pending", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
-      "source": "Flahaut et al. 2020, Planet. Space Sci. 180:104750 (doi:10.1016/j.pss.2019.104750), Table 2, site 7",
-      "region": "south_pole",
-      "kind": "candidate",
-      "group": "Luna-27 candidate site >80S (Flahaut et al. 2020), site 7",
-      "checks": [
-        {
-          "key": "slope_deg",
-          "threshold": 8,
-          "objective": 2,
-          "ok": true,
-          "value": null,
-          "margin": null,
-          "pending": true
-        },
-        {
-          "key": "illum_pct",
-          "threshold": 0.5,
-          "objective": 0.85,
-          "ok": true,
-          "value": 0.71,
-          "margin": 0.41999999999999993
-        },
-        {
-          "key": "max_dark_hours",
-          "threshold": 100,
-          "objective": 24,
-          "ok": true,
-          "value": 48.0,
-          "margin": 0.52
-        },
-        {
-          "key": "earth_vis_pct",
-          "threshold": 0.5,
-          "objective": 0.95,
-          "ok": true,
-          "value": 1.0,
-          "margin": 1.0
-        },
-        {
-          "key": "max_blackout_hours",
-          "threshold": 72,
-          "objective": 12,
-          "ok": true,
-          "value": 0.0,
-          "margin": 1.0
-        }
-      ],
-      "pending_metrics": ["slope_deg", "psr_dist_km"]
-    },
-    {
-      "id": "de_gerlache_north",
-      "name": "North de Gerlache",
-      "lat": -87.9,
-      "lon": -65.1,
-      "elev_m": 0.0,
-      "valid": true,
-      "score": 1.0,
-      "metrics": {
-        "illum_pct": 0.53,
-        "earth_vis_pct": 0.43,
-        "slope_deg": 0.0,
-        "max_dark_hours": 517.0,
-        "psr_dist_km": 0.0,
-        "sun_el_mean_deg": 0.76,
-        "max_blackout_hours": 377.0,
-        "sun_earth_pct": 0.22
-      },
-      "reasons": ["slope_deg_pending", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
-      "source": "Flahaut et al. 2020, Planet. Space Sci. 180:104750 (doi:10.1016/j.pss.2019.104750), Table 2, site 8",
-      "region": "south_pole",
-      "kind": "candidate",
-      "group": "Luna-27 candidate site >80S (Flahaut et al. 2020), site 8",
-      "checks": [
-        {
-          "key": "slope_deg",
-          "threshold": 8,
-          "objective": 2,
-          "ok": true,
-          "value": null,
-          "margin": null,
-          "pending": true
-        },
-        {
-          "key": "illum_pct",
-          "threshold": 0.5,
-          "objective": 0.85,
-          "ok": true,
-          "value": 1.0,
-          "margin": 1.0
-        },
-        {
-          "key": "max_dark_hours",
-          "threshold": 100,
-          "objective": 24,
-          "ok": true,
-          "value": 0.0,
-          "margin": 1.0
-        },
-        {
-          "key": "earth_vis_pct",
-          "threshold": 0.5,
-          "objective": 0.95,
-          "ok": true,
-          "value": 1.0,
-          "margin": 1.0
-        },
-        {
-          "key": "max_blackout_hours",
-          "threshold": 72,
-          "objective": 12,
-          "ok": true,
-          "value": 0.0,
-          "margin": 1.0
-        }
-      ],
-      "pending_metrics": ["slope_deg", "psr_dist_km"]
-    },
-    {
-      "id": "sverdrup_west",
-      "name": "West Sverdrup",
-      "lat": -88.0,
-      "lon": 173.2,
-      "elev_m": 0.0,
-      "valid": true,
-      "score": 0.481,
-      "metrics": {
-        "illum_pct": 0.54,
-        "earth_vis_pct": 0.27,
-        "slope_deg": 0.0,
-        "max_dark_hours": 516.0,
-        "psr_dist_km": 0.0,
-        "sun_el_mean_deg": 0.78,
-        "max_blackout_hours": 476.0,
-        "sun_earth_pct": 0.15
-      },
-      "reasons": ["slope_deg_pending", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
-      "source": "Flahaut et al. 2020, Planet. Space Sci. 180:104750 (doi:10.1016/j.pss.2019.104750), Table 2, site 10",
-      "region": "south_pole",
-      "kind": "candidate",
-      "group": "Luna-27 candidate site >80S (Flahaut et al. 2020), site 10",
-      "checks": [
-        {
-          "key": "slope_deg",
-          "threshold": 8,
-          "objective": 2,
-          "ok": true,
-          "value": null,
-          "margin": null,
-          "pending": true
-        },
-        {
-          "key": "illum_pct",
-          "threshold": 0.5,
-          "objective": 0.85,
-          "ok": true,
-          "value": 0.52,
-          "margin": 0.040000000000000036
-        },
-        {
-          "key": "max_dark_hours",
-          "threshold": 100,
-          "objective": 24,
-          "ok": true,
-          "value": 81.0,
-          "margin": 0.19
-        },
-        {
-          "key": "earth_vis_pct",
-          "threshold": 0.5,
-          "objective": 0.95,
-          "ok": true,
-          "value": 0.86,
-          "margin": 0.72
-        },
-        {
-          "key": "max_blackout_hours",
-          "threshold": 72,
-          "objective": 12,
-          "ok": true,
-          "value": 23.0,
-          "margin": 0.6805555555555556
-        }
-      ],
-      "pending_metrics": ["slope_deg", "psr_dist_km"]
-    },
-    {
-      "id": "wiechert_p_south",
-      "name": "South Wiechert P",
-      "lat": -87.2,
-      "lon": 146.7,
-      "elev_m": 0.0,
-      "valid": true,
-      "score": 0.495,
-      "metrics": {
-        "illum_pct": 0.53,
-        "earth_vis_pct": 0.25,
-        "slope_deg": 0.0,
-        "max_dark_hours": 465.0,
-        "psr_dist_km": 0.0,
-        "sun_el_mean_deg": 1.0,
-        "max_blackout_hours": 495.0,
-        "sun_earth_pct": 0.13
-      },
-      "reasons": ["slope_deg_pending", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
-      "source": "Flahaut et al. 2020, Planet. Space Sci. 180:104750 (doi:10.1016/j.pss.2019.104750), Table 2, site 11",
-      "region": "south_pole",
-      "kind": "candidate",
-      "group": "Luna-27 candidate site >80S (Flahaut et al. 2020), site 11",
-      "checks": [
-        {
-          "key": "slope_deg",
-          "threshold": 8,
-          "objective": 2,
-          "ok": true,
-          "value": null,
-          "margin": null,
-          "pending": true
-        },
-        {
-          "key": "illum_pct",
-          "threshold": 0.5,
-          "objective": 0.85,
-          "ok": true,
-          "value": 0.59,
-          "margin": 0.17999999999999994
-        },
-        {
-          "key": "max_dark_hours",
-          "threshold": 100,
-          "objective": 24,
-          "ok": true,
-          "value": 69.0,
-          "margin": 0.31
-        },
-        {
-          "key": "earth_vis_pct",
-          "threshold": 0.5,
-          "objective": 0.95,
-          "ok": true,
-          "value": 0.8,
-          "margin": 0.6000000000000001
-        },
-        {
-          "key": "max_blackout_hours",
-          "threshold": 72,
-          "objective": 12,
-          "ok": true,
-          "value": 33.0,
-          "margin": 0.5416666666666666
-        }
-      ],
-      "pending_metrics": ["slope_deg", "psr_dist_km"]
-    },
-    {
-      "id": "amundsen_west",
-      "name": "West Amundsen",
-      "lat": -85.8,
-      "lon": 112.7,
-      "elev_m": 0.0,
-      "valid": true,
-      "score": 0.91,
-      "metrics": {
-        "illum_pct": 0.51,
-        "earth_vis_pct": 0.28,
-        "slope_deg": 0.0,
-        "max_dark_hours": 428.0,
-        "psr_dist_km": 0.0,
-        "sun_el_mean_deg": 1.4,
-        "max_blackout_hours": 471.0,
-        "sun_earth_pct": 0.15
-      },
-      "reasons": ["slope_deg_pending", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
-      "source": "Flahaut et al. 2020, Planet. Space Sci. 180:104750 (doi:10.1016/j.pss.2019.104750), Table 2, site 13",
-      "region": "south_pole",
-      "kind": "candidate",
-      "group": "Luna-27 candidate site >80S (Flahaut et al. 2020), site 13",
-      "checks": [
-        {
-          "key": "slope_deg",
-          "threshold": 8,
-          "objective": 2,
-          "ok": true,
-          "value": null,
-          "margin": null,
-          "pending": true
-        },
-        {
-          "key": "illum_pct",
-          "threshold": 0.5,
-          "objective": 0.85,
-          "ok": true,
-          "value": 0.83,
-          "margin": 0.6599999999999999
-        },
-        {
-          "key": "max_dark_hours",
-          "threshold": 100,
-          "objective": 24,
-          "ok": true,
-          "value": 28.0,
-          "margin": 0.72
-        },
-        {
-          "key": "earth_vis_pct",
-          "threshold": 0.5,
-          "objective": 0.95,
-          "ok": true,
-          "value": 0.89,
-          "margin": 0.78
-        },
-        {
-          "key": "max_blackout_hours",
-          "threshold": 72,
-          "objective": 12,
-          "ok": true,
-          "value": 19.0,
-          "margin": 0.7361111111111112
-        }
-      ],
-      "pending_metrics": ["slope_deg", "psr_dist_km"]
-    },
-    {
-      "id": "wiechert_j_south",
-      "name": "South Wiechert J",
-      "lat": -86.5,
-      "lon": 176.6,
-      "elev_m": 0.0,
-      "valid": false,
-      "score": 0.114,
-      "metrics": {
-        "illum_pct": 0.53,
-        "earth_vis_pct": 0.17,
-        "slope_deg": 0.0,
-        "max_dark_hours": 442.0,
-        "psr_dist_km": 0.0,
-        "sun_el_mean_deg": 1.24,
-        "max_blackout_hours": 547.0,
-        "sun_earth_pct": 0.09
-      },
-      "reasons": ["slope_deg_pending", "illum_low", "dark_long", "earth_ok", "blackout_ok"],
-      "source": "Flahaut et al. 2020, Planet. Space Sci. 180:104750 (doi:10.1016/j.pss.2019.104750), Table 2, site 14",
-      "region": "south_pole",
-      "kind": "candidate",
-      "group": "Luna-27 candidate site >80S (Flahaut et al. 2020), site 14",
-      "checks": [
-        {
-          "key": "slope_deg",
-          "threshold": 8,
-          "objective": 2,
-          "ok": true,
-          "value": null,
-          "margin": null,
-          "pending": true
-        },
-        {
-          "key": "illum_pct",
-          "threshold": 0.5,
-          "objective": 0.85,
-          "ok": false,
-          "value": 0.15,
-          "margin": -0.7
-        },
-        {
-          "key": "max_dark_hours",
-          "threshold": 100,
-          "objective": 24,
-          "ok": false,
-          "value": 143.0,
-          "margin": -0.43
-        },
-        {
-          "key": "earth_vis_pct",
-          "threshold": 0.5,
-          "objective": 0.95,
-          "ok": true,
-          "value": 0.63,
-          "margin": 0.26
-        },
-        {
-          "key": "max_blackout_hours",
-          "threshold": 72,
-          "objective": 12,
-          "ok": true,
-          "value": 62.0,
-          "margin": 0.1388888888888889
-        }
-      ],
-      "pending_metrics": ["slope_deg", "psr_dist_km"]
-    },
-    {
-      "id": "im1_odysseus",
-      "name": "IM-1 Odysseus (near Malapert A)",
-      "lat": -80.13,
-      "lon": 1.44,
-      "elev_m": 0.0,
-      "valid": true,
-      "score": 1.0,
-      "metrics": {
-        "illum_pct": 0.49,
-        "earth_vis_pct": 1.0,
-        "slope_deg": 0.0,
-        "max_dark_hours": 385.0,
-        "psr_dist_km": 0.0,
-        "sun_el_mean_deg": 3.07,
-        "max_blackout_hours": 0.0,
-        "sun_earth_pct": 0.49
-      },
-      "reasons": ["slope_deg_pending", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
-      "source": "LROC featured image 1360, 'Intuitive Machines IM-1 On The Moon!'",
-      "region": "south_pole",
-      "kind": "historic_landing",
-      "group": "Commercial lander (Intuitive Machines), landed 2024-02-22",
-      "checks": [
-        {
-          "key": "slope_deg",
-          "threshold": 8,
-          "objective": 2,
-          "ok": true,
-          "value": null,
-          "margin": null,
-          "pending": true
-        },
-        {
-          "key": "illum_pct",
-          "threshold": 0.5,
-          "objective": 0.85,
-          "ok": true,
-          "value": 1.0,
-          "margin": 1.0
-        },
-        {
-          "key": "max_dark_hours",
-          "threshold": 100,
-          "objective": 24,
-          "ok": true,
-          "value": 0.0,
-          "margin": 1.0
-        },
-        {
-          "key": "earth_vis_pct",
-          "threshold": 0.5,
-          "objective": 0.95,
-          "ok": true,
-          "value": 1.0,
-          "margin": 1.0
-        },
-        {
-          "key": "max_blackout_hours",
-          "threshold": 72,
-          "objective": 12,
-          "ok": true,
-          "value": 0.0,
-          "margin": 1.0
-        }
-      ],
-      "pending_metrics": ["slope_deg", "psr_dist_km"]
-    },
-    {
-      "id": "im2_athena",
-      "name": "IM-2 Athena (Mons Mouton area)",
-      "lat": -84.7906,
-      "lon": 29.1957,
-      "elev_m": 0.0,
-      "valid": true,
-      "score": 1.0,
-      "metrics": {
-        "illum_pct": 0.49,
-        "earth_vis_pct": 0.61,
-        "slope_deg": 0.0,
-        "max_dark_hours": 414.0,
-        "psr_dist_km": 0.0,
-        "sun_el_mean_deg": 1.65,
-        "max_blackout_hours": 262.0,
-        "sun_earth_pct": 0.31
-      },
-      "reasons": ["slope_deg_pending", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
-      "source": "LROC featured image 1408, 'IM-2 Athena Seen Obliquely'",
-      "region": "south_pole",
-      "kind": "historic_landing",
-      "group": "Commercial lander (Intuitive Machines), landed 2025-03-06",
-      "checks": [
-        {
-          "key": "slope_deg",
-          "threshold": 8,
-          "objective": 2,
-          "ok": true,
-          "value": null,
-          "margin": null,
-          "pending": true
-        },
-        {
-          "key": "illum_pct",
-          "threshold": 0.5,
-          "objective": 0.85,
-          "ok": true,
-          "value": 1.0,
-          "margin": 1.0
-        },
-        {
-          "key": "max_dark_hours",
-          "threshold": 100,
-          "objective": 24,
-          "ok": true,
-          "value": 0.0,
-          "margin": 1.0
-        },
-        {
-          "key": "earth_vis_pct",
-          "threshold": 0.5,
-          "objective": 0.95,
-          "ok": true,
-          "value": 1.0,
-          "margin": 1.0
-        },
-        {
-          "key": "max_blackout_hours",
-          "threshold": 72,
-          "objective": 12,
-          "ok": true,
-          "value": 0.0,
-          "margin": 1.0
-        }
-      ],
-      "pending_metrics": ["slope_deg", "psr_dist_km"]
-    },
-    {
-      "id": "hinshelwood_rim",
-      "name": "Hinshelwood crater rim (H)",
-      "lat": 89.6564,
-      "lon": -33.56,
-      "elev_m": 0.0,
-      "valid": false,
-      "score": 0.0,
-      "metrics": {
-        "illum_pct": 0.5,
-        "earth_vis_pct": 0.43,
-        "slope_deg": 0.0,
-        "max_dark_hours": 3180.0,
-        "psr_dist_km": 0.0,
-        "sun_el_mean_deg": 0.48,
-        "max_blackout_hours": 390.0,
-        "sun_earth_pct": 0.21
-      },
-      "reasons": ["slope_deg_pending", "illum_low", "dark_long", "earth_low", "blackout_long"],
-      "source": "Glaser et al. 2018, Planet. Space Sci. 162:170-178 (doi:10.1016/j.pss.2017.07.006), Table 1, Hinshelwood H (this study)",
-      "region": "north_pole",
-      "kind": "candidate",
-      "group": "Highly illuminated point (Glaser et al. 2018)",
-      "checks": [
-        {
-          "key": "slope_deg",
-          "threshold": 8,
-          "objective": 2,
-          "ok": true,
-          "value": null,
-          "margin": null,
-          "pending": true
-        },
-        {
-          "key": "illum_pct",
-          "threshold": 0.5,
-          "objective": 0.85,
-          "ok": false,
-          "value": 0.0,
-          "margin": -1.0
-        },
-        {
-          "key": "max_dark_hours",
-          "threshold": 100,
-          "objective": 24,
-          "ok": false,
-          "value": 168.0,
-          "margin": -0.68
-        },
-        {
-          "key": "earth_vis_pct",
-          "threshold": 0.5,
-          "objective": 0.95,
-          "ok": false,
-          "value": 0.0,
-          "margin": -1.0
-        },
-        {
-          "key": "max_blackout_hours",
-          "threshold": 72,
-          "objective": 12,
-          "ok": false,
-          "value": 168.0,
-          "margin": -1.3333333333333333
-        }
-      ],
-      "pending_metrics": ["slope_deg", "psr_dist_km"]
-    },
-    {
-      "id": "peary_rim",
-      "name": "Peary crater rim (P)",
-      "lat": 89.726,
-      "lon": 123.11,
-      "elev_m": 0.0,
-      "valid": false,
-      "score": 0.0,
-      "metrics": {
-        "illum_pct": 0.52,
-        "earth_vis_pct": 0.4,
-        "slope_deg": 0.0,
-        "max_dark_hours": 3389.0,
-        "psr_dist_km": 0.0,
-        "sun_el_mean_deg": 0.48,
-        "max_blackout_hours": 404.0,
-        "sun_earth_pct": 0.21
-      },
-      "reasons": ["slope_deg_pending", "illum_low", "dark_long", "earth_low", "blackout_long"],
-      "source": "Glaser et al. 2018, Planet. Space Sci. 162:170-178 (doi:10.1016/j.pss.2017.07.006), Table 1, Peary P (this study)",
-      "region": "north_pole",
-      "kind": "candidate",
-      "group": "Highly illuminated point (Glaser et al. 2018)",
-      "checks": [
-        {
-          "key": "slope_deg",
-          "threshold": 8,
-          "objective": 2,
-          "ok": true,
-          "value": null,
-          "margin": null,
-          "pending": true
-        },
-        {
-          "key": "illum_pct",
-          "threshold": 0.5,
-          "objective": 0.85,
-          "ok": false,
-          "value": 0.0,
-          "margin": -1.0
-        },
-        {
-          "key": "max_dark_hours",
-          "threshold": 100,
-          "objective": 24,
-          "ok": false,
-          "value": 168.0,
-          "margin": -0.68
-        },
-        {
-          "key": "earth_vis_pct",
-          "threshold": 0.5,
-          "objective": 0.95,
-          "ok": false,
-          "value": 0.0,
-          "margin": -1.0
-        },
-        {
-          "key": "max_blackout_hours",
-          "threshold": 72,
-          "objective": 12,
-          "ok": false,
-          "value": 168.0,
-          "margin": -1.3333333333333333
-        }
-      ],
-      "pending_metrics": ["slope_deg", "psr_dist_km"]
-    },
-    {
-      "id": "whipple_rim",
-      "name": "Whipple crater rim (W)",
-      "lat": 89.3766,
-      "lon": 126.48,
-      "elev_m": 0.0,
-      "valid": false,
-      "score": 0.0,
-      "metrics": {
-        "illum_pct": 0.51,
-        "earth_vis_pct": 0.39,
-        "slope_deg": 0.0,
-        "max_dark_hours": 3326.0,
-        "psr_dist_km": 0.0,
-        "sun_el_mean_deg": 0.49,
-        "max_blackout_hours": 411.0,
-        "sun_earth_pct": 0.2
-      },
-      "reasons": ["slope_deg_pending", "illum_low", "dark_long", "earth_low", "blackout_long"],
-      "source": "Glaser et al. 2018, Planet. Space Sci. 162:170-178 (doi:10.1016/j.pss.2017.07.006), Table 1, Whipple W (this study)",
-      "region": "north_pole",
-      "kind": "candidate",
-      "group": "Highly illuminated point (Glaser et al. 2018)",
-      "checks": [
-        {
-          "key": "slope_deg",
-          "threshold": 8,
-          "objective": 2,
-          "ok": true,
-          "value": null,
-          "margin": null,
-          "pending": true
-        },
-        {
-          "key": "illum_pct",
-          "threshold": 0.5,
-          "objective": 0.85,
-          "ok": false,
-          "value": 0.0,
-          "margin": -1.0
-        },
-        {
-          "key": "max_dark_hours",
-          "threshold": 100,
-          "objective": 24,
-          "ok": false,
-          "value": 168.0,
-          "margin": -0.68
-        },
-        {
-          "key": "earth_vis_pct",
-          "threshold": 0.5,
-          "objective": 0.95,
-          "ok": false,
-          "value": 0.0,
-          "margin": -1.0
-        },
-        {
-          "key": "max_blackout_hours",
-          "threshold": 72,
-          "objective": 12,
-          "ok": false,
-          "value": 168.0,
-          "margin": -1.3333333333333333
-        }
-      ],
-      "pending_metrics": ["slope_deg", "psr_dist_km"]
-    },
-    {
-      "id": "apollo_11",
-      "name": "Apollo 11 LM (Tranquility Base)",
-      "lat": 0.67416,
-      "lon": 23.47314,
-      "elev_m": 0.0,
-      "valid": true,
-      "score": 1.0,
-      "metrics": {
-        "illum_pct": 0.49,
-        "earth_vis_pct": 1.0,
-        "slope_deg": 0.0,
-        "max_dark_hours": 355.0,
-        "psr_dist_km": 0.0,
-        "sun_el_mean_deg": 21.86,
-        "max_blackout_hours": 0.0,
-        "sun_earth_pct": 0.49
-      },
-      "reasons": ["slope_deg_pending", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
-      "source": "Wagner et al. 2017, Icarus 283:92-103 (doi:10.1016/j.icarus.2016.05.011); LROC 2016 coordinate table, Apollo 11 LM",
-      "region": "near_side",
-      "kind": "historic_landing",
-      "group": "Apollo crewed landing, 1969",
-      "checks": [
-        {
-          "key": "slope_deg",
-          "threshold": 8,
-          "objective": 2,
-          "ok": true,
-          "value": null,
-          "margin": null,
-          "pending": true
-        },
-        {
-          "key": "illum_pct",
-          "threshold": 0.5,
-          "objective": 0.85,
-          "ok": true,
-          "value": 1.0,
-          "margin": 1.0
-        },
-        {
-          "key": "max_dark_hours",
-          "threshold": 100,
-          "objective": 24,
-          "ok": true,
-          "value": 0.0,
-          "margin": 1.0
-        },
-        {
-          "key": "earth_vis_pct",
-          "threshold": 0.5,
-          "objective": 0.95,
-          "ok": true,
-          "value": 1.0,
-          "margin": 1.0
-        },
-        {
-          "key": "max_blackout_hours",
-          "threshold": 72,
-          "objective": 12,
-          "ok": true,
-          "value": 0.0,
-          "margin": 1.0
-        }
-      ],
-      "pending_metrics": ["slope_deg", "psr_dist_km"]
-    },
-    {
-      "id": "apollo_12",
-      "name": "Apollo 12 LM",
-      "lat": -3.0128,
-      "lon": -23.4219,
-      "elev_m": 0.0,
-      "valid": true,
-      "score": 1.0,
-      "metrics": {
-        "illum_pct": 0.49,
-        "earth_vis_pct": 1.0,
-        "slope_deg": 0.0,
-        "max_dark_hours": 355.0,
-        "psr_dist_km": 0.0,
-        "sun_el_mean_deg": 21.8,
-        "max_blackout_hours": 0.0,
-        "sun_earth_pct": 0.49
-      },
-      "reasons": ["slope_deg_pending", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
-      "source": "Wagner et al. 2017, Icarus 283:92-103 (doi:10.1016/j.icarus.2016.05.011); LROC 2016 coordinate table, Apollo 12 LM",
-      "region": "near_side",
-      "kind": "historic_landing",
-      "group": "Apollo crewed landing, 1969",
-      "checks": [
-        {
-          "key": "slope_deg",
-          "threshold": 8,
-          "objective": 2,
-          "ok": true,
-          "value": null,
-          "margin": null,
-          "pending": true
-        },
-        {
-          "key": "illum_pct",
-          "threshold": 0.5,
-          "objective": 0.85,
-          "ok": true,
-          "value": 0.96,
-          "margin": 0.9199999999999999
-        },
-        {
-          "key": "max_dark_hours",
-          "threshold": 100,
-          "objective": 24,
-          "ok": true,
-          "value": 7.0,
-          "margin": 0.93
-        },
-        {
-          "key": "earth_vis_pct",
-          "threshold": 0.5,
-          "objective": 0.95,
-          "ok": true,
-          "value": 1.0,
-          "margin": 1.0
-        },
-        {
-          "key": "max_blackout_hours",
-          "threshold": 72,
-          "objective": 12,
-          "ok": true,
-          "value": 0.0,
-          "margin": 1.0
-        }
-      ],
-      "pending_metrics": ["slope_deg", "psr_dist_km"]
-    },
-    {
-      "id": "apollo_14",
-      "name": "Apollo 14 LM",
-      "lat": -3.64589,
-      "lon": -17.47194,
-      "elev_m": 0.0,
-      "valid": true,
-      "score": 1.0,
-      "metrics": {
-        "illum_pct": 0.49,
-        "earth_vis_pct": 1.0,
-        "slope_deg": 0.0,
-        "max_dark_hours": 354.0,
-        "psr_dist_km": 0.0,
-        "sun_el_mean_deg": 21.75,
-        "max_blackout_hours": 0.0,
-        "sun_earth_pct": 0.49
-      },
-      "reasons": ["slope_deg_pending", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
-      "source": "Wagner et al. 2017, Icarus 283:92-103 (doi:10.1016/j.icarus.2016.05.011); LROC 2016 coordinate table, Apollo 14 LM",
-      "region": "near_side",
-      "kind": "historic_landing",
-      "group": "Apollo crewed landing, 1971",
-      "checks": [
-        {
-          "key": "slope_deg",
-          "threshold": 8,
-          "objective": 2,
-          "ok": true,
-          "value": null,
-          "margin": null,
-          "pending": true
-        },
-        {
-          "key": "illum_pct",
-          "threshold": 0.5,
-          "objective": 0.85,
-          "ok": true,
-          "value": 1.0,
-          "margin": 1.0
-        },
-        {
-          "key": "max_dark_hours",
-          "threshold": 100,
-          "objective": 24,
-          "ok": true,
-          "value": 0.0,
-          "margin": 1.0
-        },
-        {
-          "key": "earth_vis_pct",
-          "threshold": 0.5,
-          "objective": 0.95,
-          "ok": true,
-          "value": 1.0,
-          "margin": 1.0
-        },
-        {
-          "key": "max_blackout_hours",
-          "threshold": 72,
-          "objective": 12,
-          "ok": true,
-          "value": 0.0,
-          "margin": 1.0
-        }
-      ],
-      "pending_metrics": ["slope_deg", "psr_dist_km"]
-    },
-    {
-      "id": "apollo_15",
-      "name": "Apollo 15 LM (Hadley-Apennine)",
-      "lat": 26.13239,
-      "lon": 3.6333,
-      "elev_m": 0.0,
-      "valid": true,
-      "score": 1.0,
-      "metrics": {
-        "illum_pct": 0.49,
-        "earth_vis_pct": 1.0,
-        "slope_deg": 0.0,
-        "max_dark_hours": 357.0,
-        "psr_dist_km": 0.0,
-        "sun_el_mean_deg": 18.13,
-        "max_blackout_hours": 0.0,
-        "sun_earth_pct": 0.49
-      },
-      "reasons": ["slope_deg_pending", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
-      "source": "Wagner et al. 2017, Icarus 283:92-103 (doi:10.1016/j.icarus.2016.05.011); LROC 2016 coordinate table, Apollo 15 LM",
-      "region": "near_side",
-      "kind": "historic_landing",
-      "group": "Apollo crewed landing, 1971",
-      "checks": [
-        {
-          "key": "slope_deg",
-          "threshold": 8,
-          "objective": 2,
-          "ok": true,
-          "value": null,
-          "margin": null,
-          "pending": true
-        },
-        {
-          "key": "illum_pct",
-          "threshold": 0.5,
-          "objective": 0.85,
-          "ok": true,
-          "value": 1.0,
-          "margin": 1.0
-        },
-        {
-          "key": "max_dark_hours",
-          "threshold": 100,
-          "objective": 24,
-          "ok": true,
-          "value": 0.0,
-          "margin": 1.0
-        },
-        {
-          "key": "earth_vis_pct",
-          "threshold": 0.5,
-          "objective": 0.95,
-          "ok": true,
-          "value": 1.0,
-          "margin": 1.0
-        },
-        {
-          "key": "max_blackout_hours",
-          "threshold": 72,
-          "objective": 12,
-          "ok": true,
-          "value": 0.0,
-          "margin": 1.0
-        }
-      ],
-      "pending_metrics": ["slope_deg", "psr_dist_km"]
-    },
-    {
-      "id": "apollo_16",
-      "name": "Apollo 16 LM (Descartes highlands)",
-      "lat": -8.9734,
-      "lon": 15.5011,
-      "elev_m": 0.0,
-      "valid": true,
-      "score": 1.0,
-      "metrics": {
-        "illum_pct": 0.49,
-        "earth_vis_pct": 1.0,
-        "slope_deg": 0.0,
-        "max_dark_hours": 354.0,
-        "psr_dist_km": 0.0,
-        "sun_el_mean_deg": 21.22,
-        "max_blackout_hours": 0.0,
-        "sun_earth_pct": 0.49
-      },
-      "reasons": ["slope_deg_pending", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
-      "source": "Wagner et al. 2017, Icarus 283:92-103 (doi:10.1016/j.icarus.2016.05.011); LROC 2016 coordinate table, Apollo 16 LM",
-      "region": "near_side",
-      "kind": "historic_landing",
-      "group": "Apollo crewed landing, 1972",
-      "checks": [
-        {
-          "key": "slope_deg",
-          "threshold": 8,
-          "objective": 2,
-          "ok": true,
-          "value": null,
-          "margin": null,
-          "pending": true
-        },
-        {
-          "key": "illum_pct",
-          "threshold": 0.5,
-          "objective": 0.85,
-          "ok": true,
-          "value": 1.0,
-          "margin": 1.0
-        },
-        {
-          "key": "max_dark_hours",
-          "threshold": 100,
-          "objective": 24,
-          "ok": true,
-          "value": 0.0,
-          "margin": 1.0
-        },
-        {
-          "key": "earth_vis_pct",
-          "threshold": 0.5,
-          "objective": 0.95,
-          "ok": true,
-          "value": 1.0,
-          "margin": 1.0
-        },
-        {
-          "key": "max_blackout_hours",
-          "threshold": 72,
-          "objective": 12,
-          "ok": true,
-          "value": 0.0,
-          "margin": 1.0
-        }
-      ],
-      "pending_metrics": ["slope_deg", "psr_dist_km"]
-    },
-    {
-      "id": "apollo_17",
-      "name": "Apollo 17 LM (Taurus-Littrow)",
-      "lat": 20.1911,
-      "lon": 30.7723,
-      "elev_m": 0.0,
-      "valid": true,
-      "score": 1.0,
-      "metrics": {
-        "illum_pct": 0.49,
-        "earth_vis_pct": 1.0,
-        "slope_deg": 0.0,
-        "max_dark_hours": 356.0,
-        "psr_dist_km": 0.0,
-        "sun_el_mean_deg": 19.37,
-        "max_blackout_hours": 0.0,
-        "sun_earth_pct": 0.49
-      },
-      "reasons": ["slope_deg_pending", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
-      "source": "Wagner et al. 2017, Icarus 283:92-103 (doi:10.1016/j.icarus.2016.05.011); LROC 2016 coordinate table, Apollo 17 LM",
-      "region": "near_side",
-      "kind": "historic_landing",
-      "group": "Apollo crewed landing, 1972",
-      "checks": [
-        {
-          "key": "slope_deg",
-          "threshold": 8,
-          "objective": 2,
-          "ok": true,
-          "value": null,
-          "margin": null,
-          "pending": true
-        },
-        {
-          "key": "illum_pct",
-          "threshold": 0.5,
-          "objective": 0.85,
-          "ok": true,
-          "value": 1.0,
-          "margin": 1.0
-        },
-        {
-          "key": "max_dark_hours",
-          "threshold": 100,
-          "objective": 24,
-          "ok": true,
-          "value": 0.0,
-          "margin": 1.0
-        },
-        {
-          "key": "earth_vis_pct",
-          "threshold": 0.5,
-          "objective": 0.95,
-          "ok": true,
-          "value": 1.0,
-          "margin": 1.0
-        },
-        {
-          "key": "max_blackout_hours",
-          "threshold": 72,
-          "objective": 12,
-          "ok": true,
-          "value": 0.0,
-          "margin": 1.0
-        }
-      ],
-      "pending_metrics": ["slope_deg", "psr_dist_km"]
-    },
-    {
-      "id": "surveyor_1",
-      "name": "Surveyor 1",
-      "lat": -2.4745,
-      "lon": -43.3398,
-      "elev_m": 0.0,
-      "valid": true,
-      "score": 0.842,
-      "metrics": {
-        "illum_pct": 0.5,
-        "earth_vis_pct": 1.0,
-        "slope_deg": 0.0,
-        "max_dark_hours": 354.0,
-        "psr_dist_km": 0.0,
-        "sun_el_mean_deg": 21.95,
-        "max_blackout_hours": 0.0,
-        "sun_earth_pct": 0.5
-      },
-      "reasons": ["slope_deg_pending", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
-      "source": "Wagner et al. 2017, Icarus 283:92-103 (doi:10.1016/j.icarus.2016.05.011); LROC 2016 coordinate table, Surveyor 1",
-      "region": "near_side",
-      "kind": "historic_landing",
-      "group": "Surveyor robotic landing, 1966",
-      "checks": [
-        {
-          "key": "slope_deg",
-          "threshold": 8,
-          "objective": 2,
-          "ok": true,
-          "value": null,
-          "margin": null,
-          "pending": true
-        },
-        {
-          "key": "illum_pct",
-          "threshold": 0.5,
-          "objective": 0.85,
-          "ok": true,
-          "value": 0.73,
-          "margin": 0.45999999999999996
-        },
-        {
-          "key": "max_dark_hours",
-          "threshold": 100,
-          "objective": 24,
-          "ok": true,
-          "value": 46.0,
-          "margin": 0.54
-        },
-        {
-          "key": "earth_vis_pct",
-          "threshold": 0.5,
-          "objective": 0.95,
-          "ok": true,
-          "value": 1.0,
-          "margin": 1.0
-        },
-        {
-          "key": "max_blackout_hours",
-          "threshold": 72,
-          "objective": 12,
-          "ok": true,
-          "value": 0.0,
-          "margin": 1.0
-        }
-      ],
-      "pending_metrics": ["slope_deg", "psr_dist_km"]
-    },
-    {
-      "id": "luna_16",
-      "name": "Luna 16 (Mare Fecunditatis)",
-      "lat": -0.5137,
-      "lon": 56.3638,
-      "elev_m": 0.0,
-      "valid": true,
-      "score": 1.0,
-      "metrics": {
-        "illum_pct": 0.49,
-        "earth_vis_pct": 1.0,
-        "slope_deg": 0.0,
-        "max_dark_hours": 355.0,
-        "psr_dist_km": 0.0,
-        "sun_el_mean_deg": 21.87,
-        "max_blackout_hours": 0.0,
-        "sun_earth_pct": 0.49
-      },
-      "reasons": ["slope_deg_pending", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
-      "source": "Wagner et al. 2017, Icarus 283:92-103 (doi:10.1016/j.icarus.2016.05.011); LROC 2016 coordinate table, Luna 16",
-      "region": "near_side",
-      "kind": "historic_landing",
-      "group": "Luna robotic sample return, 1970",
-      "checks": [
-        {
-          "key": "slope_deg",
-          "threshold": 8,
-          "objective": 2,
-          "ok": true,
-          "value": null,
-          "margin": null,
-          "pending": true
-        },
-        {
-          "key": "illum_pct",
-          "threshold": 0.5,
-          "objective": 0.85,
-          "ok": true,
-          "value": 1.0,
-          "margin": 1.0
-        },
-        {
-          "key": "max_dark_hours",
-          "threshold": 100,
-          "objective": 24,
-          "ok": true,
-          "value": 0.0,
-          "margin": 1.0
-        },
-        {
-          "key": "earth_vis_pct",
-          "threshold": 0.5,
-          "objective": 0.95,
-          "ok": true,
-          "value": 1.0,
-          "margin": 1.0
-        },
-        {
-          "key": "max_blackout_hours",
-          "threshold": 72,
-          "objective": 12,
-          "ok": true,
-          "value": 0.0,
-          "margin": 1.0
-        }
-      ],
-      "pending_metrics": ["slope_deg", "psr_dist_km"]
-    },
-    {
-      "id": "luna_17",
-      "name": "Luna 17 lander (Lunokhod 1)",
-      "lat": 38.23764,
-      "lon": -35.00163,
-      "elev_m": 0.0,
-      "valid": true,
-      "score": 0.945,
-      "metrics": {
-        "illum_pct": 0.49,
-        "earth_vis_pct": 1.0,
-        "slope_deg": 0.0,
-        "max_dark_hours": 358.0,
-        "psr_dist_km": 0.0,
-        "sun_el_mean_deg": 15.28,
-        "max_blackout_hours": 0.0,
-        "sun_earth_pct": 0.49
-      },
-      "reasons": ["slope_deg_pending", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
-      "source": "Wagner et al. 2017, Icarus 283:92-103 (doi:10.1016/j.icarus.2016.05.011); LROC 2016 coordinate table, Luna 17",
-      "region": "near_side",
-      "kind": "historic_landing",
-      "group": "Luna robotic landing with rover, 1970",
-      "checks": [
-        {
-          "key": "slope_deg",
-          "threshold": 8,
-          "objective": 2,
-          "ok": true,
-          "value": null,
-          "margin": null,
-          "pending": true
+          "value": 1.86,
+          "margin": 0.7675
         },
         {
           "key": "illum_pct",
@@ -3414,27 +751,2640 @@
           "margin": 1.0
         }
       ],
-      "pending_metrics": ["slope_deg", "psr_dist_km"]
+      "pending_metrics": []
+    },
+    {
+      "id": "faustini_rim",
+      "name": "Faustini Rim A (FRA02)",
+      "lat": -87.749,
+      "lon": 95.084,
+      "elev_m": 552.78,
+      "valid": true,
+      "score": 0.895,
+      "metrics": {
+        "illum_pct": 0.58,
+        "earth_vis_pct": 0.35,
+        "slope_deg": 0.64,
+        "max_dark_hours": 430.0,
+        "psr_dist_km": 0.19,
+        "sun_el_mean_deg": 0.81,
+        "max_blackout_hours": 421.0,
+        "sun_earth_pct": 0.2
+      },
+      "reasons": ["slope_ok", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
+      "source": "Wueller et al. 2026, J. Geophys. Res. Planets 131(3) e2025JE009434, Table A1, CLS FRA02",
+      "region": "south_pole",
+      "kind": "candidate",
+      "group": "Artemis III region (2022): Faustini Rim A",
+      "checks": [
+        {
+          "key": "slope_deg",
+          "threshold": 8,
+          "objective": 2,
+          "ok": true,
+          "value": 0.64,
+          "margin": 0.92
+        },
+        {
+          "key": "illum_pct",
+          "threshold": 0.5,
+          "objective": 0.85,
+          "ok": true,
+          "value": 0.75,
+          "margin": 0.5
+        },
+        {
+          "key": "max_dark_hours",
+          "threshold": 100,
+          "objective": 24,
+          "ok": true,
+          "value": 42.0,
+          "margin": 0.58
+        },
+        {
+          "key": "earth_vis_pct",
+          "threshold": 0.5,
+          "objective": 0.95,
+          "ok": true,
+          "value": 1.0,
+          "margin": 1.0
+        },
+        {
+          "key": "max_blackout_hours",
+          "threshold": 72,
+          "objective": 12,
+          "ok": true,
+          "value": 0.0,
+          "margin": 1.0
+        }
+      ],
+      "pending_metrics": []
+    },
+    {
+      "id": "amundsen_rim",
+      "name": "Amundsen Rim (AR05)",
+      "lat": -84.229,
+      "lon": 69.877,
+      "elev_m": 470.74,
+      "valid": true,
+      "score": 0.879,
+      "metrics": {
+        "illum_pct": 0.53,
+        "earth_vis_pct": 0.44,
+        "slope_deg": 1.79,
+        "max_dark_hours": 391.0,
+        "psr_dist_km": 0.28,
+        "sun_el_mean_deg": 1.8,
+        "max_blackout_hours": 362.0,
+        "sun_earth_pct": 0.23
+      },
+      "reasons": ["slope_ok", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
+      "source": "Wueller et al. 2026, J. Geophys. Res. Planets 131(3) e2025JE009434, Table A1, CLS AR05",
+      "region": "south_pole",
+      "kind": "candidate",
+      "group": "Artemis III region (2022): Amundsen Rim",
+      "checks": [
+        {
+          "key": "slope_deg",
+          "threshold": 8,
+          "objective": 2,
+          "ok": true,
+          "value": 1.79,
+          "margin": 0.77625
+        },
+        {
+          "key": "illum_pct",
+          "threshold": 0.5,
+          "objective": 0.85,
+          "ok": true,
+          "value": 0.73,
+          "margin": 0.45999999999999996
+        },
+        {
+          "key": "max_dark_hours",
+          "threshold": 100,
+          "objective": 24,
+          "ok": true,
+          "value": 44.0,
+          "margin": 0.56
+        },
+        {
+          "key": "earth_vis_pct",
+          "threshold": 0.5,
+          "objective": 0.95,
+          "ok": true,
+          "value": 1.0,
+          "margin": 1.0
+        },
+        {
+          "key": "max_blackout_hours",
+          "threshold": 72,
+          "objective": 12,
+          "ok": true,
+          "value": 0.0,
+          "margin": 1.0
+        }
+      ],
+      "pending_metrics": []
+    },
+    {
+      "id": "cabeus_b",
+      "name": "Peak near Cabeus B (PCB04)",
+      "lat": -83.369,
+      "lon": -67.665,
+      "elev_m": 3486.57,
+      "valid": true,
+      "score": 1.0,
+      "metrics": {
+        "illum_pct": 0.54,
+        "earth_vis_pct": 0.64,
+        "slope_deg": 2.01,
+        "max_dark_hours": 354.0,
+        "psr_dist_km": 1.04,
+        "sun_el_mean_deg": 2.13,
+        "max_blackout_hours": 244.0,
+        "sun_earth_pct": 0.34
+      },
+      "reasons": ["slope_ok", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
+      "source": "Wueller et al. 2026, J. Geophys. Res. Planets 131(3) e2025JE009434, Table A1, CLS PCB04",
+      "region": "south_pole",
+      "kind": "candidate",
+      "group": "Artemis III region (2024): Peak near Cabeus B",
+      "checks": [
+        {
+          "key": "slope_deg",
+          "threshold": 8,
+          "objective": 2,
+          "ok": true,
+          "value": 2.01,
+          "margin": 0.74875
+        },
+        {
+          "key": "illum_pct",
+          "threshold": 0.5,
+          "objective": 0.85,
+          "ok": true,
+          "value": 1.0,
+          "margin": 1.0
+        },
+        {
+          "key": "max_dark_hours",
+          "threshold": 100,
+          "objective": 24,
+          "ok": true,
+          "value": 0.0,
+          "margin": 1.0
+        },
+        {
+          "key": "earth_vis_pct",
+          "threshold": 0.5,
+          "objective": 0.95,
+          "ok": true,
+          "value": 1.0,
+          "margin": 1.0
+        },
+        {
+          "key": "max_blackout_hours",
+          "threshold": 72,
+          "objective": 12,
+          "ok": true,
+          "value": 0.0,
+          "margin": 1.0
+        }
+      ],
+      "pending_metrics": []
+    },
+    {
+      "id": "shoemaker_rim",
+      "name": "Shoemaker-Faustini ridge",
+      "lat": -87.1,
+      "lon": 65.4,
+      "elev_m": 533.35,
+      "valid": true,
+      "score": 0.563,
+      "metrics": {
+        "illum_pct": 0.39,
+        "earth_vis_pct": 0.25,
+        "slope_deg": 7.02,
+        "max_dark_hours": 551.0,
+        "psr_dist_km": 0.51,
+        "sun_el_mean_deg": 0.86,
+        "max_blackout_hours": 488.0,
+        "sun_earth_pct": 0.1
+      },
+      "reasons": ["slope_ok", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
+      "source": "Flahaut et al. 2020, Planet. Space Sci. 180:104750 (doi:10.1016/j.pss.2019.104750), Table 2, site 2",
+      "region": "south_pole",
+      "kind": "candidate",
+      "group": "Luna-27 candidate site >80S (Flahaut et al. 2020), site 2 = Site A",
+      "checks": [
+        {
+          "key": "slope_deg",
+          "threshold": 8,
+          "objective": 2,
+          "ok": true,
+          "value": 7.02,
+          "margin": 0.12250000000000005
+        },
+        {
+          "key": "illum_pct",
+          "threshold": 0.5,
+          "objective": 0.85,
+          "ok": true,
+          "value": 0.62,
+          "margin": 0.24
+        },
+        {
+          "key": "max_dark_hours",
+          "threshold": 100,
+          "objective": 24,
+          "ok": true,
+          "value": 36.0,
+          "margin": 0.64
+        },
+        {
+          "key": "earth_vis_pct",
+          "threshold": 0.5,
+          "objective": 0.95,
+          "ok": true,
+          "value": 0.83,
+          "margin": 0.6599999999999999
+        },
+        {
+          "key": "max_blackout_hours",
+          "threshold": 72,
+          "objective": 12,
+          "ok": true,
+          "value": 28.0,
+          "margin": 0.6111111111111112
+        }
+      ],
+      "pending_metrics": []
+    },
+    {
+      "id": "sverdrup_rim",
+      "name": "North Sverdrup",
+      "lat": -87.4,
+      "lon": -148.2,
+      "elev_m": -1675.21,
+      "valid": false,
+      "score": 0.075,
+      "metrics": {
+        "illum_pct": 0.17,
+        "earth_vis_pct": 0.0,
+        "slope_deg": 5.74,
+        "max_dark_hours": 658.0,
+        "psr_dist_km": 0.34,
+        "sun_el_mean_deg": 0.47,
+        "max_blackout_hours": 4963.0,
+        "sun_earth_pct": 0.0
+      },
+      "reasons": ["slope_ok", "illum_low", "dark_long", "earth_low", "blackout_long"],
+      "source": "Flahaut et al. 2020, Planet. Space Sci. 180:104750 (doi:10.1016/j.pss.2019.104750), Table 2, site 9",
+      "region": "south_pole",
+      "kind": "candidate",
+      "group": "Luna-27 candidate site >80S (Flahaut et al. 2020), site 9",
+      "checks": [
+        {
+          "key": "slope_deg",
+          "threshold": 8,
+          "objective": 2,
+          "ok": true,
+          "value": 5.74,
+          "margin": 0.2825
+        },
+        {
+          "key": "illum_pct",
+          "threshold": 0.5,
+          "objective": 0.85,
+          "ok": false,
+          "value": 0.0,
+          "margin": -1.0
+        },
+        {
+          "key": "max_dark_hours",
+          "threshold": 100,
+          "objective": 24,
+          "ok": false,
+          "value": 168.0,
+          "margin": -0.68
+        },
+        {
+          "key": "earth_vis_pct",
+          "threshold": 0.5,
+          "objective": 0.95,
+          "ok": false,
+          "value": 0.0,
+          "margin": -1.0
+        },
+        {
+          "key": "max_blackout_hours",
+          "threshold": 72,
+          "objective": 12,
+          "ok": false,
+          "value": 168.0,
+          "margin": -1.3333333333333333
+        }
+      ],
+      "pending_metrics": []
+    },
+    {
+      "id": "slater_plain",
+      "name": "Slater Plain (SP07)",
+      "lat": -87.131,
+      "lon": 127.857,
+      "elev_m": 266.46,
+      "valid": true,
+      "score": 0.672,
+      "metrics": {
+        "illum_pct": 0.5,
+        "earth_vis_pct": 0.3,
+        "slope_deg": 0.83,
+        "max_dark_hours": 503.0,
+        "psr_dist_km": 0.13,
+        "sun_el_mean_deg": 0.99,
+        "max_blackout_hours": 454.0,
+        "sun_earth_pct": 0.15
+      },
+      "reasons": ["slope_ok", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
+      "source": "Wueller et al. 2026, J. Geophys. Res. Planets 131(3) e2025JE009434, Table A1, CLS SP07",
+      "region": "south_pole",
+      "kind": "candidate",
+      "group": "Artemis III region (2024): Slater Plain",
+      "checks": [
+        {
+          "key": "slope_deg",
+          "threshold": 8,
+          "objective": 2,
+          "ok": true,
+          "value": 0.83,
+          "margin": 0.89625
+        },
+        {
+          "key": "illum_pct",
+          "threshold": 0.5,
+          "objective": 0.85,
+          "ok": true,
+          "value": 0.51,
+          "margin": 0.020000000000000018
+        },
+        {
+          "key": "max_dark_hours",
+          "threshold": 100,
+          "objective": 24,
+          "ok": true,
+          "value": 75.0,
+          "margin": 0.25
+        },
+        {
+          "key": "earth_vis_pct",
+          "threshold": 0.5,
+          "objective": 0.95,
+          "ok": true,
+          "value": 0.95,
+          "margin": 0.8999999999999999
+        },
+        {
+          "key": "max_blackout_hours",
+          "threshold": 72,
+          "objective": 12,
+          "ok": true,
+          "value": 9.0,
+          "margin": 0.875
+        }
+      ],
+      "pending_metrics": []
+    },
+    {
+      "id": "de_gerlache_kocher",
+      "name": "de Gerlache-Kocher massif (dGKM02)",
+      "lat": -85.777,
+      "lon": -116.502,
+      "elev_m": 2754.83,
+      "valid": true,
+      "score": 0.967,
+      "metrics": {
+        "illum_pct": 0.69,
+        "earth_vis_pct": 0.42,
+        "slope_deg": 3.0,
+        "max_dark_hours": 350.0,
+        "psr_dist_km": 0.38,
+        "sun_el_mean_deg": 1.3,
+        "max_blackout_hours": 376.0,
+        "sun_earth_pct": 0.27
+      },
+      "reasons": ["slope_ok", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
+      "source": "Wueller et al. 2026, J. Geophys. Res. Planets 131(3) e2025JE009434, Table A1, CLS dGKM02",
+      "region": "south_pole",
+      "kind": "candidate",
+      "group": "Artemis III region (2022): de Gerlache-Kocher Massif",
+      "checks": [
+        {
+          "key": "slope_deg",
+          "threshold": 8,
+          "objective": 2,
+          "ok": true,
+          "value": 3.0,
+          "margin": 0.625
+        },
+        {
+          "key": "illum_pct",
+          "threshold": 0.5,
+          "objective": 0.85,
+          "ok": true,
+          "value": 1.0,
+          "margin": 1.0
+        },
+        {
+          "key": "max_dark_hours",
+          "threshold": 100,
+          "objective": 24,
+          "ok": true,
+          "value": 0.0,
+          "margin": 1.0
+        },
+        {
+          "key": "earth_vis_pct",
+          "threshold": 0.5,
+          "objective": 0.95,
+          "ok": true,
+          "value": 1.0,
+          "margin": 1.0
+        },
+        {
+          "key": "max_blackout_hours",
+          "threshold": 72,
+          "objective": 12,
+          "ok": true,
+          "value": 0.0,
+          "margin": 1.0
+        }
+      ],
+      "pending_metrics": []
+    },
+    {
+      "id": "mons_mouton",
+      "name": "Mons Mouton Plateau (MMP02)",
+      "lat": -84.805,
+      "lon": 24.887,
+      "elev_m": 5017.99,
+      "valid": true,
+      "score": 1.0,
+      "metrics": {
+        "illum_pct": 0.22,
+        "earth_vis_pct": 0.43,
+        "slope_deg": 0.3,
+        "max_dark_hours": 2099.0,
+        "psr_dist_km": 0.47,
+        "sun_el_mean_deg": 0.99,
+        "max_blackout_hours": 374.0,
+        "sun_earth_pct": 0.14
+      },
+      "reasons": ["slope_ok", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
+      "source": "Wueller et al. 2026, J. Geophys. Res. Planets 131(3) e2025JE009434, Table A1, CLS MMP02",
+      "region": "south_pole",
+      "kind": "candidate",
+      "group": "Artemis III region (2024): Mons Mouton Plateau",
+      "checks": [
+        {
+          "key": "slope_deg",
+          "threshold": 8,
+          "objective": 2,
+          "ok": true,
+          "value": 0.3,
+          "margin": 0.9625
+        },
+        {
+          "key": "illum_pct",
+          "threshold": 0.5,
+          "objective": 0.85,
+          "ok": true,
+          "value": 1.0,
+          "margin": 1.0
+        },
+        {
+          "key": "max_dark_hours",
+          "threshold": 100,
+          "objective": 24,
+          "ok": true,
+          "value": 0.0,
+          "margin": 1.0
+        },
+        {
+          "key": "earth_vis_pct",
+          "threshold": 0.5,
+          "objective": 0.95,
+          "ok": true,
+          "value": 1.0,
+          "margin": 1.0
+        },
+        {
+          "key": "max_blackout_hours",
+          "threshold": 72,
+          "objective": 12,
+          "ok": true,
+          "value": 0.0,
+          "margin": 1.0
+        }
+      ],
+      "pending_metrics": []
+    },
+    {
+      "id": "plain_81s",
+      "name": "South Idel'son L plains",
+      "lat": -84.6,
+      "lon": 115.7,
+      "elev_m": -2619.65,
+      "valid": false,
+      "score": 0.099,
+      "metrics": {
+        "illum_pct": 0.18,
+        "earth_vis_pct": 0.0,
+        "slope_deg": 5.03,
+        "max_dark_hours": 1402.0,
+        "psr_dist_km": 0.16,
+        "sun_el_mean_deg": 0.69,
+        "max_blackout_hours": 8760.0,
+        "sun_earth_pct": 0.0
+      },
+      "reasons": ["slope_ok", "illum_low", "dark_long", "earth_low", "blackout_long"],
+      "source": "Flahaut et al. 2020, Planet. Space Sci. 180:104750 (doi:10.1016/j.pss.2019.104750), Table 2, site 12",
+      "region": "south_pole",
+      "kind": "candidate",
+      "group": "Luna-27 candidate site >80S (Flahaut et al. 2020), site 12",
+      "checks": [
+        {
+          "key": "slope_deg",
+          "threshold": 8,
+          "objective": 2,
+          "ok": true,
+          "value": 5.03,
+          "margin": 0.37124999999999997
+        },
+        {
+          "key": "illum_pct",
+          "threshold": 0.5,
+          "objective": 0.85,
+          "ok": false,
+          "value": 0.04,
+          "margin": -0.92
+        },
+        {
+          "key": "max_dark_hours",
+          "threshold": 100,
+          "objective": 24,
+          "ok": false,
+          "value": 162.0,
+          "margin": -0.62
+        },
+        {
+          "key": "earth_vis_pct",
+          "threshold": 0.5,
+          "objective": 0.95,
+          "ok": false,
+          "value": 0.0,
+          "margin": -1.0
+        },
+        {
+          "key": "max_blackout_hours",
+          "threshold": 72,
+          "objective": 12,
+          "ok": false,
+          "value": 168.0,
+          "margin": -1.3333333333333333
+        }
+      ],
+      "pending_metrics": []
+    },
+    {
+      "id": "connecting_ridge_extension",
+      "name": "Connecting Ridge Extension (CRE01)",
+      "lat": -89.011,
+      "lon": -94.61,
+      "elev_m": 1552.45,
+      "valid": true,
+      "score": 0.993,
+      "metrics": {
+        "illum_pct": 0.77,
+        "earth_vis_pct": 0.44,
+        "slope_deg": 2.21,
+        "max_dark_hours": 143.0,
+        "psr_dist_km": 0.11,
+        "sun_el_mean_deg": 0.56,
+        "max_blackout_hours": 368.0,
+        "sun_earth_pct": 0.35
+      },
+      "reasons": ["slope_ok", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
+      "source": "Wueller et al. 2026, J. Geophys. Res. Planets 131(3) e2025JE009434, Table A1, CLS CRE01",
+      "region": "south_pole",
+      "kind": "candidate",
+      "group": "Artemis III region (2022): Connecting Ridge Extension",
+      "checks": [
+        {
+          "key": "slope_deg",
+          "threshold": 8,
+          "objective": 2,
+          "ok": true,
+          "value": 2.21,
+          "margin": 0.72375
+        },
+        {
+          "key": "illum_pct",
+          "threshold": 0.5,
+          "objective": 0.85,
+          "ok": true,
+          "value": 1.0,
+          "margin": 1.0
+        },
+        {
+          "key": "max_dark_hours",
+          "threshold": 100,
+          "objective": 24,
+          "ok": true,
+          "value": 0.0,
+          "margin": 1.0
+        },
+        {
+          "key": "earth_vis_pct",
+          "threshold": 0.5,
+          "objective": 0.95,
+          "ok": true,
+          "value": 1.0,
+          "margin": 1.0
+        },
+        {
+          "key": "max_blackout_hours",
+          "threshold": 72,
+          "objective": 12,
+          "ok": true,
+          "value": 0.0,
+          "margin": 1.0
+        }
+      ],
+      "pending_metrics": []
+    },
+    {
+      "id": "connecting_ridge_c2",
+      "name": "Connecting ridge C2 (illumination maximum)",
+      "lat": -89.3157,
+      "lon": -114.06,
+      "elev_m": 1692.8,
+      "valid": true,
+      "score": 0.959,
+      "metrics": {
+        "illum_pct": 0.79,
+        "earth_vis_pct": 0.44,
+        "slope_deg": 3.24,
+        "max_dark_hours": 168.0,
+        "psr_dist_km": 0.11,
+        "sun_el_mean_deg": 0.52,
+        "max_blackout_hours": 368.0,
+        "sun_earth_pct": 0.38
+      },
+      "reasons": ["slope_ok", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
+      "source": "Glaser et al. 2018, Planet. Space Sci. 162:170-178 (doi:10.1016/j.pss.2017.07.006), Table 1, Connecting Ridge C2 (this study)",
+      "region": "south_pole",
+      "kind": "candidate",
+      "group": "Highly illuminated point (Glaser et al. 2018)",
+      "checks": [
+        {
+          "key": "slope_deg",
+          "threshold": 8,
+          "objective": 2,
+          "ok": true,
+          "value": 3.24,
+          "margin": 0.595
+        },
+        {
+          "key": "illum_pct",
+          "threshold": 0.5,
+          "objective": 0.85,
+          "ok": true,
+          "value": 1.0,
+          "margin": 1.0
+        },
+        {
+          "key": "max_dark_hours",
+          "threshold": 100,
+          "objective": 24,
+          "ok": true,
+          "value": 0.0,
+          "margin": 1.0
+        },
+        {
+          "key": "earth_vis_pct",
+          "threshold": 0.5,
+          "objective": 0.95,
+          "ok": true,
+          "value": 1.0,
+          "margin": 1.0
+        },
+        {
+          "key": "max_blackout_hours",
+          "threshold": 72,
+          "objective": 12,
+          "ok": true,
+          "value": 0.0,
+          "margin": 1.0
+        }
+      ],
+      "pending_metrics": []
+    },
+    {
+      "id": "connecting_ridge_cr05",
+      "name": "Connecting Ridge CR05 (PSR access)",
+      "lat": -89.421,
+      "lon": -149.472,
+      "elev_m": 1560.57,
+      "valid": false,
+      "score": 0.19,
+      "metrics": {
+        "illum_pct": 0.51,
+        "earth_vis_pct": 0.0,
+        "slope_deg": 2.29,
+        "max_dark_hours": 458.0,
+        "psr_dist_km": 0.04,
+        "sun_el_mean_deg": 0.38,
+        "max_blackout_hours": 8760.0,
+        "sun_earth_pct": 0.0
+      },
+      "reasons": ["slope_ok", "illum_low", "dark_long", "earth_low", "blackout_long"],
+      "source": "Wueller et al. 2026, J. Geophys. Res. Planets 131(3) e2025JE009434, Table A1 and Sect. 4, CLS CR05",
+      "region": "south_pole",
+      "kind": "candidate",
+      "group": "Artemis III region (2022): Connecting Ridge",
+      "checks": [
+        {
+          "key": "slope_deg",
+          "threshold": 8,
+          "objective": 2,
+          "ok": true,
+          "value": 2.29,
+          "margin": 0.71375
+        },
+        {
+          "key": "illum_pct",
+          "threshold": 0.5,
+          "objective": 0.85,
+          "ok": false,
+          "value": 0.0,
+          "margin": -1.0
+        },
+        {
+          "key": "max_dark_hours",
+          "threshold": 100,
+          "objective": 24,
+          "ok": false,
+          "value": 168.0,
+          "margin": -0.68
+        },
+        {
+          "key": "earth_vis_pct",
+          "threshold": 0.5,
+          "objective": 0.95,
+          "ok": false,
+          "value": 0.0,
+          "margin": -1.0
+        },
+        {
+          "key": "max_blackout_hours",
+          "threshold": 72,
+          "objective": 12,
+          "ok": false,
+          "value": 168.0,
+          "margin": -1.3333333333333333
+        }
+      ],
+      "pending_metrics": []
+    },
+    {
+      "id": "peak_near_shackleton_pns02",
+      "name": "Peak Near Shackleton PNS02 (cold-PSR access)",
+      "lat": -89.061,
+      "lon": 128.442,
+      "elev_m": 1148.64,
+      "valid": true,
+      "score": 0.987,
+      "metrics": {
+        "illum_pct": 0.46,
+        "earth_vis_pct": 0.42,
+        "slope_deg": 2.39,
+        "max_dark_hours": 591.0,
+        "psr_dist_km": 0.22,
+        "sun_el_mean_deg": 0.36,
+        "max_blackout_hours": 392.0,
+        "sun_earth_pct": 0.21
+      },
+      "reasons": ["slope_ok", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
+      "source": "Wueller et al. 2026, J. Geophys. Res. Planets 131(3) e2025JE009434, Table A1 and Sect. 4, CLS PNS02",
+      "region": "south_pole",
+      "kind": "candidate",
+      "group": "Artemis III region (2022): Peak Near Shackleton",
+      "checks": [
+        {
+          "key": "slope_deg",
+          "threshold": 8,
+          "objective": 2,
+          "ok": true,
+          "value": 2.39,
+          "margin": 0.7012499999999999
+        },
+        {
+          "key": "illum_pct",
+          "threshold": 0.5,
+          "objective": 0.85,
+          "ok": true,
+          "value": 0.88,
+          "margin": 0.76
+        },
+        {
+          "key": "max_dark_hours",
+          "threshold": 100,
+          "objective": 24,
+          "ok": true,
+          "value": 23.0,
+          "margin": 0.77
+        },
+        {
+          "key": "earth_vis_pct",
+          "threshold": 0.5,
+          "objective": 0.95,
+          "ok": true,
+          "value": 1.0,
+          "margin": 1.0
+        },
+        {
+          "key": "max_blackout_hours",
+          "threshold": 72,
+          "objective": 12,
+          "ok": true,
+          "value": 0.0,
+          "margin": 1.0
+        }
+      ],
+      "pending_metrics": []
+    },
+    {
+      "id": "malapert_mp2",
+      "name": "Malapert peak (MP2)",
+      "lat": -86.0265,
+      "lon": 2.757964,
+      "elev_m": 5088.64,
+      "valid": false,
+      "score": 0.252,
+      "metrics": {
+        "illum_pct": 0.26,
+        "earth_vis_pct": 0.24,
+        "slope_deg": 13.29,
+        "max_dark_hours": 4701.0,
+        "psr_dist_km": 0.14,
+        "sun_el_mean_deg": 0.13,
+        "max_blackout_hours": 503.0,
+        "sun_earth_pct": 0.02
+      },
+      "reasons": ["slope_high", "illum_low", "dark_long", "earth_ok", "blackout_ok"],
+      "source": "De Rosa et al. 2012, Planet. Space Sci. 74:224-246 (doi:10.1016/j.pss.2012.08.002), Table 2, RoI MP2 (Malapert Peak)",
+      "region": "south_pole",
+      "kind": "candidate",
+      "group": "Artemis III region (2022, 2024): Malapert Massif; ESA RoI MP2",
+      "checks": [
+        {
+          "key": "slope_deg",
+          "threshold": 8,
+          "objective": 2,
+          "ok": false,
+          "value": 13.29,
+          "margin": -0.6612499999999999
+        },
+        {
+          "key": "illum_pct",
+          "threshold": 0.5,
+          "objective": 0.85,
+          "ok": false,
+          "value": 0.14,
+          "margin": -0.72
+        },
+        {
+          "key": "max_dark_hours",
+          "threshold": 100,
+          "objective": 24,
+          "ok": false,
+          "value": 144.0,
+          "margin": -0.44
+        },
+        {
+          "key": "earth_vis_pct",
+          "threshold": 0.5,
+          "objective": 0.95,
+          "ok": true,
+          "value": 0.79,
+          "margin": 0.5800000000000001
+        },
+        {
+          "key": "max_blackout_hours",
+          "threshold": 72,
+          "objective": 12,
+          "ok": true,
+          "value": 35.0,
+          "margin": 0.5138888888888888
+        }
+      ],
+      "pending_metrics": []
+    },
+    {
+      "id": "south_amundsen",
+      "name": "South Amundsen",
+      "lat": -85.0,
+      "lon": 90.0,
+      "elev_m": -3723.33,
+      "valid": false,
+      "score": 0.198,
+      "metrics": {
+        "illum_pct": 0.28,
+        "earth_vis_pct": 0.11,
+        "slope_deg": 2.05,
+        "max_dark_hours": 590.0,
+        "psr_dist_km": 0.49,
+        "sun_el_mean_deg": 1.24,
+        "max_blackout_hours": 586.0,
+        "sun_earth_pct": 0.03
+      },
+      "reasons": ["slope_ok", "illum_low", "dark_long", "earth_low", "blackout_long"],
+      "source": "Flahaut et al. 2020, Planet. Space Sci. 180:104750 (doi:10.1016/j.pss.2019.104750), Table 2, site 1",
+      "region": "south_pole",
+      "kind": "candidate",
+      "group": "Luna-27 candidate site >80S (Flahaut et al. 2020), site 1",
+      "checks": [
+        {
+          "key": "slope_deg",
+          "threshold": 8,
+          "objective": 2,
+          "ok": true,
+          "value": 2.05,
+          "margin": 0.74375
+        },
+        {
+          "key": "illum_pct",
+          "threshold": 0.5,
+          "objective": 0.85,
+          "ok": false,
+          "value": 0.29,
+          "margin": -0.42000000000000004
+        },
+        {
+          "key": "max_dark_hours",
+          "threshold": 100,
+          "objective": 24,
+          "ok": false,
+          "value": 119.0,
+          "margin": -0.19
+        },
+        {
+          "key": "earth_vis_pct",
+          "threshold": 0.5,
+          "objective": 0.95,
+          "ok": false,
+          "value": 0.43,
+          "margin": -0.14
+        },
+        {
+          "key": "max_blackout_hours",
+          "threshold": 72,
+          "objective": 12,
+          "ok": false,
+          "value": 80.0,
+          "margin": -0.1111111111111111
+        }
+      ],
+      "pending_metrics": []
+    },
+    {
+      "id": "shackleton_vicinity_25e",
+      "name": "Near Shackleton (25.5E)",
+      "lat": -89.5,
+      "lon": 25.5,
+      "elev_m": -302.55,
+      "valid": true,
+      "score": 0.828,
+      "metrics": {
+        "illum_pct": 0.29,
+        "earth_vis_pct": 0.34,
+        "slope_deg": 7.17,
+        "max_dark_hours": 1872.0,
+        "psr_dist_km": 0.09,
+        "sun_el_mean_deg": 0.33,
+        "max_blackout_hours": 429.0,
+        "sun_earth_pct": 0.16
+      },
+      "reasons": ["slope_ok", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
+      "source": "Flahaut et al. 2020, Planet. Space Sci. 180:104750 (doi:10.1016/j.pss.2019.104750), Table 2, site 3",
+      "region": "south_pole",
+      "kind": "candidate",
+      "group": "Luna-27 candidate site >80S (Flahaut et al. 2020), site 3",
+      "checks": [
+        {
+          "key": "slope_deg",
+          "threshold": 8,
+          "objective": 2,
+          "ok": true,
+          "value": 7.17,
+          "margin": 0.10375000000000001
+        },
+        {
+          "key": "illum_pct",
+          "threshold": 0.5,
+          "objective": 0.85,
+          "ok": true,
+          "value": 1.0,
+          "margin": 1.0
+        },
+        {
+          "key": "max_dark_hours",
+          "threshold": 100,
+          "objective": 24,
+          "ok": true,
+          "value": 0.0,
+          "margin": 1.0
+        },
+        {
+          "key": "earth_vis_pct",
+          "threshold": 0.5,
+          "objective": 0.95,
+          "ok": true,
+          "value": 1.0,
+          "margin": 1.0
+        },
+        {
+          "key": "max_blackout_hours",
+          "threshold": 72,
+          "objective": 12,
+          "ok": true,
+          "value": 0.0,
+          "margin": 1.0
+        }
+      ],
+      "pending_metrics": []
+    },
+    {
+      "id": "faustini_ridge",
+      "name": "Faustini ridge",
+      "lat": -87.6,
+      "lon": 103.7,
+      "elev_m": -64.47,
+      "valid": false,
+      "score": 0.116,
+      "metrics": {
+        "illum_pct": 0.11,
+        "earth_vis_pct": 0.13,
+        "slope_deg": 4.52,
+        "max_dark_hours": 4177.0,
+        "psr_dist_km": 0.04,
+        "sun_el_mean_deg": 0.36,
+        "max_blackout_hours": 578.0,
+        "sun_earth_pct": 0.0
+      },
+      "reasons": ["slope_ok", "illum_low", "dark_long", "earth_low", "blackout_long"],
+      "source": "Flahaut et al. 2020, Planet. Space Sci. 180:104750 (doi:10.1016/j.pss.2019.104750), Table 2, site 4",
+      "region": "south_pole",
+      "kind": "candidate",
+      "group": "Luna-27 candidate site >80S (Flahaut et al. 2020), site 4",
+      "checks": [
+        {
+          "key": "slope_deg",
+          "threshold": 8,
+          "objective": 2,
+          "ok": true,
+          "value": 4.52,
+          "margin": 0.43500000000000005
+        },
+        {
+          "key": "illum_pct",
+          "threshold": 0.5,
+          "objective": 0.85,
+          "ok": false,
+          "value": 0.0,
+          "margin": -1.0
+        },
+        {
+          "key": "max_dark_hours",
+          "threshold": 100,
+          "objective": 24,
+          "ok": false,
+          "value": 168.0,
+          "margin": -0.68
+        },
+        {
+          "key": "earth_vis_pct",
+          "threshold": 0.5,
+          "objective": 0.95,
+          "ok": false,
+          "value": 0.49,
+          "margin": -0.020000000000000018
+        },
+        {
+          "key": "max_blackout_hours",
+          "threshold": 72,
+          "objective": 12,
+          "ok": false,
+          "value": 74.0,
+          "margin": -0.027777777777777776
+        }
+      ],
+      "pending_metrics": []
+    },
+    {
+      "id": "shackleton_vicinity_101e",
+      "name": "Near Shackleton (101.4E)",
+      "lat": -88.6,
+      "lon": 101.4,
+      "elev_m": -466.45,
+      "valid": false,
+      "score": 0.004,
+      "metrics": {
+        "illum_pct": 0.23,
+        "earth_vis_pct": 0.13,
+        "slope_deg": 10.83,
+        "max_dark_hours": 2659.0,
+        "psr_dist_km": 0.43,
+        "sun_el_mean_deg": 0.44,
+        "max_blackout_hours": 575.0,
+        "sun_earth_pct": 0.04
+      },
+      "reasons": ["slope_high", "illum_low", "dark_long", "earth_ok", "blackout_ok"],
+      "source": "Flahaut et al. 2020, Planet. Space Sci. 180:104750 (doi:10.1016/j.pss.2019.104750), Table 2, site 5",
+      "region": "south_pole",
+      "kind": "candidate",
+      "group": "Luna-27 candidate site >80S (Flahaut et al. 2020), site 5",
+      "checks": [
+        {
+          "key": "slope_deg",
+          "threshold": 8,
+          "objective": 2,
+          "ok": false,
+          "value": 10.83,
+          "margin": -0.35375
+        },
+        {
+          "key": "illum_pct",
+          "threshold": 0.5,
+          "objective": 0.85,
+          "ok": false,
+          "value": 0.34,
+          "margin": -0.31999999999999995
+        },
+        {
+          "key": "max_dark_hours",
+          "threshold": 100,
+          "objective": 24,
+          "ok": false,
+          "value": 112.0,
+          "margin": -0.12
+        },
+        {
+          "key": "earth_vis_pct",
+          "threshold": 0.5,
+          "objective": 0.95,
+          "ok": true,
+          "value": 0.51,
+          "margin": 0.020000000000000018
+        },
+        {
+          "key": "max_blackout_hours",
+          "threshold": 72,
+          "objective": 12,
+          "ok": true,
+          "value": 72.0,
+          "margin": 0.0
+        }
+      ],
+      "pending_metrics": []
+    },
+    {
+      "id": "ibn_bajja_sw",
+      "name": "South-west Ibn Bajja plains",
+      "lat": -86.4,
+      "lon": -86.7,
+      "elev_m": -2319.22,
+      "valid": true,
+      "score": 0.569,
+      "metrics": {
+        "illum_pct": 0.22,
+        "earth_vis_pct": 0.3,
+        "slope_deg": 4.43,
+        "max_dark_hours": 645.0,
+        "psr_dist_km": 0.32,
+        "sun_el_mean_deg": 0.76,
+        "max_blackout_hours": 460.0,
+        "sun_earth_pct": 0.08
+      },
+      "reasons": ["slope_ok", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
+      "source": "Flahaut et al. 2020, Planet. Space Sci. 180:104750 (doi:10.1016/j.pss.2019.104750), Table 2, site 6",
+      "region": "south_pole",
+      "kind": "candidate",
+      "group": "Luna-27 candidate site >80S (Flahaut et al. 2020), site 6 = Site B",
+      "checks": [
+        {
+          "key": "slope_deg",
+          "threshold": 8,
+          "objective": 2,
+          "ok": true,
+          "value": 4.43,
+          "margin": 0.44625000000000004
+        },
+        {
+          "key": "illum_pct",
+          "threshold": 0.5,
+          "objective": 0.85,
+          "ok": true,
+          "value": 0.52,
+          "margin": 0.040000000000000036
+        },
+        {
+          "key": "max_dark_hours",
+          "threshold": 100,
+          "objective": 24,
+          "ok": true,
+          "value": 82.0,
+          "margin": 0.18
+        },
+        {
+          "key": "earth_vis_pct",
+          "threshold": 0.5,
+          "objective": 0.95,
+          "ok": true,
+          "value": 0.93,
+          "margin": 0.8600000000000001
+        },
+        {
+          "key": "max_blackout_hours",
+          "threshold": 72,
+          "objective": 12,
+          "ok": true,
+          "value": 12.0,
+          "margin": 0.8333333333333334
+        }
+      ],
+      "pending_metrics": []
+    },
+    {
+      "id": "cabeus_b_south",
+      "name": "South of Cabeus B",
+      "lat": -84.0,
+      "lon": -60.5,
+      "elev_m": -1044.84,
+      "valid": true,
+      "score": 0.986,
+      "metrics": {
+        "illum_pct": 0.3,
+        "earth_vis_pct": 0.44,
+        "slope_deg": 1.8,
+        "max_dark_hours": 533.0,
+        "psr_dist_km": 0.22,
+        "sun_el_mean_deg": 1.49,
+        "max_blackout_hours": 365.0,
+        "sun_earth_pct": 0.15
+      },
+      "reasons": ["slope_ok", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
+      "source": "Flahaut et al. 2020, Planet. Space Sci. 180:104750 (doi:10.1016/j.pss.2019.104750), Table 2, site 7",
+      "region": "south_pole",
+      "kind": "candidate",
+      "group": "Luna-27 candidate site >80S (Flahaut et al. 2020), site 7",
+      "checks": [
+        {
+          "key": "slope_deg",
+          "threshold": 8,
+          "objective": 2,
+          "ok": true,
+          "value": 1.8,
+          "margin": 0.775
+        },
+        {
+          "key": "illum_pct",
+          "threshold": 0.5,
+          "objective": 0.85,
+          "ok": true,
+          "value": 0.84,
+          "margin": 0.6799999999999999
+        },
+        {
+          "key": "max_dark_hours",
+          "threshold": 100,
+          "objective": 24,
+          "ok": true,
+          "value": 27.0,
+          "margin": 0.73
+        },
+        {
+          "key": "earth_vis_pct",
+          "threshold": 0.5,
+          "objective": 0.95,
+          "ok": true,
+          "value": 1.0,
+          "margin": 1.0
+        },
+        {
+          "key": "max_blackout_hours",
+          "threshold": 72,
+          "objective": 12,
+          "ok": true,
+          "value": 0.0,
+          "margin": 1.0
+        }
+      ],
+      "pending_metrics": []
+    },
+    {
+      "id": "de_gerlache_north",
+      "name": "North de Gerlache",
+      "lat": -87.9,
+      "lon": -65.1,
+      "elev_m": -1149.72,
+      "valid": true,
+      "score": 0.845,
+      "metrics": {
+        "illum_pct": 0.3,
+        "earth_vis_pct": 0.36,
+        "slope_deg": 6.66,
+        "max_dark_hours": 553.0,
+        "psr_dist_km": 0.39,
+        "sun_el_mean_deg": 0.57,
+        "max_blackout_hours": 416.0,
+        "sun_earth_pct": 0.13
+      },
+      "reasons": ["slope_ok", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
+      "source": "Flahaut et al. 2020, Planet. Space Sci. 180:104750 (doi:10.1016/j.pss.2019.104750), Table 2, site 8",
+      "region": "south_pole",
+      "kind": "candidate",
+      "group": "Luna-27 candidate site >80S (Flahaut et al. 2020), site 8",
+      "checks": [
+        {
+          "key": "slope_deg",
+          "threshold": 8,
+          "objective": 2,
+          "ok": true,
+          "value": 6.66,
+          "margin": 0.16749999999999998
+        },
+        {
+          "key": "illum_pct",
+          "threshold": 0.5,
+          "objective": 0.85,
+          "ok": true,
+          "value": 0.86,
+          "margin": 0.72
+        },
+        {
+          "key": "max_dark_hours",
+          "threshold": 100,
+          "objective": 24,
+          "ok": true,
+          "value": 11.0,
+          "margin": 0.89
+        },
+        {
+          "key": "earth_vis_pct",
+          "threshold": 0.5,
+          "objective": 0.95,
+          "ok": true,
+          "value": 1.0,
+          "margin": 1.0
+        },
+        {
+          "key": "max_blackout_hours",
+          "threshold": 72,
+          "objective": 12,
+          "ok": true,
+          "value": 0.0,
+          "margin": 1.0
+        }
+      ],
+      "pending_metrics": []
+    },
+    {
+      "id": "sverdrup_west",
+      "name": "West Sverdrup",
+      "lat": -88.0,
+      "lon": 173.2,
+      "elev_m": 13.86,
+      "valid": false,
+      "score": 0.185,
+      "metrics": {
+        "illum_pct": 0.24,
+        "earth_vis_pct": 0.0,
+        "slope_deg": 2.45,
+        "max_dark_hours": 653.0,
+        "psr_dist_km": 0.26,
+        "sun_el_mean_deg": 0.54,
+        "max_blackout_hours": 8760.0,
+        "sun_earth_pct": 0.0
+      },
+      "reasons": ["slope_ok", "illum_low", "dark_long", "earth_low", "blackout_long"],
+      "source": "Flahaut et al. 2020, Planet. Space Sci. 180:104750 (doi:10.1016/j.pss.2019.104750), Table 2, site 10",
+      "region": "south_pole",
+      "kind": "candidate",
+      "group": "Luna-27 candidate site >80S (Flahaut et al. 2020), site 10",
+      "checks": [
+        {
+          "key": "slope_deg",
+          "threshold": 8,
+          "objective": 2,
+          "ok": true,
+          "value": 2.45,
+          "margin": 0.69375
+        },
+        {
+          "key": "illum_pct",
+          "threshold": 0.5,
+          "objective": 0.85,
+          "ok": false,
+          "value": 0.0,
+          "margin": -1.0
+        },
+        {
+          "key": "max_dark_hours",
+          "threshold": 100,
+          "objective": 24,
+          "ok": false,
+          "value": 168.0,
+          "margin": -0.68
+        },
+        {
+          "key": "earth_vis_pct",
+          "threshold": 0.5,
+          "objective": 0.95,
+          "ok": false,
+          "value": 0.0,
+          "margin": -1.0
+        },
+        {
+          "key": "max_blackout_hours",
+          "threshold": 72,
+          "objective": 12,
+          "ok": false,
+          "value": 168.0,
+          "margin": -1.3333333333333333
+        }
+      ],
+      "pending_metrics": []
+    },
+    {
+      "id": "wiechert_p_south",
+      "name": "South Wiechert P",
+      "lat": -87.2,
+      "lon": 146.7,
+      "elev_m": -428.49,
+      "valid": false,
+      "score": 0.2,
+      "metrics": {
+        "illum_pct": 0.32,
+        "earth_vis_pct": 0.0,
+        "slope_deg": 0.93,
+        "max_dark_hours": 596.0,
+        "psr_dist_km": 0.14,
+        "sun_el_mean_deg": 0.75,
+        "max_blackout_hours": 8760.0,
+        "sun_earth_pct": 0.0
+      },
+      "reasons": ["slope_ok", "illum_low", "dark_long", "earth_low", "blackout_long"],
+      "source": "Flahaut et al. 2020, Planet. Space Sci. 180:104750 (doi:10.1016/j.pss.2019.104750), Table 2, site 11",
+      "region": "south_pole",
+      "kind": "candidate",
+      "group": "Luna-27 candidate site >80S (Flahaut et al. 2020), site 11",
+      "checks": [
+        {
+          "key": "slope_deg",
+          "threshold": 8,
+          "objective": 2,
+          "ok": true,
+          "value": 0.93,
+          "margin": 0.88375
+        },
+        {
+          "key": "illum_pct",
+          "threshold": 0.5,
+          "objective": 0.85,
+          "ok": false,
+          "value": 0.0,
+          "margin": -1.0
+        },
+        {
+          "key": "max_dark_hours",
+          "threshold": 100,
+          "objective": 24,
+          "ok": false,
+          "value": 168.0,
+          "margin": -0.68
+        },
+        {
+          "key": "earth_vis_pct",
+          "threshold": 0.5,
+          "objective": 0.95,
+          "ok": false,
+          "value": 0.0,
+          "margin": -1.0
+        },
+        {
+          "key": "max_blackout_hours",
+          "threshold": 72,
+          "objective": 12,
+          "ok": false,
+          "value": 168.0,
+          "margin": -1.3333333333333333
+        }
+      ],
+      "pending_metrics": []
+    },
+    {
+      "id": "amundsen_west",
+      "name": "West Amundsen",
+      "lat": -85.8,
+      "lon": 112.7,
+      "elev_m": -2572.33,
+      "valid": false,
+      "score": 0.174,
+      "metrics": {
+        "illum_pct": 0.37,
+        "earth_vis_pct": 0.0,
+        "slope_deg": 2.79,
+        "max_dark_hours": 530.0,
+        "psr_dist_km": 0.23,
+        "sun_el_mean_deg": 1.09,
+        "max_blackout_hours": 8760.0,
+        "sun_earth_pct": 0.0
+      },
+      "reasons": ["slope_ok", "illum_low", "dark_long", "earth_low", "blackout_long"],
+      "source": "Flahaut et al. 2020, Planet. Space Sci. 180:104750 (doi:10.1016/j.pss.2019.104750), Table 2, site 13",
+      "region": "south_pole",
+      "kind": "candidate",
+      "group": "Luna-27 candidate site >80S (Flahaut et al. 2020), site 13",
+      "checks": [
+        {
+          "key": "slope_deg",
+          "threshold": 8,
+          "objective": 2,
+          "ok": true,
+          "value": 2.79,
+          "margin": 0.65125
+        },
+        {
+          "key": "illum_pct",
+          "threshold": 0.5,
+          "objective": 0.85,
+          "ok": false,
+          "value": 0.0,
+          "margin": -1.0
+        },
+        {
+          "key": "max_dark_hours",
+          "threshold": 100,
+          "objective": 24,
+          "ok": false,
+          "value": 168.0,
+          "margin": -0.68
+        },
+        {
+          "key": "earth_vis_pct",
+          "threshold": 0.5,
+          "objective": 0.95,
+          "ok": false,
+          "value": 0.0,
+          "margin": -1.0
+        },
+        {
+          "key": "max_blackout_hours",
+          "threshold": 72,
+          "objective": 12,
+          "ok": false,
+          "value": 168.0,
+          "margin": -1.3333333333333333
+        }
+      ],
+      "pending_metrics": []
+    },
+    {
+      "id": "wiechert_j_south",
+      "name": "South Wiechert J",
+      "lat": -86.5,
+      "lon": 176.6,
+      "elev_m": -2829.35,
+      "valid": false,
+      "score": 0.155,
+      "metrics": {
+        "illum_pct": 0.36,
+        "earth_vis_pct": 0.0,
+        "slope_deg": 3.36,
+        "max_dark_hours": 541.0,
+        "psr_dist_km": 0.16,
+        "sun_el_mean_deg": 1.1,
+        "max_blackout_hours": 8760.0,
+        "sun_earth_pct": 0.0
+      },
+      "reasons": ["slope_ok", "illum_low", "dark_long", "earth_low", "blackout_long"],
+      "source": "Flahaut et al. 2020, Planet. Space Sci. 180:104750 (doi:10.1016/j.pss.2019.104750), Table 2, site 14",
+      "region": "south_pole",
+      "kind": "candidate",
+      "group": "Luna-27 candidate site >80S (Flahaut et al. 2020), site 14",
+      "checks": [
+        {
+          "key": "slope_deg",
+          "threshold": 8,
+          "objective": 2,
+          "ok": true,
+          "value": 3.36,
+          "margin": 0.5800000000000001
+        },
+        {
+          "key": "illum_pct",
+          "threshold": 0.5,
+          "objective": 0.85,
+          "ok": false,
+          "value": 0.0,
+          "margin": -1.0
+        },
+        {
+          "key": "max_dark_hours",
+          "threshold": 100,
+          "objective": 24,
+          "ok": false,
+          "value": 168.0,
+          "margin": -0.68
+        },
+        {
+          "key": "earth_vis_pct",
+          "threshold": 0.5,
+          "objective": 0.95,
+          "ok": false,
+          "value": 0.0,
+          "margin": -1.0
+        },
+        {
+          "key": "max_blackout_hours",
+          "threshold": 72,
+          "objective": 12,
+          "ok": false,
+          "value": 168.0,
+          "margin": -1.3333333333333333
+        }
+      ],
+      "pending_metrics": []
+    },
+    {
+      "id": "im1_odysseus",
+      "name": "IM-1 Odysseus (near Malapert A)",
+      "lat": -80.13,
+      "lon": 1.44,
+      "elev_m": 2591.95,
+      "valid": false,
+      "score": 0.8,
+      "metrics": {
+        "illum_pct": 0.39,
+        "earth_vis_pct": 1.0,
+        "slope_deg": 11.19,
+        "max_dark_hours": 451.0,
+        "psr_dist_km": 0.51,
+        "sun_el_mean_deg": 2.87,
+        "max_blackout_hours": 0.0,
+        "sun_earth_pct": 0.39
+      },
+      "reasons": ["slope_high", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
+      "source": "LROC featured image 1360, 'Intuitive Machines IM-1 On The Moon!'",
+      "region": "south_pole",
+      "kind": "historic_landing",
+      "group": "Commercial lander (Intuitive Machines), landed 2024-02-22",
+      "checks": [
+        {
+          "key": "slope_deg",
+          "threshold": 8,
+          "objective": 2,
+          "ok": false,
+          "value": 11.19,
+          "margin": -0.39874999999999994
+        },
+        {
+          "key": "illum_pct",
+          "threshold": 0.5,
+          "objective": 0.85,
+          "ok": true,
+          "value": 1.0,
+          "margin": 1.0
+        },
+        {
+          "key": "max_dark_hours",
+          "threshold": 100,
+          "objective": 24,
+          "ok": true,
+          "value": 0.0,
+          "margin": 1.0
+        },
+        {
+          "key": "earth_vis_pct",
+          "threshold": 0.5,
+          "objective": 0.95,
+          "ok": true,
+          "value": 1.0,
+          "margin": 1.0
+        },
+        {
+          "key": "max_blackout_hours",
+          "threshold": 72,
+          "objective": 12,
+          "ok": true,
+          "value": 0.0,
+          "margin": 1.0
+        }
+      ],
+      "pending_metrics": []
+    },
+    {
+      "id": "im2_athena",
+      "name": "IM-2 Athena (Mons Mouton area)",
+      "lat": -84.7906,
+      "lon": 29.1957,
+      "elev_m": 5321.5,
+      "valid": true,
+      "score": 0.993,
+      "metrics": {
+        "illum_pct": 0.44,
+        "earth_vis_pct": 0.67,
+        "slope_deg": 2.22,
+        "max_dark_hours": 458.0,
+        "psr_dist_km": 0.42,
+        "sun_el_mean_deg": 1.6,
+        "max_blackout_hours": 225.0,
+        "sun_earth_pct": 0.31
+      },
+      "reasons": ["slope_ok", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
+      "source": "LROC featured image 1408, 'IM-2 Athena Seen Obliquely'",
+      "region": "south_pole",
+      "kind": "historic_landing",
+      "group": "Commercial lander (Intuitive Machines), landed 2025-03-06",
+      "checks": [
+        {
+          "key": "slope_deg",
+          "threshold": 8,
+          "objective": 2,
+          "ok": true,
+          "value": 2.22,
+          "margin": 0.7224999999999999
+        },
+        {
+          "key": "illum_pct",
+          "threshold": 0.5,
+          "objective": 0.85,
+          "ok": true,
+          "value": 1.0,
+          "margin": 1.0
+        },
+        {
+          "key": "max_dark_hours",
+          "threshold": 100,
+          "objective": 24,
+          "ok": true,
+          "value": 0.0,
+          "margin": 1.0
+        },
+        {
+          "key": "earth_vis_pct",
+          "threshold": 0.5,
+          "objective": 0.95,
+          "ok": true,
+          "value": 1.0,
+          "margin": 1.0
+        },
+        {
+          "key": "max_blackout_hours",
+          "threshold": 72,
+          "objective": 12,
+          "ok": true,
+          "value": 0.0,
+          "margin": 1.0
+        }
+      ],
+      "pending_metrics": []
+    },
+    {
+      "id": "hinshelwood_rim",
+      "name": "Hinshelwood crater rim (H)",
+      "lat": 89.6564,
+      "lon": -33.56,
+      "elev_m": 363.15,
+      "valid": false,
+      "score": 0.482,
+      "metrics": {
+        "illum_pct": 0.83,
+        "earth_vis_pct": 0.51,
+        "slope_deg": 1.61,
+        "max_dark_hours": 290.0,
+        "psr_dist_km": 0.09,
+        "sun_el_mean_deg": 0.48,
+        "max_blackout_hours": 337.0,
+        "sun_earth_pct": 0.39
+      },
+      "reasons": ["slope_ok", "illum_ok", "dark_ok", "earth_low", "blackout_long"],
+      "source": "Glaser et al. 2018, Planet. Space Sci. 162:170-178 (doi:10.1016/j.pss.2017.07.006), Table 1, Hinshelwood H (this study)",
+      "region": "north_pole",
+      "kind": "candidate",
+      "group": "Highly illuminated point (Glaser et al. 2018)",
+      "checks": [
+        {
+          "key": "slope_deg",
+          "threshold": 8,
+          "objective": 2,
+          "ok": true,
+          "value": 1.61,
+          "margin": 0.79875
+        },
+        {
+          "key": "illum_pct",
+          "threshold": 0.5,
+          "objective": 0.85,
+          "ok": true,
+          "value": 0.68,
+          "margin": 0.3600000000000001
+        },
+        {
+          "key": "max_dark_hours",
+          "threshold": 100,
+          "objective": 24,
+          "ok": true,
+          "value": 32.0,
+          "margin": 0.68
+        },
+        {
+          "key": "earth_vis_pct",
+          "threshold": 0.5,
+          "objective": 0.95,
+          "ok": false,
+          "value": 0.0,
+          "margin": -1.0
+        },
+        {
+          "key": "max_blackout_hours",
+          "threshold": 72,
+          "objective": 12,
+          "ok": false,
+          "value": 168.0,
+          "margin": -1.3333333333333333
+        }
+      ],
+      "pending_metrics": []
+    },
+    {
+      "id": "peary_rim",
+      "name": "Peary crater rim (P)",
+      "lat": 89.726,
+      "lon": 123.11,
+      "elev_m": 263.14,
+      "valid": false,
+      "score": 0.358,
+      "metrics": {
+        "illum_pct": 0.75,
+        "earth_vis_pct": 0.44,
+        "slope_deg": 1.05,
+        "max_dark_hours": 313.0,
+        "psr_dist_km": 0.27,
+        "sun_el_mean_deg": 0.47,
+        "max_blackout_hours": 380.0,
+        "sun_earth_pct": 0.33
+      },
+      "reasons": ["slope_ok", "illum_low", "dark_ok", "earth_low", "blackout_long"],
+      "source": "Glaser et al. 2018, Planet. Space Sci. 162:170-178 (doi:10.1016/j.pss.2017.07.006), Table 1, Peary P (this study)",
+      "region": "north_pole",
+      "kind": "candidate",
+      "group": "Highly illuminated point (Glaser et al. 2018)",
+      "checks": [
+        {
+          "key": "slope_deg",
+          "threshold": 8,
+          "objective": 2,
+          "ok": true,
+          "value": 1.05,
+          "margin": 0.86875
+        },
+        {
+          "key": "illum_pct",
+          "threshold": 0.5,
+          "objective": 0.85,
+          "ok": false,
+          "value": 0.42,
+          "margin": -0.16000000000000003
+        },
+        {
+          "key": "max_dark_hours",
+          "threshold": 100,
+          "objective": 24,
+          "ok": true,
+          "value": 40.0,
+          "margin": 0.6
+        },
+        {
+          "key": "earth_vis_pct",
+          "threshold": 0.5,
+          "objective": 0.95,
+          "ok": false,
+          "value": 0.0,
+          "margin": -1.0
+        },
+        {
+          "key": "max_blackout_hours",
+          "threshold": 72,
+          "objective": 12,
+          "ok": false,
+          "value": 168.0,
+          "margin": -1.3333333333333333
+        }
+      ],
+      "pending_metrics": []
+    },
+    {
+      "id": "whipple_rim",
+      "name": "Whipple crater rim (W)",
+      "lat": 89.3766,
+      "lon": 126.48,
+      "elev_m": 448.44,
+      "valid": false,
+      "score": 0.297,
+      "metrics": {
+        "illum_pct": 0.84,
+        "earth_vis_pct": 0.45,
+        "slope_deg": 3.68,
+        "max_dark_hours": 214.0,
+        "psr_dist_km": 0.81,
+        "sun_el_mean_deg": 0.49,
+        "max_blackout_hours": 373.0,
+        "sun_earth_pct": 0.37
+      },
+      "reasons": ["slope_ok", "illum_low", "dark_ok", "earth_low", "blackout_long"],
+      "source": "Glaser et al. 2018, Planet. Space Sci. 162:170-178 (doi:10.1016/j.pss.2017.07.006), Table 1, Whipple W (this study)",
+      "region": "north_pole",
+      "kind": "candidate",
+      "group": "Highly illuminated point (Glaser et al. 2018)",
+      "checks": [
+        {
+          "key": "slope_deg",
+          "threshold": 8,
+          "objective": 2,
+          "ok": true,
+          "value": 3.68,
+          "margin": 0.54
+        },
+        {
+          "key": "illum_pct",
+          "threshold": 0.5,
+          "objective": 0.85,
+          "ok": false,
+          "value": 0.46,
+          "margin": -0.07999999999999996
+        },
+        {
+          "key": "max_dark_hours",
+          "threshold": 100,
+          "objective": 24,
+          "ok": true,
+          "value": 42.0,
+          "margin": 0.58
+        },
+        {
+          "key": "earth_vis_pct",
+          "threshold": 0.5,
+          "objective": 0.95,
+          "ok": false,
+          "value": 0.0,
+          "margin": -1.0
+        },
+        {
+          "key": "max_blackout_hours",
+          "threshold": 72,
+          "objective": 12,
+          "ok": false,
+          "value": 168.0,
+          "margin": -1.3333333333333333
+        }
+      ],
+      "pending_metrics": []
+    },
+    {
+      "id": "apollo_11",
+      "name": "Apollo 11 LM (Tranquility Base)",
+      "lat": 0.67416,
+      "lon": 23.47314,
+      "elev_m": -1925.6,
+      "valid": true,
+      "score": 1.0,
+      "metrics": {
+        "illum_pct": 0.49,
+        "earth_vis_pct": 1.0,
+        "slope_deg": 0.83,
+        "max_dark_hours": 355.0,
+        "psr_dist_km": 0.0,
+        "sun_el_mean_deg": 21.86,
+        "max_blackout_hours": 0.0,
+        "sun_earth_pct": 0.49
+      },
+      "reasons": ["slope_ok", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
+      "source": "Wagner et al. 2017, Icarus 283:92-103 (doi:10.1016/j.icarus.2016.05.011); LROC 2016 coordinate table, Apollo 11 LM",
+      "region": "near_side",
+      "kind": "historic_landing",
+      "group": "Apollo crewed landing, 1969",
+      "checks": [
+        {
+          "key": "slope_deg",
+          "threshold": 8,
+          "objective": 2,
+          "ok": true,
+          "value": 0.83,
+          "margin": 0.89625
+        },
+        {
+          "key": "illum_pct",
+          "threshold": 0.5,
+          "objective": 0.85,
+          "ok": true,
+          "value": 1.0,
+          "margin": 1.0
+        },
+        {
+          "key": "max_dark_hours",
+          "threshold": 100,
+          "objective": 24,
+          "ok": true,
+          "value": 0.0,
+          "margin": 1.0
+        },
+        {
+          "key": "earth_vis_pct",
+          "threshold": 0.5,
+          "objective": 0.95,
+          "ok": true,
+          "value": 1.0,
+          "margin": 1.0
+        },
+        {
+          "key": "max_blackout_hours",
+          "threshold": 72,
+          "objective": 12,
+          "ok": true,
+          "value": 0.0,
+          "margin": 1.0
+        }
+      ],
+      "pending_metrics": ["psr_dist_km"]
+    },
+    {
+      "id": "apollo_12",
+      "name": "Apollo 12 LM",
+      "lat": -3.0128,
+      "lon": -23.4219,
+      "elev_m": -1427.55,
+      "valid": true,
+      "score": 1.0,
+      "metrics": {
+        "illum_pct": 0.49,
+        "earth_vis_pct": 1.0,
+        "slope_deg": 0.49,
+        "max_dark_hours": 355.0,
+        "psr_dist_km": 0.0,
+        "sun_el_mean_deg": 21.8,
+        "max_blackout_hours": 0.0,
+        "sun_earth_pct": 0.49
+      },
+      "reasons": ["slope_ok", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
+      "source": "Wagner et al. 2017, Icarus 283:92-103 (doi:10.1016/j.icarus.2016.05.011); LROC 2016 coordinate table, Apollo 12 LM",
+      "region": "near_side",
+      "kind": "historic_landing",
+      "group": "Apollo crewed landing, 1969",
+      "checks": [
+        {
+          "key": "slope_deg",
+          "threshold": 8,
+          "objective": 2,
+          "ok": true,
+          "value": 0.49,
+          "margin": 0.93875
+        },
+        {
+          "key": "illum_pct",
+          "threshold": 0.5,
+          "objective": 0.85,
+          "ok": true,
+          "value": 1.0,
+          "margin": 1.0
+        },
+        {
+          "key": "max_dark_hours",
+          "threshold": 100,
+          "objective": 24,
+          "ok": true,
+          "value": 0.0,
+          "margin": 1.0
+        },
+        {
+          "key": "earth_vis_pct",
+          "threshold": 0.5,
+          "objective": 0.95,
+          "ok": true,
+          "value": 1.0,
+          "margin": 1.0
+        },
+        {
+          "key": "max_blackout_hours",
+          "threshold": 72,
+          "objective": 12,
+          "ok": true,
+          "value": 0.0,
+          "margin": 1.0
+        }
+      ],
+      "pending_metrics": ["psr_dist_km"]
+    },
+    {
+      "id": "apollo_14",
+      "name": "Apollo 14 LM",
+      "lat": -3.64589,
+      "lon": -17.47194,
+      "elev_m": -1062.17,
+      "valid": true,
+      "score": 1.0,
+      "metrics": {
+        "illum_pct": 0.49,
+        "earth_vis_pct": 1.0,
+        "slope_deg": 0.6,
+        "max_dark_hours": 354.0,
+        "psr_dist_km": 0.0,
+        "sun_el_mean_deg": 21.75,
+        "max_blackout_hours": 0.0,
+        "sun_earth_pct": 0.49
+      },
+      "reasons": ["slope_ok", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
+      "source": "Wagner et al. 2017, Icarus 283:92-103 (doi:10.1016/j.icarus.2016.05.011); LROC 2016 coordinate table, Apollo 14 LM",
+      "region": "near_side",
+      "kind": "historic_landing",
+      "group": "Apollo crewed landing, 1971",
+      "checks": [
+        {
+          "key": "slope_deg",
+          "threshold": 8,
+          "objective": 2,
+          "ok": true,
+          "value": 0.6,
+          "margin": 0.925
+        },
+        {
+          "key": "illum_pct",
+          "threshold": 0.5,
+          "objective": 0.85,
+          "ok": true,
+          "value": 1.0,
+          "margin": 1.0
+        },
+        {
+          "key": "max_dark_hours",
+          "threshold": 100,
+          "objective": 24,
+          "ok": true,
+          "value": 0.0,
+          "margin": 1.0
+        },
+        {
+          "key": "earth_vis_pct",
+          "threshold": 0.5,
+          "objective": 0.95,
+          "ok": true,
+          "value": 1.0,
+          "margin": 1.0
+        },
+        {
+          "key": "max_blackout_hours",
+          "threshold": 72,
+          "objective": 12,
+          "ok": true,
+          "value": 0.0,
+          "margin": 1.0
+        }
+      ],
+      "pending_metrics": ["psr_dist_km"]
+    },
+    {
+      "id": "apollo_15",
+      "name": "Apollo 15 LM (Hadley-Apennine)",
+      "lat": 26.13239,
+      "lon": 3.6333,
+      "elev_m": -1924.3,
+      "valid": true,
+      "score": 1.0,
+      "metrics": {
+        "illum_pct": 0.49,
+        "earth_vis_pct": 1.0,
+        "slope_deg": 1.0,
+        "max_dark_hours": 357.0,
+        "psr_dist_km": 0.0,
+        "sun_el_mean_deg": 18.13,
+        "max_blackout_hours": 0.0,
+        "sun_earth_pct": 0.49
+      },
+      "reasons": ["slope_ok", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
+      "source": "Wagner et al. 2017, Icarus 283:92-103 (doi:10.1016/j.icarus.2016.05.011); LROC 2016 coordinate table, Apollo 15 LM",
+      "region": "near_side",
+      "kind": "historic_landing",
+      "group": "Apollo crewed landing, 1971",
+      "checks": [
+        {
+          "key": "slope_deg",
+          "threshold": 8,
+          "objective": 2,
+          "ok": true,
+          "value": 1.0,
+          "margin": 0.875
+        },
+        {
+          "key": "illum_pct",
+          "threshold": 0.5,
+          "objective": 0.85,
+          "ok": true,
+          "value": 1.0,
+          "margin": 1.0
+        },
+        {
+          "key": "max_dark_hours",
+          "threshold": 100,
+          "objective": 24,
+          "ok": true,
+          "value": 0.0,
+          "margin": 1.0
+        },
+        {
+          "key": "earth_vis_pct",
+          "threshold": 0.5,
+          "objective": 0.95,
+          "ok": true,
+          "value": 1.0,
+          "margin": 1.0
+        },
+        {
+          "key": "max_blackout_hours",
+          "threshold": 72,
+          "objective": 12,
+          "ok": true,
+          "value": 0.0,
+          "margin": 1.0
+        }
+      ],
+      "pending_metrics": ["psr_dist_km"]
+    },
+    {
+      "id": "apollo_16",
+      "name": "Apollo 16 LM (Descartes highlands)",
+      "lat": -8.9734,
+      "lon": 15.5011,
+      "elev_m": 8.7,
+      "valid": true,
+      "score": 1.0,
+      "metrics": {
+        "illum_pct": 0.49,
+        "earth_vis_pct": 1.0,
+        "slope_deg": 1.44,
+        "max_dark_hours": 354.0,
+        "psr_dist_km": 0.0,
+        "sun_el_mean_deg": 21.22,
+        "max_blackout_hours": 0.0,
+        "sun_earth_pct": 0.49
+      },
+      "reasons": ["slope_ok", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
+      "source": "Wagner et al. 2017, Icarus 283:92-103 (doi:10.1016/j.icarus.2016.05.011); LROC 2016 coordinate table, Apollo 16 LM",
+      "region": "near_side",
+      "kind": "historic_landing",
+      "group": "Apollo crewed landing, 1972",
+      "checks": [
+        {
+          "key": "slope_deg",
+          "threshold": 8,
+          "objective": 2,
+          "ok": true,
+          "value": 1.44,
+          "margin": 0.8200000000000001
+        },
+        {
+          "key": "illum_pct",
+          "threshold": 0.5,
+          "objective": 0.85,
+          "ok": true,
+          "value": 1.0,
+          "margin": 1.0
+        },
+        {
+          "key": "max_dark_hours",
+          "threshold": 100,
+          "objective": 24,
+          "ok": true,
+          "value": 0.0,
+          "margin": 1.0
+        },
+        {
+          "key": "earth_vis_pct",
+          "threshold": 0.5,
+          "objective": 0.95,
+          "ok": true,
+          "value": 1.0,
+          "margin": 1.0
+        },
+        {
+          "key": "max_blackout_hours",
+          "threshold": 72,
+          "objective": 12,
+          "ok": true,
+          "value": 0.0,
+          "margin": 1.0
+        }
+      ],
+      "pending_metrics": ["psr_dist_km"]
+    },
+    {
+      "id": "apollo_17",
+      "name": "Apollo 17 LM (Taurus-Littrow)",
+      "lat": 20.1911,
+      "lon": 30.7723,
+      "elev_m": -2625.0,
+      "valid": true,
+      "score": 1.0,
+      "metrics": {
+        "illum_pct": 0.49,
+        "earth_vis_pct": 1.0,
+        "slope_deg": 1.1,
+        "max_dark_hours": 356.0,
+        "psr_dist_km": 0.0,
+        "sun_el_mean_deg": 19.37,
+        "max_blackout_hours": 0.0,
+        "sun_earth_pct": 0.49
+      },
+      "reasons": ["slope_ok", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
+      "source": "Wagner et al. 2017, Icarus 283:92-103 (doi:10.1016/j.icarus.2016.05.011); LROC 2016 coordinate table, Apollo 17 LM",
+      "region": "near_side",
+      "kind": "historic_landing",
+      "group": "Apollo crewed landing, 1972",
+      "checks": [
+        {
+          "key": "slope_deg",
+          "threshold": 8,
+          "objective": 2,
+          "ok": true,
+          "value": 1.1,
+          "margin": 0.8625
+        },
+        {
+          "key": "illum_pct",
+          "threshold": 0.5,
+          "objective": 0.85,
+          "ok": true,
+          "value": 1.0,
+          "margin": 1.0
+        },
+        {
+          "key": "max_dark_hours",
+          "threshold": 100,
+          "objective": 24,
+          "ok": true,
+          "value": 0.0,
+          "margin": 1.0
+        },
+        {
+          "key": "earth_vis_pct",
+          "threshold": 0.5,
+          "objective": 0.95,
+          "ok": true,
+          "value": 1.0,
+          "margin": 1.0
+        },
+        {
+          "key": "max_blackout_hours",
+          "threshold": 72,
+          "objective": 12,
+          "ok": true,
+          "value": 0.0,
+          "margin": 1.0
+        }
+      ],
+      "pending_metrics": ["psr_dist_km"]
+    },
+    {
+      "id": "surveyor_1",
+      "name": "Surveyor 1",
+      "lat": -2.4745,
+      "lon": -43.3398,
+      "elev_m": -1887.71,
+      "valid": true,
+      "score": 1.0,
+      "metrics": {
+        "illum_pct": 0.5,
+        "earth_vis_pct": 1.0,
+        "slope_deg": 0.1,
+        "max_dark_hours": 354.0,
+        "psr_dist_km": 0.0,
+        "sun_el_mean_deg": 21.95,
+        "max_blackout_hours": 0.0,
+        "sun_earth_pct": 0.5
+      },
+      "reasons": ["slope_ok", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
+      "source": "Wagner et al. 2017, Icarus 283:92-103 (doi:10.1016/j.icarus.2016.05.011); LROC 2016 coordinate table, Surveyor 1",
+      "region": "near_side",
+      "kind": "historic_landing",
+      "group": "Surveyor robotic landing, 1966",
+      "checks": [
+        {
+          "key": "slope_deg",
+          "threshold": 8,
+          "objective": 2,
+          "ok": true,
+          "value": 0.1,
+          "margin": 0.9875
+        },
+        {
+          "key": "illum_pct",
+          "threshold": 0.5,
+          "objective": 0.85,
+          "ok": true,
+          "value": 1.0,
+          "margin": 1.0
+        },
+        {
+          "key": "max_dark_hours",
+          "threshold": 100,
+          "objective": 24,
+          "ok": true,
+          "value": 0.0,
+          "margin": 1.0
+        },
+        {
+          "key": "earth_vis_pct",
+          "threshold": 0.5,
+          "objective": 0.95,
+          "ok": true,
+          "value": 1.0,
+          "margin": 1.0
+        },
+        {
+          "key": "max_blackout_hours",
+          "threshold": 72,
+          "objective": 12,
+          "ok": true,
+          "value": 0.0,
+          "margin": 1.0
+        }
+      ],
+      "pending_metrics": ["psr_dist_km"]
+    },
+    {
+      "id": "luna_16",
+      "name": "Luna 16 (Mare Fecunditatis)",
+      "lat": -0.5137,
+      "lon": 56.3638,
+      "elev_m": -2448.42,
+      "valid": true,
+      "score": 1.0,
+      "metrics": {
+        "illum_pct": 0.49,
+        "earth_vis_pct": 1.0,
+        "slope_deg": 0.56,
+        "max_dark_hours": 355.0,
+        "psr_dist_km": 0.0,
+        "sun_el_mean_deg": 21.87,
+        "max_blackout_hours": 0.0,
+        "sun_earth_pct": 0.49
+      },
+      "reasons": ["slope_ok", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
+      "source": "Wagner et al. 2017, Icarus 283:92-103 (doi:10.1016/j.icarus.2016.05.011); LROC 2016 coordinate table, Luna 16",
+      "region": "near_side",
+      "kind": "historic_landing",
+      "group": "Luna robotic sample return, 1970",
+      "checks": [
+        {
+          "key": "slope_deg",
+          "threshold": 8,
+          "objective": 2,
+          "ok": true,
+          "value": 0.56,
+          "margin": 0.9299999999999999
+        },
+        {
+          "key": "illum_pct",
+          "threshold": 0.5,
+          "objective": 0.85,
+          "ok": true,
+          "value": 0.86,
+          "margin": 0.72
+        },
+        {
+          "key": "max_dark_hours",
+          "threshold": 100,
+          "objective": 24,
+          "ok": true,
+          "value": 24.0,
+          "margin": 0.76
+        },
+        {
+          "key": "earth_vis_pct",
+          "threshold": 0.5,
+          "objective": 0.95,
+          "ok": true,
+          "value": 1.0,
+          "margin": 1.0
+        },
+        {
+          "key": "max_blackout_hours",
+          "threshold": 72,
+          "objective": 12,
+          "ok": true,
+          "value": 0.0,
+          "margin": 1.0
+        }
+      ],
+      "pending_metrics": ["psr_dist_km"]
+    },
+    {
+      "id": "luna_17",
+      "name": "Luna 17 lander (Lunokhod 1)",
+      "lat": 38.23764,
+      "lon": -35.00163,
+      "elev_m": -2472.28,
+      "valid": true,
+      "score": 1.0,
+      "metrics": {
+        "illum_pct": 0.49,
+        "earth_vis_pct": 1.0,
+        "slope_deg": 0.11,
+        "max_dark_hours": 358.0,
+        "psr_dist_km": 0.0,
+        "sun_el_mean_deg": 15.28,
+        "max_blackout_hours": 0.0,
+        "sun_earth_pct": 0.49
+      },
+      "reasons": ["slope_ok", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
+      "source": "Wagner et al. 2017, Icarus 283:92-103 (doi:10.1016/j.icarus.2016.05.011); LROC 2016 coordinate table, Luna 17",
+      "region": "near_side",
+      "kind": "historic_landing",
+      "group": "Luna robotic landing with rover, 1970",
+      "checks": [
+        {
+          "key": "slope_deg",
+          "threshold": 8,
+          "objective": 2,
+          "ok": true,
+          "value": 0.11,
+          "margin": 0.98625
+        },
+        {
+          "key": "illum_pct",
+          "threshold": 0.5,
+          "objective": 0.85,
+          "ok": true,
+          "value": 1.0,
+          "margin": 1.0
+        },
+        {
+          "key": "max_dark_hours",
+          "threshold": 100,
+          "objective": 24,
+          "ok": true,
+          "value": 0.0,
+          "margin": 1.0
+        },
+        {
+          "key": "earth_vis_pct",
+          "threshold": 0.5,
+          "objective": 0.95,
+          "ok": true,
+          "value": 1.0,
+          "margin": 1.0
+        },
+        {
+          "key": "max_blackout_hours",
+          "threshold": 72,
+          "objective": 12,
+          "ok": true,
+          "value": 0.0,
+          "margin": 1.0
+        }
+      ],
+      "pending_metrics": ["psr_dist_km"]
     },
     {
       "id": "luna_21",
       "name": "Luna 21 lander (Lunokhod 2)",
       "lat": 25.9994,
       "lon": 30.4076,
-      "elev_m": 0.0,
+      "elev_m": -2687.51,
       "valid": true,
       "score": 1.0,
       "metrics": {
         "illum_pct": 0.49,
         "earth_vis_pct": 1.0,
-        "slope_deg": 0.0,
+        "slope_deg": 0.4,
         "max_dark_hours": 356.0,
         "psr_dist_km": 0.0,
         "sun_el_mean_deg": 18.16,
         "max_blackout_hours": 0.0,
         "sun_earth_pct": 0.49
       },
-      "reasons": ["slope_deg_pending", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
+      "reasons": ["slope_ok", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
       "source": "Wagner et al. 2017, Icarus 283:92-103 (doi:10.1016/j.icarus.2016.05.011); LROC 2016 coordinate table, Luna 21",
       "region": "near_side",
       "kind": "historic_landing",
@@ -3445,9 +3395,8 @@
           "threshold": 8,
           "objective": 2,
           "ok": true,
-          "value": null,
-          "margin": null,
-          "pending": true
+          "value": 0.4,
+          "margin": 0.95
         },
         {
           "key": "illum_pct",
@@ -3482,27 +3431,27 @@
           "margin": 1.0
         }
       ],
-      "pending_metrics": ["slope_deg", "psr_dist_km"]
+      "pending_metrics": ["psr_dist_km"]
     },
     {
       "id": "luna_24",
       "name": "Luna 24 (Mare Crisium)",
       "lat": 12.7142,
       "lon": 62.2129,
-      "elev_m": 0.0,
+      "elev_m": -3673.53,
       "valid": true,
-      "score": 1.0,
+      "score": 0.928,
       "metrics": {
         "illum_pct": 0.49,
         "earth_vis_pct": 1.0,
-        "slope_deg": 0.0,
+        "slope_deg": 0.47,
         "max_dark_hours": 356.0,
         "psr_dist_km": 0.0,
         "sun_el_mean_deg": 20.71,
         "max_blackout_hours": 0.0,
         "sun_earth_pct": 0.49
       },
-      "reasons": ["slope_deg_pending", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
+      "reasons": ["slope_ok", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
       "source": "Wagner et al. 2017, Icarus 283:92-103 (doi:10.1016/j.icarus.2016.05.011); LROC 2016 coordinate table, Luna 24",
       "region": "near_side",
       "kind": "historic_landing",
@@ -3513,25 +3462,24 @@
           "threshold": 8,
           "objective": 2,
           "ok": true,
-          "value": null,
-          "margin": null,
-          "pending": true
+          "value": 0.47,
+          "margin": 0.94125
         },
         {
           "key": "illum_pct",
           "threshold": 0.5,
           "objective": 0.85,
           "ok": true,
-          "value": 1.0,
-          "margin": 1.0
+          "value": 0.78,
+          "margin": 0.56
         },
         {
           "key": "max_dark_hours",
           "threshold": 100,
           "objective": 24,
           "ok": true,
-          "value": 0.0,
-          "margin": 1.0
+          "value": 36.0,
+          "margin": 0.64
         },
         {
           "key": "earth_vis_pct",
@@ -3550,27 +3498,27 @@
           "margin": 1.0
         }
       ],
-      "pending_metrics": ["slope_deg", "psr_dist_km"]
+      "pending_metrics": ["psr_dist_km"]
     },
     {
       "id": "change_3",
       "name": "Chang'e 3 (Mare Imbrium)",
       "lat": 44.1214,
       "lon": -19.5117,
-      "elev_m": 0.0,
+      "elev_m": -2633.99,
       "valid": true,
       "score": 1.0,
       "metrics": {
         "illum_pct": 0.49,
         "earth_vis_pct": 1.0,
-        "slope_deg": 0.0,
+        "slope_deg": 0.18,
         "max_dark_hours": 359.0,
         "psr_dist_km": 0.0,
         "sun_el_mean_deg": 13.67,
         "max_blackout_hours": 0.0,
         "sun_earth_pct": 0.49
       },
-      "reasons": ["slope_deg_pending", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
+      "reasons": ["slope_ok", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
       "source": "Wagner et al. 2017, Icarus 283:92-103 (doi:10.1016/j.icarus.2016.05.011); LROC 2016 coordinate table, Chang'e 3",
       "region": "near_side",
       "kind": "historic_landing",
@@ -3581,25 +3529,24 @@
           "threshold": 8,
           "objective": 2,
           "ok": true,
-          "value": null,
-          "margin": null,
-          "pending": true
+          "value": 0.18,
+          "margin": 0.9775
         },
         {
           "key": "illum_pct",
           "threshold": 0.5,
           "objective": 0.85,
           "ok": true,
-          "value": 0.99,
-          "margin": 0.98
+          "value": 1.0,
+          "margin": 1.0
         },
         {
           "key": "max_dark_hours",
           "threshold": 100,
           "objective": 24,
           "ok": true,
-          "value": 2.0,
-          "margin": 0.98
+          "value": 0.0,
+          "margin": 1.0
         },
         {
           "key": "earth_vis_pct",
@@ -3618,27 +3565,27 @@
           "margin": 1.0
         }
       ],
-      "pending_metrics": ["slope_deg", "psr_dist_km"]
+      "pending_metrics": ["psr_dist_km"]
     },
     {
       "id": "change_5",
       "name": "Chang'e 5 (near Mons Rumker)",
       "lat": 43.0576,
       "lon": -51.9161,
-      "elev_m": 0.0,
+      "elev_m": -2542.78,
       "valid": true,
-      "score": 0.69,
+      "score": 1.0,
       "metrics": {
         "illum_pct": 0.5,
         "earth_vis_pct": 1.0,
-        "slope_deg": 0.0,
+        "slope_deg": 0.34,
         "max_dark_hours": 359.0,
         "psr_dist_km": 0.0,
         "sun_el_mean_deg": 14.09,
         "max_blackout_hours": 0.0,
         "sun_earth_pct": 0.5
       },
-      "reasons": ["slope_deg_pending", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
+      "reasons": ["slope_ok", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
       "source": "LROC featured image 1172, 'First Look: Chang'e 5'",
       "region": "near_side",
       "kind": "historic_landing",
@@ -3649,25 +3596,24 @@
           "threshold": 8,
           "objective": 2,
           "ok": true,
-          "value": null,
-          "margin": null,
-          "pending": true
+          "value": 0.34,
+          "margin": 0.9575
         },
         {
           "key": "illum_pct",
           "threshold": 0.5,
           "objective": 0.85,
           "ok": true,
-          "value": 0.61,
-          "margin": 0.21999999999999997
+          "value": 0.97,
+          "margin": 0.94
         },
         {
           "key": "max_dark_hours",
           "threshold": 100,
           "objective": 24,
           "ok": true,
-          "value": 66.0,
-          "margin": 0.34
+          "value": 4.0,
+          "margin": 0.96
         },
         {
           "key": "earth_vis_pct",
@@ -3686,27 +3632,27 @@
           "margin": 1.0
         }
       ],
-      "pending_metrics": ["slope_deg", "psr_dist_km"]
+      "pending_metrics": ["psr_dist_km"]
     },
     {
       "id": "chandrayaan_3",
       "name": "Chandrayaan-3 Vikram (Shiv Shakti point)",
       "lat": -69.3741,
       "lon": 32.32,
-      "elev_m": 0.0,
+      "elev_m": 528.53,
       "valid": true,
       "score": 1.0,
       "metrics": {
         "illum_pct": 0.49,
         "earth_vis_pct": 1.0,
-        "slope_deg": 0.0,
+        "slope_deg": 0.87,
         "max_dark_hours": 367.0,
         "psr_dist_km": 0.0,
         "sun_el_mean_deg": 6.35,
         "max_blackout_hours": 0.0,
         "sun_earth_pct": 0.49
       },
-      "reasons": ["slope_deg_pending", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
+      "reasons": ["slope_ok", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
       "source": "LROC featured image 1314, 'Chandrayaan-3 Landing Site'",
       "region": "near_side",
       "kind": "historic_landing",
@@ -3717,9 +3663,8 @@
           "threshold": 8,
           "objective": 2,
           "ok": true,
-          "value": null,
-          "margin": null,
-          "pending": true
+          "value": 0.87,
+          "margin": 0.89125
         },
         {
           "key": "illum_pct",
@@ -3754,27 +3699,27 @@
           "margin": 1.0
         }
       ],
-      "pending_metrics": ["slope_deg", "psr_dist_km"]
+      "pending_metrics": ["psr_dist_km"]
     },
     {
       "id": "slim",
       "name": "SLIM (near Shioli crater)",
       "lat": -13.316,
       "lon": 25.251,
-      "elev_m": 0.0,
+      "elev_m": -913.31,
       "valid": true,
-      "score": 1.0,
+      "score": 0.827,
       "metrics": {
         "illum_pct": 0.49,
         "earth_vis_pct": 1.0,
-        "slope_deg": 0.0,
+        "slope_deg": 7.2,
         "max_dark_hours": 355.0,
         "psr_dist_km": 0.0,
         "sun_el_mean_deg": 20.6,
         "max_blackout_hours": 0.0,
         "sun_earth_pct": 0.49
       },
-      "reasons": ["slope_deg_pending", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
+      "reasons": ["slope_ok", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
       "source": "LROC featured image 1358, 'JAXA SLIM Landing'",
       "region": "near_side",
       "kind": "historic_landing",
@@ -3785,9 +3730,8 @@
           "threshold": 8,
           "objective": 2,
           "ok": true,
-          "value": null,
-          "margin": null,
-          "pending": true
+          "value": 7.2,
+          "margin": 0.09999999999999998
         },
         {
           "key": "illum_pct",
@@ -3822,27 +3766,27 @@
           "margin": 1.0
         }
       ],
-      "pending_metrics": ["slope_deg", "psr_dist_km"]
+      "pending_metrics": ["psr_dist_km"]
     },
     {
       "id": "blue_ghost_m1",
       "name": "Blue Ghost Mission 1 (Mare Crisium)",
       "lat": 18.5623,
       "lon": 61.8103,
-      "elev_m": 0.0,
+      "elev_m": -3650.21,
       "valid": true,
-      "score": 1.0,
+      "score": 0.934,
       "metrics": {
         "illum_pct": 0.49,
         "earth_vis_pct": 1.0,
-        "slope_deg": 0.0,
+        "slope_deg": 0.04,
         "max_dark_hours": 356.0,
         "psr_dist_km": 0.0,
         "sun_el_mean_deg": 19.7,
         "max_blackout_hours": 0.0,
         "sun_earth_pct": 0.49
       },
-      "reasons": ["slope_deg_pending", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
+      "reasons": ["slope_ok", "illum_ok", "dark_ok", "earth_ok", "blackout_ok"],
       "source": "LROC featured image 1407, 'Blue Ghost Lunar Lander Seen From Above'",
       "region": "near_side",
       "kind": "historic_landing",
@@ -3853,25 +3797,24 @@
           "threshold": 8,
           "objective": 2,
           "ok": true,
-          "value": null,
-          "margin": null,
-          "pending": true
+          "value": 0.04,
+          "margin": 0.995
         },
         {
           "key": "illum_pct",
           "threshold": 0.5,
           "objective": 0.85,
           "ok": true,
-          "value": 1.0,
-          "margin": 1.0
+          "value": 0.79,
+          "margin": 0.5800000000000001
         },
         {
           "key": "max_dark_hours",
           "threshold": 100,
           "objective": 24,
           "ok": true,
-          "value": 0.0,
-          "margin": 1.0
+          "value": 36.0,
+          "margin": 0.64
         },
         {
           "key": "earth_vis_pct",
@@ -3890,27 +3833,27 @@
           "margin": 1.0
         }
       ],
-      "pending_metrics": ["slope_deg", "psr_dist_km"]
+      "pending_metrics": ["psr_dist_km"]
     },
     {
       "id": "change_4",
       "name": "Chang'e 4 (Von Karman crater)",
       "lat": -45.457,
       "lon": 177.589,
-      "elev_m": 0.0,
+      "elev_m": -5929.62,
       "valid": false,
-      "score": 0.0,
+      "score": 0.2,
       "metrics": {
         "illum_pct": 0.51,
         "earth_vis_pct": 0.0,
-        "slope_deg": 0.0,
+        "slope_deg": 0.35,
         "max_dark_hours": 360.0,
         "psr_dist_km": 0.0,
         "sun_el_mean_deg": 14.21,
         "max_blackout_hours": 8760.0,
         "sun_earth_pct": 0.0
       },
-      "reasons": ["slope_deg_pending", "illum_low", "dark_long", "earth_low", "blackout_long"],
+      "reasons": ["slope_ok", "illum_low", "dark_long", "earth_low", "blackout_long"],
       "source": "LROC featured image 1087, 'Chang'e 4 Lander Coordinates'",
       "region": "far_side",
       "kind": "historic_landing",
@@ -3921,9 +3864,8 @@
           "threshold": 8,
           "objective": 2,
           "ok": true,
-          "value": null,
-          "margin": null,
-          "pending": true
+          "value": 0.35,
+          "margin": 0.95625
         },
         {
           "key": "illum_pct",
@@ -3958,27 +3900,27 @@
           "margin": -1.3333333333333333
         }
       ],
-      "pending_metrics": ["slope_deg", "psr_dist_km"]
+      "pending_metrics": ["psr_dist_km"]
     },
     {
       "id": "change_6",
       "name": "Chang'e 6 (Apollo basin)",
       "lat": -41.6385,
       "lon": -153.9852,
-      "elev_m": 0.0,
+      "elev_m": -5254.77,
       "valid": false,
-      "score": 0.0,
+      "score": 0.2,
       "metrics": {
         "illum_pct": 0.51,
         "earth_vis_pct": 0.0,
-        "slope_deg": 0.0,
+        "slope_deg": 0.18,
         "max_dark_hours": 359.0,
         "psr_dist_km": 0.0,
         "sun_el_mean_deg": 15.37,
         "max_blackout_hours": 8760.0,
         "sun_earth_pct": 0.0
       },
-      "reasons": ["slope_deg_pending", "illum_low", "dark_long", "earth_low", "blackout_long"],
+      "reasons": ["slope_ok", "illum_low", "dark_long", "earth_low", "blackout_long"],
       "source": "LROC featured image 1374, 'First Look: Chang'e 6'",
       "region": "far_side",
       "kind": "historic_landing",
@@ -3989,9 +3931,8 @@
           "threshold": 8,
           "objective": 2,
           "ok": true,
-          "value": null,
-          "margin": null,
-          "pending": true
+          "value": 0.18,
+          "margin": 0.9775
         },
         {
           "key": "illum_pct",
@@ -4026,7 +3967,7 @@
           "margin": -1.3333333333333333
         }
       ],
-      "pending_metrics": ["slope_deg", "psr_dist_km"]
+      "pending_metrics": ["psr_dist_km"]
     }
   ]
 }
