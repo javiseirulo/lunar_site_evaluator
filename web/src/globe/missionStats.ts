@@ -229,6 +229,14 @@ function check(
   return { id, status, value, limit, margin, text: `${describe(value)} ${mark(status)}` };
 }
 
+/**
+ * Only planning candidates are filtered and ranked in Explore. `kind: "historic_landing"` sites are
+ * shown in the "Past landings" layer instead. A site without `kind` (v1 mock data) is a candidate.
+ */
+export function isCandidateSite(site: Site): boolean {
+  return (site.kind ?? 'candidate') === 'candidate';
+}
+
 /** Slope from sites.json, or null if missing or marked pending (contract v1.1 `pending_metrics`). */
 export function siteSlope(site: Site): number | null {
   const pending = (site as Site & { pending_metrics?: string[] }).pending_metrics;

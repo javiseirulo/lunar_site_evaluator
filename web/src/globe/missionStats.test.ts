@@ -6,6 +6,7 @@ import {
   activeChecks,
   autonomyH,
   evaluateSite,
+  isCandidateSite,
   longestRun,
   meetsText,
   missionStats,
@@ -296,5 +297,23 @@ describe('real data: shackleton_rim_01 over the whole manifest range', () => {
     expect(s.samples).toBe(ts.t_utc.length);
     expect(s.longestCommGapH).not.toBeNull();
     expect(s.longestNightH).not.toBeNull();
+  });
+});
+
+describe('isCandidateSite', () => {
+  it('keeps planning candidates and v1 sites without kind, drops historic landings', () => {
+    expect(isCandidateSite(site('a', 1, { kind: 'candidate' } as Partial<Site>))).toBe(true);
+    expect(isCandidateSite(site('b', 1))).toBe(true);
+    expect(isCandidateSite(site('c', 1, { kind: 'historic_landing' } as Partial<Site>))).toBe(
+      false,
+    );
+  });
+
+  it('leaves 39 candidates in the real catalog (59 sites, 20 historic landings)', () => {
+    const DATA = join(__dirname, '..', '..', 'public', 'data');
+    const all = (JSON.parse(readFileSync(join(DATA, 'sites.json'), 'utf8')) as { sites: Site[] })
+      .sites;
+    const historic = all.filter((s) => s.kind === 'historic_landing').length;
+    expect(all.filter(isCandidateSite)).toHaveLength(all.length - historic);
   });
 });

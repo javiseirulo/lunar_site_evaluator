@@ -7,7 +7,8 @@
  * No score from sites.json.
  * Local state: the info card (what was clicked), custom pins (customPins.ts) and the camera flight.
  * Custom pins and clicked points never change `selectedSiteId` (docs/10 §"Coordenadas personalizadas").
- * Fixed light for now: Sun direction from the timeseries arrives in v2.
+ * Lighting follows the Mission Clock: Sun direction from @/ephem (sunLight.ts); with no ephemeris
+ * for the date it falls back to a fixed light and says so.
  *
  * Mouse: left-drag moves, right-drag rotates, wheel zooms. A click (no drag) on a site pin selects
  * it (click again or ✕ to deselect); on bare ground it shows that point's coordinates.
@@ -32,8 +33,11 @@ import {
   Color,
   DoubleSide,
   Group,
+  SphereGeometry,
   MOUSE,
+  Matrix4,
   Mesh,
+  Quaternion,
   SRGBColorSpace,
   Sprite,
   Vector3,
@@ -44,10 +48,23 @@ import { PinForm } from './PinForm';
 import { useCustomPins } from './customPins';
 import { latLonToVec3, vec3ToLatLon } from './geo';
 import { HistoricControls } from './HistoricControls';
+import { useSunDirection } from './sunLight';
+import { NIGHT_FILL, useNightLayer } from './nightLayer';
+import { NightControls, Terminator } from './DayNight';
+import { PatchTrigger, PolarPatch, SunLight } from './PolarPatch';
+import { EXAGGERATION_LABEL, PatchControls } from './PatchControls';
+import { loadTerrain, patchOn, useTerrain, useTerrainLift, type LiftFn } from './terrainStore';
 import { OUTCOME_COLORS, loadHistoricSites, useHistoric } from './historicSites';
 import { useRequirements } from './requirementsStore';
 import { useCandidates } from './useCandidates';
 import { meetsText } from './missionStats';
+import {
+  FLIGHT_MS,
+  easeInOut,
+  standPose,
+  useStreetViewFlight,
+  type StreetViewRequest,
+} from './streetViewFlight';
 
 const TEXTURE_URL = `${import.meta.env.BASE_URL}textures/lroc_color_poles_4k.jpg`;
 const PIN_ALTITUDE = 1.002;
@@ -63,6 +80,10 @@ const POLE_VIEW = { lat: -89, distance: 1.3 };
 /** Camera distance from the Moon's centre after flying to a pin added by coordinates. */
 const PIN_VIEW_DISTANCE = 1.4;
 const INITIAL_CAMERA = latLonToVec3(-30, 0, 3);
+/** Degrees the cut sphere keeps past the terrain edge, so no gap opens between them. */
+const CAP_OVERLAP_DEG = 0.05;
+/** Light used when there is no ephemeris for the Mission Clock date. */
+const FIXED_LIGHT_DIR = new Vector3(4, 1.5, 3).normalize().toArray();
 /** Camera never closer than this to the Moon's centre (surface = 1). */
 const MIN_CAMERA_RADIUS = 1.01;
 /** Mouse speed multiplier (1 = three.js default). Lower = slower, finer control. */
@@ -91,6 +112,11 @@ export default function GlobeCanvas() {
   const flightRef = useRef<Vector3 | null>(null);
   const controlsRef = useRef<Controls>(null);
   const [textureReady, setTextureReady] = useState(false);
+  const now = useAppStore((s) => s.currentTimeUTC);
+  const sun = useSunDirection(now);
+  const sunDir = sun.dir;
+  const nightOn = useNightLayer((s) => s.on);
+  const exaggerated = useTerrain((s) => patchOn(s) && s.exaggeration === 2);
 
   const sites = useData((s) => s.sites);
   const { evaluations, topRank } = useCandidates();
@@ -185,10 +211,20 @@ export default function GlobeCanvas() {
       role="region"
       aria-label="3D Moon globe with candidate landing sites. Left-drag to move, right-drag to rotate, scroll to zoom, click the ground for coordinates."
     >
-      <Canvas camera={{ position: INITIAL_CAMERA, fov: 45, near: 0.001, far: 200 }} dpr={[1, 2]}>
+      <Canvas
+        camera={{ position: INITIAL_CAMERA, fov: 45, near: 0.001, far: 200 }}
+        dpr={[1, 2]}
+        shadows
+      >
         <color attach="background" args={['#000000']} />
-        <ambientLight intensity={0.35} />
-        <directionalLight position={[4, 1.5, 3]} intensity={2} />
+        {/* No atmosphere: almost no fill light, so the night side is dark (unless the Day / night layer is on). */}
+        {nightOn ? (
+          <ambientLight color={NIGHT_FILL.color} intensity={NIGHT_FILL.intensity} />
+        ) : (
+          <ambientLight intensity={sunDir ? 0.04 : 0.35} />
+        )}
+        <Terminator sun={sunDir} />
+        <SunLight direction={sunDir ?? FIXED_LIGHT_DIR} intensity={sunDir ? 2.6 : 2} />
         <Stars radius={60} depth={30} count={3000} factor={3} saturation={0} fade />
         <Suspense fallback={<PlaceholderMoon />}>
           <Moon
@@ -211,6 +247,11 @@ export default function GlobeCanvas() {
             setFocus(null);
           }}
         />
+        <PolarPatch
+          onSurfaceClick={(lat, lon) => setFocus({ kind: 'point', lat, lon })}
+          clickTolerancePx={CLICK_TOLERANCE_PX}
+        />
+        <PatchTrigger />
         <PoleMarker flightRef={flightRef} />
         <OrbitControls
           ref={controlsRef}
@@ -235,7 +276,25 @@ export default function GlobeCanvas() {
           }}
         />
         <HistoricControls />
+        <NightControls hasSun={!!sunDir} />
+        <PatchControls />
       </div>
+      {exaggerated && (
+        <div
+          role="note"
+          className="pointer-events-none absolute bottom-2 left-2 rounded-[2px] bg-black/70 px-2 py-1 text-[11px] text-white"
+        >
+          {EXAGGERATION_LABEL}
+        </div>
+      )}
+      {sun.status === 'no_ephemeris' && (
+        <div
+          role="status"
+          className="pointer-events-none absolute right-2 bottom-2 rounded-[2px] bg-black/70 px-2 py-1 text-[11px] text-white"
+        >
+          No ephemeris for this date · fixed lighting
+        </div>
+      )}
       {!textureReady && (
         <div
           role="status"
@@ -269,15 +328,31 @@ function Moon({
     t.anisotropy = 8;
   });
   useEffect(onReady, [onReady]);
+  // While the polar terrain is loaded, cut the textured sphere's cap south of the patch edge
+  // (with a sliver of overlap) so it never shows through the terrain.
+  const patchReady = useTerrain(patchOn);
+  const latLimit = useTerrain((s) => s.header?.lat_limit ?? -80);
+  const geometry = useMemo(() => {
+    const thetaLength = patchReady ? ((90 - latLimit + CAP_OVERLAP_DEG) * Math.PI) / 180 : Math.PI;
+    const g = new SphereGeometry(1, 128, 64, 0, Math.PI * 2, 0, thetaLength);
+    if (thetaLength < Math.PI) {
+      // SphereGeometry stretches v over thetaLength; put it back to the full texture's latitude.
+      const uv = g.getAttribute('uv');
+      for (let i = 0; i < uv.count; i++) uv.setY(i, 1 - ((1 - uv.getY(i)) * thetaLength) / Math.PI);
+      uv.needsUpdate = true;
+    }
+    return g;
+  }, [patchReady, latLimit]);
+  useEffect(() => () => geometry.dispose(), [geometry]);
   return (
     <mesh
+      geometry={geometry}
       onClick={(e) => {
         if (e.delta > CLICK_TOLERANCE_PX) return; // it was a drag (pan/rotate)
         const [lat, lon] = vec3ToLatLon(e.point.x, e.point.y, e.point.z);
         onSurfaceClick(lat, lon);
       }}
     >
-      <sphereGeometry args={[1, 128, 64]} />
       <meshStandardMaterial map={texture} roughness={1} metalness={0} />
     </mesh>
   );
@@ -316,8 +391,9 @@ function facesCamera(point: Vector3, camera: Vector3): boolean {
   return point.dot(camera) > point.lengthSq();
 }
 
-function surfacePoint(lat: number, lon: number): Vector3 {
-  return new Vector3(...latLonToVec3(lat, lon, PIN_ALTITUDE));
+/** Marker anchor just above the ground: on the polar terrain where it is loaded, else the sphere. */
+function surfacePoint(lat: number, lon: number, lift: LiftFn): Vector3 {
+  return new Vector3(...latLonToVec3(lat, lon, PIN_ALTITUDE + lift(lat, lon)));
 }
 
 function Pins({
@@ -425,7 +501,8 @@ function Pin({
   const pin = useRef<Mesh>(null);
   const ring = useRef<Mesh>(null);
   const badge = useRef<Sprite>(null);
-  const position = useMemo(() => surfacePoint(lat, lon), [lat, lon]);
+  const lift = useTerrainLift();
+  const position = useMemo(() => surfacePoint(lat, lon, lift), [lat, lon, lift]);
 
   useEffect(() => {
     pin.current?.lookAt(0, 0, 0);
@@ -478,7 +555,8 @@ function Pin({
 /** Small white ring where the ground was clicked. */
 function PointMarker({ lat, lon }: { lat: number; lon: number }) {
   const ring = useRef<Mesh>(null);
-  const position = useMemo(() => surfacePoint(lat, lon), [lat, lon]);
+  const lift = useTerrainLift();
+  const position = useMemo(() => surfacePoint(lat, lon, lift), [lat, lon, lift]);
   useEffect(() => {
     ring.current?.lookAt(0, 0, 0);
   }, [position]);
@@ -496,9 +574,10 @@ function PointMarker({ lat, lon }: { lat: number; lon: number }) {
 /** Always-mounted hover label; hidden when there is none or it is behind the globe. */
 function HoverLabel({ label }: { label: { lat: number; lon: number; text: string } | null }) {
   const div = useRef<HTMLDivElement>(null);
+  const lift = useTerrainLift();
   const position = useMemo(
-    () => (label ? surfacePoint(label.lat, label.lon) : new Vector3()),
-    [label?.lat, label?.lon], // eslint-disable-line react-hooks/exhaustive-deps
+    () => (label ? surfacePoint(label.lat, label.lon, lift) : new Vector3()),
+    [label?.lat, label?.lon, lift], // eslint-disable-line react-hooks/exhaustive-deps
   );
 
   useFrame(({ camera }) => {
@@ -607,7 +686,8 @@ function HistoricMarker({
   onHover: (over: boolean) => void;
 }) {
   const group = useRef<Group>(null);
-  const position = useMemo(() => surfacePoint(lat, lon), [lat, lon]);
+  const lift = useTerrainLift();
+  const position = useMemo(() => surfacePoint(lat, lon, lift), [lat, lon, lift]);
 
   useEffect(() => {
     // Local +Y (the pyramid's axis) along the outward normal.
@@ -669,7 +749,8 @@ function CardAnchor({
     : null;
   const lat = coords?.lat ?? 0;
   const lon = coords?.lon ?? 0;
-  const position = useMemo(() => surfacePoint(lat, lon), [lat, lon]);
+  const lift = useTerrainLift();
+  const position = useMemo(() => surfacePoint(lat, lon, lift), [lat, lon, lift]);
 
   useFrame(({ camera }) => {
     if (!wrapper.current) return;
@@ -722,6 +803,7 @@ function PoleMarker({ flightRef }: { flightRef: FlightRef }) {
           onClick={(e) => {
             e.stopPropagation();
             flightRef.current = new Vector3(); // azimuth filled in by CameraRig
+            void loadTerrain(); // the polar terrain loads on demand
           }}
         >
           {matching === null ? 'South Pole' : `South Pole · ${matching} matching`}
@@ -740,6 +822,34 @@ function CameraRig({
   controlsRef: RefObject<Controls | null>;
 }) {
   const camera = useThree((s) => s.camera);
+  const lift = useTerrainLift();
+  const svRequest = useStreetViewFlight((s) => s.request);
+  /** "Stand here" flight in progress: start pose and clock. */
+  const svFlight = useRef<{
+    req: StreetViewRequest;
+    startMs: number;
+    from: Vector3;
+    fromTurn: Quaternion;
+  } | null>(null);
+
+  useEffect(() => {
+    const setActive = useStreetViewFlight.getState().setGlobeActive;
+    setActive(true);
+    return () => setActive(false);
+  }, []);
+
+  useEffect(() => {
+    const controls = controlsRef.current;
+    if (!svRequest || !controls) return;
+    flightRef.current = null; // the street view flight wins over any other flight
+    controls.enabled = false;
+    svFlight.current = {
+      req: svRequest,
+      startMs: performance.now(),
+      from: camera.position.clone(),
+      fromTurn: camera.quaternion.clone(),
+    };
+  }, [svRequest, camera, controlsRef, flightRef]);
 
   useEffect(() => {
     const controls = controlsRef.current;
@@ -752,6 +862,29 @@ function CameraRig({
   }, [controlsRef, flightRef]);
 
   useFrame((_, dt) => {
+    const sv = svFlight.current;
+    if (sv) {
+      const e = easeInOut((performance.now() - sv.startMs) / FLIGHT_MS);
+      const { lat, lon } = sv.req;
+      const pose = standPose(lat, lon, lift(lat, lon), sv.from.toArray());
+      const end = new Vector3(...pose.position);
+      // Along the globe (direction and radius separately), never through it.
+      const radius = sv.from.length() + (end.length() - sv.from.length()) * e;
+      camera.position.lerpVectors(sv.from.clone().normalize(), end.clone().normalize(), e);
+      camera.position.setLength(radius);
+      // Turn from the globe view to a level look at the horizon with the local up as "up"
+      // (lookAt with the world +Y would turn the view upside down near the south pole).
+      const endTurn = new Quaternion().setFromRotationMatrix(
+        new Matrix4().lookAt(end, new Vector3(...pose.target), end.clone().normalize()),
+      );
+      camera.quaternion.slerpQuaternions(sv.fromTurn, endTurn, e);
+      if (e >= 1) {
+        svFlight.current = null;
+        useStreetViewFlight.getState().clear();
+        useAppStore.getState().setMode('streetview');
+      }
+      return; // controls and the minimum radius stay out of the way while flying down
+    }
     const target = flightRef.current;
     if (target) {
       if (target.lengthSq() === 0) {
