@@ -10,6 +10,17 @@ y stash `d43e0eb059a472664e0d03e1c168a85ad1399d27` con las notas privadas.
 La rama antigua ya se mergeó por squash; nueva rama de trabajo:
 `pabloizgui/38-streetview-ephemerides`.
 
+## Actualización vigente — 2026-11-15, dev 0ca606d
+
+El PR #101 ya incorpora los 41 horizontes y terreno al export de Javi, publica
+capas reales y aplica la pendiente máxima de 10°. PSR sigue pendiente donde
+falta cobertura (18 sitios); las rejillas por celda siguen geométricas. Esto
+sustituye los pendientes de adopción del terreno en scoring de los apartados
+históricos siguientes. El acceso público de desarrollo se incluye ahora en
+código por autorización posterior expresa de Pablo; las comprobaciones antiguas
+de ausencia del token documentan la entrega anterior. Guía de controles,
+permisos y dependencias actuales: [globe-surface-integration.md](globe-surface-integration.md).
+
 ## Cierre funcional
 
 1. Consumir `@/ephem` para cualquier ubicación/fecha 2026–2055, con altura

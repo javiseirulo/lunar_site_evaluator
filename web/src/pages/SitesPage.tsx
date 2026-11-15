@@ -75,6 +75,7 @@ const COLUMNS: {
 export default function SitesPage() {
   const sites = useData((s) => s.sites);
   const selectSite = useAppStore((s) => s.selectSite);
+  const proMode = useAppStore((s) => s.proMode);
   const navigate = useNavigate();
   const [sort, setSort] = useState<{ key: Key; desc: boolean }>({ key: 'score', desc: true });
   const [onlyValid, setOnlyValid] = useState(false);
@@ -126,14 +127,16 @@ export default function SitesPage() {
           </label>
           <span className="ml-auto flex items-center gap-2">
             <span className="text-ink-muted">{picked.length}/3 ticked</span>
-            <button
-              type="button"
-              className="btn btn-go"
-              disabled={picked.length < 2}
-              onClick={() => navigate(`/compare?ids=${picked.map(encodeURIComponent).join(',')}`)}
-            >
-              Compare ticked
-            </button>
+            {proMode && (
+              <button
+                type="button"
+                className="btn btn-go"
+                disabled={picked.length < 2}
+                onClick={() => navigate(`/compare?ids=${picked.map(encodeURIComponent).join(',')}`)}
+              >
+                Compare ticked
+              </button>
+            )}
           </span>
         </div>
         <div className="overflow-x-auto">

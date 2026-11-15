@@ -128,6 +128,7 @@ export default function StreetViewEmbed({
         hint: noop,
         labels: noop,
         observer: noop,
+        save: noop,
         error: () => {
           fail('load');
           abort.abort();
