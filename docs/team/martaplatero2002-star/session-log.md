@@ -148,3 +148,4 @@
 - Toca `src/pages/ExplorePage.tsx` (de Javi2): coordinar el PR con él.
 - Mission Clock y fecha de aterrizaje (Normal) salen de encima de la Luna: van en una franja bajo el mapa 3D, bajo la columna central; paneles laterales y controles siguen sobre el globo.
 - La página de Explore hace scroll: el mapa 3D ocupa casi toda la altura visible (`100dvh − 8,5 rem`, mínimo 26 rem) y el Mission Clock queda debajo. El scroll es el del propio `ExplorePage` (el shell no se toca). Con la rueda sobre el globo se hace zoom; para bajar, usar la barra de scroll o la rueda fuera del mapa.
+- Explore en Expert vuelve al estilo Booking: la pestaña "Sites" junta requisitos, ventana y lista de sitios (`SiteList` completo) para ver cómo varían los sitios en directo mientras se editan los requisitos; se quita la pestaña "Needs" separada. "Window" (modelo de llegada) sigue como pestaña.

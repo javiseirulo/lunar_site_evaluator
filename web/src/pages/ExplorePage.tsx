@@ -56,7 +56,7 @@ function SimulateHint() {
 const FRAME = 'border-edge-hi border-2 bg-panel shadow-[4px_4px_0_#000]';
 const FLAT = 'border-0 bg-transparent shadow-none';
 
-type LeftTab = 'needs' | 'window' | 'sites';
+type LeftTab = 'window' | 'sites';
 type RightTab = 'now' | 'sun' | 'check';
 
 function Pages<T extends string>({
@@ -95,14 +95,13 @@ function Pages<T extends string>({
 
 function LeftPanel() {
   const proMode = useAppStore((s) => s.proMode);
-  const [tab, setTab] = useState<LeftTab>(proMode ? 'needs' : 'sites');
-  const shown: LeftTab = !proMode && (tab === 'needs' || tab === 'window') ? 'sites' : tab;
+  const [tab, setTab] = useState<LeftTab>('sites');
+  const shown: LeftTab = !proMode && tab === 'window' ? 'sites' : tab;
 
   const options: { id: LeftTab; label: string }[] = proMode
     ? [
-        { id: 'needs', label: 'Needs' },
-        { id: 'window', label: 'Window' },
         { id: 'sites', label: 'Sites' },
+        { id: 'window', label: 'Window' },
       ]
     : [{ id: 'sites', label: 'Sites' }];
 
@@ -112,11 +111,12 @@ function LeftPanel() {
     >
       <Pages options={options} value={shown} onChange={setTab} />
       <div>
-        {shown === 'needs' && <SiteList part="requirements" className={FLAT} />}
         {shown === 'window' && <MissionTimingPanel className={FLAT} />}
         {shown === 'sites' &&
           (proMode ? (
-            <SiteList part="sites" className={FLAT} />
+            // Booking style: requirements, window and the matching sites together, so the list
+            // changes live while you edit a requirement.
+            <SiteList className={FLAT} />
           ) : (
             <SimpleSiteList className={FLAT} />
           ))}
