@@ -47,7 +47,7 @@ function WindowTimeBar({ day, days, progress }: { day: number; days: number; pro
       aria-valuetext={`Day ${day} of ${days}`}
       className="pointer-events-none absolute inset-x-0 bottom-0 z-10 bg-black/55"
     >
-      <span className="absolute -top-3.5 right-1.5 font-mono text-[9px] leading-none font-bold text-[#8fe39a] [text-shadow:0_1px_0_#000]">
+      <span className="absolute -top-3.5 right-[8%] font-mono text-[9px] leading-none font-bold text-[#8fe39a] [text-shadow:0_1px_0_#000]">
         Day {day} of {days}
       </span>
       <span className="block h-1 bg-[#8fe39a]" style={{ width: `${progress * 100}%` }} />
@@ -82,25 +82,29 @@ function CockpitWindow({ children }: { children: ReactNode }) {
   }
   return (
     <div className="mission-view relative aspect-[1160/680] w-full max-w-[760px] min-w-0 overflow-hidden border-4 border-black bg-[#07080d]">
-      <div
-        className="absolute overflow-hidden bg-black"
-        style={{
-          left: `${GLASS.left}%`,
-          top: `${GLASS.top}%`,
-          width: `${GLASS.width}%`,
-          height: `${GLASS.height}%`,
-        }}
-      >
-        {children}
+      {/* On phones the cabin is zoomed 1.3× around the glass so the sky is not a thumbnail;
+          the glass still fits (8%–92% of the height) and the bulkheads crop at the sides. */}
+      <div className="absolute top-0 left-0 size-full max-sm:top-[-21.3%] max-sm:left-[-15%] max-sm:h-[130%] max-sm:w-[130%]">
+        <div
+          className="absolute overflow-hidden bg-black"
+          style={{
+            left: `${GLASS.left}%`,
+            top: `${GLASS.top}%`,
+            width: `${GLASS.width}%`,
+            height: `${GLASS.height}%`,
+          }}
+        >
+          {children}
+        </div>
+        <img
+          src={FRAME_SRC}
+          alt=""
+          aria-hidden
+          draggable={false}
+          onError={() => setFrameFailed(true)}
+          className="pointer-events-none absolute inset-0 z-20 size-full select-none"
+        />
       </div>
-      <img
-        src={FRAME_SRC}
-        alt=""
-        aria-hidden
-        draggable={false}
-        onError={() => setFrameFailed(true)}
-        className="pointer-events-none absolute inset-0 z-20 size-full select-none"
-      />
     </div>
   );
 }

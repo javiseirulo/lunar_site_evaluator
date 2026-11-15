@@ -165,3 +165,90 @@ el reintento con `CHOKIDAR_USEPOLLING=1` pasó. No se ha probado el giro WebGL 3
 Siguiente bloque recomendado: cámara/legibilidad y benchmark de un horizonte;
 después conectar el contrato y vectores cuando entren en dev. La nueva rejilla
 y el polo norte amplían el alcance, no son entregables ya implementados.
+
+## Actualización del visor, 15 de noviembre de 2026
+
+El adaptador de Street View conserva los vectores horarios de Javi, el paralaje
+topocéntrico y el margen del enlace. Los discos esquemáticos usan radio solar
+0,2666° y radio terrestre angular asin(6371 km/distancia). La fracción de disco
+supone un horizonte recto a través del disco. Para un punto libre se indica el
+horizonte de la esfera. Girar la cámara reutiliza la muestra calculada.
+
+La prueba con los binarios publicados sitúa el centro terrestre a −28,345° en
+el enlace de Pablo (−14,24842526°, −110,35066553°, 2027-01-01 00:00 UTC).
+En Amundsen West el 12 de enero a las 12:00 UTC queda a +0,218°, detrás de
+un perfil LOLA de +3,171° a ese azimut. La comparación independiente del
+equipo con JPL está en [Horizons](../../validation/horizons-check.md).
+
+## Entrega del plan de Street View del 15 de noviembre
+
+Esta nota sustituye los pendientes de interfaz y despliegue descritos arriba.
+Las ramas se publicaron desde dev b8c323e. Al reanudar se cotejó origin/dev
+54b9cbb, que añade la entrada iluminada en Mons Hadley, fechas en Normal/Expert,
+pins en el store y assets de Mission. Al integrar conservar SHOWCASE, startView
+y el selector compartido del equipo.
+
+| Bloque | Issue | PR contra dev | Commits de la rama |
+| --- | --- | --- | --- |
+| Discos Sol/Tierra y margen del enlace | #46 | #142 | 985f1d8, faf50bf |
+| Movimiento hasta 500 m | #136 | #143 | 470a7e1 |
+| Controles, QR y pantalla completa | #137 | #144 | 2f69c7c |
+| Astronauta suministrado, arrastre móvil | #138 | #145 | 59afd38 |
+| Auditoría de fuentes y cobertura | #139 | #147 | 6e4df81 y cierre documental |
+| Altura ausente en la malla | #146 | #148 | a971691 |
+
+El paso conserva hasta 101 consultas de suelo cada 5 m y dura hasta 2,4 s.
+La textura original es el modo inicial y tras reintentar. El QR conserva
+UTC, coordenadas, altura y cámara. La pantalla completa usa la API nativa y
+un modo ampliado en navegadores que la carecen. El astronauta tiene caja de
+56 px, PNG RGBA de 512 px y balanceo CSS durante el arrastre. Para ambas poses
+se usa la única imagen recibida. Conserva una firma discreta ChatGPT y
+metadatos de procedencia. La Tierra y el Sol se dibujan como discos esquemáticos
+con diámetros angulares, sin fase ni textura fotométrica.
+
+Chrome verificó cinco regiones, el disco de la Tierra al orientar la cámara,
+salida al mapa única, QR, fullscreen nativo y fallback móvil con scroll
+restaurado. La emulación táctil verificó tap y arrastre → vuelo → Street View.
+El fallo exacto (0°,180°) ofrece abrir expresamente suelo medido a 43 m,
+conservando UTC y las coordenadas elegidas. La publicación vigente de Vercel
+abrió terreno en una sesión limpia sin introducir clave, con HTTP 200 de Cesium.
+
+La combinación local de los bloques sobre b8c323e pasó 521 pruebas en 57
+archivos. La repetición final de TypeScript, lint selectivo y build, con el último
+ajuste de altura incluido y la clave pública del código, terminó correctamente.
+La compilación avisa del tamaño de los bundles Cesium/Three. Lint de la web completa
+terminó con cero errores y dos avisos previos de Fast Refresh en Figure.tsx y
+HistoricControls.tsx. No atribuir estos resultados al dev posterior 54b9cbb.
+
+### Revisión e integración del equipo
+
+- Revisar los seis PR y ejecutar los checks en GitHub antes de integrar.
+  #143 y #148 coinciden en los imports de LunarViewport.tsx. Conservar
+  MAX_WALK_DISTANCE_M y MissingSurfaceHeight. #142, #144 y #148 modifican
+  StreetView.tsx; mantener también el nuevo startView de #134.
+- Marta y Pablo deben revisar el control en teléfono físico, Safari/iOS,
+  la esquina inferior derecha y el panel de Explore con los nuevos pins.
+- Javi y Marta deben acordar DEM, resolución y presupuesto para el horizonte
+  topográfico por demanda. La propuesta y sus costes están en
+  [global-lunar-detail-audit.md](global-lunar-detail-audit.md). Los 41 perfiles
+  siguen disponibles para sus posiciones y altura; el resto conserva la
+  estimación geométrica declarada.
+- Javi2 puede desplegar tras la revisión. La comprobación del token corresponde
+  al despliegue observado, con sus URLs autorizadas y su configuración actual.
+- Los inputs de Marta y Javi mantienen su ubicación en web/public/data/terrain
+  y web/public/data/horizon. El plan de interfaz no regenera esos datos.
+
+## Integración autorizada del 15 de noviembre
+
+Pablo autorizó resolver los conflictos y fusionar los PR en GitHub. #142,
+#143, #144, #145 y #148 quedaron integrados en dev mediante squash, con
+checks correctos. El cierre documental se integra mediante #147.
+Se conservaron startView/SHOWCASE, el selector de fecha y los pins del store.
+Los conflictos de imports y del registro compartido se resolvieron conservando
+las funcionalidades y las atribuciones de ambos lados.
+
+La integración local con dev 54b9cbb pasó 529 pruebas en 58 archivos,
+TypeScript, lint selectivo y build. El código resultante de los cinco merges
+se cotejó con esa combinación verificada. La compilación conserva el aviso
+de tamaño de bundles. Quedan la prueba en teléfono físico/Safari y el acuerdo
+sobre datos y presupuesto para horizonte topográfico global por demanda.

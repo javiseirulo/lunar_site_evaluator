@@ -83,3 +83,7 @@ que el vuelo inicial ya no reemplaza el punto observado por el centro del catál
 Esta prueba no reemplaza la validación en un teléfono físico. Los resultados
 de CI se consultan en el PR #104; esta auditoría documenta las comprobaciones
 locales y no afirma una aprobación remota.
+
+## Control actualizado el 15 de noviembre
+
+El botón de 56 × 56 px usa el PNG transparente de 512 px entregado por Pablo para reposo y arrastre. La animación respeta movimiento reducido. La firma ChatGPT mantiene la procedencia visible sin la antigua etiqueta «AI». Al soltar, el punto continúa entrando por el vuelo de Marta. Dimensiones, origen y SHA-256 en `web/public/streetview/assets.json`.

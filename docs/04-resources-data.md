@@ -142,3 +142,5 @@ Contactos de soporte: Microsoft samfal@microsoft.com · Google cloudstartupsuppo
 
 - (javiseirulo, 2026-11-15) `firebase` (npm, SDK modular, Realtime Database) y proyecto Firebase `glossy-monitor-514715-k4`: solo se usa la base de datos en tiempo real para sincronizar profesor y alumnos por token de clase; la web sigue en Vercel. No se guardan datos personales (apodo + respuestas, sin cuentas). Reglas en `database.rules.json`.
 - (javiseirulo, 2026-11-15) `qrcode.react` (npm, licencia ISC): genera el QR de unión a la clase en la pantalla del profesor.
+
+- 2026-11-15 · Pablo · Cobertura y resolución por latitud de la malla e imagen LRO usadas en Street View. [Ficha del proveedor Cesium Moon](https://cesium.com/platform/cesium-ion/content/cesium-moon/).
