@@ -1,6 +1,7 @@
+import { Component, type ReactNode } from 'react';
 import { useAppStore } from '@/core';
 import { TimeBar } from '@/core/shell/TimeBar';
-import { LayersPanel } from '@/layers';
+import { LayersPanel, PolarMap } from '@/layers';
 import { GlobeView, SiteDetail, SiteList } from '@/globe';
 import { MissionTimingPanel, SiteCheckPanel } from '@/scoring';
 import { SimpleSiteList } from './explore/SimpleSiteList';
@@ -9,6 +10,31 @@ import { SimpleSiteList } from './explore/SimpleSiteList';
  * Normal mode: a site list, the 3D Moon globe, the clock and one site card. Expert mode adds the mission
  * requirements form, layers, mission timing and the site check.
  */
+/** True when the browser can create a WebGL context (the 3D globe needs one). */
+function hasWebGL(): boolean {
+  try {
+    const c = document.createElement('canvas');
+    return !!(c.getContext('webgl2') ?? c.getContext('webgl'));
+  } catch {
+    return false;
+  }
+}
+const WEBGL = typeof document !== 'undefined' && hasWebGL();
+
+/** If the 3D globe throws (WebGL context refused), show the fallback instead of a broken page. */
+class GlobeBoundary extends Component<
+  { fallback: ReactNode; children: ReactNode },
+  { failed: boolean }
+> {
+  state = { failed: false };
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+  render() {
+    return this.state.failed ? this.props.fallback : this.props.children;
+  }
+}
+
 export default function ExplorePage() {
   const proMode = useAppStore((s) => s.proMode);
 
@@ -43,7 +69,14 @@ export default function ExplorePage() {
         <div className="box overflow-hidden">
           <div className="space relative p-4">
             <div className="mx-auto aspect-square w-full max-w-[560px]">
-              <GlobeView />
+              {/* Without WebGL (old devices, locked-down browsers) fall back to the flat polar map. */}
+              {WEBGL ? (
+                <GlobeBoundary fallback={<PolarMap className="size-full" />}>
+                  <GlobeView />
+                </GlobeBoundary>
+              ) : (
+                <PolarMap className="size-full" />
+              )}
             </div>
           </div>
           {proMode && (
