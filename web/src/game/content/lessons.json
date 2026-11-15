@@ -1,0 +1,8 @@
+{
+  "slope": "Steep ground tips a lander over. Safe landing sites need gentle slopes, so always check the slope before committing.",
+  "cold": "Without sunlight the lander's batteries must keep heaters and electronics alive, and long polar nights drain them. Very cold sites are hard to survive.",
+  "blackout": "Near the pole, Earth can sit below the horizon for long stretches, cutting the radio link. A site that is often in view of Earth keeps communications open.",
+  "low_sun": "Solar panels need sunlight to make power. A site that stays dark for too long leaves the lander without energy.",
+  "low_comm": "Communication depends on how much of the time Earth is above the horizon. Poor visibility means a patchy link with mission control.",
+  "win": "Well done! You balanced slope, sunlight, temperature and Earth visibility, and the lander survived until the end of its window."
+}
