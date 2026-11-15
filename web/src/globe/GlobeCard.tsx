@@ -130,7 +130,7 @@ export function GlobeCard({
         {content.kind === 'custom' && (
           <>
             <p className="text-ink-faint text-[12px]">
-              Your pin. No sunlight or Earth data for this exact point yet.
+              Your pin. Sunlight and Earth view are computed for this exact point (flat horizon).
             </p>
             <button
               type="button"
