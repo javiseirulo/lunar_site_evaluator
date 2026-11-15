@@ -229,7 +229,8 @@ export function GlobalHeat() {
           key={layer.id}
           layer={layer}
           metric={GLOBAL_METRIC[layer.id]!}
-          opacity={opacity}
+          // Whole-Moon overlay: capped so the lunar texture stays visible under the colour.
+          opacity={Math.min(opacity, 0.45)}
           order={i}
           geometry={geometry}
         />

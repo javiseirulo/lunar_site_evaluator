@@ -179,7 +179,9 @@ def main() -> int:
         "source": f"NASA PGDA LOLA 20 m PSR mask, LPSR_80S_20MPP_ADJ.TIF ({PSR_URL});"
         " Barker et al. (2023); majority (>=50 %) reduction to 512² in python/export/layers.py",
     }
-    manifest["layers"] = [*terrain["layers"], psr, *grid_layers(manifest, out)]
+    # All layers start off: the first view is Marta's shaded LOLA patch (layers are an Expert tool).
+    pablo = [{**layer, "default_visible": False} for layer in terrain["layers"]]
+    manifest["layers"] = [*pablo, psr, *grid_layers(manifest, out)]
     jsonschema.validate(manifest, json.loads((CONTRACTS / "layers.schema.json").read_text()))
     (DATA / "layers.json").write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + "\n")
     print(f"layers.json: {[layer['id'] for layer in manifest['layers']]}")

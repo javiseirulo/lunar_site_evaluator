@@ -36,7 +36,7 @@
           "#f1efe9"
         ]
       ],
-      "default_visible": true,
+      "default_visible": false,
       "default_opacity": 1,
       "description": "Real LOLA elevation; area-mean display layer from the 80 m product. Not a landing-safety metric.",
       "file": "terrain/elevation.png",
