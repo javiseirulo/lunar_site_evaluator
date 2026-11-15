@@ -14,15 +14,24 @@ import {
   useData,
   uvToLatLon,
 } from '@/core';
-import { scoreColor } from './scoreColor';
+import { siteMarkerColor, siteMarkerLabel } from './markerStyle';
 
-export function PolarMap({ className }: { className?: string }) {
+/**
+ * `neutral`: Normal mode. Markers drop the score colour and label; the selected one stays amber.
+ */
+export function PolarMap({
+  className,
+  neutral = false,
+}: {
+  className?: string;
+  neutral?: boolean;
+}) {
   const manifest = useData((s) => s.layers);
   const sites = useData((s) => s.sites);
   const activeLayers = useAppStore((s) => s.activeLayers);
   const layerOpacity = useAppStore((s) => s.layerOpacity);
   const selectedSiteId = useAppStore((s) => s.selectedSiteId);
-  const selectSite = useAppStore((s) => s.selectSite);
+  const requestSelection = useAppStore((s) => s.requestSelection);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [hover, setHover] = useState<[number, number] | null>(null);
 
@@ -81,7 +90,12 @@ export function PolarMap({ className }: { className?: string }) {
             site={s}
             manifest={manifest}
             selected={s.id === selectedSiteId}
-            onSelect={() => selectSite(s.id === selectedSiteId ? null : s.id)}
+            neutral={neutral}
+            onSelect={() =>
+              requestSelection(
+                s.id === selectedSiteId ? null : { kind: 'site', id: s.id, name: s.name },
+              )
+            }
           />
         ))}
       <div className="num bg-night/80 text-white pointer-events-none absolute bottom-0 left-0 rounded-[3px] px-1.5 py-0.5 text-[11px]">
@@ -154,11 +168,13 @@ function Pin({
   site,
   manifest,
   selected,
+  neutral,
   onSelect,
 }: {
   site: Site;
   manifest: LayersManifest;
   selected: boolean;
+  neutral: boolean;
   onSelect: () => void;
 }) {
   const [u, v] = latLonToUv(site.lat, site.lon, manifest);
@@ -168,7 +184,7 @@ function Pin({
       onClick={onSelect}
       className="group absolute -translate-x-1/2 -translate-y-1/2 p-1.5"
       style={{ left: `${u * 100}%`, top: `${v * 100}%` }}
-      aria-label={`${site.name}, score ${Math.round(site.score * 100)}`}
+      aria-label={siteMarkerLabel(site.name, site.score, neutral)}
       aria-pressed={selected}
     >
       <span
@@ -179,7 +195,7 @@ function Pin({
             : 'border-black',
           !site.valid && 'opacity-50',
         )}
-        style={{ background: scoreColor(site.score) }}
+        style={{ background: siteMarkerColor(site.score, neutral, selected) }}
       />
       <span
         className={cn(

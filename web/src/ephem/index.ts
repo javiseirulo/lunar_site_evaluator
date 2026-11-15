@@ -42,3 +42,5 @@ export { loadHorizon, useHorizon, __setHorizonForTests } from './horizon';
 export type { HorizonState } from './horizon';
 export { loadGrid, parseGrid, sampleGrid, gridCell, __resetGridsForTests } from './grid';
 export type { Grid } from './grid';
+export { useActiveSeries, pointSeries, pointSeriesKey, pointName, pointSite } from './activeSeries';
+export type { ActiveSeries, ActiveSite } from './activeSeries';

@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { LayersManifest } from '@lunar/contracts';
 import { DEFAULT_TIME_UTC, useAppStore } from './store';
 
@@ -67,5 +67,185 @@ describe('app store', () => {
     expect(useAppStore.getState().selectedPoint).toBeNull();
     expect(() => useAppStore.getState().setSelectedPoint({ lat: 91, lon: 0 })).toThrow(RangeError);
     expect(useAppStore.getState().selectedSiteId).toBe('shackleton_rim_01');
+  });
+});
+
+describe('simulationStarted (Normal mode Simulate)', () => {
+  beforeEach(() => useAppStore.setState(initial, true));
+
+  it('starts false and is set by setSimulationStarted', () => {
+    expect(useAppStore.getState().simulationStarted).toBe(false);
+    useAppStore.getState().setSimulationStarted(true);
+    expect(useAppStore.getState().simulationStarted).toBe(true);
+  });
+
+  it('resets when another site is selected', () => {
+    const s = useAppStore.getState();
+    s.selectSite('site_a');
+    s.setSimulationStarted(true);
+    useAppStore.getState().selectSite('site_b');
+    expect(useAppStore.getState().simulationStarted).toBe(false);
+  });
+
+  it('resets when a site is deselected', () => {
+    const s = useAppStore.getState();
+    s.selectSite('site_a');
+    s.setSimulationStarted(true);
+    useAppStore.getState().selectSite(null);
+    expect(useAppStore.getState().simulationStarted).toBe(false);
+  });
+
+  it('keeps the flag when the same site is selected again', () => {
+    const s = useAppStore.getState();
+    s.selectSite('site_a');
+    s.setSimulationStarted(true);
+    useAppStore.getState().selectSite('site_a');
+    expect(useAppStore.getState().simulationStarted).toBe(true);
+    expect(useAppStore.getState().selectedSiteId).toBe('site_a');
+  });
+
+  it('resets when a free point is set to different coordinates', () => {
+    const s = useAppStore.getState();
+    s.setSelectedPoint({ lat: -89.5, lon: 10 });
+    s.setSimulationStarted(true);
+    useAppStore.getState().setSelectedPoint({ lat: -89.5, lon: 11 });
+    expect(useAppStore.getState().simulationStarted).toBe(false);
+  });
+
+  it('keeps the flag when the same point coordinates are set again', () => {
+    const s = useAppStore.getState();
+    s.setSelectedPoint({ lat: -89.5, lon: 10 });
+    s.setSimulationStarted(true);
+    useAppStore.getState().setSelectedPoint({ lat: -89.5, lon: 10 });
+    expect(useAppStore.getState().simulationStarted).toBe(true);
+  });
+
+  it('resets when a site is swapped for a free point and back', () => {
+    const s = useAppStore.getState();
+    s.selectSite('site_a');
+    s.setSimulationStarted(true);
+    useAppStore.getState().setSelectedPoint({ lat: -80, lon: 0 });
+    expect(useAppStore.getState().simulationStarted).toBe(false);
+    useAppStore.getState().setSimulationStarted(true);
+    useAppStore.getState().selectSite('site_a');
+    expect(useAppStore.getState().simulationStarted).toBe(false);
+  });
+});
+
+describe('guarded selection (requestSelection)', () => {
+  const A = { kind: 'site' as const, id: 'site_a', name: 'Site A' };
+  const B = { kind: 'site' as const, id: 'site_b', name: 'Site B' };
+  const P = { kind: 'point' as const, lat: -85, lon: 30, name: 'Point' };
+  const START = '2027-01-01T00:00:00Z';
+
+  beforeEach(() => useAppStore.setState({ ...initial, proMode: false }, true));
+
+  it('selects at once when no simulation is running (no dialog)', () => {
+    useAppStore.getState().selectSite('site_a');
+    useAppStore.getState().requestSelection(B);
+    const s = useAppStore.getState();
+    expect(s.selectedSiteId).toBe('site_b');
+    expect(s.pendingSelection).toBeNull();
+  });
+
+  it('sets a pending switch when a simulation is running', () => {
+    const s = useAppStore.getState();
+    s.selectSite('site_a');
+    s.setSimulationStarted(true);
+    s.requestSelection(B);
+    const st = useAppStore.getState();
+    expect(st.pendingSelection?.target).toEqual(B);
+    expect(st.selectedSiteId).toBe('site_a');
+    expect(st.simulationStarted).toBe(true);
+  });
+
+  it('asks for a free point switch too, and keeps the clock running state untouched on cancel', () => {
+    const s = useAppStore.getState();
+    s.selectSite('site_a');
+    s.setSimulationStarted(true);
+    s.requestSelection(P);
+    expect(useAppStore.getState().pendingSelection?.target).toEqual(P);
+  });
+
+  it('confirm resets the clock and simulation, then applies the pending site', () => {
+    const after = vi.fn();
+    const s = useAppStore.getState();
+    s.selectSite('site_a');
+    s.setSimulationStarted(true);
+    s.setTime('2027-01-03T12:00:00Z');
+    const nonce = useAppStore.getState().clockResetNonce;
+    s.requestSelection(B, after);
+    useAppStore.getState().confirmPending(START);
+    const st = useAppStore.getState();
+    expect(st.selectedSiteId).toBe('site_b');
+    expect(st.selectedPoint).toBeNull();
+    expect(st.simulationStarted).toBe(false);
+    expect(st.pendingSelection).toBeNull();
+    expect(st.currentTimeUTC).toBe(START);
+    expect(st.clockResetNonce).toBe(nonce + 1);
+    expect(after).toHaveBeenCalledTimes(1);
+  });
+
+  it('confirm applies a pending free point', () => {
+    const s = useAppStore.getState();
+    s.selectSite('site_a');
+    s.setSimulationStarted(true);
+    s.requestSelection(P);
+    useAppStore.getState().confirmPending(START);
+    const st = useAppStore.getState();
+    expect(st.selectedSiteId).toBeNull();
+    expect(st.selectedPoint).toEqual({ lat: -85, lon: 30 });
+    expect(st.simulationStarted).toBe(false);
+  });
+
+  it('cancel keeps the selection and the simulation', () => {
+    const after = vi.fn();
+    const s = useAppStore.getState();
+    s.selectSite('site_a');
+    s.setSimulationStarted(true);
+    s.setTime('2027-01-03T12:00:00Z');
+    s.requestSelection(B, after);
+    useAppStore.getState().cancelPending();
+    const st = useAppStore.getState();
+    expect(st.selectedSiteId).toBe('site_a');
+    expect(st.simulationStarted).toBe(true);
+    expect(st.currentTimeUTC).toBe('2027-01-03T12:00:00Z');
+    expect(st.pendingSelection).toBeNull();
+    expect(after).not.toHaveBeenCalled();
+  });
+
+  it('the same site or point is never a pending switch', () => {
+    const s = useAppStore.getState();
+    s.selectSite('site_a');
+    s.setSimulationStarted(true);
+    s.requestSelection(A);
+    expect(useAppStore.getState().pendingSelection).toBeNull();
+    expect(useAppStore.getState().simulationStarted).toBe(true);
+
+    s.selectSite(null);
+    s.setSelectedPoint({ lat: -85, lon: 30 });
+    s.setSimulationStarted(true);
+    s.requestSelection(P);
+    expect(useAppStore.getState().pendingSelection).toBeNull();
+    expect(useAppStore.getState().simulationStarted).toBe(true);
+  });
+
+  it('deselecting never asks', () => {
+    const s = useAppStore.getState();
+    s.selectSite('site_a');
+    s.setSimulationStarted(true);
+    s.requestSelection(null);
+    expect(useAppStore.getState().pendingSelection).toBeNull();
+    expect(useAppStore.getState().selectedSiteId).toBeNull();
+  });
+
+  it('Expert mode selects at once even while a simulation runs', () => {
+    useAppStore.setState({ proMode: true });
+    const s = useAppStore.getState();
+    s.selectSite('site_a');
+    s.setSimulationStarted(true);
+    s.requestSelection(B);
+    expect(useAppStore.getState().selectedSiteId).toBe('site_b');
+    expect(useAppStore.getState().pendingSelection).toBeNull();
   });
 });

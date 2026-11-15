@@ -6,9 +6,17 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Pause, Play, SkipBack } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAppStore } from '../store';
-import { useData, useTimeseries } from '../data';
+import { useData } from '../data';
+import { useActiveSeries } from '@/ephem/activeSeries';
 import { formatHours, formatUtc } from '../format';
-import { hoursUntilChange, sampleAt } from '../timeseries';
+import {
+  changeLead,
+  changeWhen,
+  nextChange,
+  sampleAt,
+  seriesSpanLabel,
+  type NextChange,
+} from '../timeseries';
 import { dayOfWindow, friendlyHours } from '../metrics';
 import { EARTH_BAND, SUN_BAND, windowsGradient } from '../timeline';
 
@@ -27,10 +35,14 @@ export function TimeBar({ className }: { className?: string }) {
   const range = useData((s) => s.manifest?.time_range);
   const currentTimeUTC = useAppStore((s) => s.currentTimeUTC);
   const setTime = useAppStore((s) => s.setTime);
-  const siteId = useAppStore((s) => s.selectedSiteId);
-  const ts = useTimeseries(siteId);
+  const active = useActiveSeries();
+  const ts = active.ts;
   const proMode = useAppStore((s) => s.proMode);
   const [playing, setPlaying] = useState(false);
+  const simulationStarted = useAppStore((s) => s.simulationStarted);
+  const setSimulationStarted = useAppStore((s) => s.setSimulationStarted);
+  const clockResetNonce = useAppStore((s) => s.clockResetNonce);
+  const resetClock = useAppStore((s) => s.resetClock);
   const [speed, setSpeed] = useState(DEFAULT_SPEED);
 
   const t0 = range ? Date.parse(range.start_utc) : 0;
@@ -38,12 +50,21 @@ export function TimeBar({ className }: { className?: string }) {
   const t1 = range ? Date.parse(range.end_utc) - range.step_s * 1000 : 0;
   const now = Date.parse(currentTimeUTC);
 
+  // A reset from outside (end-simulation confirm) stops playback at once: adjust during render.
+  const [seenReset, setSeenReset] = useState(clockResetNonce);
+  if (seenReset !== clockResetNonce) {
+    setSeenReset(clockResetNonce);
+    setPlaying(false);
+  }
+
   // Playback loop: advance the shared clock while playing.
   const raf = useRef(0);
   useEffect(() => {
     if (!playing || !range) return;
+    const nonce = useAppStore.getState().clockResetNonce;
     let last = performance.now();
     const tick = (frame: number) => {
+      if (useAppStore.getState().clockResetNonce !== nonce) return;
       const dt = (frame - last) / 1000;
       last = frame;
       const { currentTimeUTC: cur, setTime: set } = useAppStore.getState();
@@ -66,16 +87,17 @@ export function TimeBar({ className }: { className?: string }) {
     [ts],
   );
   const sample = ts ? sampleAt(ts, currentTimeUTC) : null;
-  const toSunChange = ts ? hoursUntilChange(ts, ts.lit, currentTimeUTC) : null;
-  const toEarthChange = ts?.earth_visible
-    ? hoursUntilChange(ts, ts.earth_visible, currentTimeUTC)
-    : null;
+  const toSunChange = nextChange(ts, ts?.lit, currentTimeUTC);
+  const toEarthChange = nextChange(ts, ts?.earth_visible, currentTimeUTC);
 
   if (!range) return null;
   const pct = t1 > t0 ? ((Math.min(t1, Math.max(t0, now)) - t0) / (t1 - t0)) * 100 : 0;
   const day = dayOfWindow(currentTimeUTC, range.start_utc, range.end_utc);
-  const when = (h: number | null) =>
-    h === null ? 'not in this window' : proMode ? formatHours(h) : friendlyHours(h);
+  const span = ts ? seriesSpanLabel(ts) : '';
+  // Normal mode asks for Simulate first; Expert keeps Play / Pause.
+  const label = playing ? 'Pause' : proMode ? 'Play' : simulationStarted ? 'Resume' : 'Simulate';
+  const when = (n: NextChange) =>
+    changeWhen(n, span, (h) => (proMode ? formatHours(h) : friendlyHours(h)));
 
   return (
     <section
@@ -102,10 +124,7 @@ export function TimeBar({ className }: { className?: string }) {
             <button
               type="button"
               className="btn btn-quiet w-[32px] px-0"
-              onClick={() => {
-                setPlaying(false);
-                setTime(range.start_utc);
-              }}
+              onClick={() => resetClock(range.start_utc)}
               aria-label="Back to day 1"
               title="Back to day 1"
             >
@@ -115,11 +134,15 @@ export function TimeBar({ className }: { className?: string }) {
           <button
             type="button"
             className="btn btn-go w-[88px]"
-            onClick={() => setPlaying((p) => !p)}
-            aria-label={playing ? 'Pause' : 'Play'}
+            onClick={() => {
+              // Normal: the first press on Simulate marks the simulation as started for this selection.
+              if (!proMode && !playing) setSimulationStarted(true);
+              setPlaying((p) => !p);
+            }}
+            aria-label={label}
           >
             {playing ? <Pause className="size-3.5" /> : <Play className="size-3.5" />}
-            {playing ? 'Pause' : 'Play'}
+            {label}
           </button>
           <select
             className="field"
@@ -185,16 +208,22 @@ export function TimeBar({ className }: { className?: string }) {
             )}
           </span>
         ) : (
-          <span>Pick a site to see when it gets sun and sees Earth</span>
+          <span>
+            {active.kind === 'point'
+              ? active.error
+                ? 'Ephemeris unavailable for this point'
+                : 'Computing…'
+              : 'Pick a site to see when it gets sun and sees Earth'}
+          </span>
         )}
         {proMode && sample && (
           <span>
-            {sample.lit ? 'Sunset' : 'Sunrise'} in{' '}
+            {changeLead(sample.lit ? 'Sunset' : 'Sunrise', toSunChange)}{' '}
             <b className="text-heading">{when(toSunChange)}</b>
             {sample.earthVisible !== null && (
               <>
                 {', '}
-                {sample.earthVisible ? 'Earthset' : 'Earthrise'} in{' '}
+                {changeLead(sample.earthVisible ? 'Earthset' : 'Earthrise', toEarthChange)}{' '}
                 <b className="text-heading">{when(toEarthChange)}</b>
               </>
             )}

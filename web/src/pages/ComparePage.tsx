@@ -4,7 +4,7 @@
  * Selection lives in the URL (?ids=a,b,c) so a comparison can be shared as a link.
  */
 import { useMemo } from 'react';
-import { Link, useSearchParams } from 'react-router';
+import { Navigate, useSearchParams } from 'react-router';
 import type { Site } from '@lunar/contracts';
 import { cn } from '@/lib/utils';
 import {
@@ -15,7 +15,11 @@ import {
   SUN_BAND,
   formatHours,
   formatLatLon,
-  hoursUntilChange,
+  changeLead,
+  changeWhen,
+  nextChange,
+  seriesSpanLabel,
+  type NextChange,
   sampleAt,
   useAppStore,
   useData,
@@ -66,11 +70,16 @@ function buildRows(pro: boolean): Row[] {
   ];
 }
 
+/** Compare exists only in Expert mode: in Normal the route quietly goes back to Explore. */
 export default function ComparePage() {
+  const proMode = useAppStore((s) => s.proMode);
+  return proMode ? <CompareView /> : <Navigate to="/explore" replace />;
+}
+
+function CompareView() {
   const sites = useData((s) => s.sites);
   const selectedSiteId = useAppStore((s) => s.selectedSiteId);
   const proMode = useAppStore((s) => s.proMode);
-  const setProMode = useAppStore((s) => s.setProMode);
   const rows = useMemo(() => buildRows(proMode), [proMode]);
   const [params, setParams] = useSearchParams();
 
@@ -84,27 +93,6 @@ export default function ComparePage() {
       .map((s) => s.id);
     return [...new Set([selectedSiteId, ...ranked].filter((x): x is string => !!x))].slice(0, 3);
   }, [params, sites, selectedSiteId]);
-
-  if (!proMode) {
-    return (
-      <section className="box mx-auto max-w-[560px]">
-        <div className="box-head">Compare is an Expert tool</div>
-        <div className="box-body">
-          <p className="text-ink-muted mb-4">
-            Side-by-side figures and sunlight timelines are available in Expert mode.
-          </p>
-          <div className="flex flex-wrap gap-3">
-            <button type="button" className="btn btn-go" onClick={() => setProMode(true)}>
-              Switch to Expert
-            </button>
-            <Link to="/explore" className="btn">
-              Back to Explore
-            </Link>
-          </div>
-        </div>
-      </section>
-    );
-  }
 
   if (!sites) return null;
   const chosen = ids.flatMap((id) => sites.find((s) => s.id === id) ?? []);
@@ -271,15 +259,16 @@ function TimelineRow({ site }: { site: Site }) {
     [ts],
   );
   const sample = ts ? sampleAt(ts, currentTimeUTC) : null;
-  const toSun = ts ? hoursUntilChange(ts, ts.lit, currentTimeUTC) : null;
-  const toEarth = ts?.earth_visible ? hoursUntilChange(ts, ts.earth_visible, currentTimeUTC) : null;
+  const toSun = nextChange(ts, ts?.lit, currentTimeUTC);
+  const toEarth = nextChange(ts, ts?.earth_visible, currentTimeUTC);
 
   const t0 = range ? Date.parse(range.start_utc) : 0;
   const t1 = range ? Date.parse(range.end_utc) : 1;
   const pos = Math.min(1, Math.max(0, (Date.parse(currentTimeUTC) - t0) / (t1 - t0 || 1)));
   const proMode = useAppStore((s) => s.proMode);
-  const when = (h: number | null) =>
-    h === null ? 'not in this window' : proMode ? formatHours(h) : friendlyHours(h);
+  const span = ts ? seriesSpanLabel(ts) : '';
+  const when = (n: NextChange) =>
+    changeWhen(n, span, (h) => (proMode ? formatHours(h) : friendlyHours(h)));
 
   return (
     <div className="grid items-center gap-x-3 gap-y-1 sm:grid-cols-[150px_minmax(0,1fr)_210px]">
@@ -296,12 +285,13 @@ function TimelineRow({ site }: { site: Site }) {
       <span className="text-ink-muted text-[11px]">
         {sample ? (
           <>
-            <span className="text-sun">{sample.lit ? 'Sunset' : 'Sunrise'}</span> {when(toSun)}
+            <span className="text-sun">{changeLead(sample.lit ? 'Sunset' : 'Sunrise', toSun)}</span>{' '}
+            {when(toSun)}
             {sample.earthVisible !== null && (
               <>
                 {', '}
                 <span className="text-earth">
-                  {sample.earthVisible ? 'Earthset' : 'Earthrise'}
+                  {changeLead(sample.earthVisible ? 'Earthset' : 'Earthrise', toEarth)}
                 </span>{' '}
                 {when(toEarth)}
               </>

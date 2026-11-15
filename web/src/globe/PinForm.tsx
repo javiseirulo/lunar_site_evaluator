@@ -8,8 +8,15 @@ import { parseCoordinate } from './geo';
 
 export function PinForm({
   onAdd,
+  buttonLabel = 'Pin by coordinates',
+  title = 'Pin by coordinates',
+  submitLabel = 'Add pin',
 }: {
   onAdd: (pin: { name: string; lat: number; lon: number }) => void;
+  /** Normal mode uses plainer wording ("Go to coordinates"). */
+  buttonLabel?: string;
+  title?: string;
+  submitLabel?: string;
 }) {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState('');
@@ -25,7 +32,7 @@ export function PinForm({
         style={{ ['--color-ink' as string]: '#e6edf7' }}
         onClick={() => setOpen(true)}
       >
-        <MapPinPlus className="size-3.5" aria-hidden /> Pin by coordinates
+        <MapPinPlus className="size-3.5" aria-hidden /> {buttonLabel}
       </button>
     );
   }
@@ -51,7 +58,7 @@ export function PinForm({
   };
 
   return (
-    <Sheet as="form" title="Pin by coordinates" onClose={() => setOpen(false)} onSubmit={submit}>
+    <Sheet as="form" title={title} onClose={() => setOpen(false)} onSubmit={submit}>
       <div className="grid grid-cols-[auto_1fr] items-center gap-x-2 gap-y-1.5 px-3 pb-3">
         <label htmlFor="pin-name" className="label">
           Name
@@ -97,7 +104,7 @@ export function PinForm({
           type="submit"
           className="btn btn-go col-span-2 h-[30px] justify-self-start text-[13px]"
         >
-          Add pin
+          {submitLabel}
         </button>
       </div>
     </Sheet>
