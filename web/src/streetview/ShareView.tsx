@@ -3,6 +3,34 @@ interface Matrix {
   size: number;
   modules: boolean[][];
 }
+let qrLoader: Promise<(text: string) => Matrix> | null = null;
+function loadQr() {
+  if (qrLoader) return qrLoader;
+  // A public asset must be loaded as a browser module script. Vite deliberately
+  // rejects importing /public JavaScript from the application's source graph.
+  qrLoader = new Promise<(text: string) => Matrix>((resolve, reject) => {
+    const script = document.createElement('script');
+    script.type = 'module';
+    script.src = `${import.meta.env.BASE_URL}vendor/qrcodegen.js`;
+    script.onload = () => {
+      const encode = (window as Window & { lunarQrEncode?: (text: string) => Matrix })
+        .lunarQrEncode;
+      if (encode) resolve(encode);
+      else {
+        qrLoader = null;
+        script.remove();
+        reject(new Error('QR module unavailable'));
+      }
+    };
+    script.onerror = () => {
+      qrLoader = null;
+      script.remove();
+      reject(new Error('QR module unavailable'));
+    };
+    document.head.appendChild(script);
+  });
+  return qrLoader;
+}
 export function ShareView({ url }: { url: string }) {
   const [open, setOpen] = useState(false);
   const [snapshot, setSnapshot] = useState(url);
@@ -11,10 +39,9 @@ export function ShareView({ url }: { url: string }) {
   useEffect(() => {
     if (!open) return;
     let active = true;
-    const path = `${import.meta.env.BASE_URL}vendor/qrcodegen.js`;
-    void import(/* @vite-ignore */ path)
-      .then((module: { encodeQr: (text: string) => Matrix }) => {
-        if (active) setMatrix(module.encodeQr(snapshot));
+    void loadQr()
+      .then((encode) => {
+        if (active) setMatrix(encode(snapshot));
       })
       .catch(() => {
         if (active) setMessage('QR unavailable. You can still copy the link.');
@@ -30,7 +57,11 @@ export function ShareView({ url }: { url: string }) {
         className="btn"
         aria-expanded={open}
         onClick={() => {
-          if (!open) setSnapshot(url);
+          if (!open) {
+            setMatrix(null);
+            setMessage('');
+            setSnapshot(url);
+          }
           setOpen(!open);
         }}
       >
@@ -78,7 +109,14 @@ export function ShareView({ url }: { url: string }) {
           >
             Copy link
           </button>
-          <button className="btn" onClick={() => setSnapshot(url)}>
+          <button
+            className="btn"
+            onClick={() => {
+              if (url !== snapshot) setMatrix(null);
+              setMessage('');
+              setSnapshot(url);
+            }}
+          >
             Capture current view
           </button>
           {local && (

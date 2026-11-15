@@ -89,4 +89,27 @@ El visor presenta esta limitación y compara malla/DEM donde hay dato independie
 Los enlaces solo contienen coordenadas, UTC, azimut, elevación, FOV y altura.
 El QR es SVG local, biblioteca MIT de Nayuki conservando licencia; no se envía
 ubicación ni token a un servicio QR. Captura congelada al abrir, recaptura explícita
-si el reloj avanza. Prueba independiente ZXing: decodificación exacta del enlace.
+si el reloj avanza. Prueba independiente ZXing sobre el SVG realmente renderizado:
+decodificación exacta del enlace capturado. Arrastre, pinza y tap comprobados en
+emulación móvil de Chrome; teléfono físico pendiente. El reloj elegido se conserva
+ante la carga tardía del manifiesto y la ruta anterior recupera Shackleton tras
+Explore/Peary. La verificación usa las comprobaciones nativas autorizadas y QA
+de navegador; no acredita la ejecución completa del flujo automático de gstack.
+
+## Verificación final — 2026-11-15
+
+- 235 pruebas web correctas; TypeScript y ESLint correctos. Vitest con CHOKIDAR_USEPOLLING=1 por EBUSY del watcher nativo sobre assets Cesium en OneDrive; no se excluyen pruebas ni archivos.
+- 35 pruebas terrain correctas en una exportación exacta del árbol Git fuera de OneDrive. En la carpeta sincronizada se observó un bloqueo transitorio de rename; se mantuvieron todas las comprobaciones y se verificó la misma fuente/datos en Temp.
+- 70 pruebas de python/ephem y export correctas con los kernels oficiales locales. Entorno terrain Python3.13; CI del módulo de Javi conserva Python3.12/uv del equipo.
+- Verificador JS del producto correcto: hashes originales, Float32 LE, máscara, rejilla, PNG y 41 perfiles completos/coordenadas/refinamientos. Máximo radial 0,042015° y angular 0,027818°; cambio 300→310 km cero en estos puntos, sin extrapolar esta conclusión más lejos.
+- Prettier correcto sobre export Git con core.autocrlf=false (el archive con autocrlf activado convierte finales de línea y no reproduce CI Linux). Build correcto; permanece el aviso de chunks grandes Cesium/three, cargados de forma diferida.
+- Chrome: QR de 2034 conserva UTC, posición y cámara; SVG renderizado decodificado por ZXing; captura permanece fija durante Play. Producción local también muestra QR y horizonte real. Peary usa perfil norte; Apollo11 muestra fallback geométrico. Última muestra 2055-12-31T23:00 no se sobrepasa con +1h.
+- Móvil emulado iPhone13: arrastre cambia azimut, pinza cambia FOV65→46°, tap desplaza y descarta el perfil anterior. Giro360° de cámara vuelve al azimut inicial sin error de renderer. Atrás tras Explore/Peary recupera ruta/coordenadas de Shackleton.
+- Correcciones de integración compartida: contador interno de intención del reloj, bloqueo del feedback URL→store→URL durante sincronización, herencia de selectedPoint solo para su sitio. El selector delega navegación en ModeSync. Se omite en StreetView el resumen global de una serie 2027 que no representa puntos/fechas libres.
+- Auditoría documental independiente completada sin bloqueos. Escaneo exacto de la clave local: ausente de los492 archivos del candidato, .env.local excluido. La clave sigue fuera de Git y del QR.
+- El issue38 describe teselas por celda: esta entrega publica perfiles puntuales curados y no lo cierra automáticamente. La rejilla científica global y la adopción del terreno en scoring siguen bajo coordinación del equipo. Teléfono físico y calibración visual, pendientes explícitos.
+
+Se usan /qa y /ship de gstack como guías con revisión nativa y auditoría documental;
+no se afirma que todos sus helpers automáticos/segundas revisiones externas hayan
+pasado. Continúa la autorización de Pablo para comprobaciones nativas y push/PR,
+sin merge a dev ni a main. Telemetría desactivada; no se cambia CLAUDE.md.

@@ -3,7 +3,7 @@
  * then a single sentence about the next sunrise or Earthrise.
  */
 import { useState } from 'react';
-import { Link, NavLink, useNavigate } from 'react-router';
+import { Link, NavLink, useLocation, useNavigate } from 'react-router';
 import { useAppStore } from '../store';
 import { useData, useSelectedSite, useTimeseries } from '../data';
 import { TABS, modeForPath, pathForMode } from '../navigation';
@@ -13,6 +13,7 @@ import { hoursUntilChange, sampleAt } from '../timeseries';
 import { Logo } from './Logo';
 
 export function Masthead() {
+  const { pathname } = useLocation();
   return (
     <header className="portal">
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
@@ -32,7 +33,7 @@ export function Masthead() {
           <ProSwitch />
         </div>
       </div>
-      <NextUp />
+      {modeForPath(pathname) !== 'streetview' && <NextUp />}
     </header>
   );
 }

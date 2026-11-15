@@ -1,12 +1,12 @@
 /** Pablo's viewer: real shared ephemerides, sourced catalogue, local camera. */
 import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react';
-import { useNavigate, useParams } from 'react-router';
+import { useParams } from 'react-router';
 import { dataUrl, formatUtc, useAppStore } from '@/core';
 import { useEphem, useHorizon } from '@/ephem';
 import { observerSky, type TerrainSite } from './sky';
 import { surfaceDistance } from './navigation';
 import type { Observer } from './lunarScene';
-import { DEFAULT_VIEW, makeViewLink, readViewLink, type ViewState } from './viewLink';
+import { DEFAULT_VIEW, initialPoint, makeViewLink, readViewLink, type ViewState } from './viewLink';
 import { ShareView } from './ShareView';
 import { StreetViewClock } from './StreetViewClock';
 import './streetview.css';
@@ -26,7 +26,6 @@ export function StreetView() {
 }
 
 function ObserverView({ siteId }: { siteId: string }) {
-  const navigate = useNavigate();
   const time = useAppStore((s) => s.currentTimeUTC);
   const setTime = useAppStore((s) => s.setTime);
   const selectSite = useAppStore((s) => s.selectSite);
@@ -37,7 +36,9 @@ function ObserverView({ siteId }: { siteId: string }) {
   const [catalog, setCatalog] = useState<Catalog | null>(null);
   const [catalogError, setCatalogError] = useState('');
   const [retry, setRetry] = useState(0);
-  const [startingPoint] = useState(shared.point ?? selectedPoint);
+  const [startingPoint] = useState(() =>
+    initialPoint(shared.point, siteId, useAppStore.getState().selectedSiteId, selectedPoint),
+  );
   const [activePoint, setActivePoint] = useState<Observer | null>(startingPoint);
   const [view, setView] = useState<ViewState>(shared.view);
   const [meshGround, setMeshGround] = useState<number | null>(null);
@@ -128,7 +129,6 @@ function ObserverView({ siteId }: { siteId: string }) {
             onChange={(event) => {
               const id = event.target.value;
               selectSite(id);
-              navigate(`/streetview/${encodeURIComponent(id)}`);
             }}
           >
             <option value="" disabled>

@@ -2,8 +2,11 @@
 
 Independent NASA LOLA calculations, assisted by OpenAI Codex, 2026-11-14.
 **Not production visibility, illumination, mission metrics or certified accuracy.**
-The existing `terrain/delivery.json` correctly retains **0 production profiles**.
-These files are deliberately outside `data/horizon/`, which Javi's loader owns.
+These six historical trial profiles remain separate from the **41 current polar
+catalogue profiles** in `data/horizon/`, reported by `terrain/delivery.json` and
+`terrain/catalog-delivery.json`. Trial coordinates and results are preserved;
+they must not replace a current catalogue profile. See the
+[current handoff](../../../../../docs/team/pabloizgui/team-handoff.md).
 
 | File | Purpose |
 | --- | --- |
@@ -60,6 +63,7 @@ experimental summaries/CSV and provenance of existing pilots.
 Use `requirements-terrain.txt`. Large source DEMs stay in ignored `data/terrain/`;
 teammates can read these small JSON/CSV files without downloading them.
 
-Javi: review against proposed PR #70, confirm final site catalogue (#48),
-MOON_ME realization and validation before copying any profile to `horizon/`.
+Javi: these pilots predate the current catalogue and its validated sampled
+profiles; do not copy fixture-coordinate profiles into `horizon/`. Consume the
+current catalogue delivery when regenerating evaluation outputs.
 Marta: these trials are separate from your existing Float32 heightmap and mask.

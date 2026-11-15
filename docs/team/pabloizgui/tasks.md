@@ -16,7 +16,7 @@ Guía actual: [ephemeris-integration.md](ephemeris-integration.md).
 | Navegación global y móvil | Arrastre izquierdo/un dedo, rueda/pinza, sin flechas; pasos hasta 200 m, transición suave, coordenadas libres y teclado |
 | Lectura del relieve / nombres | Luz artificial, estado solar explícito, cielo negro, rótulos IAU/USGS con línea oblicua/horizontal; centros de accidentes, no cumbres |
 | Reloj y enseñanza | UTC completo, pasos y reproducción sobre el reloj de core; enlace/QR con posición, cámara, altura y tiempo, sin token |
-| Validación y publicación | Comprobaciones automáticas y navegador; publicación autorizada, sin merge automático |
+| Validación y publicación | Comprobaciones nativas autorizadas y navegador; QR renderizado decodificado por ZXing y móvil emulado; publicación autorizada, sin merge automático. Teléfono físico pendiente; no se afirma un flujo automático gstack completo |
 
 ### Qué queda del resto del equipo
 

@@ -18,6 +18,16 @@ export interface SharedView {
   error: string | null;
 }
 
+/** A route cannot inherit a free point belonging to a different selected site. */
+export function initialPoint(
+  shared: Observer | null,
+  routeId: string,
+  selectedId: string | null,
+  selectedPoint: Observer | null,
+) {
+  return shared ?? (routeId === selectedId ? selectedPoint : null);
+}
+
 export function readViewLink(url: URL): SharedView {
   const params = url.searchParams;
   const fallback = { point: null, time: null, view: DEFAULT_VIEW, error: null };

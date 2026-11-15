@@ -7,6 +7,21 @@
 
 ## 0. Estado real (actualizado 2026-11-14)
 
+> **Actualización de integración de Pablo, 2026-11-15:** dev `0b8f028` ya incluye
+> export real de los 59 sitios y sus series, rejillas de métricas, Explore con
+> filtros, Mission jugable y alunizajes históricos (#80–#89). Las tablas de v0
+> siguientes conservan el historial. Rama pendiente de revisión
+> `pabloizgui/38-streetview-ephemerides`: cielo SPICE 2026–2055, navegación
+> móvil/global, lectura del relieve, nombres y enlace/QR reproducible; 41
+> horizontes polares (5 m, 0,1°, 310 km), relieve/pendiente/PSR del catálogo real.
+> Heightmap/capas originales de Marta intactos. Guía, archivos por destinatario
+> y límites: [entrega actual](team/pabloizgui/team-handoff.md) y
+> [pendientes actuales](team/pabloizgui/tasks.md).
+> El export real de Javi y sus rejillas todavía usan horizonte plano; debe
+> consumir esta entrega para regenerar métricas/score. Globo/pins, despliegue
+> y teléfono físico siguen siendo integraciones del equipo. No se afirma que
+> la rama de Pablo ya esté mergeada ni que 41 perfiles cubran toda la Luna.
+
 ### Ramas: se trabaja contra `dev`
 - `dev` = rama de integración: **todo el trabajo entra aquí**. `main` = estable/entrega, solo recibe `dev` con un PR `dev` → `main` en cada integración.
 - Flujo: issue → `git switch -c <handle>/<n>-<slug> origin/dev` → PR con `gh pr create --base dev` → revisión → squash-merge a `dev`.

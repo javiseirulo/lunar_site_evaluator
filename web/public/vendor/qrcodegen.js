@@ -868,3 +868,4 @@ export function encodeQr(text) {
     ),
   };
 }
+if (typeof window !== 'undefined') window.lunarQrEncode = encodeQr;

@@ -1,5 +1,13 @@
 import { expect, it } from 'vitest';
-import { DEFAULT_VIEW, END_UTC, makeViewLink, readViewLink } from './viewLink';
+import { DEFAULT_VIEW, END_UTC, initialPoint, makeViewLink, readViewLink } from './viewLink';
+
+it('keeps shared coordinates authoritative and rejects a point owned by another route', () => {
+  const point = { lat: 12, lon: 23 };
+  const shared = { lat: -89, lon: 20 };
+  expect(initialPoint(null, 'a', 'b', point)).toBeNull();
+  expect(initialPoint(null, 'a', 'a', point)).toEqual(point);
+  expect(initialPoint(shared, 'a', 'b', point)).toEqual(shared);
+});
 
 it('restores a reproducible lunar position, UTC epoch and camera pose', () => {
   const base = new URL('https://user:secret@moon.example/streetview/a?token=do-not-share#old');
