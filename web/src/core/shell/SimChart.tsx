@@ -320,7 +320,7 @@ export function SimChart({ className }: { className?: string }) {
           </Readout>
         )}
         <Readout label="Sunny so far">{Math.round(st.litFraction * 100)}%</Readout>
-        <Readout label="Longest night so far">
+        <Readout label="Longest night">
           {st.longestDarkHours > 0 ? hoursText(st.longestDarkHours, proMode) : 'none yet'}
         </Readout>
       </div>
