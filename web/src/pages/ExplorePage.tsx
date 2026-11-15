@@ -1,7 +1,7 @@
 import { Component, type ReactNode } from 'react';
 import { useAppStore } from '@/core';
 import { TimeBar } from '@/core/shell/TimeBar';
-import { LayersPanel, PolarMap } from '@/layers';
+import { PolarMap } from '@/layers';
 import { GlobeView, SiteDetail, SiteList } from '@/globe';
 import { MissionTimingPanel, SiteCheckPanel } from '@/scoring';
 import { SimpleSiteList } from './explore/SimpleSiteList';
@@ -46,7 +46,7 @@ export default function ExplorePage() {
           : 'grid grid-cols-1 gap-4 md:grid-cols-[minmax(0,1fr)_300px] lg:grid-cols-[240px_minmax(0,1fr)_300px]'
       }
     >
-      {/* Left: sites (+ layer switches in Expert) */}
+      {/* Left: sites  */}
       <aside
         className={
           proMode
@@ -54,14 +54,7 @@ export default function ExplorePage() {
             : 'order-3 flex flex-col gap-4 md:order-3 md:col-span-2 lg:order-1 lg:col-span-1'
         }
       >
-        {proMode ? (
-          <>
-            <SiteList />
-            <LayersPanel />
-          </>
-        ) : (
-          <SimpleSiteList />
-        )}
+        {proMode ? <SiteList /> : <SimpleSiteList />}
       </aside>
 
       {/* Centre: map + clock */}
