@@ -5,9 +5,7 @@ import { SimChart } from '@/core/shell/SimChart';
 import { PolarMap } from '@/layers';
 import { GlobeView, SiteDetail, SiteList } from '@/globe';
 import { useHistoric } from '@/globe/historicSites';
-import { LayersMenu } from '@/globe/LayersMenu';
-import { PatchControls } from '@/globe/PatchControls';
-import { PinForm } from '@/globe/PinForm';
+import { useChromeSlot } from '@/globe/chromeSlot';
 import { LandingDate, MissionTimingPanel, SiteCheckPanel } from '@/scoring';
 import { SimpleSiteList } from './explore/SimpleSiteList';
 import { EndSimulationDialog } from './explore/EndSimulationDialog';
@@ -58,7 +56,7 @@ function SimulateHint() {
 const FRAME = 'border-edge-hi border-2 bg-panel shadow-[4px_4px_0_#000]';
 const FLAT = 'border-0 bg-transparent shadow-none';
 
-type LeftTab = 'needs' | 'window' | 'sites' | 'map';
+type LeftTab = 'sites';
 type RightTab = 'now' | 'sun' | 'check';
 
 function Pages<T extends string>({
@@ -95,57 +93,23 @@ function Pages<T extends string>({
   );
 }
 
-function MapPage() {
-  const proMode = useAppStore((s) => s.proMode);
-  const requestPin = useAppStore((s) => s.requestPin);
-  return (
-    <div className="flex flex-col gap-2 px-2 py-2">
-      <PinForm
-        embedded
-        title={proMode ? 'Pin by coordinates' : 'Go to coordinates'}
-        submitLabel={proMode ? 'Add pin' : 'Go there'}
-        onAdd={requestPin}
-      />
-      <div className="border-edge-hi border-t-2 pt-2">
-        <LayersMenu embedded hasSun expert={proMode} />
-      </div>
-      <PatchControls />
-    </div>
-  );
-}
-
 function LeftPanel() {
   const proMode = useAppStore((s) => s.proMode);
-  const [tab, setTab] = useState<LeftTab>(proMode ? 'needs' : 'sites');
-  const shown: LeftTab = !proMode && (tab === 'needs' || tab === 'window') ? 'sites' : tab;
-
-  const options: { id: LeftTab; label: string }[] = proMode
-    ? [
-        { id: 'needs', label: 'Needs' },
-        { id: 'window', label: 'Window' },
-        { id: 'sites', label: 'Sites' },
-        { id: 'map', label: 'Map' },
-      ]
-    : [
-        { id: 'sites', label: 'Sites' },
-        { id: 'map', label: 'Map' },
-      ];
+  const options: { id: LeftTab; label: string }[] = [{ id: 'sites', label: 'Sites' }];
 
   return (
     <aside
       className={`${FRAME} pointer-events-auto flex max-h-full min-h-0 w-full flex-col self-start overflow-y-auto`}
     >
-      <Pages options={options} value={shown} onChange={setTab} />
+      <Pages options={options} value="sites" onChange={() => undefined} />
       <div>
-        {shown === 'needs' && <SiteList part="requirements" className={FLAT} />}
-        {shown === 'window' && <MissionTimingPanel className={FLAT} />}
-        {shown === 'sites' &&
-          (proMode ? (
-            <SiteList part="sites" className={FLAT} />
-          ) : (
-            <SimpleSiteList className={FLAT} />
-          ))}
-        {shown === 'map' && <MapPage />}
+        {proMode ? (
+          // Booking style: requirements, window and the matching sites together, so the list
+          // changes live while you edit a requirement.
+          <SiteList className={FLAT} />
+        ) : (
+          <SimpleSiteList className={FLAT} />
+        )}
       </div>
     </aside>
   );
@@ -200,30 +164,42 @@ function RightPanel() {
 
 export default function ExplorePage() {
   const proMode = useAppStore((s) => s.proMode);
+  const setChromeSlot = useChromeSlot((s) => s.setSlot);
 
   return (
-    <>
+    // The page scrolls: a tall 3D map first, the Mission Clock below it.
+    <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
       <EndSimulationDialog />
-      <div className="border-edge-hi relative min-h-0 flex-1 overflow-hidden border-2 bg-black">
+      <div className="border-edge-hi relative h-[calc(100dvh-8.5rem)] min-h-[26rem] shrink-0 overflow-hidden border-2 bg-black">
         <div className="absolute inset-0">
           {WEBGL ? (
             <GlobeBoundary fallback={<PolarMap className="size-full" neutral={!proMode} />}>
-              <GlobeView hideChrome />
+              <GlobeView />
             </GlobeBoundary>
           ) : (
             <PolarMap className="size-full" neutral={!proMode} />
           )}
         </div>
 
-        <div className="pointer-events-none absolute inset-0 grid grid-cols-1 grid-rows-[minmax(0,1fr)_auto] gap-3 p-3 md:grid-cols-[minmax(200px,20%)_minmax(0,1fr)_minmax(210px,22%)]">
+        <div className="pointer-events-none absolute inset-0 grid grid-cols-1 grid-rows-[minmax(0,1fr)] gap-3 p-3 md:grid-cols-[minmax(200px,20%)_minmax(0,1fr)_minmax(210px,22%)]">
           <LeftPanel />
+          {/* Free map area between the panels: the globe puts its coordinate, Layers and astronaut controls here. */}
+          <div
+            ref={setChromeSlot}
+            className="pointer-events-none absolute inset-0 md:relative md:inset-auto md:col-start-2 md:row-start-1"
+          />
           <RightPanel />
-          <div className="pointer-events-auto flex flex-col gap-2 self-end md:col-start-2 md:row-start-2">
-            {!proMode && <LandingDate />}
-            <TimeBar />
-          </div>
         </div>
       </div>
-    </>
+
+      {/* Mission Clock below the 3D view (not over the Moon), under the free map column. */}
+      <div className="mt-2 grid shrink-0 grid-cols-1 gap-3 px-3 pb-3 md:grid-cols-[minmax(200px,20%)_minmax(0,1fr)_minmax(210px,22%)]">
+        <div className="flex flex-col gap-2 md:col-start-2">
+          {!proMode && <LandingDate />}
+          {proMode && <MissionTimingPanel />}
+          <TimeBar />
+        </div>
+      </div>
+    </div>
   );
 }

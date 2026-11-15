@@ -5,6 +5,7 @@
   z-index: 45;
   pointer-events: none;
 }
+/* Same square, colours and shadow as the Layers button (.box, 56 px). */
 .astronaut-button {
   display: grid;
   place-items: center;
@@ -13,10 +14,14 @@
   width: 56px;
   height: 56px;
   padding: 0;
-  background: #0e2040ed;
-  border: 1px solid #24406e;
-  border-radius: 2px;
+  background: var(--color-panel);
+  border: 2px solid #24406e;
+  border-radius: 0;
+  box-shadow: 4px 4px 0 #000;
   cursor: grab;
+}
+.astronaut-button:hover {
+  background: var(--color-panel-2);
 }
 .astronaut-button:active {
   cursor: grabbing;
