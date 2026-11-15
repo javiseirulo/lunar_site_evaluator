@@ -370,12 +370,21 @@
 
 /* Mission Clock: running indicator + scan stripe (reduced-motion handled by the global rule). */
 @keyframes clock-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.25; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.25;
+  }
 }
 @keyframes clock-scan {
-  from { transform: translateX(-100%); }
-  to { transform: translateX(350%); }
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(350%);
+  }
 }
 .clock-dot {
   animation: clock-pulse 1.2s ease-in-out infinite;

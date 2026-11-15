@@ -67,9 +67,7 @@ describe('planFlight / flightAt', () => {
     const end = flightAt(flight, 99);
     expect(end.done).toBe(true);
     expect(len(end.position)).toBeCloseTo(SITE_VIEW_DISTANCE, 8);
-    end.position.forEach((v, i) =>
-      expect(v / SITE_VIEW_DISTANCE).toBeCloseTo(flight.to[i]!, 8),
-    );
+    end.position.forEach((v, i) => expect(v / SITE_VIEW_DISTANCE).toBeCloseTo(flight.to[i]!, 8));
   });
 
   it('lasts 1.4-1.8 s', () => {
