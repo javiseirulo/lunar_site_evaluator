@@ -251,7 +251,7 @@ export function LayersMenu({
       </button>
       {open && (
         <div
-          className="box absolute bottom-full left-0 z-10 mb-1 max-h-[60vh] w-64 overflow-y-auto px-3 py-2"
+          className="box absolute bottom-full left-0 z-10 mb-1 max-h-[min(60vh,calc(100dvh-15rem))] w-64 overflow-y-auto px-3 py-2"
           role="group"
           aria-label="Map layers"
         >
