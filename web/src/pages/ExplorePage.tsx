@@ -1,6 +1,7 @@
 import { Component, type ReactNode } from 'react';
 import { useAppStore } from '@/core';
 import { TimeBar } from '@/core/shell/TimeBar';
+import { SimChart } from '@/core/shell/SimChart';
 import { LayersPanel, PolarMap } from '@/layers';
 import { GlobeView, SiteDetail, SiteList } from '@/globe';
 import { MissionTimingPanel, SiteCheckPanel } from '@/scoring';
@@ -88,6 +89,7 @@ export default function ExplorePage() {
         </div>
         {proMode && <MissionTimingPanel />}
         <TimeBar />
+        <SimChart />
       </section>
 
       {/* Right: site card (+ validity check in Expert) */}
