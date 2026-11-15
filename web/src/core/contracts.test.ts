@@ -158,8 +158,18 @@ describe.runIf(existsSync(join(DATA, HISTORIC)))('historic_sites.json follows th
     for (const h of file.sites) {
       const c = catalog.get(h.id);
       if (!c) continue;
+      // A shared id must be the same landing, not a candidate that happens to share the name.
+      expect(c.kind, h.id).toBe('historic_landing');
       expect(h.lat, h.id).toBeCloseTo(c.lat, 6);
       expect(h.lon, h.id).toBeCloseTo(c.lon, 6);
     }
+  });
+
+  it('lists every historic_landing of sites.json (so a renamed id cannot slip through)', () => {
+    const ids = new Set(read<HistoricSitesFile>(HISTORIC).sites.map((s) => s.id));
+    const missing = read<SitesFile>('sites.json')
+      .sites.filter((s) => s.kind === 'historic_landing' && !ids.has(s.id))
+      .map((s) => s.id);
+    expect(missing).toEqual([]);
   });
 });
