@@ -1,7 +1,7 @@
 {
   "version": 1,
   "mock": false,
-  "generated_utc": "2026-11-14T22:49:17Z",
+  "generated_utc": "2026-11-15T10:18:19Z",
   "time_range": {
     "start_utc": "2027-01-01T00:00:00Z",
     "end_utc": "2028-01-01T00:00:00Z",
@@ -10,8 +10,8 @@
   "sources": [
     "SPICE kernels: naif0012.tls, pck00011.tpc, de440s.bsp, moon_pa_de440_200625.bpc, moon_de440_250416.tf",
     "Frame MOON_ME_DE440_ME421, aberration LT+S (python/ephem/vectors.py)",
-    "Horizon: flat (no terrain), observer 5 m; antenna margin 2 deg",
+    "Horizon: terrain profiles horizon/<id>.json for 41 polar sites (LOLA, Pablo), flat (no terrain) elsewhere; observer 5 m; antenna margin 2 deg",
     "Sites: python/export/catalog.yaml (cited sources per site)",
-    "slope_deg / psr_dist_km pending terrain (placeholder 0, see pending_metrics)"
+    "elev_m / slope_deg / psr_dist_km: terrain/catalog.json (Pablo); psr_dist_km pending where unknown (see pending_metrics)"
   ]
 }

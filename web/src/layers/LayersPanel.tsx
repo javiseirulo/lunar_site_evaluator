@@ -14,9 +14,9 @@ const LAYER_UI: Record<string, { label: string }> = {
   slope: { label: 'Slope' },
   psr: { label: 'Icy craters' },
   elevation: { label: 'Height' },
-  score: { label: 'Score' },
+  earth_vis: { label: 'Earth in view' }, // real grid layer (2026-11-15); mock 'score' dropped
 };
-const ORDER = ['illumination', 'slope', 'psr', 'elevation', 'score'];
+const ORDER = ['illumination', 'earth_vis', 'slope', 'psr', 'elevation'];
 
 export function LayersPanel({ className }: { className?: string }) {
   const manifest = useData((s) => s.layers);

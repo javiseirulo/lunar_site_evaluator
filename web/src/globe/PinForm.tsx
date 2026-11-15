@@ -22,7 +22,7 @@ export function PinForm({
       <button
         type="button"
         className="btn h-[30px] px-2.5 text-[13px]"
-        style={{ ['--color-ink' as string]: '#2c2822' }}
+        style={{ ['--color-ink' as string]: '#e6edf7' }}
         onClick={() => setOpen(true)}
       >
         <MapPinPlus className="size-3.5" aria-hidden /> Pin by coordinates

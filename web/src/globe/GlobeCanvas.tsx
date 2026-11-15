@@ -47,11 +47,14 @@ import { GlobeCard, type CardContent } from './GlobeCard';
 import { PinForm } from './PinForm';
 import { useCustomPins } from './customPins';
 import { latLonToVec3, vec3ToLatLon } from './geo';
+import { flightAt, planFlight, type Flight } from './flight';
 import { HistoricControls } from './HistoricControls';
 import { useSunDirection } from './sunLight';
 import { NIGHT_FILL, useNightLayer } from './nightLayer';
 import { NightControls, Terminator } from './DayNight';
 import { PatchTrigger, PolarPatch, SunLight } from './PolarPatch';
+import { ActiveLegend } from '@/layers';
+import { GlobalHeat } from './LayerOverlays'; // Javi: whole-Moon heat maps of active layers
 import { EXAGGERATION_LABEL, PatchControls } from './PatchControls';
 import { loadTerrain, patchOn, useTerrain, useTerrainLift, type LiftFn } from './terrainStore';
 import { OUTCOME_COLORS, loadHistoricSites, useHistoric } from './historicSites';
@@ -113,6 +116,8 @@ export default function GlobeCanvas() {
   const controlsRef = useRef<Controls>(null);
   const [textureReady, setTextureReady] = useState(false);
   const now = useAppStore((s) => s.currentTimeUTC);
+  // DESIGN.md: Normal mode keeps one main action; pinning by coordinates is an Expert tool.
+  const expert = useAppStore((s) => s.proMode);
   const sun = useSunDirection(now);
   const sunDir = sun.dir;
   const nightOn = useNightLayer((s) => s.on);
@@ -232,6 +237,8 @@ export default function GlobeCanvas() {
             onSurfaceClick={(lat, lon) => setFocus({ kind: 'point', lat, lon })}
           />
         </Suspense>
+        {/* Javi: global heat map (grid/global_1deg.bin) for active sunlight / Earth layers. */}
+        <GlobalHeat />
         <Pins focus={focus} onSiteClick={onSiteClick} onCustomClick={onCustomClick} />
         <HistoricMarkers
           focusId={focus?.kind === 'historic' ? focus.id : null}
@@ -267,18 +274,22 @@ export default function GlobeCanvas() {
         <CameraRig flightRef={flightRef} controlsRef={controlsRef} />
       </Canvas>
       <div className="absolute top-2 left-2 flex flex-col items-start gap-2">
-        <PinForm
-          onAdd={({ name, lat, lon }) => {
-            createPin(lat, lon, name);
-            // Fly above the new pin (avoid the exact pole, where the orbit is undefined).
-            const safeLat = Math.max(-89.5, Math.min(89.5, lat));
-            flightRef.current = new Vector3(...latLonToVec3(safeLat, lon, PIN_VIEW_DISTANCE));
-          }}
-        />
+        {expert && (
+          <PinForm
+            onAdd={({ name, lat, lon }) => {
+              createPin(lat, lon, name);
+              // Fly above the new pin (avoid the exact pole, where the orbit is undefined).
+              const safeLat = Math.max(-89.5, Math.min(89.5, lat));
+              flightRef.current = new Vector3(...latLonToVec3(safeLat, lon, PIN_VIEW_DISTANCE));
+            }}
+          />
+        )}
         <HistoricControls />
         <NightControls hasSun={!!sunDir} />
         <PatchControls />
       </div>
+      {/* Javi: legend of the active map layers (Expert only, like the layers panel). */}
+      {expert && <ActiveLegend className="pointer-events-none absolute top-2 right-2" />}
       {exaggerated && (
         <div
           role="note"
@@ -822,6 +833,52 @@ function CameraRig({
   controlsRef: RefObject<Controls | null>;
 }) {
   const camera = useThree((s) => s.camera);
+  const siteFlight = useRef<{ flight: Flight; elapsed: number } | null>(null);
+
+  // Any selection of a site (list, globe pin, header finder) flies the camera to it.
+  useEffect(() => {
+    const fly = (id: string | null) => {
+      if (!id) return;
+      const site = useData.getState().sites?.find((x) => x.id === id);
+      if (!site) return;
+      const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+      const flight = planFlight(
+        camera.position.toArray() as [number, number, number],
+        latLonToVec3(site.lat, site.lon),
+      );
+      flightRef.current = null;
+      if (reduced) {
+        siteFlight.current = null;
+        const end = flightAt(flight, flight.duration).position;
+        camera.position.set(...end);
+        controlsRef.current?.target.set(0, 0, 0);
+        controlsRef.current?.update();
+        return;
+      }
+      siteFlight.current = { flight, elapsed: 0 };
+    };
+    // A site already selected when the globe opens is flown to as soon as the sites are loaded.
+    let pending: (() => void) | null = null;
+    const initial = useAppStore.getState().selectedSiteId;
+    if (initial) {
+      if (useData.getState().sites) fly(initial);
+      else
+        pending = useData.subscribe((d) => {
+          if (!d.sites) return;
+          pending?.();
+          pending = null;
+          if (useAppStore.getState().selectedSiteId === initial) fly(initial);
+        });
+    }
+    const unsub = useAppStore.subscribe((s, prev) => {
+      if (s.selectedSiteId !== prev.selectedSiteId) fly(s.selectedSiteId);
+    });
+    return () => {
+      pending?.();
+      unsub();
+    };
+  }, [camera, controlsRef, flightRef]);
+
   const lift = useTerrainLift();
   const svRequest = useStreetViewFlight((s) => s.request);
   /** "Stand here" flight in progress: start pose and clock. */
@@ -856,6 +913,7 @@ function CameraRig({
     if (!controls) return;
     const cancel = () => {
       flightRef.current = null;
+      siteFlight.current = null;
     };
     controls.addEventListener('start', cancel);
     return () => controls.removeEventListener('start', cancel);
@@ -886,6 +944,16 @@ function CameraRig({
       return; // controls and the minimum radius stay out of the way while flying down
     }
     const target = flightRef.current;
+    const sf = siteFlight.current;
+    if (target) siteFlight.current = null;
+    else if (sf) {
+      sf.elapsed += Math.min(dt, 0.05);
+      const { position, done } = flightAt(sf.flight, sf.elapsed);
+      camera.position.set(...position);
+      // Hand the orbit target back to the Moon's centre so orbiting after landing does not jump.
+      controlsRef.current?.target.lerp(ORIGIN, done ? 1 : 1 - Math.exp(-dt * 8));
+      if (done) siteFlight.current = null;
+    }
     if (target) {
       if (target.lengthSq() === 0) {
         // Pole: keep the current azimuth so the globe tilts down instead of spinning.
