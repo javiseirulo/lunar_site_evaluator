@@ -3,7 +3,7 @@
  * lat/lon typed in — for the current mission win, with each requirement's margin, the score
  * breakdown and the temporal robustness (±3 days). Sky computed client-side from `@/ephem`.
  */
-import { useId, useMemo, useState } from 'react';
+import { useEffect, useId, useMemo, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { formatUtc, useAppStore, useSelectedSite } from '@/core';
 import {
@@ -19,9 +19,12 @@ import {
   explainEvaluation,
   formatNeed,
   formatRequirementValue,
+  pendingNote,
   requirementLabel,
   type Explanation,
 } from './explain';
+import { slopeFromHeightmap } from './pointTerrain';
+import { loadTerrain, useTerrain } from '@/globe/terrainStore';
 import { robustnessRange, temporalRobustness } from './robustness';
 
 const label = requirementLabel;
@@ -118,6 +121,11 @@ export function SiteCheckPanel({
   const range = robustnessRange(win, 3);
   const ephem = useEphem(point ? range.start_utc : null, point ? range.end_utc : null);
   const ephemVersion = useEphemVersion();
+  const terrain = useTerrain((t) => (t.status === 'ready' ? t : null));
+  const needTerrain = !!custom && terrain === null;
+  useEffect(() => {
+    if (needTerrain) void loadTerrain();
+  }, [needTerrain]);
   const horizon = useHorizon(point && !custom ? point.id : null);
 
   const result = useMemo(() => {
@@ -127,17 +135,29 @@ export function SiteCheckPanel({
       antennaMarginDeg: config.antenna_margin_deg ?? 0,
     });
     if (!ts) return null;
+    // A free point has no catalogue metrics: slope comes from the polar heightmap when the point
+    // lies inside it; the distance to icy craters is never measured for a free point.
+    const ps =
+      custom && terrain?.header && terrain.heights
+        ? slopeFromHeightmap(terrain.header, terrain.heights, terrain.mask, point.lat, point.lon)
+        : null;
     const site: EvaluableSite =
       !custom && selected
         ? { metrics: selected.metrics, pending_metrics: selected.pending_metrics }
-        : { pending_metrics: ['slope_deg', 'psr_dist_km'] };
+        : ps
+          ? { metrics: { slope_deg: ps.slope_deg }, pending_metrics: ['psr_dist_km'] }
+          : { pending_metrics: ['slope_deg', 'psr_dist_km'] };
     return {
+      slopeBaselineM: ps?.baseline_m ?? null,
       ev: evaluateWindow(site, ts, config, win),
       rob: temporalRobustness(site, ts, config, win, 3),
       horizonSource: ts.horizon_source,
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [point, ephem.ready, ephemVersion, horizon, config, win.start_utc, win.end_utc]);
+  }, [point, ephem.ready, ephemVersion, horizon, terrain, config, win.start_utc, win.end_utc]);
+
+  const note = result ? pendingNote(result.ev.checks) : null;
+  const partial = note !== null;
 
   return (
     <section className={cn('box', className)} aria-label="Site check">
@@ -198,15 +218,34 @@ export function SiteCheckPanel({
                     : 'border-red-500 text-red-400',
                 )}
               >
-                {result.ev.valid ? (simple ? 'VALID for this mission' : 'VALID') : 'NOT VALID'}
+                {result.ev.valid
+                  ? partial
+                    ? 'VALID on what we can measure'
+                    : simple
+                      ? 'VALID for this mission'
+                      : 'VALID'
+                  : 'NOT VALID'}
               </strong>
               {!simple && <span className="min-w-0 truncate">{point.name}</span>}
               <span className={cn('num shrink-0', simple ? 'text-[15px] font-bold' : 'ml-auto')}>
                 {simple ? '' : 'score '}
-                {Math.round(result.ev.score * 100)}/100
+                {Math.round(result.ev.score * 100)}/100{partial ? ' so far' : ''}
               </span>
-              <WhyInfo exp={explainEvaluation(result.ev, config, config.surface_days)} />
+              <WhyInfo
+                exp={explainEvaluation(
+                  result.ev,
+                  config,
+                  config.surface_days,
+                  result.slopeBaselineM,
+                )}
+              />
             </div>
+            {note && <p className="text-warn text-[11px]">{note}</p>}
+            {result.slopeBaselineM !== null && (
+              <p className="text-ink-faint text-[10px]">
+                Slope from the polar heightmap, over {Math.round(result.slopeBaselineM)} m.
+              </p>
+            )}
             {!simple && (
               <p className="text-ink-faint text-[10px]">
                 Mission window <span className="num">{formatUtc(win.start_utc)}</span> →{' '}
@@ -232,7 +271,7 @@ export function SiteCheckPanel({
                         {c.pending
                           ? simple
                             ? 'not measured yet'
-                            : 'pending terrain'
+                            : 'not measured'
                           : show(c.key, c.value)}
                       </span>
                     </div>

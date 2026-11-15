@@ -6,7 +6,8 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Pause, Play, SkipBack } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAppStore } from '../store';
-import { useData, useTimeseries } from '../data';
+import { useData } from '../data';
+import { useActiveSeries } from '@/ephem/activeSeries';
 import { formatHours, formatUtc } from '../format';
 import {
   changeLead,
@@ -34,8 +35,8 @@ export function TimeBar({ className }: { className?: string }) {
   const range = useData((s) => s.manifest?.time_range);
   const currentTimeUTC = useAppStore((s) => s.currentTimeUTC);
   const setTime = useAppStore((s) => s.setTime);
-  const siteId = useAppStore((s) => s.selectedSiteId);
-  const ts = useTimeseries(siteId);
+  const active = useActiveSeries();
+  const ts = active.ts;
   const proMode = useAppStore((s) => s.proMode);
   const [playing, setPlaying] = useState(false);
   const [speed, setSpeed] = useState(DEFAULT_SPEED);
@@ -191,7 +192,13 @@ export function TimeBar({ className }: { className?: string }) {
             )}
           </span>
         ) : (
-          <span>Pick a site to see when it gets sun and sees Earth</span>
+          <span>
+            {active.kind === 'point'
+              ? active.error
+                ? 'Ephemeris unavailable for this point'
+                : 'Computing…'
+              : 'Pick a site to see when it gets sun and sees Earth'}
+          </span>
         )}
         {proMode && sample && (
           <span>

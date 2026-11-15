@@ -23,7 +23,6 @@ import {
   useAppStore,
   useData,
   useSelectedSite,
-  useTimeseries,
 } from '@/core';
 import {
   autonomyH,
@@ -37,6 +36,7 @@ import {
   type SiteEvaluation,
   type SortBy,
 } from './missionStats';
+import { useActiveSeries } from '@/ephem/activeSeries';
 import { useRequirements } from './requirementsStore';
 import { useCandidates, useMissionWindow, useSiteStats } from './useCandidates';
 
@@ -477,7 +477,9 @@ export function SiteDetail({ className }: { className?: string }) {
   const stats = useSiteStats(site?.id ?? null);
   const loadError = useData((s) => (site ? s.timeseriesErrors[site.id] : undefined));
   const window = useMissionWindow();
+  const point = useAppStore((s) => s.selectedPoint);
 
+  if (!site && point) return <PointDetail className={className} />;
   if (!site) {
     return (
       <section className={cn('box p-5', className)}>
@@ -585,9 +587,27 @@ export function SiteDetail({ className }: { className?: string }) {
   );
 }
 
+/** Card for a free lat/lon ("Go to coordinates"): the same live Mission Clock readout, in situ. */
+function PointDetail({ className }: { className?: string }) {
+  const active = useActiveSeries();
+  const proMode = useAppStore((s) => s.proMode);
+  if (!active.site) return null;
+  return (
+    <section className={cn('box p-5', className)} aria-label="Selected point details">
+      <h2 className="text-[24px] leading-tight">{active.site.name}</h2>
+      <p className="text-ink-muted mt-1 text-[12px]">
+        Your point{proMode ? ` · ${formatLatLon(active.site.lat, active.site.lon)}` : ''}. Press
+        Play to watch its sunlight and Earth view.
+      </p>
+      <NowSection siteId="point" expert={proMode} />
+    </section>
+  );
+}
+
 function NowSection({ siteId, expert }: { siteId: string; expert: boolean }) {
-  const ts = useTimeseries(siteId);
-  const loadError = useData((s) => s.timeseriesErrors[siteId]);
+  const active = useActiveSeries();
+  const ts = active.ts;
+  const loadError = useData((s) => s.timeseriesErrors[siteId]) ?? active.error;
   const now = useAppStore((s) => s.currentTimeUTC);
   const sky = ts ? sampleAt(ts, now) : null;
   const span = ts ? seriesSpanLabel(ts) : '';
@@ -603,7 +623,9 @@ function NowSection({ siteId, expert }: { siteId: string; expert: boolean }) {
       {loadError ? (
         <p className="text-bad mt-1 text-[13px]">Could not load this site's data.</p>
       ) : !ts || !sky ? (
-        <p className="text-ink-muted mt-1 text-[13px]">Loading…</p>
+        <p className="text-ink-muted mt-1 text-[13px]">
+          {active.computing ? 'Computing…' : 'Loading…'}
+        </p>
       ) : (
         <dl className="rows border-edge mt-2 border-t text-[14px]">
           <Row label="Sun elevation" value={`${sky.sun_el.toFixed(1)}°`} />
@@ -629,6 +651,9 @@ function NowSection({ siteId, expert }: { siteId: string; expert: boolean }) {
             }
           />
         </dl>
+      )}
+      {ts && sky && active.flatHorizon && (
+        <p className="text-ink-muted mt-1 text-[12px]">Flat horizon, no terrain.</p>
       )}
       {ts && sky && ts.earth_visible && ts.earth_visible.every((f) => f === 0) && (
         <p className="text-ink-muted mt-1 text-[12px]">

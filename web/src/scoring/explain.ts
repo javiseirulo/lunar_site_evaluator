@@ -45,6 +45,17 @@ export function formatNeed(key: string, threshold: number): string {
   return `${lessIsBetter(key as RequirementKey) ? '≤' : '≥'} ${formatRequirementValue(key, threshold)}`;
 }
 
+/**
+ * Note shown next to a score when some requirements could not be measured, or null when all were:
+ * "Slope not measured here — score uses the other 4 requirements".
+ */
+export function pendingNote(checks: readonly RequirementCheck[]): string | null {
+  const pending = checks.filter((c) => c.pending).map((c) => requirementLabel(c.key));
+  if (pending.length === 0) return null;
+  const rest = checks.length - pending.length;
+  return `${pending.join(' and ')} not measured here — score uses the other ${rest} requirement${rest === 1 ? '' : 's'}`;
+}
+
 export interface Explanation {
   /** Generic part: what VALID and the score mean. */
   general: string;
@@ -58,6 +69,7 @@ export function explainEvaluation(
   ev: { valid: boolean; score: number; checks: RequirementCheck[]; contributions: Contribution[] },
   config: ScoringConfig,
   surfaceDays: number,
+  slopeBaselineM: number | null = null,
 ): Explanation {
   const weighted = Object.keys(config.requirements).filter(
     (k) => (config.weights[k as RequirementKey] ?? 0) > 0,
@@ -72,7 +84,9 @@ export function explainEvaluation(
       : equal
         ? `${n} requirements count equally, ${points(sumW / n)} points each at most.`
         : `${n} requirements are weighted, up to ${weighted
-            .map((k) => `${requirementLabel(k)} ${points(config.weights[k as RequirementKey] ?? 0)}`)
+            .map(
+              (k) => `${requirementLabel(k)} ${points(config.weights[k as RequirementKey] ?? 0)}`,
+            )
             .join(', ')} points.`;
   const general =
     `A site is VALID when every requirement is met over the ${surfaceDays}-day mission window ` +
@@ -83,7 +97,16 @@ export function explainEvaluation(
   const measured = ev.checks.filter((c) => !c.pending);
   const pendingLabels = ev.checks.filter((c) => c.pending).map((c) => requirementLabel(c.key));
   const pendingText =
-    pendingLabels.length > 0 ? [`${pendingLabels.join(', ')}: not measured yet.`] : [];
+    pendingLabels.length > 0
+      ? [
+          `${pendingLabels.join(', ')}: not measured here, so left out. The score covers only the ${measured.length} requirement${measured.length === 1 ? '' : 's'} that could be measured (${measured.map((c) => requirementLabel(c.key)).join(', ')}) and is not a final verdict.`,
+        ]
+      : [];
+
+  if (slopeBaselineM !== null)
+    pendingText.push(
+      `Slope was measured from the polar heightmap with a ${Math.round(slopeBaselineM)} m baseline; it is coarser than the catalogue's own slope.`,
+    );
 
   if (!ev.valid) {
     const failing = measured.filter((c) => !c.ok);
@@ -108,7 +131,7 @@ export function explainEvaluation(
   }
   return {
     general,
-    headline: `Score ${Math.round(ev.score * 100)} because:`,
+    headline: `${pendingLabels.length > 0 ? 'Score so far' : 'Score'} ${Math.round(ev.score * 100)} because:`,
     reasons: [
       ...measured.map((c) => {
         const u = util.get(c.key);
