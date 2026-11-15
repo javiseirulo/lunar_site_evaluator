@@ -9,11 +9,12 @@
 import { useCallback, useEffect, useRef, type ReactNode } from 'react';
 import { motion, MotionConfig, useReducedMotion } from 'motion/react';
 import { clsx } from 'clsx';
-import { useAppStore, useData } from '@/core';
+import { useAppStore } from '@/core';
 import { useGameAudio } from '../audio/useGameAudio';
 import { DESCENT_MS, useGame, type Phase } from '../state/gameStore';
 import { AlertScreen } from './AlertScreen';
 import { MENU_BG } from './assets';
+import { ClassEntry } from '../class/ClassEntry';
 import { ExitControl } from './ExitControl';
 import { ApproachScreen, DescentScreen } from './FlightScreens';
 import { GameGlobe } from './GameGlobe';
@@ -29,6 +30,7 @@ import { TimelapseScreen } from './TimelapseScreen';
 import { TimeoutScreen } from './TimeoutScreen';
 import { useDealHand } from './useDealHand';
 import { VerdictScreen } from './VerdictScreen';
+import { useGameSites } from '../historic/useGameSites';
 
 /** Screens that show the in-game exit (X); the menu and end screens have their own buttons. */
 const EXIT_PHASES: readonly Phase[] = [
@@ -79,8 +81,6 @@ export function MissionGame() {
   useEffect(() => {
     const { difficulty, ...config } = parseGameParams(window.location.search);
     useGame.getState().configure(config, difficulty);
-    // ?difficulty= also moves the site-wide Normal | Expert switch (one switch for everything).
-    if (difficulty) useAppStore.getState().setProMode(difficulty === 'expert');
   }, []);
 
   // Leaving the page ends the game: a later visit starts from the menu (fresh deadline, and
@@ -114,20 +114,13 @@ export function MissionGame() {
   // Background globe shot for this phase (numbered, anonymous markers only).
   const cards = useGame((s) => s.hand?.cards);
   const chosenSlot = useGame((s) => s.chosenSlot);
-  const sites = useData((s) => s.sites);
+  const sites = useGameSites();
   const shot = backgroundShot(phase, cards ?? [], chosenSlot, sites);
   const onShotDone = useCallback(() => {
     const g = useGame.getState();
     if (g.phase === 'approach') g.approached();
     else if (g.phase === 'descent') g.landed();
   }, []);
-
-  // One switch for the whole site: Expert mode = the game's expert difficulty.
-  const proMode = useAppStore((s) => s.proMode);
-  const setDifficulty = useGame((s) => s.setDifficulty);
-  useEffect(() => {
-    setDifficulty(proMode ? 'expert' : 'normal');
-  }, [proMode, setDifficulty]);
 
   let screen: ReactNode;
   switch (phase) {
@@ -168,7 +161,7 @@ export function MissionGame() {
       <MissionFx />
       <div
         ref={rootRef}
-        className="mission-root bg-navy-950 text-ink relative flex min-h-[544px] w-full flex-col overflow-hidden font-sans"
+        className="mission-root bg-navy-950 text-ink relative flex min-h-[780px] w-full flex-col overflow-hidden font-sans"
       >
         {shot && (
           <div
@@ -212,9 +205,12 @@ export function MissionGame() {
             phase === 'intro' && 'bg-[#0b0f1a]',
           )}
         >
-          <span className="text-ink-faint min-w-0 truncate font-mono text-[10px] tracking-[0.3em] uppercase">
-            {EXIT_PHASES.includes(phase) ? 'Mission in progress' : ''}
-          </span>
+          <div className="flex min-w-0 items-center gap-2">
+            <span className="text-ink-faint min-w-0 truncate font-mono text-[10px] tracking-[0.3em] uppercase">
+              {EXIT_PHASES.includes(phase) ? 'Mission in progress' : ''}
+            </span>
+            {phase === 'menu' && <ClassEntry />}
+          </div>
           <div className="flex items-center gap-1.5">
             <SoundControls />
             {EXIT_PHASES.includes(phase) && <ExitControl />}

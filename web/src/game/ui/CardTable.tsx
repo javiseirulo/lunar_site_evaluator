@@ -4,12 +4,14 @@
  */
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useReducedMotion } from 'motion/react';
-import { useAppStore, useData } from '@/core';
+import { formatUtc, useAppStore } from '@/core';
 import { sfx } from '../audio/sfx';
 import { useGame } from '../state/gameStore';
 import { handSiteImages } from './assets';
 import { dealTimeline, slotForKey } from './format';
 import { SiteCard } from './SiteCard';
+import { useGameSites } from '../historic/useGameSites';
+import { useMissionRules } from '../state/useMissionRules';
 
 /** Time the pick animation plays before the game moves on. */
 const PICK_MS = 650;
@@ -19,7 +21,13 @@ export function CardTable() {
   const hand = useGame((s) => s.hand);
   const seed = useGame((s) => s.seed);
   const difficulty = useGame((s) => s.difficulty);
-  const sites = useData((s) => s.sites);
+  const sites = useGameSites();
+  const historical = useGame((s) => s.mode === 'historical');
+  const rules = useMissionRules();
+  const light = historical ? rules.landing_light : null;
+  const days = rules.surface_days;
+  const landingSun = useGame((s) => s.hand?.landingSunEl);
+  const lightTime = formatUtc(useGame((s) => s.hand?.landingUtc) ?? '');
   const reduced = useReducedMotion() ?? false;
 
   // Deal animation only if the table mounted while dealing (retry shows cards face-up).
@@ -99,8 +107,23 @@ export function CardTable() {
       </p>
       {phase === 'choosing' && picked === null && (
         <p className="text-ink-muted mx-auto max-w-xl text-center text-[11.5px] leading-snug">
-          Bars show each site&apos;s average over a whole year. Your mission is one 7-day week.
-          Fuller and greener is safer.
+          {light ? (
+            <>
+              Landing time is fixed: {lightTime}. Pilots and landing cameras need the Sun between{' '}
+              {light.min}° and {light.max}° to see the rocks. Bars cover the {days} days after
+              landing.
+            </>
+          ) : historical ? (
+            <>
+              Landing time is fixed: {lightTime}. Bars cover the {days} days after landing. Fuller
+              and greener is safer.
+            </>
+          ) : (
+            <>
+              Bars show each site&apos;s average over a whole year. Your mission is one 7-day week.
+              Fuller and greener is safer.
+            </>
+          )}
         </p>
       )}
       <div ref={gridRef} className="grid grid-cols-2 gap-3 px-1 pt-5 pb-2 md:grid-cols-4">
@@ -116,6 +139,7 @@ export function CardTable() {
             timeline={timeline}
             state={picked === null ? 'idle' : picked === card.slot ? 'picked' : 'dismissed'}
             clickable={choosing}
+            landingSunEl={landingSun?.[card.siteId]}
             onPick={pick}
           />
         ))}

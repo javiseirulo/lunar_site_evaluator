@@ -2,7 +2,7 @@
  * Look-only Street View for other modules (the Mission game's recon screen): the Cesium Moon
  * terrain at `lat`/`lon`, with the real Sun and Earth markers for `timeUtc` (shared `@/ephem`
  * vectors through `observerSky`). No location picker, sharing, access panel, walking or
- * (with `hideLabels`) feature names. It reads the build's token only; without one, or when
+ * (with `hideLabels`) feature names. It uses the same application token as Street View. Without one, or when
  * WebGL / Cesium fails or setup exceeds `timeoutMs`, it calls `onError` once and renders
  * nothing, so the host can show its own fallback. Load it lazily (it pulls in Cesium).
  *
@@ -11,6 +11,7 @@
  */
 import { useEffect, useImperativeHandle, useMemo, useRef, useState, type Ref } from 'react';
 import { useEphem } from '@/ephem';
+import { CESIUM_APPLICATION_TOKEN } from './cesiumAccess';
 import {
   embedInitialView,
   embedSceneOptions,
@@ -101,7 +102,7 @@ export default function StreetViewEmbed({
       setFailed(true);
       latest.current.onError?.(reason);
     };
-    const token = embedToken(import.meta.env.VITE_CESIUM_ION_TOKEN);
+    const token = embedToken(CESIUM_APPLICATION_TOKEN);
     if (!token) {
       fail('no-token');
       return;
@@ -137,7 +138,7 @@ export default function StreetViewEmbed({
         view: (state) => latest.current.onView?.(state),
       },
       embedInitialView(h),
-      embedSceneOptions(hide, mode),
+      { ...embedSceneOptions(hide, mode), detail: 'preview' },
     )
       .then((instance) => {
         window.clearTimeout(timer);

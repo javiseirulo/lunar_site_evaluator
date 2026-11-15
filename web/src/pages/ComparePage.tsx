@@ -6,15 +6,12 @@
 import { useMemo } from 'react';
 import { Navigate, useSearchParams } from 'react-router';
 import type { Site } from '@lunar/contracts';
-import { cn } from '@/lib/utils';
 import {
   EARTH_BAND,
-  Hint,
   METRICS,
   friendlyHours,
   SUN_BAND,
   formatHours,
-  formatLatLon,
   changeLead,
   changeWhen,
   nextChange,
@@ -27,47 +24,62 @@ import {
   windowsGradient,
 } from '@/core';
 import { TimeBar } from '@/core/shell/TimeBar';
-import { scoreColor } from '@/layers';
+import { choiceGroups } from '@/core/siteChoices';
+import { SiteMoon } from './CompareMoons';
 
-type Better = 'high' | 'low' | null;
-interface Row {
-  label: string;
-  value: (s: Site) => number;
-  fmt: (s: Site) => string;
-  better: Better;
-  tone?: string;
-  help?: string;
+/** Great-circle separation, in degrees. Neighbours at the south pole are only a couple of degrees apart. */
+function angularSepDeg(a: Site, b: Site): number {
+  const dLat = ((b.lat - a.lat) * Math.PI) / 180;
+  const dLon = ((b.lon - a.lon) * Math.PI) / 180;
+  const lat1 = (a.lat * Math.PI) / 180;
+  const lat2 = (b.lat * Math.PI) / 180;
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) ** 2;
+  return (2 * Math.asin(Math.min(1, Math.sqrt(h))) * 180) / Math.PI;
 }
 
-/** Score + the shared metric definitions (plain names for students, technical in Pro mode). */
-function buildRows(pro: boolean): Row[] {
-  return [
-    {
-      label: 'Score',
-      value: (s) => s.score,
-      fmt: (s) => String(Math.round(s.score * 100)),
-      better: 'high',
-      help: 'Overall rating from 0 to 100 using the default weights.',
-    },
-    ...METRICS.map((m) => ({
-      label: pro ? m.proLabel : m.label,
-      value: (s: Site) => s.metrics[m.key],
-      fmt: (s: Site) => m.format(s.metrics, pro),
-      better: m.better,
-      tone: m.tone,
-      help: m.help,
-    })),
-    ...(pro
-      ? [
-          {
-            label: 'Elevation',
-            value: (s: Site) => s.elev_m,
-            fmt: (s: Site) => `${s.elev_m.toLocaleString('en')} m`,
-            better: null,
-          } as Row,
-        ]
-      : []),
-  ];
+function shuffle<T>(items: T[]): T[] {
+  const out = [...items];
+  for (let i = out.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    const swap = out[i]!;
+    out[i] = out[j]!;
+    out[j] = swap;
+  }
+  return out;
+}
+
+/**
+ * Three sites you can tell apart: one from each region when possible, and never two
+ * that sit within 25° of each other. The highest-scoring defaults are all on the same rim.
+ */
+function randomSpread(sites: Site[], count = 3): Site[] {
+  const minSep = 25;
+  const byRegion = new Map<string, Site[]>();
+  for (const site of sites) {
+    const key = site.region ?? 'other';
+    const list = byRegion.get(key);
+    if (list) list.push(site);
+    else byRegion.set(key, [site]);
+  }
+  const picked: Site[] = [];
+  const farEnough = (site: Site) => picked.every((chosen) => angularSepDeg(site, chosen) >= minSep);
+  for (const region of shuffle([...byRegion.keys()])) {
+    if (picked.length >= count) break;
+    const choice = shuffle(byRegion.get(region)!).find(farEnough);
+    if (choice) picked.push(choice);
+  }
+  if (picked.length < count) {
+    const rest = shuffle(sites).filter((site) => !picked.some((chosen) => chosen.id === site.id));
+    rest.sort((a, b) => {
+      const away = (site: Site) => Math.min(...picked.map((chosen) => angularSepDeg(site, chosen)));
+      return away(b) - away(a);
+    });
+    for (const site of rest) {
+      if (picked.length >= count) break;
+      if (farEnough(site)) picked.push(site);
+    }
+  }
+  return picked.slice(0, count);
 }
 
 /** Compare exists only in Expert mode: in Normal the route quietly goes back to Explore. */
@@ -79,8 +91,6 @@ export default function ComparePage() {
 function CompareView() {
   const sites = useData((s) => s.sites);
   const selectedSiteId = useAppStore((s) => s.selectedSiteId);
-  const proMode = useAppStore((s) => s.proMode);
-  const rows = useMemo(() => buildRows(proMode), [proMode]);
   const [params, setParams] = useSearchParams();
 
   const ids = useMemo(() => {
@@ -94,9 +104,10 @@ function CompareView() {
     return [...new Set([selectedSiteId, ...ranked].filter((x): x is string => !!x))].slice(0, 3);
   }, [params, sites, selectedSiteId]);
 
+  const groups = useMemo(() => choiceGroups(sites ?? []), [sites]);
+
   if (!sites) return null;
   const chosen = ids.flatMap((id) => sites.find((s) => s.id === id) ?? []);
-  const sorted = [...sites].sort((a, b) => a.name.localeCompare(b.name));
 
   const setSlot = (slot: number, id: string) => {
     const next = [...ids];
@@ -105,35 +116,41 @@ function CompareView() {
     setParams({ ids: [...new Set(next.filter(Boolean))].join(',') }, { replace: true });
   };
 
-  const best = (row: Row) => {
-    if (!row.better || chosen.length < 2) return null;
-    const values = chosen.map(row.value);
-    const target = row.better === 'high' ? Math.max(...values) : Math.min(...values);
-    return values.filter((v) => v === target).length === values.length ? null : target;
-  };
-
   return (
-    <div className="flex flex-col gap-3">
-      <section className="box">
-        <div className="box-head">Compare Sites</div>
-        <div className="box-body">
-          <p className="text-ink-muted mb-3 max-w-[75ch]">
-            A mission slips and you need an alternative nearby? Put up to three sites side by side.
-            The best value in each row gets a <b className="text-accent">★</b>. Drag the Mission
-            Clock below to see which site has the Sun and Earth up at any moment.
-          </p>
-          <div className="mb-4 flex flex-wrap gap-3">
-            {[0, 1, 2].map((slot) => (
-              <label key={slot} className="flex items-center gap-1.5">
-                <span className="label">Site {slot + 1}</span>
-                <select
-                  className="field w-48"
-                  value={ids[slot] ?? ''}
-                  onChange={(e) => setSlot(slot, e.target.value)}
-                  disabled={slot > ids.length}
-                >
-                  <option value="">{slot < 2 ? 'Choose…' : '— none —'}</option>
-                  {sorted.map((s) => (
+    <div className="border-edge-hi flex h-full min-h-0 flex-1 flex-col gap-2 overflow-hidden border-2 p-2">
+      <div className="flex shrink-0 flex-wrap items-center gap-x-3 gap-y-2">
+        <h1 className="font-mono text-[13px] font-bold tracking-[0.12em] text-heading uppercase">
+          Compare
+        </h1>
+        <button
+          type="button"
+          className="btn"
+          onClick={() =>
+            setParams(
+              {
+                ids: randomSpread(sites)
+                  .map((site) => site.id)
+                  .join(','),
+              },
+              { replace: true },
+            )
+          }
+        >
+          Randomize
+        </button>
+        {[0, 1, 2].map((slot) => (
+          <label key={slot} className="flex items-center gap-1.5">
+            <span className="label">Site {slot + 1}</span>
+            <select
+              className="field w-44"
+              value={ids[slot] ?? ''}
+              onChange={(e) => setSlot(slot, e.target.value)}
+              disabled={slot > ids.length}
+            >
+              <option value="">{slot < 2 ? 'Choose…' : '— none —'}</option>
+              {groups.map((group) => (
+                <optgroup key={group.label} label={group.label}>
+                  {group.sites.map((s) => (
                     <option
                       key={s.id}
                       value={s.id}
@@ -142,101 +159,31 @@ function CompareView() {
                       {s.name}
                     </option>
                   ))}
-                </select>
-              </label>
-            ))}
-          </div>
-
-          {chosen.length > 0 && (
-            <div className="overflow-x-auto overscroll-x-contain">
-              <table className="border-edge w-full min-w-[560px] border-collapse border text-[12px]">
-                <thead>
-                  <tr className="bg-navy-700">
-                    <th className="sticky left-0 z-10 w-40 bg-navy-700 px-3 py-2" />
-                    {chosen.map((s) => (
-                      <th key={s.id} className="px-3 py-2 text-left">
-                        <span className="block text-[14px] text-heading font-medium">{s.name}</span>
-                        <span className="text-ink-faint num block text-[10px] font-normal">
-                          {formatLatLon(s.lat, s.lon)}
-                        </span>
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {rows.map((row, i) => {
-                    const target = best(row);
-                    return (
-                      <tr
-                        key={row.label}
-                        className={cn(
-                          'border-edge border-t',
-                          i % 2 ? 'bg-navy-850' : 'bg-navy-900',
-                        )}
-                      >
-                        <th
-                          className={cn(
-                            'sticky left-0 z-10 px-3 py-2 text-left font-normal text-ink-muted',
-                            i % 2 ? 'bg-navy-850' : 'bg-navy-900',
-                          )}
-                        >
-                          <span className="inline-flex items-center gap-1.5">
-                            {row.label}
-                            {row.help && <Hint text={row.help} />}
-                          </span>
-                        </th>
-                        {chosen.map((s) => {
-                          const isBest = target !== null && row.value(s) === target;
-                          return (
-                            <td
-                              key={s.id}
-                              className={cn('num px-3 py-2', row.tone, isBest && 'font-bold')}
-                            >
-                              {row.label === 'Score' ? (
-                                <span
-                                  className="inline-block min-w-8 border border-black px-1 text-center font-bold text-black"
-                                  style={{ background: scoreColor(s.score) }}
-                                >
-                                  {row.fmt(s)}
-                                </span>
-                              ) : (
-                                row.fmt(s)
-                              )}
-                              {isBest && <span className="text-accent ml-1">★</span>}
-                            </td>
-                          );
-                        })}
-                      </tr>
-                    );
-                  })}
-                  <tr className="border-edge border-t">
-                    <th className="text-ink-muted px-3 py-2 text-left font-normal">Hard filters</th>
-                    {chosen.map((s) => (
-                      <td
-                        key={s.id}
-                        className={cn('px-3 py-2 font-bold', s.valid ? 'text-good' : 'text-bad')}
-                      >
-                        {s.valid ? '✔ Pass' : '✖ Fail'}
-                      </td>
-                    ))}
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
-      </section>
+                </optgroup>
+              ))}
+            </select>
+          </label>
+        ))}
+      </div>
 
       {chosen.length > 0 && (
-        <section className="box">
-          <div className="box-head">
-            Sunlight &amp; Earth Windows
-            <span className="ml-auto font-sans font-normal">
+        <div className="grid min-h-0 flex-1 grid-cols-1 gap-2 md:grid-cols-3">
+          {chosen.map((site, index) => (
+            <SiteColumn key={index} site={site} />
+          ))}
+        </div>
+      )}
+
+      {chosen.length > 0 && (
+        <section className="box shrink-0">
+          <div className="text-heading flex items-center gap-2 px-3 pt-1.5 pb-0.5 font-mono text-[11px] tracking-[0.12em] uppercase">
+            Sunlight &amp; Earth
+            <span className="text-ink-muted ml-auto font-sans text-[10px] font-normal tracking-normal normal-case">
               <span className="text-sun">■</span> sunlit, <span className="text-earth">■</span>{' '}
               Earth in view
             </span>
           </div>
-          <div className="box-body space-y-3">
+          <div className="space-y-0.5 px-3 pb-1.5">
             {chosen.map((s) => (
               <TimelineRow key={s.id} site={s} />
             ))}
@@ -244,8 +191,78 @@ function CompareView() {
         </section>
       )}
 
-      <TimeBar />
+      <TimeBar compact className="shrink-0" />
     </div>
+  );
+}
+
+function SiteColumn({ site }: { site: Site }) {
+  const pro = useAppStore((s) => s.proMode);
+  const ts = useTimeseries(site.id);
+  const now = useAppStore((s) => s.currentTimeUTC);
+  const sample = ts ? sampleAt(ts, now) : null;
+  const sunEl = sample ? sample.sun_el : 2;
+  const bars = [
+    {
+      label: 'Score',
+      value: Math.round(site.score * 100),
+      text: String(Math.round(site.score * 100)),
+    },
+    ...METRICS.flatMap((m) => {
+      const goodness = m.goodness(site.metrics);
+      if (goodness === null) return [];
+      return [
+        {
+          label: pro ? m.proLabel : m.label,
+          value: Math.round(goodness * 100),
+          text: m.format(site.metrics, pro),
+        },
+      ];
+    }),
+  ];
+
+  return (
+    <article className="border-edge-hi flex min-h-0 flex-col gap-2 border-2 bg-black p-2">
+      <div className="relative min-h-[140px] flex-1">
+        <SiteMoon lat={site.lat} lon={site.lon} sunEl={sunEl} label={site.name} />
+      </div>
+      <div>
+        <h3 className="truncate text-[14px] font-medium text-heading">{site.name}</h3>
+        <p className="text-ink-muted text-[12px]">
+          {sample ? (
+            <>
+              <span className="text-sun">{sample.lit ? 'Sun up' : 'Sun down'}</span>
+              {' · '}
+              <span className="text-earth">
+                {sample.earthVisible === null
+                  ? 'Earth unknown'
+                  : sample.earthVisible
+                    ? 'Earth in view'
+                    : 'Earth hidden'}
+              </span>
+            </>
+          ) : (
+            'Loading the sky…'
+          )}
+        </p>
+      </div>
+      <ul className="grid shrink-0 grid-cols-2 gap-x-3 gap-y-1">
+        {bars.map((bar) => (
+          <li key={bar.label}>
+            <div className="text-ink-muted flex items-baseline justify-between gap-2 text-[10px]">
+              <span>{bar.label}</span>
+              <span className="num text-ink">{bar.text}</span>
+            </div>
+            <div className="bg-navy-950 h-1" aria-hidden>
+              <div
+                className="bg-sun h-full"
+                style={{ width: `${Math.min(100, Math.max(0, bar.value))}%` }}
+              />
+            </div>
+          </li>
+        ))}
+      </ul>
+    </article>
   );
 }
 
@@ -271,18 +288,18 @@ function TimelineRow({ site }: { site: Site }) {
     changeWhen(n, span, (h) => (proMode ? formatHours(h) : friendlyHours(h)));
 
   return (
-    <div className="grid items-center gap-x-3 gap-y-1 sm:grid-cols-[150px_minmax(0,1fr)_210px]">
-      <span className="font-bold text-heading">{site.name}</span>
-      <div className="border-edge-lo bg-navy-950 relative border p-[3px]">
-        <div className="h-[8px]" style={{ background: sun ?? 'transparent' }} />
-        <div className="mt-px h-[8px]" style={{ background: earth ?? 'transparent' }} />
+    <div className="grid items-center gap-x-2 sm:grid-cols-[9rem_minmax(0,1fr)_minmax(0,14rem)]">
+      <span className="truncate text-[11px] font-medium text-heading">{site.name}</span>
+      <div className="border-edge-lo bg-navy-950 relative border p-px">
+        <div className="h-[4px]" style={{ background: sun ?? 'transparent' }} />
+        <div className="mt-px h-[4px]" style={{ background: earth ?? 'transparent' }} />
         <div
           className="bg-accent absolute top-0 bottom-0 w-px"
           style={{ left: `calc(3px + ${pos} * (100% - 6px))` }}
           aria-hidden
         />
       </div>
-      <span className="text-ink-muted text-[11px]">
+      <span className="text-ink-muted truncate text-[10px]">
         {sample ? (
           <>
             <span className="text-sun">{changeLead(sample.lit ? 'Sunset' : 'Sunrise', toSun)}</span>{' '}

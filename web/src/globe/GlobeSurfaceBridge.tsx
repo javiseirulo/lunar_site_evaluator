@@ -64,16 +64,18 @@ export function AstronautControl({
   apiRef,
   armed,
   onArmed,
+  className,
 }: {
   apiRef: RefObject<SurfaceBridgeApi | null>;
   armed: boolean;
   onArmed: (armed: boolean) => void;
+  className?: string;
 }) {
   const start = useRef<{ x: number; y: number } | null>(null);
   const [ghost, setGhost] = useState<{ x: number; y: number } | null>(null);
   const [hint, setHint] = useState('Drag the astronaut onto the Moon.');
   return (
-    <div className="globe-surface-control">
+    <div className={className ? `globe-surface-control ${className}` : 'globe-surface-control'}>
       {ghost && (
         <img
           className="astronaut-ghost"

@@ -15,7 +15,7 @@ export function faultsFor(fx: CockpitFx): {
     power: fx === 'cold' || fx === 'low_sun',
     temp: fx === 'cold',
     link: fx === 'blackout' || fx === 'low_comm',
-    tilt: fx === 'slope',
+    tilt: fx === 'slope' || fx === 'dark_landing' || fx === 'glare_landing',
     minimum: fx === 'low_sun' ? 'power' : fx === 'low_comm' ? 'link' : null,
   };
 }

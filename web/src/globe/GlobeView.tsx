@@ -19,9 +19,11 @@ export interface GlobeViewProps {
   cinematic?: CinematicView;
   /** Cinematic mode only: called once when the current shot finishes (never for `spin`). */
   onShotDone?: () => void;
+  /** Explore draws Layers and coordinates in its own panel. */
+  hideChrome?: boolean;
 }
 
-export function GlobeView({ cinematic, onShotDone }: GlobeViewProps = {}) {
+export function GlobeView({ cinematic, onShotDone, hideChrome }: GlobeViewProps = {}) {
   if (cinematic) {
     return (
       // No loading text: the caller shows its own backdrop until the canvas paints.
@@ -41,7 +43,7 @@ export function GlobeView({ cinematic, onShotDone }: GlobeViewProps = {}) {
         </div>
       }
     >
-      <GlobeCanvas />
+      <GlobeCanvas hideChrome={hideChrome} />
     </Suspense>
   );
 }

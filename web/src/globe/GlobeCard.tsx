@@ -10,6 +10,7 @@ import type { CustomPin } from './customPins';
 import { coordsForClipboard } from './geo';
 import { KIND_LABELS, OUTCOME_COLORS, OUTCOME_LABELS } from './historicSites';
 import { PAPER } from './paper';
+import { PointStatsView } from './PointStatsView';
 
 export type CardContent =
   /** rank: 1–5 in the top five; summary: "Meets X of Y requirements"; note: first unmet check. */
@@ -142,6 +143,7 @@ export function GlobeCard({
             </button>
           </>
         )}
+        {content.kind === 'point' && <PointStatsView point={content} />}
         {content.kind === 'point' && (
           <button
             type="button"

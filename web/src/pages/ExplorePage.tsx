@@ -1,9 +1,13 @@
-import { Component, type ReactNode } from 'react';
+import { Component, useState, type ReactNode } from 'react';
 import { useAppStore } from '@/core';
 import { TimeBar } from '@/core/shell/TimeBar';
 import { SimChart } from '@/core/shell/SimChart';
 import { PolarMap } from '@/layers';
 import { GlobeView, SiteDetail, SiteList } from '@/globe';
+import { LayersMenu } from '@/globe/LayersMenu';
+import { PatchControls } from '@/globe/PatchControls';
+import { PinForm } from '@/globe/PinForm';
+import { submitExplorePin } from '@/globe/exploreBridge';
 import { MissionTimingPanel, SiteCheckPanel } from '@/scoring';
 import { SimpleSiteList } from './explore/SimpleSiteList';
 import { EndSimulationDialog } from './explore/EndSimulationDialog';
@@ -37,77 +41,179 @@ class GlobeBoundary extends Component<
   }
 }
 
-/** Normal mode before Simulate: the verdict box with its title and one faint line, nothing else. */
+/** Normal mode, once a site is chosen and before Simulate: one line under the site card. */
 function SimulateHint() {
   return (
-    <section className="box" aria-label="Site check">
-      <div className="box-head">Does it work for the mission?</div>
-      <p className="box-body text-ink-faint text-[13px]">
+    <section className="border-edge-hi border-t-2 px-5 py-3" aria-label="Site check">
+      <h2 className="font-mono text-[13px] font-bold tracking-[0.12em] text-heading uppercase">
+        Does it work for the mission?
+      </h2>
+      <p className="text-ink-faint mt-1 text-[13px]">
         Press Simulate to check if it works for the mission
       </p>
     </section>
   );
 }
 
-export default function ExplorePage() {
+const FRAME = 'border-edge-hi border-2 bg-panel shadow-[4px_4px_0_#000]';
+const FLAT = 'border-0 bg-transparent shadow-none';
+
+type LeftTab = 'needs' | 'window' | 'sites' | 'map';
+type RightTab = 'now' | 'sun' | 'check';
+
+function Pages<T extends string>({
+  options,
+  value,
+  onChange,
+}: {
+  options: { id: T; label: string }[];
+  value: T;
+  onChange: (id: T) => void;
+}) {
+  return (
+    <div className="border-edge-hi flex shrink-0 border-b-2" role="tablist">
+      {options.map((option) => (
+        <button
+          key={option.id}
+          type="button"
+          role="tab"
+          aria-selected={value === option.id}
+          className={
+            value === option.id
+              ? 'bg-warn h-8 flex-1 font-mono text-[10px] font-bold tracking-[0.08em] text-black uppercase'
+              : 'h-8 flex-1 font-mono text-[10px] font-bold tracking-[0.08em] text-[#9fb2d0] uppercase hover:text-white'
+          }
+          onClick={() => onChange(option.id)}
+        >
+          {option.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function MapPage() {
+  const proMode = useAppStore((s) => s.proMode);
+  return (
+    <div className="flex h-full min-h-0 flex-col gap-2 overflow-hidden px-2 py-2">
+      <PinForm
+        embedded
+        title={proMode ? 'Pin by coordinates' : 'Go to coordinates'}
+        submitLabel={proMode ? 'Add pin' : 'Go there'}
+        onAdd={submitExplorePin}
+      />
+      <div className="border-edge-hi min-h-0 flex-1 overflow-y-auto border-t-2 pt-2">
+        <LayersMenu embedded hasSun expert={proMode} />
+      </div>
+      <PatchControls />
+    </div>
+  );
+}
+
+function LeftPanel() {
+  const proMode = useAppStore((s) => s.proMode);
+  const [tab, setTab] = useState<LeftTab>(proMode ? 'needs' : 'sites');
+  const shown: LeftTab = !proMode && (tab === 'needs' || tab === 'window') ? 'sites' : tab;
+
+  const options: { id: LeftTab; label: string }[] = proMode
+    ? [
+        { id: 'needs', label: 'Needs' },
+        { id: 'window', label: 'Window' },
+        { id: 'sites', label: 'Sites' },
+        { id: 'map', label: 'Map' },
+      ]
+    : [
+        { id: 'sites', label: 'Sites' },
+        { id: 'map', label: 'Map' },
+      ];
+
+  return (
+    <aside
+      className={`${FRAME} pointer-events-auto flex max-h-[62%] min-h-0 w-full flex-col self-start overflow-hidden`}
+    >
+      <Pages options={options} value={shown} onChange={setTab} />
+      <div className="min-h-0 flex-1 overflow-hidden">
+        {shown === 'needs' && (
+          <SiteList part="requirements" className={`${FLAT} h-full overflow-y-auto`} />
+        )}
+        {shown === 'window' && (
+          <div className="h-full overflow-y-auto">
+            <MissionTimingPanel className={FLAT} />
+          </div>
+        )}
+        {shown === 'sites' &&
+          (proMode ? (
+            <SiteList part="sites" className={`${FLAT} h-full`} />
+          ) : (
+            <SimpleSiteList className={`${FLAT} h-full`} />
+          ))}
+        {shown === 'map' && <MapPage />}
+      </div>
+    </aside>
+  );
+}
+
+function RightPanel() {
   const proMode = useAppStore((s) => s.proMode);
   const simulationStarted = useAppStore((s) => s.simulationStarted);
+  const selectedSiteId = useAppStore((s) => s.selectedSiteId);
+  const selectedPoint = useAppStore((s) => s.selectedPoint);
+  const hasSubject = Boolean(selectedSiteId || selectedPoint);
+  const [tab, setTab] = useState<RightTab>('now');
+
+  const options: { id: RightTab; label: string }[] = [
+    { id: 'now', label: 'Now' },
+    ...(hasSubject ? [{ id: 'sun' as const, label: 'Sun' }] : []),
+    ...(hasSubject
+      ? [{ id: 'check' as const, label: proMode || simulationStarted ? 'Check' : 'Mission' }]
+      : []),
+  ];
+  const shown: RightTab = options.some((o) => o.id === tab) ? tab : 'now';
+
+  return (
+    <aside
+      className={`${FRAME} pointer-events-auto flex max-h-[62%] min-h-0 w-full flex-col self-start overflow-hidden md:col-start-3`}
+    >
+      <Pages options={options} value={shown} onChange={setTab} />
+      <div className="min-h-0 flex-1 overflow-y-auto">
+        {shown === 'now' && <SiteDetail className={`${FLAT} h-full`} />}
+        {shown === 'sun' && <SimChart className={`${FLAT} h-full`} />}
+        {shown === 'check' &&
+          hasSubject &&
+          (proMode || simulationStarted ? (
+            <SiteCheckPanel simple={!proMode} className={`${FLAT} h-full`} />
+          ) : (
+            <SimulateHint />
+          ))}
+      </div>
+    </aside>
+  );
+}
+
+export default function ExplorePage() {
+  const proMode = useAppStore((s) => s.proMode);
 
   return (
     <>
       <EndSimulationDialog />
-      <div
-        className={
-          proMode
-            ? 'grid grid-cols-1 gap-4 md:grid-cols-[250px_minmax(0,1fr)] lg:grid-cols-[250px_minmax(0,1fr)_270px]'
-            : 'grid grid-cols-1 gap-4 md:grid-cols-[minmax(0,1fr)_300px] lg:grid-cols-[240px_minmax(0,1fr)_300px]'
-        }
-      >
-        {/* Left: sites */}
-        <aside
-          className={
-            proMode
-              ? 'order-3 flex flex-col gap-4 md:order-1'
-              : 'order-3 flex flex-col gap-4 md:order-3 md:col-span-2 lg:order-1 lg:col-span-1'
-          }
-        >
-          {proMode ? <SiteList /> : <SimpleSiteList />}
-        </aside>
+      <div className="border-edge-hi relative min-h-0 flex-1 overflow-hidden border-2 bg-black">
+        <div className="absolute inset-0">
+          {WEBGL ? (
+            <GlobeBoundary fallback={<PolarMap className="size-full" neutral={!proMode} />}>
+              <GlobeView hideChrome />
+            </GlobeBoundary>
+          ) : (
+            <PolarMap className="size-full" neutral={!proMode} />
+          )}
+        </div>
 
-        {/* Centre: map + clock */}
-        <section className="order-1 flex min-w-0 flex-col gap-4 md:order-2">
-          <div className="box overflow-hidden">
-            <div className="space relative p-4">
-              <div className="mx-auto aspect-square w-full max-w-[560px]">
-                {/* Without WebGL (old devices, locked-down browsers) fall back to the flat polar map. */}
-                {WEBGL ? (
-                  <GlobeBoundary fallback={<PolarMap className="size-full" neutral={!proMode} />}>
-                    <GlobeView />
-                  </GlobeBoundary>
-                ) : (
-                  <PolarMap className="size-full" neutral={!proMode} />
-                )}
-              </div>
-            </div>
-            {proMode && (
-              <p className="space text-ink-muted border-edge border-t px-4 py-2 text-[12px]">
-                Drag to rotate, scroll to zoom. Markers are candidate sites coloured by score; dim =
-                fails a hard filter.
-              </p>
-            )}
+        <div className="pointer-events-none absolute inset-0 grid grid-cols-1 grid-rows-[minmax(0,1fr)_auto] gap-3 p-3 md:grid-cols-[minmax(200px,20%)_minmax(0,1fr)_minmax(210px,22%)]">
+          <LeftPanel />
+          <RightPanel />
+          <div className="pointer-events-auto self-end md:col-start-2 md:row-start-2">
+            <TimeBar />
           </div>
-          {proMode && <MissionTimingPanel />}
-          <TimeBar />
-        </section>
-
-        {/* Right: site card (+ validity check in Expert) */}
-        <aside className="order-2 flex flex-col gap-4 md:order-3 lg:col-span-1">
-          <SiteDetail />
-          <SimChart />
-          {/* Validity for the current mission window (Javi, @/scoring; docs/10 J6–J7). */}
-          {/* Normal: the verdict appears only once Simulate was pressed for this selection. */}
-          {proMode || simulationStarted ? <SiteCheckPanel simple={!proMode} /> : <SimulateHint />}
-        </aside>
+        </div>
       </div>
     </>
   );

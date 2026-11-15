@@ -125,7 +125,16 @@ function RasterRow({
   );
 }
 
-export function LayersMenu({ hasSun, expert }: { hasSun: boolean; expert: boolean }) {
+export function LayersMenu({
+  hasSun,
+  expert,
+  embedded = false,
+}: {
+  hasSun: boolean;
+  expert: boolean;
+  /** Show the layer list in place, for the Explore map page. */
+  embedded?: boolean;
+}) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const manifest = useData((s) => s.layers);
@@ -168,6 +177,47 @@ export function LayersMenu({ hasSun, expert }: { hasSun: boolean; expert: boolea
     />
   );
 
+  const list = (
+    <ul className="space-y-0.5">
+      {global.map(renderRaster)}
+      <Row label="Day / night" on={nightOn} onToggle={() => setNightOn(!nightOn)}>
+        <NightDetails hasSun={hasSun} />
+      </Row>
+      <Row
+        label="Past landings"
+        on={historic.on}
+        onToggle={historic.toggle}
+        disabled={historic.busy}
+        hint={
+          historic.unavailable
+            ? 'unavailable · retry'
+            : historic.status === 'loading'
+              ? 'loading…'
+              : undefined
+        }
+      >
+        <HistoricDetails />
+      </Row>
+      {polar.length > 0 && (
+        <li className="border-edge mt-2 border-t pt-2" aria-hidden>
+          <p className="text-ink-muted text-[11px]">
+            Only visible near the south pole (below 80°S), zoom in to see them:
+          </p>
+        </li>
+      )}
+      {polar.map(renderRaster)}
+    </ul>
+  );
+
+  if (embedded) {
+    return (
+      <div role="group" aria-label="Map layers">
+        <p className="text-heading px-1 pb-1 text-[14px] font-medium">Layers</p>
+        {list}
+      </div>
+    );
+  }
+
   return (
     <div ref={ref} className="relative" style={PAPER}>
       <button
@@ -205,35 +255,7 @@ export function LayersMenu({ hasSun, expert }: { hasSun: boolean; expert: boolea
           role="group"
           aria-label="Map layers"
         >
-          <ul className="space-y-0.5">
-            {global.map(renderRaster)}
-            <Row label="Day / night" on={nightOn} onToggle={() => setNightOn(!nightOn)}>
-              <NightDetails hasSun={hasSun} />
-            </Row>
-            <Row
-              label="Past landings"
-              on={historic.on}
-              onToggle={historic.toggle}
-              disabled={historic.busy}
-              hint={
-                historic.unavailable
-                  ? 'unavailable · retry'
-                  : historic.status === 'loading'
-                    ? 'loading…'
-                    : undefined
-              }
-            >
-              <HistoricDetails />
-            </Row>
-            {polar.length > 0 && (
-              <li className="border-edge mt-2 border-t pt-2" aria-hidden>
-                <p className="text-ink-muted text-[11px]">
-                  Only visible near the south pole (below 80°S), zoom in to see them:
-                </p>
-              </li>
-            )}
-            {polar.map(renderRaster)}
-          </ul>
+          {list}
         </div>
       )}
     </div>

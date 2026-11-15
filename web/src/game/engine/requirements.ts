@@ -12,6 +12,14 @@ export interface MissionRequirements {
   illum_pct: Criterion;
   antenna_margin_deg: number;
   surface_days: number;
+  /**
+   * Historical mode: allowed Sun elevation (degrees) at touchdown. Too low and the pilot (or the
+   * cameras) cannot see the ground; too high and there are no shadows to show the rocks.
+   * Absent / null: no landing-light rule (South Pole mode, radar-era landers).
+   */
+  landing_light?: { min: number; max: number } | null;
+  /** Far side missions: the Earth link goes through a relay satellite, so it is always up. */
+  relay?: boolean;
 }
 
 export const DEFAULT_REQUIREMENTS: MissionRequirements = {
