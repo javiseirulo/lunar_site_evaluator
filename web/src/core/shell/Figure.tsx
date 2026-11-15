@@ -14,8 +14,8 @@ export function Figure({
 }) {
   return (
     <figure className={className}>
-      <img src={src} alt={alt} className="block w-full bg-black" />
-      <figcaption className="text-ink-faint px-2 py-1.5 text-[11px] leading-snug">
+      <img src={src} alt={alt} className="block max-h-72 w-full bg-black object-contain" />
+      <figcaption className="text-ink-muted px-2 py-2 text-[13px] leading-snug">
         {children}
       </figcaption>
     </figure>

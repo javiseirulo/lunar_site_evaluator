@@ -2,6 +2,7 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { dataUrl, formatUtc, useAppStore } from '@/core';
+import { choiceGroups } from '@/core/siteChoices';
 import { CESIUM_APPLICATION_TOKEN } from './cesiumAccess';
 import { useEphem, useHorizon } from '@/ephem';
 import { observerSky, type TerrainSite } from './sky';
@@ -145,10 +146,14 @@ function ObserverView({ siteId }: { siteId: string }) {
                 Custom location
               </option>
             )}
-            {catalog.sites.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.name}
-              </option>
+            {choiceGroups(catalog.sites).map((group) => (
+              <optgroup key={group.label} label={group.label}>
+                {group.sites.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.name}
+                  </option>
+                ))}
+              </optgroup>
             ))}
           </select>
         </label>

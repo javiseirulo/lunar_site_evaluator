@@ -16,6 +16,8 @@ export interface TerrainSite extends Observer {
   elevation_source: string;
   psr_dist_km: number | null;
   horizon_file: string | null;
+  region?: string;
+  group?: string;
 }
 export interface ViewerSky extends SkySample, Sky {
   sunFraction: number;

@@ -24,7 +24,7 @@ export function SimpleSiteList({ className }: { className?: string }) {
       <p className="text-ink-muted px-5 pb-2 text-[12px]">
         Select a site to learn whether it works for the mission
       </p>
-      <ul className="max-h-[420px] overflow-y-auto px-2 pb-3">
+      <ul className="min-h-0 flex-1 overflow-y-auto px-2 pb-3">
         {sorted.map((s) => {
           const selected = s.id === selectedSiteId;
           return (

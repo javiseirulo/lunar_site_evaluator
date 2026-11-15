@@ -39,7 +39,7 @@ function H({ id, children }: { id: string; children: React.ReactNode }) {
   return (
     <h2
       id={id}
-      className="border-edge mb-1.5 scroll-mt-4 border-b pb-0.5 text-[14px] font-bold text-heading"
+      className="border-edge mb-2 scroll-mt-4 border-b pb-1 text-[18px] font-bold text-heading"
     >
       {children}
     </h2>
@@ -67,8 +67,16 @@ function Beside({
   return (
     <section>
       <H id={id}>{title}</H>
-      <div className="mt-2 grid items-center gap-4 md:grid-cols-2">
-        <div className={imageFirst ? 'md:order-2' : undefined}>{children}</div>
+      <div
+        className={`mt-3 grid items-start gap-x-8 gap-y-4 ${
+          imageFirst
+            ? 'md:grid-cols-[minmax(200px,0.72fr)_minmax(0,1.4fr)]'
+            : 'md:grid-cols-[minmax(0,1.4fr)_minmax(200px,0.72fr)]'
+        }`}
+      >
+        <div className={`text-ink text-[16px] leading-[1.65] ${imageFirst ? 'md:order-2' : ''}`}>
+          {children}
+        </div>
         <Figure
           src={src}
           alt={alt}
@@ -106,8 +114,8 @@ export default function LearnPage() {
 
       <article className="box">
         <div className="box-head">Light and line of sight at the lunar south pole</div>
-        <div className="box-body space-y-8">
-          <p className="text-ink-muted text-[13px]">
+        <div className="box-body space-y-10 text-[16px] leading-[1.65]">
+          <p className="text-ink">
             Two questions decide whether a landing site near the lunar south pole can work: will the
             lander have <b className="text-sun">sunlight</b> for power, and will it be able to{' '}
             <b className="text-earth">see Earth</b> to talk to mission control? Both depend on the
@@ -209,7 +217,7 @@ export default function LearnPage() {
 
           <section>
             <H id="use">Using this site</H>
-            <ul className="text-ink-muted list-[square] space-y-1 pl-5">
+            <ul className="text-ink list-[square] space-y-2 pl-5">
               <li>
                 <Link to="/explore" className="lnk">
                   Explore
@@ -247,7 +255,7 @@ export default function LearnPage() {
 
           <section>
             <H id="glossary">Glossary</H>
-            <table className="border-edge w-full border-collapse border text-[12px]">
+            <table className="border-edge w-full border-collapse border text-[15px]">
               <tbody>
                 {GLOSSARY.map(([term, def], i) => (
                   <tr key={term} className={i % 2 ? 'bg-navy-850' : 'bg-navy-900'}>
