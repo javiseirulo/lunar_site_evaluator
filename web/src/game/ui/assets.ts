@@ -12,6 +12,8 @@ export const MENU_BG = gameAsset('menu-bg.png');
 export const MODE_SOUTH_POLE = gameAsset('mode-south-pole.png');
 export const MODE_HISTORICAL = gameAsset('mode-historical.png');
 export const LANDER_ICON = gameAsset('lander/lander-icon.png');
+export const LANDER_SIDE = gameAsset('lander/lander-side.png');
+export const ORBIT_BG = gameAsset('orbit-bg.png');
 
 export type Terrain = 'rim' | 'cliff' | 'ridge' | 'peak' | 'massif' | 'mons' | 'plateau' | 'crater';
 
