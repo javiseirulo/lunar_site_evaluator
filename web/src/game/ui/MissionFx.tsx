@@ -62,11 +62,15 @@ const CSS = `
 .mission-scanlines {
   background-image: repeating-linear-gradient(0deg, #00000038 0 1px, transparent 1px 3px);
 }
-.mission-cockpit > .mission-bezel:first-child { transition: transform 0.5s ease-out; transform-origin: 50% 80%; }
-.mission-cockpit .mission-panel { transition: filter 1.2s ease-out; }
+.mission-cockpit > .mission-view { transition: transform 0.5s ease-out; transform-origin: 50% 80%; }
+.mission-cockpit .mission-panel {
+  transition: filter 1.2s ease-out;
+  background: url('${import.meta.env.BASE_URL}game/cockpit/panel-bg.webp') center / cover,
+    linear-gradient(180deg, #3a3f4d 0%, #262a35 60%, #1b1e27 100%);
+}
 .mission-cockpit[data-fx='cold'] .mission-panel { filter: brightness(0.7) saturate(0.7); }
 /* Slope failure: only the window tilts (and shrinks a little), so the gauges stay in view. */
-.mission-cockpit[data-fx='slope'] > .mission-bezel:first-child {
+.mission-cockpit[data-fx='slope'] > .mission-view {
   transform: rotate(-3deg) scale(0.95); animation: mission-shake 0.3s linear 5;
 }
 @keyframes mission-shake {
@@ -100,9 +104,9 @@ const CSS = `
 .mission-timer[data-low='true'] { animation: mission-pulse 1s ease-in-out infinite; }
 @media (prefers-reduced-motion: reduce) {
   .mission-frame[data-flash='true'], .mission-blink, .mission-instrument[data-fault='true'],
-  .mission-static, .mission-alarm-lamp, .mission-cockpit[data-fx='slope'] > .mission-bezel,
+  .mission-static, .mission-alarm-lamp, .mission-cockpit[data-fx='slope'] > .mission-view,
   .mission-timer[data-low='true'] { animation: none; }
-  .mission-cockpit > .mission-bezel, .mission-cockpit .mission-panel { transition: none; }
+  .mission-cockpit > .mission-view, .mission-cockpit .mission-panel { transition: none; }
 }
 `;
 
