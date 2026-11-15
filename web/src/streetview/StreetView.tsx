@@ -1,7 +1,7 @@
 /** Pablo's viewer: real shared ephemerides, sourced catalogue, local camera. */
 import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
-import { dataUrl, formatUtc, useAppStore } from '@/core';
+import { DEFAULT_TIME_UTC, dataUrl, formatUtc, useAppStore } from '@/core';
 import { choiceGroups } from '@/core/siteChoices';
 import { CESIUM_APPLICATION_TOKEN } from './cesiumAccess';
 import { useEphem, useHorizon } from '@/ephem';
@@ -20,14 +20,25 @@ interface Catalog {
   sites: TerrainSite[];
 }
 
+/**
+ * Where Street View opens when nothing is chosen: Apollo 15 at Hadley, mid-morning, facing Mons
+ * Hadley, so the first thing people see is sunlit. Near the south pole the Sun never climbs above
+ * about 1.5 degrees, so most of the ground there is in shadow whichever way you look.
+ */
+const SHOWCASE = {
+  siteId: 'apollo_15',
+  timeUtc: '2027-01-17T00:00:00Z', // Sun 22 degrees up in the east
+  view: { ...DEFAULT_VIEW, heading: 20 },
+};
+
 export function StreetView() {
   const { siteId } = useParams();
   const selected = useAppStore((s) => s.selectedSiteId);
-  const id = siteId || selected || 'shackleton_rim_01';
-  return <ObserverView key={id} siteId={id} />;
+  const id = siteId || selected || SHOWCASE.siteId;
+  return <ObserverView key={id} siteId={id} showcase={!siteId && !selected} />;
 }
 
-function ObserverView({ siteId }: { siteId: string }) {
+function ObserverView({ siteId, showcase }: { siteId: string; showcase: boolean }) {
   const navigate = useNavigate();
   const time = useAppStore((s) => s.currentTimeUTC);
   const setTime = useAppStore((s) => s.setTime);
@@ -43,7 +54,11 @@ function ObserverView({ siteId }: { siteId: string }) {
     initialPoint(shared.point, siteId, useAppStore.getState().selectedSiteId, selectedPoint),
   );
   const [activePoint, setActivePoint] = useState<Observer | null>(startingPoint);
-  const [view, setView] = useState<ViewState>(shared.view);
+  // No link and nothing chosen: start on the sunlit showcase view instead of facing north.
+  const [startView] = useState<ViewState>(() =>
+    showcase && shared.view === DEFAULT_VIEW ? SHOWCASE.view : shared.view,
+  );
+  const [view, setView] = useState<ViewState>(startView);
   const [meshGround, setMeshGround] = useState<number | null>(null);
   const [token, setToken] = useState(CESIUM_APPLICATION_TOKEN);
   const [draft, setDraft] = useState('');
@@ -51,7 +66,10 @@ function ObserverView({ siteId }: { siteId: string }) {
   const [accessRevision, setAccessRevision] = useState(0);
   useEffect(() => {
     if (shared.time) setTime(shared.time);
-  }, [shared, setTime]);
+    // Only move the clock if nobody has touched it yet.
+    else if (showcase && useAppStore.getState().currentTimeUTC === DEFAULT_TIME_UTC)
+      setTime(SHOWCASE.timeUtc);
+  }, [shared, setTime, showcase]);
   useEffect(() => {
     const abort = new AbortController();
     void fetch(dataUrl('terrain/catalog.json'), { signal: abort.signal })
@@ -93,10 +111,22 @@ function ObserverView({ siteId }: { siteId: string }) {
     time,
     Number.isFinite(parsedTime) ? new Date(parsedTime + 1).toISOString() : time,
   );
-  const sample =
-    activeObserver && horizon.status !== 'loading'
-      ? observerSky(activeObserver, time, view.height, terrainPoint, horizon.horizon, margin)
-      : null;
+  const sample = useMemo(
+    () =>
+      activeObserver && ephem.ready && horizon.status !== 'loading'
+        ? observerSky(activeObserver, time, view.height, terrainPoint, horizon.horizon, margin)
+        : null,
+    [
+      activeObserver,
+      ephem.ready,
+      horizon.status,
+      horizon.horizon,
+      margin,
+      terrainPoint,
+      time,
+      view.height,
+    ],
+  );
   const onObserver = useCallback((point: Observer) => {
     setActivePoint(point);
     setMeshGround(null);
@@ -228,7 +258,7 @@ function ObserverView({ siteId }: { siteId: string }) {
                 observer={initialObserver}
                 token={token}
                 sample={sample}
-                initialView={shared.view ?? DEFAULT_VIEW}
+                initialView={startView}
                 shareUrl={shareUrl}
                 onReturn={returnToMap}
                 onObserver={onObserver}
@@ -241,7 +271,12 @@ function ObserverView({ siteId }: { siteId: string }) {
       </div>
       <details className="lunar-sky-details">
         <summary>
-          {sample ? 'Real SPICE sky' : 'Loading sky / horizon'} ·{' '}
+          {sample
+            ? 'Real SPICE sky'
+            : ephem.error
+              ? 'Ephemeris unavailable'
+              : 'Loading sky / horizon'}{' '}
+          ·{' '}
           {sample?.terrainMatched
             ? 'LOLA terrain horizon'
             : sample
@@ -261,7 +296,8 @@ function ObserverView({ siteId }: { siteId: string }) {
               </p>
               <p>
                 Earth az {sample.earth_az.toFixed(2)}° / el {sample.earth_el.toFixed(3)}° ·{' '}
-                {sample.earth_km.toFixed(0)} km · direct link{' '}
+                {sample.earth_km.toFixed(0)} km · disc above horizon{' '}
+                {(100 * sample.earthDiscFraction).toFixed(1)}%{' · '}direct link{' '}
                 {sample.earthVisible ? 'clear' : 'blocked'} ({margin}° margin)
               </p>
               <p>

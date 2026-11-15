@@ -13,7 +13,7 @@ import {
   FEATURES,
   FINAL,
   HOW,
-  LIMITS,
+  FUTURE,
   STATS,
   TEAM,
   WHY_HARD,
@@ -98,7 +98,7 @@ export function Details() {
         <Features />
         <How />
         <Data />
-        <Limits />
+        <Future />
         <WhoFor />
         <Team />
         <Final />
@@ -251,11 +251,11 @@ function Data() {
   );
 }
 
-function Limits() {
+function Future() {
   return (
-    <Block title={LIMITS.title} lead={LIMITS.lead}>
+    <Block title={FUTURE.title} lead={FUTURE.lead}>
       <ul className="border-b border-white/15">
-        {LIMITS.items.map((t) => (
+        {FUTURE.items.map((t) => (
           <li key={t} className="border-t border-white/15 py-4 text-white/80">
             {t}
           </li>
@@ -287,8 +287,6 @@ function Team() {
   return (
     <Block title={TEAM.title}>
       <p className={BODY}>{TEAM.body}</p>
-      <h3 className="mt-10 text-lg font-semibold tracking-[-0.02em] text-white">{TEAM.aiTitle}</h3>
-      <p className="mt-2 text-white/75">{TEAM.ai}</p>
     </Block>
   );
 }
