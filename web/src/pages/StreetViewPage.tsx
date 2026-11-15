@@ -5,7 +5,7 @@ export default function StreetViewPage() {
     <div className="flex flex-col gap-3">
       <section className="box">
         <div className="box-head">Street View</div>
-        <div className="space h-[660px] p-3">
+        <div className="space h-[800px] p-3">
           <StreetView />
         </div>
       </section>

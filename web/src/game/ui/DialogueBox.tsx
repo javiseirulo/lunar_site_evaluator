@@ -9,7 +9,7 @@ import { ChevronRight, FastForward } from 'lucide-react';
 import { clsx } from 'clsx';
 import { sfx } from '../audio/sfx';
 import { rateLimiter } from '../audio/theory';
-import { advanceAction, charsShown, isAdvanceKey } from './typewriter';
+import { advanceAction, charsShown, isAdvanceKey, TYPE_CPS } from './typewriter';
 
 export interface DialogueBoxProps {
   lines: readonly string[];
@@ -17,13 +17,28 @@ export interface DialogueBoxProps {
   onDone: () => void;
   /** Shows a "Skip" button that calls this. */
   onSkip?: () => void;
+  /** Told whenever a line starts or stops typing (e.g. to animate the speaker's mouth). */
+  onTypingChange?: (typing: boolean) => void;
+  /** Typing speed in characters per second (default `TYPE_CPS`). */
+  cps?: number;
+  /** Hint shown under the last line once it is typed (default "Start mission"). */
+  doneLabel?: string;
   className?: string;
 }
 
 /** Interval between typing updates; fine enough for 35 chars/s. */
 const TICK_MS = 25;
 
-export function DialogueBox({ lines, speaker, onDone, onSkip, className }: DialogueBoxProps) {
+export function DialogueBox({
+  lines,
+  speaker,
+  onDone,
+  onSkip,
+  onTypingChange,
+  cps = TYPE_CPS,
+  doneLabel = 'Start mission',
+  className,
+}: DialogueBoxProps) {
   const reduced = useReducedMotion() ?? false;
   const [index, setIndex] = useState(0);
   const [typed, setTyped] = useState(0);
@@ -36,6 +51,14 @@ export function DialogueBox({ lines, speaker, onDone, onSkip, className }: Dialo
   const shown = reduced ? line.length : Math.min(typed, line.length);
   const complete = shown >= line.length;
   const isLast = index >= lines.length - 1;
+
+  const typingRef = useRef(onTypingChange);
+  useEffect(() => {
+    typingRef.current = onTypingChange;
+  }, [onTypingChange]);
+  useEffect(() => {
+    typingRef.current?.(!complete);
+  }, [complete]);
 
   // Take keyboard focus so Enter / Space work right away (without scrolling the page).
   useEffect(() => {
@@ -57,7 +80,7 @@ export function DialogueBox({ lines, speaker, onDone, onSkip, className }: Dialo
         return;
       }
       const now = performance.now();
-      const next = charsShown(now - start, length);
+      const next = charsShown(now - start, length, cps);
       setTyped((prev) => Math.max(prev, next));
       if (next > blipped) {
         if (blipGate(now)) sfx.blip(line.charAt(next - 1));
@@ -66,7 +89,7 @@ export function DialogueBox({ lines, speaker, onDone, onSkip, className }: Dialo
       if (next >= length) window.clearInterval(id);
     }, TICK_MS);
     return () => window.clearInterval(id);
-  }, [index, line, reduced]);
+  }, [index, line, reduced, cps]);
 
   const finish = () => {
     if (doneRef.current) return;
@@ -145,7 +168,7 @@ export function DialogueBox({ lines, speaker, onDone, onSkip, className }: Dialo
             complete ? 'opacity-100' : 'opacity-0',
           )}
         >
-          {isLast ? 'Start mission' : 'Next'}
+          {isLast ? doneLabel : 'Next'}
           <ChevronRight className="size-3" />
         </div>
       </div>

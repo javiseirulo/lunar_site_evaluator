@@ -5,6 +5,7 @@
 import { useEffect } from 'react';
 import { Link, useLocation } from 'react-router';
 import { useAppStore } from '@/core';
+import { Figure, figureSrc } from '@/core/shell/Figure';
 
 const SECTIONS = [
   { id: 'pole', title: 'Why the south pole?' },
@@ -88,6 +89,15 @@ export default function LearnPage() {
               Those permanently shadowed regions are among the coldest places known and can trap
               water ice, which is a big reason missions want to land nearby.
             </p>
+            <Figure
+              src={figureSrc('illumination-south-pole.jpg')}
+              alt="A round map of the lunar south pole. Bright ground was sunlit often; crater floors are black."
+            >
+              How often the ground was sunlit, from six months of Lunar Reconnaissance Orbiter
+              Camera images. Brighter means lit more of the time. Shackleton is the round dark
+              crater near the center; its floor never sees the Sun. NASA/GSFC/Arizona State
+              University.
+            </Figure>
           </section>
 
           <section>
@@ -100,6 +110,13 @@ export default function LearnPage() {
               why we show both the share of time in sunlight and the <i>longest night</i>, which
               sets how big the batteries must be.
             </p>
+            <Figure
+              src={figureSrc('rimlight-shackleton.jpg')}
+              alt="Sunlight grazing the rim of Shackleton crater, with the ground beyond it in shadow."
+            >
+              Sunlight grazing Shackleton's rim. The lit strip is where solar panels can work. A few
+              kilometres into the shadow, they cannot. NASA/GSFC/Arizona State University.
+            </Figure>
           </section>
 
           <section>
@@ -111,6 +128,15 @@ export default function LearnPage() {
               wobble can hide it behind terrain. While Earth is hidden, a lander cannot send data
               directly home and has to wait or use a relay satellite.
             </p>
+            <Figure
+              src={figureSrc('south-pole-earth.jpg')}
+              alt="Earth hanging just above the lunar horizon, seen from near the south pole."
+            >
+              Earth from near the south pole. It stays low, so the small wobble of libration can
+              drop it behind a ridge. The red dot marks the horizon in this visualization; it is not
+              a landing site. Drawn from LOLA terrain and a planetary ephemeris. NASA Scientific
+              Visualization Studio.
+            </Figure>
           </section>
 
           <section>
@@ -121,6 +147,14 @@ export default function LearnPage() {
               the Moon itself. We build it from laser-altimeter elevation data and compare it, hour
               by hour, with the positions of the Sun and Earth.
             </p>
+            <Figure
+              src={figureSrc('shackleton-heights.jpg')}
+              alt="Shackleton crater shown two ways: height in color on the left, and shaded relief on the right."
+            >
+              Shackleton, measured by LOLA. Color on the left is height. The right side is the same
+              crater in shade, and the floor stays black because the Sun never reaches it.
+              NASA/Zuber et al., Nature, 2012.
+            </Figure>
           </section>
 
           <section>

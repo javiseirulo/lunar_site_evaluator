@@ -13,13 +13,16 @@ import {
   formatHours,
   formatLatLon,
   formatUtc,
-  hoursUntilChange,
+  lowScoreReason,
+  changeLead,
+  changeWhen,
+  nextChange,
+  seriesSpanLabel,
   pct,
   sampleAt,
   useAppStore,
   useData,
   useSelectedSite,
-  useTimeseries,
 } from '@/core';
 import {
   autonomyH,
@@ -33,6 +36,8 @@ import {
   type SiteEvaluation,
   type SortBy,
 } from './missionStats';
+import { useActiveSeries } from '@/ephem/activeSeries';
+import { YourPoints } from './YourPoints';
 import { useRequirements } from './requirementsStore';
 import { useCandidates, useMissionWindow, useSiteStats } from './useCandidates';
 
@@ -340,9 +345,12 @@ function Results() {
 
   if (!active) {
     return (
-      <p className="border-edge text-ink-muted border-t px-5 py-4 text-[14px]">
-        Add a mission requirement to find landing sites.
-      </p>
+      <>
+        <p className="border-edge text-ink-muted border-t px-5 py-4 text-[14px]">
+          Add a mission requirement to find landing sites.
+        </p>
+        <YourPoints />
+      </>
     );
   }
 
@@ -458,6 +466,7 @@ function Results() {
       )}
 
       <p className="text-ink-muted px-5 pt-3 text-[12px]">{ASSUMPTION}</p>
+      <YourPoints />
     </div>
   );
 }
@@ -473,7 +482,9 @@ export function SiteDetail({ className }: { className?: string }) {
   const stats = useSiteStats(site?.id ?? null);
   const loadError = useData((s) => (site ? s.timeseriesErrors[site.id] : undefined));
   const window = useMissionWindow();
+  const point = useAppStore((s) => s.selectedPoint);
 
+  if (!site && point) return <PointDetail className={className} />;
   if (!site) {
     return (
       <section className={cn('box p-5', className)}>
@@ -503,6 +514,10 @@ export function SiteDetail({ className }: { className?: string }) {
         <p className="text-ink-muted num mt-1 text-[12px]">
           {formatLatLon(site.lat, site.lon)}, {site.elev_m.toLocaleString('en')} m
         </p>
+      )}
+
+      {lowScoreReason(site) && (
+        <p className="text-ink-muted mt-1 text-[12px]">{lowScoreReason(site)}</p>
       )}
 
       {evaluation.checks.length > 0 && (
@@ -577,11 +592,30 @@ export function SiteDetail({ className }: { className?: string }) {
   );
 }
 
+/** Card for a free lat/lon ("Go to coordinates"): the same live Mission Clock readout, in situ. */
+function PointDetail({ className }: { className?: string }) {
+  const active = useActiveSeries();
+  const proMode = useAppStore((s) => s.proMode);
+  if (!active.site) return null;
+  return (
+    <section className={cn('box p-5', className)} aria-label="Selected point details">
+      <h2 className="text-[24px] leading-tight">{active.site.name}</h2>
+      <p className="text-ink-muted mt-1 text-[12px]">
+        Your point{proMode ? ` · ${formatLatLon(active.site.lat, active.site.lon)}` : ''}. Press
+        Play to watch its sunlight and Earth view.
+      </p>
+      <NowSection siteId="point" expert={proMode} />
+    </section>
+  );
+}
+
 function NowSection({ siteId, expert }: { siteId: string; expert: boolean }) {
-  const ts = useTimeseries(siteId);
-  const loadError = useData((s) => s.timeseriesErrors[siteId]);
+  const active = useActiveSeries();
+  const ts = active.ts;
+  const loadError = useData((s) => s.timeseriesErrors[siteId]) ?? active.error;
   const now = useAppStore((s) => s.currentTimeUTC);
   const sky = ts ? sampleAt(ts, now) : null;
+  const span = ts ? seriesSpanLabel(ts) : '';
 
   return (
     <div className="mt-4">
@@ -594,36 +628,47 @@ function NowSection({ siteId, expert }: { siteId: string; expert: boolean }) {
       {loadError ? (
         <p className="text-bad mt-1 text-[13px]">Could not load this site's data.</p>
       ) : !ts || !sky ? (
-        <p className="text-ink-muted mt-1 text-[13px]">Loading…</p>
+        <p className="text-ink-muted mt-1 text-[13px]">
+          {active.computing ? 'Computing…' : 'Loading…'}
+        </p>
       ) : (
         <dl className="rows border-edge mt-2 border-t text-[14px]">
           <Row label="Sun elevation" value={`${sky.sun_el.toFixed(1)}°`} />
           <Row
-            label={sky.lit ? 'Sunlit · sunset in' : 'Dark · sunrise in'}
-            value={untilChange(hoursUntilChange(ts, ts.lit, now))}
+            label={changeLead(
+              sky.lit ? 'Sunlit · sunset' : 'Dark · sunrise',
+              nextChange(ts, ts.lit, now),
+            )}
+            value={changeWhen(nextChange(ts, ts.lit, now), span, formatHours)}
           />
           <Row
             label={
               sky.earthVisible === null
                 ? 'Earth visibility'
                 : sky.earthVisible
-                  ? 'Earth in view · Earthset in'
-                  : 'Earth hidden · Earthrise in'
+                  ? changeLead('Earth in view · Earthset', nextChange(ts, ts.earth_visible, now))
+                  : changeLead('Earth hidden · Earthrise', nextChange(ts, ts.earth_visible, now))
             }
             value={
               sky.earthVisible === null || !ts.earth_visible
                 ? 'unknown'
-                : untilChange(hoursUntilChange(ts, ts.earth_visible, now))
+                : changeWhen(nextChange(ts, ts.earth_visible, now), span, formatHours)
             }
           />
         </dl>
       )}
+      {ts && sky && active.flatHorizon && (
+        <p className="text-ink-muted mt-1 text-[12px]">Flat horizon, no terrain.</p>
+      )}
+      {ts && sky && ts.earth_visible && ts.earth_visible.every((f) => f === 0) && (
+        <p className="text-ink-muted mt-1 text-[12px]">
+          Earth never rises here in {span}: hidden by terrain or the far side. The data is complete;
+          this site can still be explored.
+        </p>
+      )}
     </div>
   );
 }
-
-/** Countdown to the next change, or a clear note when it never changes in the data. */
-const untilChange = (h: number | null) => (h === null ? 'not in data range' : formatHours(h));
 
 function Row({ label, value }: { label: string; value: string }) {
   return (

@@ -4,7 +4,12 @@
  * Local to `web/src/game/`; it does NOT touch the shared app store. Illegal transitions are
  * silent no-ops. Actions that set the deadline accept an optional `now` (epoch ms) so tests
  * can control time. The decision clock starts when the cards are revealed (`revealed`), not
- * while the site data loads, and it pauses while the exit dialog is open (`pause`/`resume`).
+ * while the site data loads; it pauses while the exit dialog is open (`pause`/`resume`) and
+ * while the descent animation plays (`heldAt`, from `choose` to `landed`).
+ *
+ * Order (#100): menu → intro → alert → briefing → approach → dealing → choosing → descent →
+ * recon → timelapse → verdict (or timeout from `choosing` / `recon`). The hand is dealt in the
+ * background during `alert` / `briefing` (`dealt`); `recon` can go back to `choosing`.
  *
  *   const phase = useGame((s) => s.phase);
  *   useGame.getState().start();
@@ -19,9 +24,12 @@ export type Phase =
   | 'menu'
   | 'intro'
   | 'alert'
+  | 'briefing'
+  | 'approach'
   | 'dealing'
   | 'choosing'
-  | 'travel'
+  | 'descent'
+  | 'recon'
   | 'timelapse'
   | 'verdict'
   | 'timeout';
@@ -30,13 +38,22 @@ export type Phase =
 export const IN_GAME_PHASES: readonly Phase[] = [
   'intro',
   'alert',
+  'briefing',
+  'approach',
   'dealing',
   'choosing',
-  'travel',
+  'descent',
+  'recon',
   'timelapse',
   'verdict',
   'timeout',
 ];
+
+/** Phases in which the hand may be dealt (in the background, before the approach). */
+export const DEAL_PHASES: readonly Phase[] = ['alert', 'briefing'];
+
+/** Phases in which the countdown may run out. */
+const TIMEOUT_PHASES: readonly Phase[] = ['choosing', 'recon'];
 
 /** Optional run settings (from `?seed=…&skipIntro=1`, see `ui/gameParams.ts`). */
 export interface GameConfig {
@@ -48,6 +65,11 @@ export interface GameConfig {
 
 /** Time the player has to decide, in milliseconds. */
 export const COUNTDOWN_MS = 180_000;
+
+/** Length of the descent shot (globe dive to the chosen site), in milliseconds. */
+export const DESCENT_MS = 3500;
+/** The same with prefers-reduced-motion (the camera jumps, then holds briefly). */
+export const DESCENT_REDUCED_MS = 600;
 
 export interface GameState {
   phase: Phase;
@@ -62,6 +84,8 @@ export interface GameState {
   deadline: number;
   /** Epoch ms at which the clock was paused (exit dialog open), or null while it runs. */
   pausedAt: number | null;
+  /** Epoch ms at which the descent started (clock held until touchdown), or null. */
+  heldAt: number | null;
   /** Increments on every new deal (each alert with a fresh hand): keys per-deal UI state. */
   dealId: number;
   config: GameConfig;
@@ -74,19 +98,29 @@ export interface GameState {
   /** intro → alert. */
   endIntro: () => void;
   skipIntro: () => void;
-  /** alert → dealing (the caller has already dealt the hand). */
-  beginDealing: (hand: Hand) => void;
+  /** Stores the hand dealt in the background (only during `alert` / `briefing`, once). */
+  dealt: (hand: Hand) => void;
+  /** alert → briefing. */
+  endAlert: () => void;
+  /** briefing → approach (needs the hand: the approach shows its sites). */
+  endBriefing: () => void;
+  /** approach → dealing (the globe reached the pole). */
+  approached: () => void;
   /** dealing → choosing; starts the decision clock. */
   revealed: (now?: number) => void;
   /** During `choosing`: lock in a slot so the countdown can no longer expire. */
   pick: (slot: number) => void;
-  /** choosing → travel. */
-  choose: (slot: number) => void;
-  /** travel → timelapse. */
-  landed: () => void;
+  /** choosing → descent; holds the clock during the descent. */
+  choose: (slot: number, now?: number) => void;
+  /** descent → recon (touchdown); the clock runs again, the hold pushed the deadline back. */
+  landed: (now?: number) => void;
+  /** recon → choosing, same hand and clock, the choice cleared. */
+  chooseAgain: () => void;
+  /** recon → timelapse. */
+  simulate: () => void;
   /** timelapse → verdict. */
   finish: () => void;
-  /** choosing → timeout (ignored while a pick is pending, the clock is paused or no hand). */
+  /** choosing | recon → timeout (ignored while a pick is pending, the clock is paused or no hand). */
   timeUp: () => void;
   /** Freeze the decision clock (exit dialog open). */
   pause: (now?: number) => void;
@@ -115,6 +149,7 @@ export const useGame = create<GameState>()((set, get) => {
       emergencyId: pickEmergency(s.seed),
       deadline: 0,
       pausedAt: null,
+      heldAt: null,
       dealId: s.dealId + 1,
     }));
 
@@ -144,6 +179,7 @@ export const useGame = create<GameState>()((set, get) => {
     pendingSlot: null,
     deadline: 0,
     pausedAt: null,
+    heldAt: null,
     dealId: 0,
     config: { seed: null, skipIntro: false },
 
@@ -166,6 +202,7 @@ export const useGame = create<GameState>()((set, get) => {
         pendingSlot: null,
         deadline: 0,
         pausedAt: null,
+        heldAt: null,
       });
       if (config.skipIntro) enterAlert();
     },
@@ -173,8 +210,22 @@ export const useGame = create<GameState>()((set, get) => {
     endIntro: () => leaveIntro(),
     skipIntro: () => leaveIntro(),
 
-    beginDealing: (hand) => {
-      if (get().phase === 'alert') set({ phase: 'dealing', hand });
+    dealt: (hand) => {
+      const { phase, hand: current } = get();
+      if (DEAL_PHASES.includes(phase) && current === null) set({ hand });
+    },
+
+    endAlert: () => {
+      if (get().phase === 'alert') set({ phase: 'briefing' });
+    },
+
+    endBriefing: () => {
+      const { phase, hand } = get();
+      if (phase === 'briefing' && hand) set({ phase: 'approach' });
+    },
+
+    approached: () => {
+      if (get().phase === 'approach') set({ phase: 'dealing' });
     },
 
     revealed: (now = Date.now()) => {
@@ -193,12 +244,30 @@ export const useGame = create<GameState>()((set, get) => {
       if (phase === 'choosing' && pendingSlot === null) set({ pendingSlot: slot });
     },
 
-    choose: (slot) => {
-      if (get().phase === 'choosing') set({ phase: 'travel', chosenSlot: slot, pendingSlot: null });
+    choose: (slot, now = Date.now()) => {
+      if (get().phase !== 'choosing') return;
+      set({ phase: 'descent', chosenSlot: slot, pendingSlot: null, heldAt: now });
     },
 
-    landed: () => {
-      if (get().phase === 'travel') set({ phase: 'timelapse' });
+    landed: (now = Date.now()) => {
+      const { phase, heldAt, pausedAt, deadline } = get();
+      if (phase !== 'descent') return;
+      const held = heldAt === null ? 0 : Math.max(0, now - heldAt);
+      set({
+        phase: 'recon',
+        heldAt: null,
+        deadline: deadline === 0 ? 0 : deadline + held,
+        // Exit dialog still open: its pause counts from now (the hold covered it so far).
+        pausedAt: pausedAt === null ? null : now,
+      });
+    },
+
+    chooseAgain: () => {
+      if (get().phase === 'recon') set({ phase: 'choosing', chosenSlot: null, pendingSlot: null });
+    },
+
+    simulate: () => {
+      if (get().phase === 'recon') set({ phase: 'timelapse' });
     },
 
     finish: () => {
@@ -206,9 +275,10 @@ export const useGame = create<GameState>()((set, get) => {
     },
 
     timeUp: () => {
-      const { phase, pendingSlot, pausedAt, hand, deadline } = get();
-      if (pendingSlot !== null || pausedAt !== null || hand === null || deadline === 0) return;
-      if (phase === 'choosing') set({ phase: 'timeout' });
+      const { phase, pendingSlot, pausedAt, heldAt, hand, deadline } = get();
+      if (pendingSlot !== null || pausedAt !== null || heldAt !== null) return;
+      if (hand === null || deadline === 0) return;
+      if (TIMEOUT_PHASES.includes(phase)) set({ phase: 'timeout' });
     },
 
     pause: (now = Date.now()) => {
@@ -216,12 +286,11 @@ export const useGame = create<GameState>()((set, get) => {
     },
 
     resume: (now = Date.now()) => {
-      const { pausedAt, deadline } = get();
+      const { pausedAt, deadline, heldAt } = get();
       if (pausedAt === null) return;
-      set({
-        pausedAt: null,
-        deadline: deadline === 0 ? 0 : deadline + Math.max(0, now - pausedAt),
-      });
+      // During the descent the hold already covers the paused time: do not count it twice.
+      const shift = heldAt !== null || deadline === 0 ? 0 : Math.max(0, now - pausedAt);
+      set({ pausedAt: null, deadline: deadline + shift });
     },
 
     retry: (now = Date.now()) => {
@@ -233,6 +302,7 @@ export const useGame = create<GameState>()((set, get) => {
         pendingSlot: null,
         deadline: now + COUNTDOWN_MS,
         pausedAt: null,
+        heldAt: null,
       });
     },
 
@@ -256,6 +326,7 @@ export const useGame = create<GameState>()((set, get) => {
         pendingSlot: null,
         deadline: 0,
         pausedAt: null,
+        heldAt: null,
       }),
   };
 });

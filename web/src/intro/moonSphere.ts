@@ -157,3 +157,113 @@ const smoothstep = (a: number, b: number, x: number) => {
 export function sunLonForProgress(t: number): number {
   return -100 * (1 - smoothstep(0, 0.85, t)) + 0;
 }
+
+export interface Spinner {
+  size: number;
+  /** Writes RGBA for the Moon rotated by `thetaRad` about its own axis. */
+  draw: (out: Uint8ClampedArray, thetaRad: number) => void;
+}
+
+/**
+ * A Moon that turns on its axis. The camera and the Sun stay put, so the lighting is fixed per pixel and
+ * precomputed; spinning only shifts which texture column sits under each pixel. That makes a frame a
+ * cheap bilinear lookup (no trigonometry), fast enough to animate on every page load.
+ *
+ * `sunAzimuthDeg` is where the Sun sits left (negative) or right (positive) of the camera axis.
+ */
+export function buildSpinner(
+  tex: TextureData,
+  size: number,
+  viewLatDeg: number,
+  sunAzimuthDeg: number,
+  sunElevationDeg = 12,
+): Spinner {
+  const n = size * size;
+  const { data, width: W, height: H } = tex;
+  const lat0 = viewLatDeg * DEG;
+  const R = size / 2;
+  const az = sunAzimuthDeg * DEG;
+  const el = sunElevationDeg * DEG;
+  const sx = Math.sin(az) * Math.cos(el);
+  const sy = Math.sin(el);
+  const sz = Math.cos(az) * Math.cos(el);
+
+  const index: number[] = [];
+  const turns = new Float32Array(n); // longitude in turns, [-0.5, 0.5] + 0.5 offset applied at draw time
+  const rowTop = new Uint16Array(n);
+  const rowFrac = new Float32Array(n);
+  const lit = new Float32Array(n);
+  const earth = new Float32Array(n);
+  const alpha = new Uint8Array(n);
+
+  for (let py = 0; py < size; py++) {
+    const y = -(py + 0.5 - R) / R;
+    for (let px = 0; px < size; px++) {
+      const x = (px + 0.5 - R) / R;
+      const i = py * size + px;
+      const rho = Math.hypot(x, y);
+      const cover = Math.max(0, Math.min(1, (1 - rho) * R));
+      if (cover === 0) continue;
+      const ll = orthoInverse(Math.min(x, 0.99999), Math.min(y, 0.99999), lat0, 0);
+      if (!ll) continue;
+      const [lat, lon] = ll;
+      index.push(i);
+      alpha[i] = Math.round(cover * 255);
+      turns[i] = lon / (2 * Math.PI) + 0.5;
+      const fy = Math.max(0, Math.min(H - 1.001, (0.5 - lat / Math.PI) * H - 0.5));
+      rowTop[i] = Math.floor(fy);
+      rowFrac[i] = fy - Math.floor(fy);
+
+      // Lighting from the camera-space normal (fixed while the Moon turns).
+      const nz = Math.sqrt(Math.max(0, 1 - x * x - y * y));
+      const d = x * sx + y * sy + nz * sz;
+      let t = (d + 0.02) / 0.24;
+      t = t < 0 ? 0 : t > 1 ? 1 : t;
+      const k = t * t * (3 - 2 * t);
+      const dl = d <= 0 ? 0 : d >= 1 ? 1 : d;
+      lit[i] = k * (0.6 + 0.4 * POW_LUT[(dl * 1024) | 0]!) * 1.3;
+      earth[i] = 0.055 * (1 - k);
+    }
+  }
+  const idx = Int32Array.from(index);
+
+  return {
+    size,
+    draw(out, thetaRad) {
+      const shift = thetaRad / (2 * Math.PI);
+      for (let q = 0; q < idx.length; q++) {
+        const i = idx[q]!;
+        let u = turns[i]! + shift;
+        u -= Math.floor(u);
+        const fx = u * W - 0.5;
+        const x0 = Math.floor(fx);
+        const tx = fx - x0;
+        const xa = ((x0 % W) + W) % W;
+        const xb = (xa + 1) % W;
+        const ya = rowTop[i]!;
+        const yb = Math.min(H - 1, ya + 1);
+        const ty = rowFrac[i]!;
+        const p00 = (ya * W + xa) * 4;
+        const p10 = (ya * W + xb) * 4;
+        const p01 = (yb * W + xa) * 4;
+        const p11 = (yb * W + xb) * 4;
+        const w00 = (1 - tx) * (1 - ty);
+        const w10 = tx * (1 - ty);
+        const w01 = (1 - tx) * ty;
+        const w11 = tx * ty;
+        const l = lit[i]!;
+        const e = earth[i]!;
+        const j = i * 4;
+        const r = data[p00]! * w00 + data[p10]! * w10 + data[p01]! * w01 + data[p11]! * w11;
+        const g =
+          data[p00 + 1]! * w00 + data[p10 + 1]! * w10 + data[p01 + 1]! * w01 + data[p11 + 1]! * w11;
+        const b =
+          data[p00 + 2]! * w00 + data[p10 + 2]! * w10 + data[p01 + 2]! * w01 + data[p11 + 2]! * w11;
+        out[j] = r * l + r * e * 0.7;
+        out[j + 1] = g * l + g * e * 0.85;
+        out[j + 2] = b * l + b * e * 1.25;
+        out[j + 3] = alpha[i]!;
+      }
+    },
+  };
+}

@@ -1,12 +1,14 @@
 .globe-surface-control {
   position: absolute;
+  /* Stay clear of the Layers button in the bottom-left corner. */
+  left: 78px;
   right: 10px;
   bottom: 10px;
   z-index: 45;
   display: flex;
-  align-items: end;
+  align-items: flex-end;
   gap: 8px;
-  flex-direction: column;
+  flex-direction: column-reverse;
   pointer-events: none;
 }
 .astronaut-button {
@@ -35,7 +37,7 @@
   font-size: 8px;
 }
 .globe-surface-control p {
-  max-width: 210px;
+  max-width: min(210px, 100%);
   background: #101925df;
   color: #edf2f8;
   padding: 6px 8px;
