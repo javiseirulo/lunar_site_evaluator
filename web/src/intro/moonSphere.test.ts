@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   buildSphere,
+  buildSpinner,
   orthoInverse,
   shadeInto,
   sunLonForProgress,
@@ -88,5 +89,49 @@ describe('sunLonForProgress', () => {
       expect(v).toBeGreaterThanOrEqual(prev - 1e-9);
       prev = v;
     }
+  });
+});
+
+describe('spinner', () => {
+  // Left half of the texture white, right half black: spinning half a turn swaps them.
+  const striped: TextureData = {
+    width: 16,
+    height: 8,
+    data: new Uint8ClampedArray(16 * 8 * 4).map((_, i) =>
+      i % 4 === 3 ? 255 : (i >> 2) % 16 < 8 ? 255 : 0,
+    ),
+  };
+  const size = 64;
+
+  it('keeps the same silhouette while turning but changes the surface', () => {
+    const sp = buildSpinner(striped, size, -35, 0);
+    const a = new Uint8ClampedArray(size * size * 4);
+    const b = new Uint8ClampedArray(size * size * 4);
+    sp.draw(a, 0);
+    sp.draw(b, Math.PI);
+    const c = (size / 2) * size + size / 2;
+    expect(a[c * 4 + 3]).toBe(255);
+    expect(b[c * 4 + 3]).toBe(255);
+    expect(a[3]).toBe(0); // corner stays empty
+    let differs = 0;
+    for (let i = 0; i < size * size; i++) if (Math.abs(a[i * 4]! - b[i * 4]!) > 40) differs++;
+    expect(differs).toBeGreaterThan(300);
+  });
+
+  it('repeats exactly after one full turn', () => {
+    const sp = buildSpinner(striped, size, -35, -50);
+    const a = new Uint8ClampedArray(size * size * 4);
+    const b = new Uint8ClampedArray(size * size * 4);
+    sp.draw(a, 0.7);
+    sp.draw(b, 0.7 + 2 * Math.PI);
+    for (let i = 0; i < a.length; i += 4) expect(Math.abs(a[i]! - b[i]!)).toBeLessThanOrEqual(1);
+  });
+
+  it('is lit on the Sun side and dark on the other', () => {
+    const flatSp = buildSpinner(flat, size, -35, -60);
+    const out = new Uint8ClampedArray(size * size * 4);
+    flatSp.draw(out, 0);
+    const y = size / 2;
+    expect(out[(y * size + 8) * 4]!).toBeGreaterThan(out[(y * size + size - 9) * 4]! + 40);
   });
 });
