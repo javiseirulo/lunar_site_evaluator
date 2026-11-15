@@ -1,5 +1,9 @@
 /** Public API of the core for other modules: import from '@/core'. */
 export { useAppStore, DEFAULT_TIME_UTC } from './store';
+export { prepareSurfaceLocation, surfacePath, validMoonPoint } from './surfaceNavigation';
+export type { MoonPoint } from './surfaceNavigation';
+export { useCustomPins as useSavedPlaces } from './savedPlaces';
+export type { CustomPin as SavedPlace } from './savedPlaces';
 export type { AppState } from './store';
 export { useData, useTimeseries, useSite, useSelectedSite, loadTimeseries, dataUrl } from './data';
 export { sampleAt, indexAt, hoursUntilChange, fractionOn } from './timeseries';
