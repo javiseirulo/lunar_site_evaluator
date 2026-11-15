@@ -19,12 +19,12 @@ import { ApproachScreen, DescentScreen } from './FlightScreens';
 import { GameGlobe } from './GameGlobe';
 import { parseGameParams } from './gameParams';
 import { backgroundShot } from './globeShots';
+import { SiteRecon } from './SiteRecon';
 import { SoundControls } from './SoundControls';
 import { sharedSelectionFor } from './reveal';
 import { IntroScreen } from './IntroScreen';
 import { MenuScreen } from './MenuScreen';
 import { MissionFx } from './MissionFx';
-import { ReconScreen } from './ReconScreen';
 import { TimelapseScreen } from './TimelapseScreen';
 import { TimeoutScreen } from './TimeoutScreen';
 import { useDealHand } from './useDealHand';
@@ -141,7 +141,7 @@ export function MissionGame() {
       screen = <DescentScreen />;
       break;
     case 'recon':
-      screen = <ReconScreen />;
+      screen = <SiteRecon />;
       break;
     case 'timelapse':
       screen = <TimelapseScreen />;

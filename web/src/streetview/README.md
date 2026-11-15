@@ -127,3 +127,31 @@ and [trial horizons](../../public/data/terrain/trials/README.md). That navigatio
 document preserves the earlier v1 evidence; the current integration notes above
 supersede its pending catalogue/ephemeris statements. Physical-phone QA and
 Cesium/LOLA calibration remain pending.
+
+## Embedding (2026-11-15, #100)
+
+`StreetViewEmbed.tsx` (default export, load it with `lazy()`) shows the same Cesium
+Moon surface and real Sun/Earth markers inside another module, look-only. The
+`/streetview` page does not use it and behaves exactly as before.
+
+```tsx
+<StreetViewEmbed
+  lat={site.lat} lon={site.lon} timeUtc={landingUtc} // instant whose Sun/Earth are drawn
+  heading={0}               // initial heading, degrees from north
+  hideLabels                // default true: no feature names (they could reveal the place)
+  interactive="look-only"   // default: drag/arrows/zoom only; 'walk' re-enables click-to-walk
+  timeoutMs={12_000}        // default 90 s, like the page
+  ref={handle}              // handle.look(dHeading, dPitch) for host-side keys/buttons
+  onReady={…} onView={(v) => v.heading} onError={(reason) => …}
+/>
+```
+
+- No location picker, share/QR or access panel. It reads `VITE_CESIUM_ION_TOKEN` only;
+  `onError` receives `'no-token' | 'webgl' | 'timeout' | 'load'` once and the embed then
+  renders nothing, so the host shows its own fallback.
+- The sky uses `observerSky` at the given point with the flat geometric horizon; the
+  mesh itself hides a marker that sits behind terrain.
+- `createLunarScene` gained an optional `SceneOptions` argument (`names`, `walk`, both
+  default true) and a `look(dh, dp)` method; existing callers are unchanged.
+- Pure helpers in `embed.ts` are covered by `embed.test.ts`. The Mission game hosts it
+  from `web/src/game/ui/SiteRecon.tsx`. Pending: Pablo's review.
