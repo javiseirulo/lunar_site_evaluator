@@ -41,6 +41,9 @@ export function Footer() {
           )}
         </p>
       </div>
+      <Link to="/" className="btn mt-4 inline-flex h-[40px] px-5 text-[13px]">
+        Back to the landing page
+      </Link>
     </footer>
   );
 }

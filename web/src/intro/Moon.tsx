@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useImperativeHandle, useRef, type Ref } from 'react';
-import { buildSphere, shadeInto, type SphereBuffers, type TextureData } from './moonSphere';
+import { buildSphere, shadeInto, type SphereBuffers } from './moonSphere';
+import { loadMoonTexture } from './moonTexture';
 
 /** Imperative handle so the scroll loop can move the terminator without re-rendering React. */
 export interface MoonHandle {
@@ -11,30 +12,6 @@ const VIEW_LAT = -35;
 const VIEW_LON = 0;
 // Redraw only when the phase moved this many degrees; a full redraw is ~1M pixels.
 const MIN_STEP_DEG = 0.35;
-
-let texturePromise: Promise<TextureData> | null = null;
-
-function loadTexture(): Promise<TextureData> {
-  texturePromise ??= new Promise<TextureData>((resolve, reject) => {
-    const img = new Image();
-    img.onload = () => {
-      const c = document.createElement('canvas');
-      c.width = img.naturalWidth;
-      c.height = img.naturalHeight;
-      const ctx = c.getContext('2d', { willReadFrequently: true });
-      if (!ctx) return reject(new Error('2d canvas unavailable'));
-      ctx.drawImage(img, 0, 0);
-      const d = ctx.getImageData(0, 0, c.width, c.height);
-      resolve({ data: d.data, width: d.width, height: d.height });
-    };
-    img.onerror = () => {
-      texturePromise = null;
-      reject(new Error('Moon texture failed to load'));
-    };
-    img.src = `${import.meta.env.BASE_URL}landing/moon-2k.jpg`;
-  });
-  return texturePromise;
-}
 
 export function Moon({
   pixels,
@@ -87,7 +64,7 @@ export function Moon({
     const c = canvasRef.current;
     if (!c) return;
     c.removeAttribute('data-ready');
-    loadTexture()
+    loadMoonTexture('moon-2k.jpg')
       .then((tex) => {
         if (cancelled) return;
         c.width = pixels;

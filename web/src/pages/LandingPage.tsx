@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router';
 import { useAppStore, useData, useSelectedSite } from '@/core';
-import { PolarMap, scoreColor } from '@/layers';
+import { SpinningMoon } from '@/intro/SpinningMoon';
 
 const PLACES: { to: string; title: string; line: string }[] = [
   {
@@ -87,21 +87,7 @@ export function LandingPage() {
         </div>
 
         <div className="space flex flex-col justify-center p-5 sm:p-7">
-          <div className="mx-auto aspect-square w-full max-w-[480px]">
-            <PolarMap className="size-full" />
-          </div>
-          {site && (
-            <p className="mt-3 text-center text-ink-muted text-[13px]">
-              {selected ? 'Selected' : 'Best in this data'}: {site.name}
-              <span
-                className="mx-2 inline-block size-2.5 align-middle"
-                style={{ background: scoreColor(site.score) }}
-                aria-hidden
-              />
-              <span className="num text-white">{Math.round(site.score * 100)}</span>
-              <span className="text-ink-faint"> / 100</span>
-            </p>
-          )}
+          <SpinningMoon className="mx-auto aspect-square w-full max-w-[440px]" />
         </div>
       </section>
 
