@@ -14,6 +14,7 @@ import { useGameAudio } from '../audio/useGameAudio';
 import { DESCENT_MS, useGame, type Phase } from '../state/gameStore';
 import { AlertScreen } from './AlertScreen';
 import { MENU_BG } from './assets';
+import { ClassEntry } from '../class/ClassEntry';
 import { ExitControl } from './ExitControl';
 import { ApproachScreen, DescentScreen } from './FlightScreens';
 import { GameGlobe } from './GameGlobe';
@@ -204,9 +205,12 @@ export function MissionGame() {
             phase === 'intro' && 'bg-[#0b0f1a]',
           )}
         >
-          <span className="text-ink-faint min-w-0 truncate font-mono text-[10px] tracking-[0.3em] uppercase">
-            {EXIT_PHASES.includes(phase) ? 'Mission in progress' : ''}
-          </span>
+          <div className="flex min-w-0 items-center gap-2">
+            <span className="text-ink-faint min-w-0 truncate font-mono text-[10px] tracking-[0.3em] uppercase">
+              {EXIT_PHASES.includes(phase) ? 'Mission in progress' : ''}
+            </span>
+            {phase === 'menu' && <ClassEntry />}
+          </div>
           <div className="flex items-center gap-1.5">
             <SoundControls />
             {EXIT_PHASES.includes(phase) && <ExitControl />}

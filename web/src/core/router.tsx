@@ -13,6 +13,8 @@ const GamePage = lazy(() => import('@/pages/GamePage'));
 const AboutPage = lazy(() => import('@/pages/AboutPage'));
 const SitesPage = lazy(() => import('@/pages/SitesPage'));
 const ComparePage = lazy(() => import('@/pages/ComparePage'));
+const TeacherPage = lazy(() => import('@/game/class/TeacherPage'));
+const StudentPage = lazy(() => import('@/game/class/StudentPage'));
 const LearnPage = lazy(() => import('@/pages/LearnPage'));
 
 export const router = createBrowserRouter(
@@ -27,12 +29,22 @@ export const router = createBrowserRouter(
       ),
     },
     {
+      // Students' phones: full-bleed, no shell, nothing heavy loaded.
+      path: 'join/:token?',
+      element: (
+        <Suspense fallback={<div className="min-h-screen bg-[#05060d]" />}>
+          <StudentPage />
+        </Suspense>
+      ),
+    },
+    {
       element: <AppShell />,
       children: [
         { path: 'home', element: <LandingPage /> },
         { path: 'explore', element: <ExplorePage /> },
         { path: 'streetview/:siteId?', element: <StreetViewPage /> },
         { path: 'game', element: <GamePage /> },
+        { path: 'class', element: <TeacherPage /> },
         { path: 'sites', element: <SitesPage /> },
         { path: 'compare', element: <ComparePage /> },
         { path: 'learn', element: <LearnPage /> },
