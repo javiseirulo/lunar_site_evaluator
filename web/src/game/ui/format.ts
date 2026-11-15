@@ -44,3 +44,17 @@ export function dealTimeline(count: number, reducedMotion: boolean): DealTimelin
     totalMs: Math.round((flipStart + (count - 1) * flipStep + flipDuration) * 1000),
   };
 }
+
+/** Count-up value after `elapsedMs` of a `durationMs` ease-out animation to `target` (rounded). */
+export function countUp(elapsedMs: number, durationMs: number, target: number): number {
+  if (!(durationMs > 0) || elapsedMs >= durationMs) return target;
+  const t = Math.max(0, elapsedMs) / durationMs;
+  return Math.round(target * (1 - (1 - t) ** 3));
+}
+
+/** Slot chosen by a number-key shortcut ("1"–"4"), or null if the key is not a listed slot. */
+export function slotForKey(key: string, slots: readonly number[]): number | null {
+  if (!/^[1-9]$/.test(key)) return null;
+  const n = Number(key);
+  return slots.includes(n) ? n : null;
+}

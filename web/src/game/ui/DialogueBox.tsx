@@ -7,6 +7,8 @@ import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
 import { ChevronRight, FastForward } from 'lucide-react';
 import { clsx } from 'clsx';
+import { sfx } from '../audio/sfx';
+import { rateLimiter } from '../audio/theory';
 import { advanceAction, charsShown, isAdvanceKey } from './typewriter';
 
 export interface DialogueBoxProps {
@@ -27,6 +29,8 @@ export function DialogueBox({ lines, speaker, onDone, onSkip, className }: Dialo
   const [typed, setTyped] = useState(0);
   const doneRef = useRef(false);
   const boxRef = useRef<HTMLDivElement>(null);
+  /** The player completed the current line by hand: stop typing (and blipping) it. */
+  const rushedRef = useRef(false);
 
   const line = lines[index] ?? '';
   const shown = reduced ? line.length : Math.min(typed, line.length);
@@ -41,15 +45,28 @@ export function DialogueBox({ lines, speaker, onDone, onSkip, className }: Dialo
   // Type the current line; the timer is cleared on line change and on unmount.
   useEffect(() => {
     if (reduced) return;
+    rushedRef.current = false;
     const start = performance.now();
     const length = line.length;
+    // Typewriter blips, at most ~16 per second so they never become a buzz.
+    const blipGate = rateLimiter(60);
+    let blipped = 0;
     const id = window.setInterval(() => {
-      const next = charsShown(performance.now() - start, length);
+      if (rushedRef.current) {
+        window.clearInterval(id);
+        return;
+      }
+      const now = performance.now();
+      const next = charsShown(now - start, length);
       setTyped((prev) => Math.max(prev, next));
+      if (next > blipped) {
+        if (blipGate(now)) sfx.blip(line.charAt(next - 1));
+        blipped = next;
+      }
       if (next >= length) window.clearInterval(id);
     }, TICK_MS);
     return () => window.clearInterval(id);
-  }, [index, line.length, reduced]);
+  }, [index, line, reduced]);
 
   const finish = () => {
     if (doneRef.current) return;
@@ -60,6 +77,7 @@ export function DialogueBox({ lines, speaker, onDone, onSkip, className }: Dialo
   const advance = () => {
     switch (advanceAction(index, shown, line.length, lines.length)) {
       case 'complete':
+        rushedRef.current = true;
         setTyped(line.length);
         break;
       case 'next':
@@ -80,6 +98,11 @@ export function DialogueBox({ lines, speaker, onDone, onSkip, className }: Dialo
 
   return (
     <div className={clsx('flex w-full flex-col gap-2', className)}>
+      {/* Screen readers get the whole line at once; the typed copy is visual only. Outside the
+          role=button, whose children are presentational and would not be announced. */}
+      <p className="sr-only" aria-live="polite">
+        {`${speaker}: ${line}`}
+      </p>
       <div
         ref={boxRef}
         role="button"
@@ -94,10 +117,6 @@ export function DialogueBox({ lines, speaker, onDone, onSkip, className }: Dialo
         <div className="mb-2 inline-block bg-white px-2 py-0.5 font-mono text-[11px] font-bold tracking-widest text-black uppercase">
           {speaker}
         </div>
-        {/* Screen readers get the whole line at once; the typed copy is visual only. */}
-        <p className="sr-only" aria-live="polite">
-          {line}
-        </p>
         <p
           aria-hidden
           className="grid min-h-[4.5em] font-mono text-[13px] leading-relaxed text-white"
@@ -132,10 +151,14 @@ export function DialogueBox({ lines, speaker, onDone, onSkip, className }: Dialo
       </div>
       <div className="flex items-center justify-between font-mono text-[10px] tracking-widest text-ink-faint uppercase">
         <span>
-          {index + 1} / {lines.length} · Click, Enter or Space
+          {index + 1} / {lines.length} · Tap or press Enter to continue
         </span>
         {onSkip && (
-          <button type="button" className="btn inline-flex items-center gap-1" onClick={onSkip}>
+          <button
+            type="button"
+            className="btn inline-flex h-10 items-center gap-1"
+            onClick={onSkip}
+          >
             <FastForward className="size-3" aria-hidden />
             Skip
           </button>

@@ -95,7 +95,9 @@ export function deal(
     );
     if (winners.length < 1 || losers.length < size - 2) continue;
 
-    const nWin = Math.min(winners.length, 1 + Math.floor(rnd() * 2), size - 1);
+    // Rolled 1 or 2 winners, but more when there are too few losers to fill the hand.
+    const rolled = 1 + Math.floor(rnd() * 2);
+    const nWin = Math.min(winners.length, size - 1, Math.max(rolled, size - losers.length));
     const picked = winners.slice(0, nWin);
 
     // Fill with losers, preferring causes not yet in the hand.

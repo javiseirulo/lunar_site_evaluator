@@ -1,9 +1,14 @@
 /** The Mission mini-game: one screen per phase of `useGame`. */
-import { useEffect, type ReactNode } from 'react';
-import { MotionConfig } from 'motion/react';
+import { useEffect, useRef, type ReactNode } from 'react';
+import { motion, MotionConfig } from 'motion/react';
 import { useAppStore } from '@/core';
-import { useGame } from '../state/gameStore';
+import { useGameAudio } from '../audio/useGameAudio';
+import { useGame, type Phase } from '../state/gameStore';
 import { AlertScreen } from './AlertScreen';
+import { ExitControl } from './ExitControl';
+import { parseGameParams } from './gameParams';
+import { SoundControls } from './SoundControls';
+import { sharedSelectionFor } from './reveal';
 import { IntroScreen } from './IntroScreen';
 import { MenuScreen } from './MenuScreen';
 import { MissionFx } from './MissionFx';
@@ -13,9 +18,51 @@ import { TravelScreen } from './TravelScreen';
 import { useDealHand } from './useDealHand';
 import { VerdictScreen } from './VerdictScreen';
 
+/** Screens that show the in-game exit (X); the menu and end screens have their own buttons. */
+const EXIT_PHASES: readonly Phase[] = [
+  'intro',
+  'alert',
+  'dealing',
+  'choosing',
+  'travel',
+  'timelapse',
+];
+
+/** alert, dealing and choosing are one screen (the cards deal in place). */
+function screenKey(phase: Phase): string {
+  return phase === 'dealing' || phase === 'choosing' ? 'alert' : phase;
+}
+
 export function MissionGame() {
   const phase = useGame((s) => s.phase);
-  const dealStatus = useDealHand();
+  const deal = useDealHand();
+  const rootRef = useRef<HTMLDivElement>(null);
+  useGameAudio(rootRef);
+
+  // Optional reproducible-run params (?seed=…&skipIntro=1&difficulty=expert). Without params
+  // this resets the config to the defaults (clock seeds, intro), i.e. no change of behaviour.
+  useEffect(() => {
+    const { difficulty, ...config } = parseGameParams(window.location.search);
+    useGame.getState().configure(config, difficulty);
+    // ?difficulty= also moves the site-wide Normal | Expert switch (one switch for everything).
+    if (difficulty) useAppStore.getState().setProMode(difficulty === 'expert');
+  }, []);
+
+  // Leaving the page ends the game: a later visit starts from the menu (fresh deadline, and
+  // the ?seed params apply again) instead of resuming a stale mission.
+  useEffect(() => () => useGame.getState().quit(), []);
+
+  // Keep the real site name secret until the verdict: the site-wide header prints the name of
+  // the selected site, so the selection is cleared during play and set at the verdict.
+  const chosenSiteId = useGame(
+    (s) => s.hand?.cards.find((c) => c.slot === s.chosenSlot)?.siteId ?? null,
+  );
+  useEffect(() => {
+    const want = sharedSelectionFor(phase, chosenSiteId);
+    if (want === undefined) return;
+    const app = useAppStore.getState();
+    if (app.selectedSiteId !== want) app.selectSite(want);
+  }, [phase, chosenSiteId]);
 
   // One switch for the whole site: Expert mode = the game's expert difficulty.
   const proMode = useAppStore((s) => s.proMode);
@@ -35,7 +82,7 @@ export function MissionGame() {
     case 'alert':
     case 'dealing':
     case 'choosing':
-      screen = <AlertScreen dealStatus={dealStatus} />;
+      screen = <AlertScreen dealStatus={deal.status} onRetry={deal.retry} />;
       break;
     case 'travel':
       screen = <TravelScreen />;
@@ -54,8 +101,30 @@ export function MissionGame() {
   return (
     <MotionConfig reducedMotion="user">
       <MissionFx />
-      <div className="mission-root bg-navy-950 text-ink relative flex min-h-[544px] w-full flex-col overflow-hidden font-sans">
-        {screen}
+      <div
+        ref={rootRef}
+        className="mission-root bg-navy-950 text-ink relative flex min-h-[544px] w-full flex-col overflow-hidden font-sans"
+      >
+        <div className="flex min-h-10 items-center justify-between gap-2 pb-1.5">
+          <span className="min-w-0 truncate font-mono text-[10px] tracking-[0.3em] text-ink-faint uppercase">
+            {EXIT_PHASES.includes(phase) ? 'Mission in progress' : ''}
+          </span>
+          <div className="flex items-center gap-1.5">
+            <SoundControls />
+            {EXIT_PHASES.includes(phase) && <ExitControl />}
+          </div>
+        </div>
+        {/* Enter-only transition: the old screen leaves at once (an exit animation would
+            re-render it with the next phase's state), the new one fades and rises in. */}
+        <motion.div
+          key={screenKey(phase)}
+          className="flex min-w-0 flex-1 flex-col"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.28, ease: 'easeOut' }}
+        >
+          {screen}
+        </motion.div>
       </div>
     </MotionConfig>
   );

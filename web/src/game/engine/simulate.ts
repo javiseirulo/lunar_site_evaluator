@@ -159,14 +159,14 @@ export function simulate(
     candidates.push({
       cause: 'cold',
       at: cold.exceedsAt,
-      detail: `Night lasted over ${req.max_dark_h.threshold} h (failed at hour ${cold.exceedsAt})`,
+      detail: `Night lasted over ${req.max_dark_h.threshold} h`,
     });
   }
   if (blackout.exceedsAt !== null) {
     candidates.push({
       cause: 'blackout',
       at: blackout.exceedsAt,
-      detail: `Comms blackout lasted over ${req.max_blackout_h.threshold} h (failed at hour ${blackout.exceedsAt})`,
+      detail: `Earth link lost for over ${req.max_blackout_h.threshold} h`,
     });
   }
   if (candidates.length > 0) {
