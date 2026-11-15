@@ -390,3 +390,16 @@
   animation: clock-scan 2.4s linear infinite;
   pointer-events: none;
 }
+
+/* Range whose track fills amber up to the current value (Mission Clock). Set --pct inline. */
+.range-progress::-webkit-slider-runnable-track {
+  height: 6px;
+  background: linear-gradient(to right, #ffcc4d var(--pct, 0%), var(--color-edge) var(--pct, 0%));
+}
+.range-progress::-moz-range-track {
+  height: 6px;
+  background: linear-gradient(to right, #ffcc4d var(--pct, 0%), var(--color-edge) var(--pct, 0%));
+}
+.range-progress::-webkit-slider-thumb {
+  margin-top: -5px;
+}

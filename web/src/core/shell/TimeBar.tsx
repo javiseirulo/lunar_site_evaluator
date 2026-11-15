@@ -150,9 +150,6 @@ export function TimeBar({ className }: { className?: string }) {
         <div className="pointer-events-none mx-[8px] overflow-hidden rounded-full" aria-hidden>
           <div className="h-[5px] bg-white/5" style={{ background: sun ?? undefined }} />
           <div className="mt-[2px] h-[5px] bg-white/5" style={{ background: earth ?? undefined }} />
-          <div className="mt-[3px] h-[2px] rounded-full bg-white/5">
-            <div className="h-full rounded-full bg-[#ffcc4d]" style={{ width: `${pct}%` }} />
-          </div>
         </div>
         <div
           className="bg-heading pointer-events-none absolute -top-1 -bottom-1 w-[2px]"
@@ -161,7 +158,8 @@ export function TimeBar({ className }: { className?: string }) {
         />
         <input
           type="range"
-          className="range relative -mt-1"
+          className="range range-progress relative -mt-1"
+          style={{ ['--pct' as string]: `${pct}%` }}
           min={t0}
           max={t1}
           step={3_600_000}

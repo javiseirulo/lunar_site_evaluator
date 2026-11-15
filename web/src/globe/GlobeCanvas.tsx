@@ -765,10 +765,26 @@ function CameraRig({
       }
       siteFlight.current = { flight, elapsed: 0 };
     };
-    // Only changes after mount fly; a site already selected at mount is left as is.
-    return useAppStore.subscribe((s, prev) => {
+    // A site already selected when the globe opens is flown to as soon as the sites are loaded.
+    let pending: (() => void) | null = null;
+    const initial = useAppStore.getState().selectedSiteId;
+    if (initial) {
+      if (useData.getState().sites) fly(initial);
+      else
+        pending = useData.subscribe((d) => {
+          if (!d.sites) return;
+          pending?.();
+          pending = null;
+          if (useAppStore.getState().selectedSiteId === initial) fly(initial);
+        });
+    }
+    const unsub = useAppStore.subscribe((s, prev) => {
       if (s.selectedSiteId !== prev.selectedSiteId) fly(s.selectedSiteId);
     });
+    return () => {
+      pending?.();
+      unsub();
+    };
   }, [camera, controlsRef, flightRef]);
 
   useEffect(() => {

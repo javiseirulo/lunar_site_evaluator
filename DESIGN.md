@@ -17,7 +17,7 @@
 
 ## Normal vs Expert (the core rule)
 - **One switch** (header, `proMode` in the store, labelled Normal | Expert). Mission's difficulty is the same switch.
-- **Normal:** four pages (Explore, Compare, Mission, Learn), one amber action per screen, plain-language
+- **Normal:** three pages (Explore, Mission, Learn); Explore shows only the 3D globe, one amber action per screen, plain-language
   numbers ("Day 12 of 365", "in 3 days"), a site list instead of requirement forms.
 - **Expert:** + Sites, Street View, Data pages; requirements form, map layers, Mission Timing, Site Check,
   UTC times, coordinates, site finder, full footer. Nothing is removed from Expert; it is only hidden in Normal.
@@ -53,3 +53,4 @@
 | 2026-11-15 | Global theme = Mission's navy/amber/mono | Javi's request: whole web matches the game |
 | 2026-11-15 | Pro mode renamed Expert, shown as a segmented switch | Same switch as Mission difficulty |
 | 2026-11-15 | Normal hides requirements form, layers, timing, site check | Few options; Expert keeps them |
+| 2026-11-15 | Compare moves to Expert; Explore drops the 2D map (3D globe only); selecting a site flies the globe camera; Mission Clock defaults to 2 days/s with a visible running state | Javi (#93–#96) |
