@@ -34,7 +34,16 @@ export interface SceneCallbacks {
   labels: (labels: LabelLayout[]) => void;
   save: (point: Observer) => void;
 }
+/** Embedding switches (StreetViewEmbed). Defaults keep the full /streetview behaviour. */
+export interface SceneOptions {
+  /** Load and label official feature names. */
+  names?: boolean;
+  /** Click/tap nearby ground to walk (with the hover ring). */
+  walk?: boolean;
+}
 export interface LunarScene {
+  /** Turn the view by `dh` degrees of heading and `dp` of pitch (clamped like dragging). */
+  look: (dh: number, dp: number) => void;
   faceBody: (body: 'sun' | 'earth') => void;
   setHeight: (height: number) => void;
   setSky: (sample: SkySample | null) => void;
@@ -51,7 +60,10 @@ export async function createLunarScene(
   signal: AbortSignal,
   callbacks: SceneCallbacks,
   initialView: ViewState = DEFAULT_VIEW,
+  options: SceneOptions = {},
 ): Promise<LunarScene> {
+  const allowNames = options.names ?? true;
+  const allowWalk = options.walk ?? true;
   (window as Window & { CESIUM_BASE_URL?: string }).CESIUM_BASE_URL = new URL(
     `${import.meta.env.BASE_URL}cesium/`,
     window.location.origin,
@@ -113,7 +125,7 @@ export async function createLunarScene(
     let pose = limitLook(initialView.heading, initialView.pitch);
     let moving = false;
     let sky: SkySample | null = null;
-    let namesEnabled = true;
+    let namesEnabled = allowNames;
     let features: Landmark[] = [];
     let anchors: { feature: Landmark; position: import('cesium').Cartesian3 }[] = [];
     let landmarkRevision = 0;
@@ -280,21 +292,22 @@ export async function createLunarScene(
         /* Names are optional; a catalogue failure must not hide terrain. */
       }
     };
-    void fetch(`${import.meta.env.BASE_URL}data/terrain/lunar-names.json`, { signal })
-      .then((response) => {
-        if (!response.ok) throw new Error('Names unavailable');
-        return response.json();
-      })
-      .then((data: { features: Landmark[] }) => {
-        if (!disposed) {
-          features = data.features;
-          void loadAnchors();
-        }
-      })
-      .catch(() => {
-        if (!disposed)
-          callbacks.hint('Place names unavailable. Terrain navigation remains available.');
-      });
+    if (allowNames)
+      void fetch(`${import.meta.env.BASE_URL}data/terrain/lunar-names.json`, { signal })
+        .then((response) => {
+          if (!response.ok) throw new Error('Names unavailable');
+          return response.json();
+        })
+        .then((data: { features: Landmark[] }) => {
+          if (!disposed) {
+            features = data.features;
+            void loadAnchors();
+          }
+        })
+        .catch(() => {
+          if (!disposed)
+            callbacks.hint('Place names unavailable. Terrain navigation remains available.');
+        });
     let previousLabels = '';
     let lastLabels = 0;
     let labelTimer = 0;
@@ -410,7 +423,9 @@ export async function createLunarScene(
     canvas.tabIndex = 0;
     canvas.setAttribute(
       'aria-label',
-      'Lunar surface. Drag to look, scroll or pinch to zoom. Click or tap nearby ground to walk. Arrow keys look; plus and minus zoom.',
+      allowWalk
+        ? 'Lunar surface. Drag to look, scroll or pinch to zoom. Click or tap nearby ground to walk. Arrow keys look; plus and minus zoom.'
+        : 'Lunar surface. Drag to look, scroll or pinch to zoom. Arrow keys look; plus and minus zoom.',
     );
     canvas.style.touchAction = 'none';
     const gestures = new NavigationGestures();
@@ -418,7 +433,7 @@ export async function createLunarScene(
     let tapTimer = 0;
     cleanup.push(() => window.clearTimeout(tapTimer));
     const pickGround = (clientX: number, clientY: number) => {
-      if (moving || disposed || !viewer.scene.pickPositionSupported) return null;
+      if (!allowWalk || moving || disposed || !viewer.scene.pickPositionSupported) return null;
       const bounds = canvas.getBoundingClientRect();
       const world = viewer.scene.pickPosition(
         new C.Cartesian2(clientX - bounds.left, clientY - bounds.top),
@@ -551,7 +566,7 @@ export async function createLunarScene(
     const up = (event: PointerEvent) => {
       const gesture = gestures.up(event.pointerId, event.clientX, event.clientY);
       if (canvas.hasPointerCapture(event.pointerId)) canvas.releasePointerCapture(event.pointerId);
-      if (gesture?.type === 'tap') {
+      if (gesture?.type === 'tap' && allowWalk) {
         if (event.pointerType !== 'touch') {
           void walk(gesture.x, gesture.y);
           return;
@@ -630,6 +645,7 @@ export async function createLunarScene(
     cleanup.push(() => resize.disconnect());
     renderPose();
     return {
+      look,
       faceBody: (body) => {
         if (!sky || moving) return;
         const target = limitLook(
@@ -673,7 +689,7 @@ export async function createLunarScene(
         viewer.scene.requestRender();
       },
       setNames: (enabled) => {
-        namesEnabled = enabled;
+        namesEnabled = allowNames && enabled;
         lastLabels = 0;
         renderLabels();
       },

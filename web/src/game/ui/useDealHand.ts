@@ -1,5 +1,5 @@
 /**
- * Deals the hand while the game is in `alert` with no hand. A year of hourly data is ~500 KB per
+ * Deals the hand in the background while the game is in `alert` / `briefing` with no hand. A year of hourly data is ~500 KB per
  * site, so it does not load every series: it picks a seeded subset of South Pole sites
  * (`pickSubset`), loads only their timeseries and runs `deal()` on them; if that subset has no
  * valid hand it tries another one, up to `MAX_DEAL_ATTEMPTS`. Safe against StrictMode double
@@ -11,7 +11,7 @@
 import { useEffect, useState } from 'react';
 import { loadTimeseries, useData } from '@/core';
 import { deal, MAX_DEAL_ATTEMPTS, pickSubset, southPoleSites } from '../engine/deal';
-import { useGame } from '../state/gameStore';
+import { DEAL_PHASES, useGame } from '../state/gameStore';
 
 export type DealStatus = 'loading' | 'empty' | 'error';
 
@@ -22,7 +22,8 @@ export interface DealHand {
 }
 
 export function useDealHand(): DealHand {
-  const phase = useGame((s) => s.phase);
+  // A boolean, so going from alert to briefing does not restart a deal in progress.
+  const inDeal = useGame((s) => DEAL_PHASES.includes(s.phase));
   const hand = useGame((s) => s.hand);
   const seed = useGame((s) => s.seed);
   const dealId = useGame((s) => s.dealId);
@@ -34,11 +35,13 @@ export function useDealHand(): DealHand {
   const [failedKey, setFailedKey] = useState<string | null>(null);
 
   useEffect(() => {
-    if (phase !== 'alert' || hand !== null || !sites) return;
+    if (!inDeal || hand !== null || !sites) return;
     let cancelled = false;
     const stale = (): boolean => {
       const game = useGame.getState();
-      return cancelled || game.phase !== 'alert' || game.hand !== null || game.seed !== seed;
+      return (
+        cancelled || !DEAL_PHASES.includes(game.phase) || game.hand !== null || game.seed !== seed
+      );
     };
     const pool = southPoleSites(sites);
 
@@ -54,7 +57,7 @@ export function useDealHand(): DealHand {
         loadFailed ||= subset.some((s) => !data.timeseries[s.id] && data.timeseriesErrors[s.id]);
         const dealt = deal(subset, data.timeseries, seed);
         if (dealt) {
-          useGame.getState().beginDealing(dealt);
+          useGame.getState().dealt(dealt);
           return;
         }
         if (subset.length >= pool.length) break; // every site already tried
@@ -73,7 +76,7 @@ export function useDealHand(): DealHand {
     return () => {
       cancelled = true;
     };
-  }, [phase, hand, seed, sites, key]);
+  }, [inDeal, hand, seed, sites, key]);
 
   const status: DealStatus =
     dataError || failedKey === key ? 'error' : emptyKey === key ? 'empty' : 'loading';
