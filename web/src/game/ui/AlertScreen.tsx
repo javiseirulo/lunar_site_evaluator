@@ -5,6 +5,7 @@
 import { useState } from 'react';
 import { motion } from 'motion/react';
 import { AlertTriangle, Loader2 } from 'lucide-react';
+import { useData } from '@/core';
 import { useGame } from '../state/gameStore';
 import { emergencyImage, scientistImage } from './assets';
 import { emergencyById } from './content';
@@ -13,10 +14,18 @@ import { Countdown } from './Countdown';
 import { GameImage } from './GameImage';
 import type { DealStatus } from './useDealHand';
 
-export function AlertScreen({ dealStatus }: { dealStatus: DealStatus }) {
+export function AlertScreen({
+  dealStatus,
+  onRetry,
+}: {
+  dealStatus: DealStatus;
+  onRetry: () => void;
+}) {
   const phase = useGame((s) => s.phase);
   const emergency = emergencyById(useGame((s) => s.emergencyId));
   const quit = useGame((s) => s.quit);
+  // The shared site list itself failed: a deal retry cannot fix that, only a page reload.
+  const sitesFailed = useData((s) => s.status === 'error');
   // A brief screen shake when the emergency first appears (not on a retry, which skips the alert).
   const [shake] = useState(() => phase === 'alert');
 
@@ -34,9 +43,16 @@ export function AlertScreen({ dealStatus }: { dealStatus: DealStatus }) {
             ? 'None of the landing times in the loaded data gives a hand with both a safe and an unsafe site.'
             : 'The landing-site data failed to load. Check your connection and try again.'}
         </p>
-        <button type="button" className="btn h-10" onClick={quit}>
-          Back to menu
-        </button>
+        <div className="flex flex-wrap justify-center gap-2">
+          {dealStatus === 'error' && !sitesFailed && (
+            <button type="button" className="btn btn-go h-10 px-4" onClick={onRetry}>
+              Retry
+            </button>
+          )}
+          <button type="button" className="btn h-10 px-4" onClick={quit}>
+            Back to menu
+          </button>
+        </div>
       </div>
     );
   }

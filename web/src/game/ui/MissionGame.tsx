@@ -35,7 +35,7 @@ function screenKey(phase: Phase): string {
 
 export function MissionGame() {
   const phase = useGame((s) => s.phase);
-  const dealStatus = useDealHand();
+  const deal = useDealHand();
   const rootRef = useRef<HTMLDivElement>(null);
   useGameAudio(rootRef);
 
@@ -45,6 +45,10 @@ export function MissionGame() {
     const { difficulty, ...config } = parseGameParams(window.location.search);
     useGame.getState().configure(config, difficulty);
   }, []);
+
+  // Leaving the page ends the game: a later visit starts from the menu (fresh deadline, and
+  // the ?seed params apply again) instead of resuming a stale mission.
+  useEffect(() => () => useGame.getState().quit(), []);
 
   // Keep the real site name secret until the verdict: the site-wide header prints the name of
   // the selected site, so the selection is cleared during play and set at the verdict.
@@ -69,7 +73,7 @@ export function MissionGame() {
     case 'alert':
     case 'dealing':
     case 'choosing':
-      screen = <AlertScreen dealStatus={dealStatus} />;
+      screen = <AlertScreen dealStatus={deal.status} onRetry={deal.retry} />;
       break;
     case 'travel':
       screen = <TravelScreen />;

@@ -3,7 +3,8 @@
  * Back to menu and Keep playing. It is a native modal <dialog>: the rest of the page is inert
  * while it is open (focus stays inside), Esc closes it, and focus returns to the X.
  *
- * The game keeps running underneath: the decision countdown does not pause.
+ * The decision clock pauses while the dialog is open (store `pause`/`resume`): the deadline is
+ * pushed back by the time the dialog stayed open.
  */
 import { useEffect, useRef, useState } from 'react';
 import { Home, Play, RotateCcw, Timer, X } from 'lucide-react';
@@ -43,7 +44,10 @@ export function ExitControl() {
         aria-label="Leave mission"
         title="Leave mission"
         aria-haspopup="dialog"
-        onClick={() => setOpen(true)}
+        onClick={() => {
+          useGame.getState().pause();
+          setOpen(true);
+        }}
         data-sfx-silent
         className="mission-pixel flex size-10 shrink-0 cursor-pointer items-center justify-center border-2 border-black bg-[#2a0a0e] text-white hover:bg-[#ff3b30] focus-visible:bg-[#ff3b30] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
       >
@@ -58,6 +62,7 @@ export function ExitControl() {
         onClose={() => {
           // Fires for every close (buttons, Esc, backdrop).
           sfx.modalClose();
+          useGame.getState().resume();
           setOpen(false);
           xRef.current?.focus();
         }}
@@ -78,7 +83,7 @@ export function ExitControl() {
             {clockRunning ? (
               <span className="flex items-center gap-1.5 font-mono font-bold text-[#ffcc4d]">
                 <Timer className="size-4 shrink-0" aria-hidden />
-                The clock is still running.
+                Clock paused.
               </span>
             ) : (
               'Your progress in this mission will be lost.'

@@ -32,14 +32,16 @@ describe('useGame phase machine', () => {
     const g = () => useGame.getState();
     g().start(7);
     expect(g().phase).toBe('intro');
-    g().endIntro(1000);
+    g().endIntro();
     expect(g().phase).toBe('alert');
-    expect(g().deadline).toBe(1000 + COUNTDOWN_MS);
+    expect(g().deadline).toBe(0); // the clock waits for the cards
     expect(COUNTDOWN_MS).toBe(180_000);
     g().beginDealing(hand);
     expect(g().phase).toBe('dealing');
-    g().revealed();
+    expect(g().deadline).toBe(0);
+    g().revealed(1000);
     expect(g().phase).toBe('choosing');
+    expect(g().deadline).toBe(1000 + COUNTDOWN_MS);
     g().choose(3);
     expect(g().phase).toBe('travel');
     expect(g().chosenSlot).toBe(3);
@@ -51,26 +53,27 @@ describe('useGame phase machine', () => {
 
   it('skipIntro also goes to alert with emergency and deadline', () => {
     useGame.getState().start(7);
-    useGame.getState().skipIntro(0);
+    useGame.getState().skipIntro();
     const s = useGame.getState();
     expect(s.phase).toBe('alert');
-    expect(s.emergencyId).toBe(emergencies[Math.floor(mulberry32(7)() * emergencies.length)]!.id);
-    expect(s.deadline).toBe(COUNTDOWN_MS);
+    const draw = mulberry32((7 ^ 0xa5a5a5a5) >>> 0)();
+    expect(s.emergencyId).toBe(emergencies[Math.floor(draw * emergencies.length)]!.id);
+    expect(s.deadline).toBe(0);
   });
 
-  it('timeUp works from alert, dealing, choosing only', () => {
+  it('timeUp only works once the cards are revealed (choosing)', () => {
     const g = () => useGame.getState();
     g().start(1);
     g().endIntro();
-    g().timeUp();
-    expect(g().phase).toBe('timeout');
+    g().timeUp(); // data still loading: no hand, no clock
+    expect(g().phase).toBe('alert');
 
     reset();
     g().start(1);
     g().endIntro();
     g().beginDealing(hand);
     g().timeUp();
-    expect(g().phase).toBe('timeout');
+    expect(g().phase).toBe('dealing');
 
     reset();
     g().start(1);
@@ -94,9 +97,9 @@ describe('useGame phase machine', () => {
   it('retry keeps the hand, clears the choice, resets the deadline', () => {
     const g = () => useGame.getState();
     g().start(1);
-    g().endIntro(0);
+    g().endIntro();
     g().beginDealing(hand);
-    g().revealed();
+    g().revealed(0);
     g().choose(1);
     g().landed();
     g().finish();
@@ -112,7 +115,9 @@ describe('useGame phase machine', () => {
     g().start(1);
     g().endIntro();
     g().beginDealing(hand);
+    g().revealed();
     g().timeUp();
+    expect(g().phase).toBe('timeout');
     g().retry(0);
     expect(g().phase).toBe('choosing');
     expect(g().hand).toBe(hand);
@@ -123,13 +128,16 @@ describe('useGame phase machine', () => {
     g().start(1);
     g().endIntro();
     g().beginDealing(hand);
+    g().revealed();
     g().timeUp();
-    g().newGame(99, 0);
+    const dealId = g().dealId;
+    g().newGame(99);
     expect(g().phase).toBe('alert');
     expect(g().seed).toBe(99);
     expect(g().hand).toBeNull();
     expect(g().chosenSlot).toBeNull();
-    expect(g().deadline).toBe(COUNTDOWN_MS);
+    expect(g().deadline).toBe(0);
+    expect(g().dealId).toBe(dealId + 1);
   });
 
   it('newGame is a no-op outside verdict/timeout', () => {
@@ -156,7 +164,7 @@ describe('useGame phase machine', () => {
 
   it('a pending pick blocks timeUp and still reaches travel', () => {
     const g = () => useGame.getState();
-    useGame.setState({ phase: 'choosing', hand });
+    useGame.setState({ phase: 'choosing', hand, deadline: 1 });
     g().pick(3);
     expect(g().pendingSlot).toBe(3);
     g().pick(1); // only the first pick counts
@@ -195,15 +203,16 @@ describe('useGame phase machine', () => {
   it('restart works from every in-game phase: fresh seed, no hand, no pick, alert', () => {
     for (const phase of IN_GAME_PHASES) {
       reset();
-      useGame.setState({ phase, hand, chosenSlot: 2, pendingSlot: 3, seed: 1 });
-      useGame.getState().restart(42, 10);
+      useGame.setState({ phase, hand, chosenSlot: 2, pendingSlot: 3, seed: 1, pausedAt: 5 });
+      useGame.getState().restart(42);
       const s = useGame.getState();
       expect(s.phase, phase).toBe('alert');
       expect(s.seed).toBe(42);
       expect(s.hand).toBeNull();
       expect(s.chosenSlot).toBeNull();
       expect(s.pendingSlot).toBeNull();
-      expect(s.deadline).toBe(10 + COUNTDOWN_MS);
+      expect(s.deadline).toBe(0);
+      expect(s.pausedAt).toBeNull();
       expect(s.emergencyId).not.toBeNull();
     }
   });
@@ -240,9 +249,9 @@ describe('useGame phase machine', () => {
 
   it('skipIntro config makes start go straight to the alert', () => {
     useGame.getState().configure({ seed: null, skipIntro: true });
-    useGame.getState().start(3, 100);
+    useGame.getState().start(3);
     expect(useGame.getState().phase).toBe('alert');
-    expect(useGame.getState().deadline).toBe(100 + COUNTDOWN_MS);
+    expect(useGame.getState().deadline).toBe(0);
   });
 
   it('without config, start keeps the intro; configure only works in the menu', () => {
@@ -251,5 +260,55 @@ describe('useGame phase machine', () => {
     useGame.getState().configure({ seed: 9, skipIntro: true }, 'expert');
     expect(useGame.getState().config).toEqual({ seed: null, skipIntro: false });
     expect(useGame.getState().difficulty).toBe('normal');
+  });
+
+  it('timeUp is ignored on a timeout screen reached without a hand, and retry stays a no-op', () => {
+    useGame.setState({ phase: 'choosing', hand: null, deadline: 1 });
+    useGame.getState().timeUp();
+    expect(useGame.getState().phase).toBe('choosing');
+  });
+
+  it('pause freezes the clock: timeUp is ignored and resume shifts the deadline', () => {
+    const g = () => useGame.getState();
+    g().start(1);
+    g().endIntro();
+    g().beginDealing(hand);
+    g().revealed(1000);
+    g().pause(5000);
+    expect(g().pausedAt).toBe(5000);
+    g().pause(6000); // a second pause keeps the first timestamp
+    expect(g().pausedAt).toBe(5000);
+    g().timeUp();
+    expect(g().phase).toBe('choosing');
+    g().resume(65_000);
+    expect(g().pausedAt).toBeNull();
+    expect(g().deadline).toBe(1000 + COUNTDOWN_MS + 60_000);
+    g().resume(70_000); // not paused: no-op
+    expect(g().deadline).toBe(1000 + COUNTDOWN_MS + 60_000);
+  });
+
+  it('a pause before the cards are revealed does not eat into the clock', () => {
+    const g = () => useGame.getState();
+    g().start(1);
+    g().endIntro();
+    g().pause(100);
+    g().resume(200);
+    expect(g().deadline).toBe(0);
+    g().beginDealing(hand);
+    g().pause(300);
+    g().revealed(1000); // revealed under the dialog
+    g().resume(4000);
+    expect(g().deadline).toBe(1000 + COUNTDOWN_MS + 3000);
+  });
+
+  it('every new alert gets a new dealId (quit + start with the same seed included)', () => {
+    const g = () => useGame.getState();
+    g().configure({ seed: 5, skipIntro: true });
+    g().start();
+    const first = g().dealId;
+    g().quit();
+    g().start();
+    expect(g().seed).toBe(5);
+    expect(g().dealId).toBe(first + 1);
   });
 });
