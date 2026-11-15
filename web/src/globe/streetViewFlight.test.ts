@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { vi, beforeEach, describe, expect, it } from 'vitest';
 import { useAppStore } from '@/core';
 import { latLonToVec3 } from './geo';
 import {
@@ -72,4 +72,19 @@ describe('standHere', () => {
     expect(useAppStore.getState().mode).toBe('explore');
     expect(useStreetViewFlight.getState().request?.siteId).toBe('sr1');
   });
+});
+
+it('reuses the existing flight for a free-coordinate URL, including immediate entry', () => {
+  const arrive = vi.fn();
+  useStreetViewFlight.setState({ globeActive: false, request: null });
+  standHere({ siteId: 'free', lat: -34.2, lon: 12.4, onArrive: arrive });
+  expect(arrive).toHaveBeenCalledTimes(1);
+  useStreetViewFlight.getState().setGlobeActive(true);
+  standHere({ siteId: 'free', lat: -34.2, lon: 12.4, onArrive: arrive });
+  expect(arrive).toHaveBeenCalledTimes(1);
+  const request = useStreetViewFlight.getState().request!;
+  expect(request).toMatchObject({ siteId: 'free', lat: -34.2, lon: 12.4 });
+  request.onArrive!();
+  expect(arrive).toHaveBeenCalledTimes(2);
+  useStreetViewFlight.setState({ globeActive: false, request: null });
 });

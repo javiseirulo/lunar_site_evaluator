@@ -96,11 +96,17 @@ Only a matching 5 m terrain profile is used; free points and changed heights
 show a labelled geometric horizon. Share view / QR freezes location, time and
 camera; Capture current view updates it. Links never include Cesium credentials.
 
-Configure `VITE_CESIUM_ION_TOKEN` in ignored `web/.env.local` or the build
-environment (public read access to Moon asset 2684829). All teammates can use
-Pablo's application token without their own ion account. Domain restrictions
-still apply: a localhost QR is not reachable from another phone. Use an allowed
-deployment/LAN origin for classroom sharing. Do not commit tokens.
+The public development read key is included in `src/streetview/cesiumAccess.ts`
+at Pablo's explicit request: teammates need no individual ion account or manual
+key entry. It is restricted to Moon 2684829 and localhost/127.0.0.1:5173.
+`VITE_CESIUM_ION_TOKEN` overrides it for another allowed deployment origin.
+Private credentials must remain outside Git. A localhost QR is not reachable
+from another phone; classroom sharing needs a reachable, permitted origin.
+
+In `/explore` (3D by default, with a WebGL fallback), drag the astronaut onto the Moon (or activate it and select
+a point). Street View reuses Marta's globe flight and the existing route. Right-click/double tap saves
+named locations in the globe's existing local pin format; Face Sun/Earth and
+Back to 3D map are available inside the viewport. Cesium/data credits remain.
 
 Data paths, numerical limits and outstanding consumer integrations:
 [Pablo's handoff](../docs/team/pabloizgui/team-handoff.md) and
