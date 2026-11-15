@@ -1,5 +1,5 @@
 import { Suspense, useEffect } from 'react';
-import { Outlet, useLocation } from 'react-router';
+import { Outlet, ScrollRestoration, useLocation } from 'react-router';
 import { loadCoreData, useData } from '../data';
 import { ModeSync } from '../ModeSync';
 import { Masthead } from './Masthead';
@@ -25,6 +25,8 @@ export function AppShell() {
           : 'flex min-h-full flex-col px-4 pt-4 sm:px-6 sm:pt-5'
       }
     >
+      {/* New pages open at the top (Back restores the previous position; #anchors still work). */}
+      <ScrollRestoration />
       <ModeSync />
       <Masthead />
       <main className={stage ? 'mt-1 flex min-h-0 flex-1 flex-col' : 'portal mt-3 flex-1'}>

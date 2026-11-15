@@ -17,7 +17,9 @@ import { formatUtc, useTimeseries } from '@/core';
 import type { StreetViewEmbedHandle, StreetViewEmbedProps } from '@/streetview/StreetViewEmbed';
 import { DEFAULT_REQUIREMENTS } from '../engine/requirements';
 import { useGame } from '../state/gameStore';
+import { siteTerrain } from './assets';
 import { skyAt, viewHeading } from './cockpit/sky';
+import { ReconPanorama } from './ReconPanorama';
 import { Countdown } from './Countdown';
 import { compassPoint, earthText, reconSky, SUN_TEXT } from './panorama';
 import { useGameSite } from '../historic/useGameSites';
@@ -133,10 +135,30 @@ export function SiteRecon() {
         role="group"
         aria-label={`Surface view at ${label}. Drag or use the arrow keys to look around.`}
       >
-        {mode !== '3d' && (
-          <p className="text-ink-muted pointer-events-none absolute inset-0 flex items-center justify-center bg-black px-6 text-center font-mono text-[11px] tracking-widest uppercase">
-            {mode === 'loading' ? 'Loading the surface…' : 'The surface did not load.'}
-          </p>
+        {/* Simplified 360° panorama (real Sun/Earth at touchdown): shown while the 3D terrain
+            loads and kept if it is unavailable, so the player is never left with a black box. */}
+        {sky && status ? (
+          <div
+            className={clsx(
+              'absolute inset-0 transition-opacity duration-500 motion-reduce:transition-none',
+              mode === '3d' ? 'pointer-events-none opacity-0' : 'opacity-100',
+            )}
+            aria-hidden={mode === '3d'}
+          >
+            <ReconPanorama
+              sky={sky}
+              status={status}
+              terrain={card ? siteTerrain(card.siteId) : 'rim'}
+              heading={heading}
+              onHeading={setHeading}
+            />
+          </div>
+        ) : (
+          mode === 'flat' && (
+            <p className="text-ink-muted pointer-events-none absolute inset-0 flex items-center justify-center bg-black px-6 text-center font-mono text-[11px] tracking-widest uppercase">
+              The surface did not load.
+            </p>
+          )
         )}
         {canEmbed && (
           <div

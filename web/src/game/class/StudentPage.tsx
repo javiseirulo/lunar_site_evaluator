@@ -166,9 +166,14 @@ function Session({ token, identity }: { token: string; identity: Identity }) {
     sending.current = true;
     setPending({ q: state.q, slot });
     const t = Math.max(0, transport.serverNow() - state.shownAt);
-    void transport.sendAnswer(state.q, sid, { choice: slot, t }).finally(() => {
-      sending.current = false;
-    });
+    void transport
+      .sendAnswer(state.q, sid, { choice: slot, t })
+      // Not sent (network): unlock the cards so the student can tap again, instead of
+      // showing "Answer locked in" for an answer the teacher never received.
+      .catch(() => setPending(null))
+      .finally(() => {
+        sending.current = false;
+      });
   };
 
   const board = state?.board ?? [];
