@@ -14,6 +14,7 @@ import {
   formatLatLon,
   formatUtc,
   lowScoreReason,
+  changeLead,
   changeWhen,
   nextChange,
   seriesSpanLabel,
@@ -607,7 +608,10 @@ function NowSection({ siteId, expert }: { siteId: string; expert: boolean }) {
         <dl className="rows border-edge mt-2 border-t text-[14px]">
           <Row label="Sun elevation" value={`${sky.sun_el.toFixed(1)}°`} />
           <Row
-            label={sky.lit ? 'Sunlit · sunset in' : 'Dark · sunrise in'}
+            label={changeLead(
+              sky.lit ? 'Sunlit · sunset' : 'Dark · sunrise',
+              nextChange(ts, ts.lit, now),
+            )}
             value={changeWhen(nextChange(ts, ts.lit, now), span, formatHours)}
           />
           <Row
@@ -615,8 +619,8 @@ function NowSection({ siteId, expert }: { siteId: string; expert: boolean }) {
               sky.earthVisible === null
                 ? 'Earth visibility'
                 : sky.earthVisible
-                  ? 'Earth in view · Earthset in'
-                  : 'Earth hidden · Earthrise in'
+                  ? changeLead('Earth in view · Earthset', nextChange(ts, ts.earth_visible, now))
+                  : changeLead('Earth hidden · Earthrise', nextChange(ts, ts.earth_visible, now))
             }
             value={
               sky.earthVisible === null || !ts.earth_visible
