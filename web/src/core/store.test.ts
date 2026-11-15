@@ -18,6 +18,7 @@ describe('app store', () => {
   it('starts with the contract defaults', () => {
     const s = useAppStore.getState();
     expect(s.selectedSiteId).toBeNull();
+    expect(s.selectedPoint).toBeNull();
     expect(s.currentTimeUTC).toBe(DEFAULT_TIME_UTC);
     expect(s.activeLayers).toEqual([]);
     expect(s.mode).toBe('explore');
@@ -56,5 +57,15 @@ describe('app store', () => {
     expect(cfg.time_mode).toBe('mission');
     expect(cfg.surface_days).toBe(9);
     expect(cfg.trajectory).toBe(s.missionConfig.trajectory);
+  });
+  it('shares a free location without mutating its caller or reusing it for another site', () => {
+    const point = { lat: 10, lon: 120 };
+    useAppStore.getState().setSelectedPoint(point);
+    point.lat = 0;
+    expect(useAppStore.getState().selectedPoint).toEqual({ lat: 10, lon: 120 });
+    useAppStore.getState().selectSite('shackleton_rim_01');
+    expect(useAppStore.getState().selectedPoint).toBeNull();
+    expect(() => useAppStore.getState().setSelectedPoint({ lat: 91, lon: 0 })).toThrow(RangeError);
+    expect(useAppStore.getState().selectedSiteId).toBe('shackleton_rim_01');
   });
 });

@@ -70,8 +70,9 @@ export async function loadCoreData(): Promise<void> {
     app.initLayers(layers);
     // Start the shared clock at the beginning of the data window.
     if (
-      app.currentTimeUTC < manifest.time_range.start_utc ||
-      app.currentTimeUTC >= manifest.time_range.end_utc // end_utc is exclusive (v1.1)
+      app.timeRevision === 0 &&
+      (app.currentTimeUTC < manifest.time_range.start_utc ||
+        app.currentTimeUTC >= manifest.time_range.end_utc) // end_utc is exclusive (v1.1)
     ) {
       app.setTime(manifest.time_range.start_utc);
     }

@@ -17,6 +17,7 @@ export function ModeSync() {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const pathRef = useRef(pathname);
+  const applyingUrl = useRef(false);
 
   // URL → store
   useEffect(() => {
@@ -24,14 +25,22 @@ export function ModeSync() {
     const mode = modeForPath(pathname);
     const siteId = siteIdFromPath(pathname);
     const s = useAppStore.getState();
-    if (mode && mode !== s.mode) s.setMode(mode);
-    if (siteId && siteId !== s.selectedSiteId) s.selectSite(siteId);
+    // URL updates may change mode before site. Do not redirect that intermediate
+    // state back to the previous site (notably when using the browser Back button).
+    applyingUrl.current = true;
+    try {
+      if (mode && mode !== s.mode) s.setMode(mode);
+      if (siteId && siteId !== s.selectedSiteId) s.selectSite(siteId);
+    } finally {
+      applyingUrl.current = false;
+    }
   }, [pathname]);
 
   // store → URL (reacts to changes only, never on mount, so the landing page stays put)
   useEffect(
     () =>
       useAppStore.subscribe((s, prev) => {
+        if (applyingUrl.current) return;
         const here = pathRef.current;
         const modeChanged = s.mode !== prev.mode;
         const siteChangedInStreetView =

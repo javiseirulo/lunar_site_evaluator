@@ -7,6 +7,21 @@
 
 ## 0. Estado real (actualizado 2026-11-14)
 
+> **Actualización de integración de Pablo, 2026-11-15:** dev `0b8f028` ya incluye
+> export real de los 59 sitios y sus series, rejillas de métricas, Explore con
+> filtros, Mission jugable y alunizajes históricos (#80–#89). Las tablas de v0
+> siguientes conservan el historial. Rama pendiente de revisión
+> `pabloizgui/38-streetview-ephemerides`: cielo SPICE 2026–2055, navegación
+> móvil/global, lectura del relieve, nombres y enlace/QR reproducible; 41
+> horizontes polares (5 m, 0,1°, 310 km), relieve/pendiente/PSR del catálogo real.
+> Heightmap/capas originales de Marta intactos. Guía, archivos por destinatario
+> y límites: [entrega actual](team/pabloizgui/team-handoff.md) y
+> [pendientes actuales](team/pabloizgui/tasks.md).
+> El export real de Javi y sus rejillas todavía usan horizonte plano; debe
+> consumir esta entrega para regenerar métricas/score. Globo/pins, despliegue
+> y teléfono físico siguen siendo integraciones del equipo. No se afirma que
+> la rama de Pablo ya esté mergeada ni que 41 perfiles cubran toda la Luna.
+
 ### Ramas: se trabaja contra `dev`
 - `dev` = rama de integración: **todo el trabajo entra aquí**. `main` = estable/entrega, solo recibe `dev` con un PR `dev` → `main` en cada integración.
 - Flujo: issue → `git switch -c <handle>/<n>-<slug> origin/dev` → PR con `gh pr create --base dev` → revisión → squash-merge a `dev`.
@@ -26,7 +41,7 @@
 | Landing, About (fuentes, declaración IA, sin branding NASA) | ✅ v0 | `web/src/pages/` |
 | Tests (store, helpers, validación de `public/data`) + CI | ✅ | `web/src/core/*.test.ts`, `.github/workflows/web.yml` |
 | Globo 3D + filtros (Marta) | ✅ v0 (globo, pins, ficha, coordenadas, pins propios) · ⏳ v1 requisitos de misión | `web/src/globe/`; filtro provisional en `requirements.ts` hasta la v1 (ver §5 Marta) |
-| Street View (Pablo) | ⏳ hueco listo | `web/src/streetview/` (placeholder que imprime Sol/Tierra az/el) |
+| Street View (Pablo) | v0 integrado con la entrega de terreno en rama #46; observador inicial 5 m; giro completo pendiente | `web/src/streetview/` y `web/public/data/terrain/`; revisiones/CI pendientes antes de integrar en dev |
 | Mission / juego (Cristóbal) | ⏳ diseño descrito (#52), hueco listo | `web/src/game/` (placeholder) |
 | Pipeline Python (Javi, Pablo) | Entrega polar real reunida con el visor en rama #46; revisión/integración pendientes | `python/terrain/`, `web/public/data/terrain/`: heightmap 1025², máscara, elevación/pendiente y tabla de 20 sitios; horizonte/efemérides aún pendientes |
 | Efemérides SPICE + `@/ephem` + `@/scoring` (Javi) | ✅ en `dev` (#70, #77, #78) · ⏳ export real | `python/ephem/`, `web/src/ephem/`, `web/src/scoring/`; diseño y qué usar: `docs/team/javiseirulo/diseno-efemerides-scoring.md` |
@@ -55,6 +70,7 @@ Contratos y mocks: **`contracts/README.md`**.
 
 ### Siguiente paso por persona
 > ➕ (@javiseirulo, 2026-11-14, #67) **Alcance = toda la Luna, con énfasis en el polo sur.** Qué tiene que cambiar cada uno: **§10**.
+- **Javi**: sustituir los mocks por datos reales con la misma forma (`"mock": false`); `pnpm test` en `web/` comprueba el formato.
 - **Javi**: ➕ (2026-11-14) contrato v1.1, efemérides y `@/scoring` ya en `dev`; **qué podéis usar cada uno: `docs/team/javiseirulo/diseno-efemerides-scoring.md` §5**. Siguiente: export real.
   Antes: sustituir los mocks por datos reales con la misma forma (`"mock": false`); `pnpm test` en `web/` comprueba el formato.
   ➕ (@martaplatero2002-star, 2026-11-15) **Javi (@javiseirulo) se encarga ahora del core y las capas (antes Javi2).** Pendiente para el globo (#92): (1) que el core cargue el `terrain/layers.json` real de Pablo en vez del `web/public/data/layers.json` mock — sin eso no se pintan capas sobre el parche polar 3D; (2) campo de fecha/hora en el Mission Clock; (3) barra lateral de Explore más alta. **El mapa polar 2D se quitará más adelante**: no invertir en él (descartado pedir `candidateIds` en el store para el 2D).
@@ -788,6 +804,7 @@ mock, propuesta `PolarHeightmap`, pruebas Python/consumidor JS y guía de lectur
 Se mantienen pendientes la revisión del contrato/loader por Marta/Javi2 y los
 horizontes de Javi (#38). El muestreo entrega terreno real en coordenadas de
 fixtures; no convierte scores, iluminación ni sitios inventados en resultados.
+
 ## 10. Toda la Luna, con énfasis en el polo sur (decisión de @javiseirulo, 2026-11-14, #67)
 
 > **Qué se decide.** La app permite **seleccionar y evaluar cualquier punto de la Luna**. El polo sur sigue siendo el foco: es donde hay más datos, terreno real y la mayoría de sitios. Ya estaba en J1 ("Se puede seleccionar toda la Luna, con énfasis en el polo sur"), pero el código y los mocks se habían quedado solo en el polo (≤ −80°). Esta sección dice qué cambia y qué necesita cada uno.
@@ -861,3 +878,17 @@ Física fuera de los polos, para que nadie se sorprenda con los resultados:
    - `evaluateSite`, `rankSites`, robustez, `bestDateCurve`, `paretoFront`;
    - panel de evaluación del sitio o del punto.
 4. **Datos reales:** catálogo global, `timeseries`, `sites.json` y `manifest` con `mock: false`. Después, mapa de calor.
+
+## Navegación e investigación de horizonte (Pablo, 2026-11-14)
+
+En la rama #46 hay controles móviles (un dedo/pinza), rueda, movimiento cercano
+limitado a 200 m con transición, coordenadas libres globales, luz artificial de
+lectura y rótulos IAU/USGS. Guía y dependencias actualizadas:
+`docs/team/pabloizgui/streetview-navigation-v1.md`. Se conserva la separación
+entre render y cálculo y el reloj de core; `selectedPoint` y `@/ephem` siguen
+siendo entregas externas pendientes.
+
+Descargado LOLA global LDEM_64 (unos 474 m) para ampliar la cobertura numérica
+de prueba. Hay seis perfiles experimentales y un CSV/benchmark en
+`web/public/data/terrain/trials/`; no son perfiles validados de producción ni
+alimentan score. La entrega polar Float32/máscara para Marta permanece intacta.

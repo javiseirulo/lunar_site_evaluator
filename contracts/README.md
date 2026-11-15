@@ -107,3 +107,22 @@ in contrast, are sampled at pixel centres within the same outer bounds.
 See [Pablo's handoff guide](../docs/team/pabloizgui/terrain-handoff.md) for decoding,
 NoData, source/frame, regeneration and the separate real elevation/slope layers.
 Marta/Javi2 must review this addition before integration in `dev`.
+
+## Street View integration handoff (#38)
+
+`AppEvents.selectedPoint` is additive and optional for existing consumers; core
+defaults it to null. `setSelectedPoint({lat, lon})` uses planetocentric degrees,
+east-positive longitude [-180,180], and rejects non-finite/out-of-range points.
+`selectSite` clears the free point. Street View inherits it only when the route
+belongs to the current selected site; an explicit shared URL takes precedence.
+Map/globe consumers must opt in rather than communicate through renderer state.
+
+`terrain/catalog.json` / `catalog-terrain.csv` carry terrain for the 59 sourced
+coordinates of `python/export/catalog.yaml`. `horizon/<id>.json` follows the
+v1.1 contract for 41 polar sites (5 m, 0.1°, 310 km). No profile is reused at a
+different location/height. Numerical validation and source hashes are in each
+profile and `terrain/catalog-delivery.json`. Unknown PSR distances are null;
+`psr_mapped_distance_km` is only an upper bound outside demonstrated coverage,
+with a stated 0.19 km spatial approximation bound. `slope_coarse` flags the
+non-polar global-DEM slope. These products do not mutate scores or hide pending
+metrics: Javi's export must consume them and regenerate evaluation outputs.
