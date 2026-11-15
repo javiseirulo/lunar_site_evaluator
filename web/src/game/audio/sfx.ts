@@ -199,6 +199,21 @@ export const sfx = {
       tone(g, { type: 'sine', freq: 48, to: 62, dur, peak: 0.12, attack: 0.4, release: 0.3 });
     }),
 
+  /** Dive from orbit: a band of noise falling in pitch over `dur` seconds. */
+  whoosh: (dur: number) =>
+    play((g) =>
+      noiseHit(g, {
+        dur,
+        peak: 0.16,
+        filter: 'bandpass',
+        freq: 2600,
+        to: 260,
+        q: 0.9,
+        attack: 0.08,
+        release: 0.4,
+      }),
+    ),
+
   /** Touchdown thud after `delay` seconds. */
   thud: (delay = 0) =>
     play((g) => {

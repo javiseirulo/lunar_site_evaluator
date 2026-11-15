@@ -1,7 +1,7 @@
 /**
  * Result of the chosen card: stars on a win, cause + lesson on a loss, and the real site name.
  * The chosen card's bars come back with the deciding one highlighted, and a loss names the
- * landing sites that would have survived.
+ * landing sites that would have survived. A small globe pulls back from the site and names it.
  */
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
@@ -16,6 +16,7 @@ import { verdictImage } from './assets';
 import { CAUSE_HEADLINE, lessonFor } from './content';
 import { GameButtons } from './GameButtons';
 import { countUp } from './format';
+import { GameGlobe } from './GameGlobe';
 import { GameImage } from './GameImage';
 import { QualityBar } from './QualityBar';
 import { survivorsLine, verdictSummary } from './reveal';
@@ -170,6 +171,14 @@ export function VerdictScreen() {
             className="size-full"
           />
         </motion.div>
+        {site && (
+          // The globe pulls back from the site and names it: the moment the name goes public.
+          <div className="mission-pixel absolute right-2 bottom-2 h-28 w-44 overflow-hidden border-2 border-black sm:h-36 sm:w-56">
+            <GameGlobe
+              shot={{ kind: 'reveal', target: { lat: site.lat, lon: site.lon }, label: siteName }}
+            />
+          </div>
+        )}
       </div>
       <div className="flex min-w-0 flex-1 flex-col gap-3">
         <h2

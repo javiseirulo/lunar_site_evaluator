@@ -1,20 +1,32 @@
-/** The Mission mini-game: one screen per phase of `useGame`. */
-import { useEffect, useRef, type ReactNode } from 'react';
+/**
+ * The Mission mini-game: one screen per phase of `useGame`, over a background globe.
+ *
+ * The background `GameGlobe` stays mounted from the menu to the descent (one WebGL context, no
+ * reload between shots, and the camera flies on from shot to shot): it spins behind the menu,
+ * intro, alert and briefing, flies to the pole for the approach (ending it), stays there behind
+ * the cards, and dives to the chosen site in the descent (ending it). From recon on it unmounts.
+ */
+import { useCallback, useEffect, useRef, type ReactNode } from 'react';
 import { motion, MotionConfig } from 'motion/react';
-import { useAppStore } from '@/core';
+import { clsx } from 'clsx';
+import { useAppStore, useData } from '@/core';
 import { useGameAudio } from '../audio/useGameAudio';
 import { useGame, type Phase } from '../state/gameStore';
 import { AlertScreen } from './AlertScreen';
+import { MENU_BG } from './assets';
 import { ExitControl } from './ExitControl';
+import { ApproachScreen, DescentScreen } from './FlightScreens';
+import { GameGlobe } from './GameGlobe';
 import { parseGameParams } from './gameParams';
+import { backgroundShot } from './globeShots';
 import { SoundControls } from './SoundControls';
 import { sharedSelectionFor } from './reveal';
 import { IntroScreen } from './IntroScreen';
 import { MenuScreen } from './MenuScreen';
 import { MissionFx } from './MissionFx';
+import { ReconScreen } from './ReconScreen';
 import { TimelapseScreen } from './TimelapseScreen';
 import { TimeoutScreen } from './TimeoutScreen';
-import { TravelScreen } from './TravelScreen';
 import { useDealHand } from './useDealHand';
 import { VerdictScreen } from './VerdictScreen';
 
@@ -22,15 +34,21 @@ import { VerdictScreen } from './VerdictScreen';
 const EXIT_PHASES: readonly Phase[] = [
   'intro',
   'alert',
+  'briefing',
+  'approach',
   'dealing',
   'choosing',
-  'travel',
+  'descent',
+  'recon',
   'timelapse',
 ];
 
-/** alert, dealing and choosing are one screen (the cards deal in place). */
+/** Phases whose screen lets the globe show through (darkened a little for readable text). */
+const DIM_PHASES: readonly Phase[] = ['menu', 'intro'];
+
+/** alert, briefing, dealing and choosing are one screen (content changes in place). */
 function screenKey(phase: Phase): string {
-  return phase === 'dealing' || phase === 'choosing' ? 'alert' : phase;
+  return phase === 'briefing' || phase === 'dealing' || phase === 'choosing' ? 'alert' : phase;
 }
 
 export function MissionGame() {
@@ -62,6 +80,17 @@ export function MissionGame() {
     if (app.selectedSiteId !== want) app.selectSite(want);
   }, [phase, chosenSiteId]);
 
+  // Background globe shot for this phase (numbered, anonymous markers only).
+  const cards = useGame((s) => s.hand?.cards);
+  const chosenSlot = useGame((s) => s.chosenSlot);
+  const sites = useData((s) => s.sites);
+  const shot = backgroundShot(phase, cards ?? [], chosenSlot, sites);
+  const onShotDone = useCallback(() => {
+    const g = useGame.getState();
+    if (g.phase === 'approach') g.approached();
+    else if (g.phase === 'descent') g.landed();
+  }, []);
+
   let screen: ReactNode;
   switch (phase) {
     case 'menu':
@@ -71,12 +100,19 @@ export function MissionGame() {
       screen = <IntroScreen />;
       break;
     case 'alert':
+    case 'briefing':
     case 'dealing':
     case 'choosing':
       screen = <AlertScreen dealStatus={deal.status} onRetry={deal.retry} />;
       break;
-    case 'travel':
-      screen = <TravelScreen />;
+    case 'approach':
+      screen = <ApproachScreen />;
+      break;
+    case 'descent':
+      screen = <DescentScreen />;
+      break;
+    case 'recon':
+      screen = <ReconScreen />;
       break;
     case 'timelapse':
       screen = <TimelapseScreen />;
@@ -96,8 +132,24 @@ export function MissionGame() {
         ref={rootRef}
         className="mission-root bg-navy-950 text-ink relative flex min-h-[544px] w-full flex-col overflow-hidden font-sans"
       >
-        <div className="flex min-h-10 items-center justify-between gap-2 pb-1.5">
-          <span className="min-w-0 truncate font-mono text-[10px] tracking-[0.3em] text-ink-faint uppercase">
+        {shot && (
+          <div className="absolute inset-0">
+            <GameGlobe
+              shot={shot}
+              onShotDone={onShotDone}
+              fallbackSrc={phase === 'menu' ? MENU_BG : undefined}
+            />
+            <div
+              aria-hidden
+              className={clsx(
+                'pointer-events-none absolute inset-0 transition-colors duration-500',
+                DIM_PHASES.includes(phase) ? 'bg-black/35' : 'bg-transparent',
+              )}
+            />
+          </div>
+        )}
+        <div className="relative flex min-h-10 items-center justify-between gap-2 pb-1.5">
+          <span className="text-ink-faint min-w-0 truncate font-mono text-[10px] tracking-[0.3em] uppercase">
             {EXIT_PHASES.includes(phase) ? 'Mission in progress' : ''}
           </span>
           <div className="flex items-center gap-1.5">
@@ -109,7 +161,7 @@ export function MissionGame() {
             re-render it with the next phase's state), the new one fades and rises in. */}
         <motion.div
           key={screenKey(phase)}
-          className="flex min-w-0 flex-1 flex-col"
+          className="relative flex min-w-0 flex-1 flex-col"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.28, ease: 'easeOut' }}

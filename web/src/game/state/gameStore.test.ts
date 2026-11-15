@@ -10,6 +10,15 @@ function reset() {
   useGame.setState(useGame.getInitialState(), true);
 }
 
+/** alert → (hand dealt) → briefing → approach → dealing. */
+function toDealing() {
+  const g = () => useGame.getState();
+  g().dealt(hand);
+  g().endAlert();
+  g().endBriefing();
+  g().approached();
+}
+
 describe('useGame phase machine', () => {
   beforeEach(reset);
 
@@ -36,16 +45,18 @@ describe('useGame phase machine', () => {
     expect(g().phase).toBe('alert');
     expect(g().deadline).toBe(0); // the clock waits for the cards
     expect(COUNTDOWN_MS).toBe(180_000);
-    g().beginDealing(hand);
+    toDealing();
     expect(g().phase).toBe('dealing');
     expect(g().deadline).toBe(0);
     g().revealed(1000);
     expect(g().phase).toBe('choosing');
     expect(g().deadline).toBe(1000 + COUNTDOWN_MS);
     g().choose(3);
-    expect(g().phase).toBe('travel');
+    expect(g().phase).toBe('descent');
     expect(g().chosenSlot).toBe(3);
     g().landed();
+    expect(g().phase).toBe('recon');
+    g().simulate();
     expect(g().phase).toBe('timelapse');
     g().finish();
     expect(g().phase).toBe('verdict');
@@ -71,14 +82,14 @@ describe('useGame phase machine', () => {
     reset();
     g().start(1);
     g().endIntro();
-    g().beginDealing(hand);
+    toDealing();
     g().timeUp();
     expect(g().phase).toBe('dealing');
 
     reset();
     g().start(1);
     g().endIntro();
-    g().beginDealing(hand);
+    toDealing();
     g().revealed();
     g().timeUp();
     expect(g().phase).toBe('timeout');
@@ -86,10 +97,13 @@ describe('useGame phase machine', () => {
     reset();
     g().start(1);
     g().endIntro();
-    g().beginDealing(hand);
+    toDealing();
     g().revealed();
     g().choose(0);
+    g().timeUp(); // descent: the clock is held
+    expect(g().phase).toBe('descent');
     g().landed();
+    g().simulate();
     g().timeUp();
     expect(g().phase).toBe('timelapse');
   });
@@ -98,10 +112,11 @@ describe('useGame phase machine', () => {
     const g = () => useGame.getState();
     g().start(1);
     g().endIntro();
-    g().beginDealing(hand);
+    toDealing();
     g().revealed(0);
     g().choose(1);
     g().landed();
+    g().simulate();
     g().finish();
     g().retry(5000);
     expect(g().phase).toBe('choosing');
@@ -114,7 +129,7 @@ describe('useGame phase machine', () => {
     const g = () => useGame.getState();
     g().start(1);
     g().endIntro();
-    g().beginDealing(hand);
+    toDealing();
     g().revealed();
     g().timeUp();
     expect(g().phase).toBe('timeout');
@@ -127,7 +142,7 @@ describe('useGame phase machine', () => {
     const g = () => useGame.getState();
     g().start(1);
     g().endIntro();
-    g().beginDealing(hand);
+    toDealing();
     g().revealed();
     g().timeUp();
     const dealId = g().dealId;
@@ -162,7 +177,7 @@ describe('useGame phase machine', () => {
     expect(useGame.getState().difficulty).toBe('expert');
   });
 
-  it('a pending pick blocks timeUp and still reaches travel', () => {
+  it('a pending pick blocks timeUp and still reaches the descent', () => {
     const g = () => useGame.getState();
     useGame.setState({ phase: 'choosing', hand, deadline: 1 });
     g().pick(3);
@@ -172,7 +187,7 @@ describe('useGame phase machine', () => {
     g().timeUp();
     expect(g().phase).toBe('choosing');
     g().choose(3);
-    expect(g().phase).toBe('travel');
+    expect(g().phase).toBe('descent');
     expect(g().chosenSlot).toBe(3);
     expect(g().pendingSlot).toBeNull();
   });
@@ -272,7 +287,7 @@ describe('useGame phase machine', () => {
     const g = () => useGame.getState();
     g().start(1);
     g().endIntro();
-    g().beginDealing(hand);
+    toDealing();
     g().revealed(1000);
     g().pause(5000);
     expect(g().pausedAt).toBe(5000);
@@ -294,7 +309,7 @@ describe('useGame phase machine', () => {
     g().pause(100);
     g().resume(200);
     expect(g().deadline).toBe(0);
-    g().beginDealing(hand);
+    toDealing();
     g().pause(300);
     g().revealed(1000); // revealed under the dialog
     g().resume(4000);
@@ -310,5 +325,120 @@ describe('useGame phase machine', () => {
     g().start();
     expect(g().seed).toBe(5);
     expect(g().dealId).toBe(first + 1);
+  });
+});
+
+describe('cinematic phases (#100)', () => {
+  beforeEach(reset);
+  const g = () => useGame.getState();
+
+  /** Into `choosing` with the clock started at `t0`. */
+  function toChoosing(t0 = 0) {
+    g().start(1);
+    g().endIntro();
+    toDealing();
+    g().revealed(t0);
+  }
+
+  it('the hand is dealt in the background during alert or briefing, once', () => {
+    g().start(1);
+    g().endIntro();
+    g().endAlert();
+    expect(g().phase).toBe('briefing');
+    g().endBriefing(); // no hand yet: the approach needs the sites
+    expect(g().phase).toBe('briefing');
+    g().dealt(hand);
+    expect(g().hand).toBe(hand);
+    const other: Hand = { ...hand, startIndex: 9 };
+    g().dealt(other); // already dealt
+    expect(g().hand).toBe(hand);
+    g().endBriefing();
+    expect(g().phase).toBe('approach');
+    g().dealt(other); // too late
+    expect(g().hand).toBe(hand);
+    expect(g().deadline).toBe(0); // no clock during the approach
+    g().approached();
+    expect(g().phase).toBe('dealing');
+  });
+
+  it('dealt, endAlert, endBriefing and approached are no-ops elsewhere', () => {
+    g().dealt(hand);
+    g().endAlert();
+    g().endBriefing();
+    g().approached();
+    expect(g().phase).toBe('menu');
+    expect(g().hand).toBeNull();
+  });
+
+  it('the clock is held during the descent and runs again in recon', () => {
+    toChoosing(0);
+    g().pick(2);
+    g().choose(2, 10_000);
+    expect(g().phase).toBe('descent');
+    expect(g().heldAt).toBe(10_000);
+    g().timeUp();
+    expect(g().phase).toBe('descent');
+    g().landed(13_500);
+    expect(g().phase).toBe('recon');
+    expect(g().heldAt).toBeNull();
+    expect(g().deadline).toBe(COUNTDOWN_MS + 3500);
+    g().timeUp(); // the clock can run out while looking around
+    expect(g().phase).toBe('timeout');
+  });
+
+  it('choose another site: back to the same hand and clock, choice cleared', () => {
+    toChoosing(0);
+    g().choose(3, 1000);
+    g().landed(2000);
+    const deadline = g().deadline;
+    g().chooseAgain();
+    expect(g().phase).toBe('choosing');
+    expect(g().hand).toBe(hand);
+    expect(g().chosenSlot).toBeNull();
+    expect(g().pendingSlot).toBeNull();
+    expect(g().deadline).toBe(deadline);
+    g().choose(1, 5000);
+    expect(g().chosenSlot).toBe(1);
+  });
+
+  it('simulate and chooseAgain only work in recon', () => {
+    toChoosing(0);
+    g().simulate();
+    g().chooseAgain();
+    expect(g().phase).toBe('choosing');
+    g().choose(1, 0);
+    g().simulate();
+    expect(g().phase).toBe('descent');
+  });
+
+  it('the exit dialog during the descent does not count the held time twice', () => {
+    toChoosing(0);
+    g().choose(1, 10_000);
+    g().pause(11_000);
+    g().resume(12_000); // inside the hold: no extra shift
+    g().landed(13_000);
+    expect(g().deadline).toBe(COUNTDOWN_MS + 3000);
+  });
+
+  it('a dialog still open at touchdown only counts its time after touchdown', () => {
+    toChoosing(0);
+    g().choose(1, 10_000);
+    g().pause(11_000);
+    g().landed(13_000);
+    expect(g().pausedAt).toBe(13_000);
+    g().timeUp(); // still paused
+    expect(g().phase).toBe('recon');
+    g().resume(20_000);
+    expect(g().deadline).toBe(COUNTDOWN_MS + 3000 + 7000);
+  });
+
+  it('retry and restart clear the hold', () => {
+    useGame.setState({ phase: 'timeout', hand, heldAt: 5 });
+    g().retry(0);
+    expect(g().heldAt).toBeNull();
+    useGame.setState({ phase: 'descent', heldAt: 5 });
+    g().restart(3);
+    expect(g().heldAt).toBeNull();
+    expect(g().phase).toBe('alert');
   });
 });
