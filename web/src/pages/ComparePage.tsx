@@ -27,6 +27,13 @@ import { TimeBar } from '@/core/shell/TimeBar';
 import { choiceGroups } from '@/core/siteChoices';
 import { SiteMoon } from './CompareMoons';
 
+/**
+ * Default comparison: three well-known areas far apart on the Moon, so the differences show —
+ * the south pole (Shackleton rim), a nearside mare (Apollo 11, Tranquility Base) and the far side
+ * inside the South Pole–Aitken basin (Chang'e 4, Von Kármán).
+ */
+const DEFAULT_IDS = ['shackleton_rim_01', 'apollo_11', 'change_4'];
+
 /** Great-circle separation, in degrees. Neighbours at the south pole are only a couple of degrees apart. */
 function angularSepDeg(a: Site, b: Site): number {
   const dLat = ((b.lat - a.lat) * Math.PI) / 180;
@@ -96,12 +103,12 @@ function CompareView() {
   const ids = useMemo(() => {
     const fromUrl = (params.get('ids') ?? '').split(',').filter(Boolean);
     if (fromUrl.length || !sites) return fromUrl.slice(0, 3);
-    // Default: the selected site plus the best-scoring valid sites.
-    const ranked = [...sites]
-      .filter((s) => s.valid)
-      .sort((a, b) => b.score - a.score)
-      .map((s) => s.id);
-    return [...new Set([selectedSiteId, ...ranked].filter((x): x is string => !!x))].slice(0, 3);
+    // Default: the selected site (if it is in the catalogue) plus the three far-apart areas above.
+    const known = new Set(sites.map((s) => s.id));
+    const first = selectedSiteId && known.has(selectedSiteId) ? selectedSiteId : null;
+    return [...new Set([first, ...DEFAULT_IDS.filter((id) => known.has(id))].filter(Boolean))]
+      .slice(0, 3)
+      .map(String);
   }, [params, sites, selectedSiteId]);
 
   const groups = useMemo(() => choiceGroups(sites ?? []), [sites]);
@@ -167,7 +174,7 @@ function CompareView() {
       </div>
 
       {chosen.length > 0 && (
-        <div className="grid min-h-[30rem] flex-1 grid-cols-1 gap-2 md:grid-cols-3">
+        <div className="grid shrink-0 grid-cols-1 gap-2 md:grid-cols-3 md:items-start">
           {chosen.map((site, index) => (
             <SiteColumn key={index} site={site} />
           ))}
@@ -176,14 +183,14 @@ function CompareView() {
 
       {chosen.length > 0 && (
         <section className="box shrink-0">
-          <div className="text-heading flex items-center gap-2 px-3 pt-1.5 pb-0.5 font-mono text-[11px] tracking-[0.12em] uppercase">
+          <div className="text-heading flex items-center gap-2 px-4 pt-3 pb-2 font-mono text-[11px] tracking-[0.12em] uppercase">
             Sunlight &amp; Earth
             <span className="text-ink-muted ml-auto font-sans text-[10px] font-normal tracking-normal normal-case">
               <span className="text-sun">■</span> sunlit, <span className="text-earth">■</span>{' '}
               Earth in view
             </span>
           </div>
-          <div className="space-y-0.5 px-3 pb-1.5">
+          <div className="space-y-2.5 px-4 pb-3.5">
             {chosen.map((s) => (
               <TimelineRow key={s.id} site={s} />
             ))}
@@ -223,7 +230,7 @@ function SiteColumn({ site }: { site: Site }) {
 
   return (
     <article className="border-edge-hi flex min-h-0 flex-col gap-2 border-2 bg-black p-2">
-      <div className="relative min-h-[140px] flex-1">
+      <div className="relative h-[clamp(11rem,26vh,17rem)] flex-none">
         <SiteMoon lat={site.lat} lon={site.lon} sunEl={sunEl} label={site.name} />
       </div>
       <div>
@@ -291,8 +298,8 @@ function TimelineRow({ site }: { site: Site }) {
     <div className="grid items-center gap-x-2 sm:grid-cols-[9rem_minmax(0,1fr)_minmax(0,14rem)]">
       <span className="truncate text-[11px] font-medium text-heading">{site.name}</span>
       <div className="border-edge-lo bg-navy-950 relative border p-px">
-        <div className="h-[4px]" style={{ background: sun ?? 'transparent' }} />
-        <div className="mt-px h-[4px]" style={{ background: earth ?? 'transparent' }} />
+        <div className="h-[6px]" style={{ background: sun ?? 'transparent' }} />
+        <div className="mt-px h-[6px]" style={{ background: earth ?? 'transparent' }} />
         <div
           className="bg-accent absolute top-0 bottom-0 w-px"
           style={{ left: `calc(3px + ${pos} * (100% - 6px))` }}
