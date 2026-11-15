@@ -1,13 +1,14 @@
 {
   "version": 1,
-  "asset": "astronaut-ai.png",
-  "width": 1254,
-  "height": 1254,
-  "sha256": "6eda84d86cbbdecd375df947ed907a283ab242a68181e3425193e6644304b8ca",
+  "asset": "astronaut.png",
+  "width": 512,
+  "height": 512,
+  "sha256": "e5b8e18ec6d8e3f96ba24952910a900c484aac3ccaf7d754677893fa6743f8da",
   "ai_generated": true,
-  "provider": "OpenAI imagegen",
+  "provider": "ChatGPT image supplied by Pablo",
   "date": "2026-11-15",
-  "purpose": "Human-requested draggable astronaut UI control",
+  "purpose": "Street View launcher and drag image",
   "visible_ai_mark": true,
-  "agency_branding": false
+  "agency_branding": false,
+  "visible_credit": "ChatGPT"
 }

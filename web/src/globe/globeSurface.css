@@ -1,71 +1,68 @@
-.globe-surface-control.is-staged {
-  left: auto;
-  right: 12px;
-  top: 12px;
-  bottom: auto;
-  width: max-content;
-  transform: none;
-  flex-direction: column;
-  align-items: flex-end;
-}
-@media (min-width: 768px) {
-  .globe-surface-control.is-staged {
-    /* Sit on the Moon, at the top-left corner of the Explore card. */
-    right: calc(12px + max(210px, 22%) + 10px);
-  }
-}
 .globe-surface-control {
   position: absolute;
-  /* Stay clear of the Layers button in the bottom-left corner. */
-  left: 78px;
-  right: 10px;
-  bottom: 10px;
+  bottom: max(12px, env(safe-area-inset-bottom));
+  right: max(12px, env(safe-area-inset-right));
   z-index: 45;
-  display: flex;
-  align-items: flex-end;
-  gap: 8px;
-  flex-direction: column-reverse;
   pointer-events: none;
 }
 .astronaut-button {
-  pointer-events: auto;
-  width: 54px;
-  height: 66px;
-  background: #111925e8;
-  border: 1px solid #8898a5;
-  border-radius: 4px;
-  cursor: grab;
+  display: grid;
+  place-items: center;
   position: relative;
+  pointer-events: auto;
+  width: 56px;
+  height: 56px;
+  padding: 0;
+  background: #0e2040ed;
+  border: 1px solid #24406e;
+  border-radius: 2px;
+  cursor: grab;
 }
+.astronaut-button:active {
+  cursor: grabbing;
+}
+.astronaut-button:focus-visible,
 .astronaut-button[aria-pressed='true'] {
-  outline: 2px solid #f2c55c;
+  outline: 2px solid #ffcc4d;
 }
 .astronaut-button img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
+  width: 44px;
+  height: 44px;
+  margin-bottom: 5px;
 }
-.astronaut-button span {
+.astronaut-credit {
   position: absolute;
+  right: 2px;
   bottom: 1px;
-  right: 3px;
+  font: 8px/1 sans-serif;
   color: #ced5de;
-  font-size: 8px;
-}
-.globe-surface-control p {
-  max-width: min(210px, 100%);
-  background: #101925df;
-  color: #edf2f8;
-  padding: 6px 8px;
-  font-size: 11px;
-  line-height: 1.4;
 }
 .astronaut-ghost {
   position: fixed;
-  width: 54px;
-  height: 66px;
-  transform: translate(-50%, -85%);
+  width: 56px;
+  height: 56px;
+  translate: -52% -30%;
+  transform-origin: 52% 30%;
   z-index: 2000;
   pointer-events: none;
   object-fit: contain;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .astronaut-ghost {
+    animation: astronaut-sway 0.62s ease-in-out infinite alternate;
+  }
+  @keyframes astronaut-sway {
+    from {
+      rotate: -4deg;
+    }
+    to {
+      rotate: 4deg;
+    }
+  }
+}
+@media (max-width: 767px) {
+  /* The staged Explore layout reserves its last row for the time controls. */
+  .globe-surface-control.is-staged {
+    bottom: calc(84px + env(safe-area-inset-bottom));
+  }
 }

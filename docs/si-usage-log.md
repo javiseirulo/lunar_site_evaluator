@@ -84,3 +84,5 @@ La **idea** no puede venir de la IA.
 | 2026-11-15 | javocruz | Claude Code (Opus 5.5) | Revisión y reescritura de textos de la landing (funciones, trabajo futuro) contra los datos actuales | Texto asistido por IA, revisado por el usuario |
 | 2026-11-15 | javiseirulo | Claude Code (Sonnet 5.5) | Selector de fecha de aterrizaje en Explore (Normal y Expert) con validación de años de efemérides y avisos de puntuaciones del catálogo obsoletas (#154) | Código y pruebas asistidos por IA; verificado en navegador con fechas 1969, 2024, 2026, 2035, 2040, 2055 y 1985 (rechazada) |
 | 2026-11-15 | martaplatero2002-star | Claude Code (Opus 5.5) | Redacción de los prompts de Higgsfield para los assets de Mission (ideas aprobadas por Manuel) y comprobación de coste en el CLI; no se generó ningún asset (#127) | Solo documentación interna (`docs/team/martaplatero2002-star/higgsfield-mission-prompts.md`); los assets que salgan se declararán como imágenes/vídeo/voz generados con IA |
+
+- 2026-11-15 · Pablo suministró la ilustración de astronauta creada con ChatGPT. Codex adaptó la interacción, conservó el canal alfa y la firma visible ChatGPT. El recurso es ilustrativo.
