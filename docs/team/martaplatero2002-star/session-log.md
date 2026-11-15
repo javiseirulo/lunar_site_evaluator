@@ -108,3 +108,8 @@
 - `terrainLift(lat, lon)` (terrain.ts): proyección estereográfica (`projectSouthPolar` de `@/core/projection`, solo lectura) + altura bilineal → elevación sobre la esfera en unidades del globo, con la exageración activa; 0 fuera del parche o sin dato. `sampleHeight` tolera el redondeo en los bordes de la rejilla.
 - `useTerrainLift()` (terrainStore.ts): función estable mientras no cambie el terreno ni la exageración. Pins de sitios, pins propios, alunizajes históricos, marcador de clic, etiqueta de hover y tarjeta se anclan a `PIN_ALTITUDE + lift`.
 - Comprobado con los datos reales: SR1 +1652 m, SR3 +1383 m, CR1 +1927 m, GR1 +1759 m (bordes de cráter, plausible). 3 tests nuevos (incluido que coincide con el vértice de la malla).
+
+### Paso 5 — "Stand here in Street View" (2026-11-15)
+- Señal local `streetViewFlight.ts` (zustand, en src/globe): `globeActive` (lo pone el CameraRig al montarse) y `request`. `standHere(site)`: en 3D pide el vuelo; en 2D (globo no montado) o con `prefers-reduced-motion` hace `setMode('streetview')` directamente.
+- Vuelo de 1,5 s (easeInOut): dirección y radio interpolados por separado (rodea el globo, no lo atraviesa) hasta 3 km sobre el terreno (`terrainLift`), y orientación por slerp de cuaterniones hasta mirar nivelado al horizonte (~100 km) con el "arriba" local (con lookAt y +Y del mundo la vista saldría invertida junto al polo sur). Mira en la dirección de viaje; si no hay, al norte. Controles desactivados durante el vuelo; al terminar, `setMode('streetview')`.
+- 6 tests (pose, nivelado, dirección, polo, easing, 2D vs 3D). Sin verificar visualmente (panel oculto).

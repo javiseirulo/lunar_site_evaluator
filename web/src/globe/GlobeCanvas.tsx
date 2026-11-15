@@ -35,7 +35,9 @@ import {
   Group,
   SphereGeometry,
   MOUSE,
+  Matrix4,
   Mesh,
+  Quaternion,
   SRGBColorSpace,
   Sprite,
   Vector3,
@@ -54,6 +56,13 @@ import { OUTCOME_COLORS, loadHistoricSites, useHistoric } from './historicSites'
 import { useRequirements } from './requirementsStore';
 import { useCandidates } from './useCandidates';
 import { meetsText } from './missionStats';
+import {
+  FLIGHT_MS,
+  easeInOut,
+  standPose,
+  useStreetViewFlight,
+  type StreetViewRequest,
+} from './streetViewFlight';
 
 const TEXTURE_URL = `${import.meta.env.BASE_URL}textures/lroc_color_poles_4k.jpg`;
 const PIN_ALTITUDE = 1.002;
@@ -804,6 +813,34 @@ function CameraRig({
   controlsRef: RefObject<Controls | null>;
 }) {
   const camera = useThree((s) => s.camera);
+  const lift = useTerrainLift();
+  const svRequest = useStreetViewFlight((s) => s.request);
+  /** "Stand here" flight in progress: start pose and clock. */
+  const svFlight = useRef<{
+    req: StreetViewRequest;
+    startMs: number;
+    from: Vector3;
+    fromTurn: Quaternion;
+  } | null>(null);
+
+  useEffect(() => {
+    const setActive = useStreetViewFlight.getState().setGlobeActive;
+    setActive(true);
+    return () => setActive(false);
+  }, []);
+
+  useEffect(() => {
+    const controls = controlsRef.current;
+    if (!svRequest || !controls) return;
+    flightRef.current = null; // the street view flight wins over any other flight
+    controls.enabled = false;
+    svFlight.current = {
+      req: svRequest,
+      startMs: performance.now(),
+      from: camera.position.clone(),
+      fromTurn: camera.quaternion.clone(),
+    };
+  }, [svRequest, camera, controlsRef, flightRef]);
 
   useEffect(() => {
     const controls = controlsRef.current;
@@ -816,6 +853,29 @@ function CameraRig({
   }, [controlsRef, flightRef]);
 
   useFrame((_, dt) => {
+    const sv = svFlight.current;
+    if (sv) {
+      const e = easeInOut((performance.now() - sv.startMs) / FLIGHT_MS);
+      const { lat, lon } = sv.req;
+      const pose = standPose(lat, lon, lift(lat, lon), sv.from.toArray());
+      const end = new Vector3(...pose.position);
+      // Along the globe (direction and radius separately), never through it.
+      const radius = sv.from.length() + (end.length() - sv.from.length()) * e;
+      camera.position.lerpVectors(sv.from.clone().normalize(), end.clone().normalize(), e);
+      camera.position.setLength(radius);
+      // Turn from the globe view to a level look at the horizon with the local up as "up"
+      // (lookAt with the world +Y would turn the view upside down near the south pole).
+      const endTurn = new Quaternion().setFromRotationMatrix(
+        new Matrix4().lookAt(end, new Vector3(...pose.target), end.clone().normalize()),
+      );
+      camera.quaternion.slerpQuaternions(sv.fromTurn, endTurn, e);
+      if (e >= 1) {
+        svFlight.current = null;
+        useStreetViewFlight.getState().clear();
+        useAppStore.getState().setMode('streetview');
+      }
+      return; // controls and the minimum radius stay out of the way while flying down
+    }
     const target = flightRef.current;
     if (target) {
       if (target.lengthSq() === 0) {
