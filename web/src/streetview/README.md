@@ -22,7 +22,7 @@ Links and QR codes never include credentials. See
 [team handoff](../../../docs/team/pabloizgui/team-handoff.md) and the
 [official token guide](https://cesium.com/learn/ion/cesium-ion-access-tokens/).
 
-Open `/explore?view=3d` and drag the astronaut onto the visible Moon, or open
+Open `/explore` (3D by default, with a WebGL fallback) and drag the astronaut onto the visible Moon, or open
 `/streetview/shackleton_rim_01` directly. Tapping/keyboard-activating the astronaut
 arms placement; the next Moon click reuses Marta's globe flight and the existing
 Street View route. The URL takes the current UTC when that flight finishes.
@@ -113,8 +113,10 @@ Javi J0/J10 alignment: the default observer height is 5 m. `observerSky` consume
 Javi's available `skyAt` and checks location/height before using a terrain
 profile. The ephemeris frame is `MOON_ME_DE440_ME421`, aligned with the DEM's
 ME/DE421 frame; see the shared Horizons report. Visual mesh/DEM height calibration
-and physical-device QA remain pending. Javi's export still needs to consume the
-terrain delivery to regenerate its flat-horizon series, metrics and scores.
+and physical-device QA remain pending. Javi's integrated #101 export now consumes
+all 41 polar profiles and catalogue terrain, and publishes real map layers.
+Per-cell grids still use geometric horizons; PSR remains pending in 18 sites
+without coverage. These current facts supersede earlier consumer-pending notes.
 
 ## Navegación v1 (2026-11-14)
 

@@ -2,7 +2,7 @@
 
 2026-11-15 · Pablo · peticiones humanas implementadas con OpenAI Codex.
 Base actualizada: dev 0ca606d (#91, #97 globo v2, #98 despliegue, #90 Mission y #101 datos/capas/restyle integrados). Rama pabloizgui/46-globe-streetview.
-Las notas privadas se conservan en stash y se restauran al cerrar la entrega.
+Las notas privadas están restauradas localmente y conservan una copia en stash; no forman parte de la entrega publicada.
 
 ## Alcance vigente
 
@@ -61,7 +61,7 @@ Astronauta generado con imagegen, PNG transparente, sin insignias ni banderas,
 marca AI visible: web/public/streetview/astronaut-ai.png. Es un control ilustrado,
 no fotografía ni dato NASA. Se conserva el original generado.
 
-Verificación de este bloque tras integrar dev: 330 pruebas web en 36 archivos,
+Verificación inicial con dev f6dd86f: 330 pruebas web en 36 archivos,
 lint y TypeScript correctos; verificador de entrega de terreno correcto, con
 1 050 625 muestras y hashes/máscara conservados. Chrome con emulación móvil
 comprueba arrastre → vuelo existente → ruta y cambio de UTC durante el vuelo:
@@ -73,3 +73,13 @@ fallback WebGL, Normal/Expert y las nuevas capas de Javi. El retorno respeta
 selectedPoint y evita el vuelo inicial al centro original del sitio; las
 selecciones posteriores de catálogo conservan sus vuelos. El export de Javi ya
 consume los 41 horizontes y terreno; las rejillas por celda siguen geométricas.
+La suite con esta base 0ca606d pasa 340 pruebas web en 39 archivos. Tras el guard
+final del retorno, lint selectivo, TypeScript y build de producción sin variable
+de token también pasan. En Chrome de producción con gesto táctil nativo: se abre
+Shackleton con coordenadas compartidas 20° N, 30° E y UTC 2034-04-01T12:00:00Z,
+se vuelve al mapa, se espera 2,4 s y se suelta el astronauta en el centro. La llegada
+queda en 20,1383° N, 30° E y conserva UTC (error de colocación <0,5°), comprobando
+que el vuelo inicial ya no reemplaza el punto observado por el centro del catálogo.
+Esta prueba no reemplaza la validación en un teléfono físico. Los resultados
+de CI se consultan en el PR #104; esta auditoría documenta las comprobaciones
+locales y no afirma una aprobación remota.

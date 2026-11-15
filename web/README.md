@@ -103,7 +103,7 @@ key entry. It is restricted to Moon 2684829 and localhost/127.0.0.1:5173.
 Private credentials must remain outside Git. A localhost QR is not reachable
 from another phone; classroom sharing needs a reachable, permitted origin.
 
-In `/explore?view=3d`, drag the astronaut onto the Moon (or activate it and select
+In `/explore` (3D by default, with a WebGL fallback), drag the astronaut onto the Moon (or activate it and select
 a point). Street View reuses Marta's globe flight and the existing route. Right-click/double tap saves
 named locations in the globe's existing local pin format; Face Sun/Earth and
 Back to 3D map are available inside the viewport. Cesium/data credits remain.
