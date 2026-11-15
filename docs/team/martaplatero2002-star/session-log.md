@@ -147,3 +147,4 @@
 - Mecanismo: `ExplorePage` registra el hueco libre entre paneles (`chromeSlot`) y el globo coloca ahí sus controles con un portal; sin hueco, quedan sobre todo el globo como antes. Se quita la pestaña "Map" del panel izquierdo.
 - Toca `src/pages/ExplorePage.tsx` (de Javi2): coordinar el PR con él.
 - Mission Clock y fecha de aterrizaje (Normal) salen de encima de la Luna: van en una franja bajo el mapa 3D, bajo la columna central; paneles laterales y controles siguen sobre el globo.
+- La página de Explore hace scroll: el mapa 3D ocupa casi toda la altura visible (`100dvh − 8,5 rem`, mínimo 26 rem) y el Mission Clock queda debajo. El scroll es el del propio `ExplorePage` (el shell no se toca). Con la rueda sobre el globo se hace zoom; para bajar, usar la barra de scroll o la rueda fuera del mapa.

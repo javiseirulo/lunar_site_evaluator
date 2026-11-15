@@ -177,9 +177,10 @@ export default function ExplorePage() {
   const setChromeSlot = useChromeSlot((s) => s.setSlot);
 
   return (
-    <>
+    // The page scrolls: a tall 3D map first, the Mission Clock below it.
+    <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
       <EndSimulationDialog />
-      <div className="border-edge-hi relative min-h-0 flex-1 overflow-hidden border-2 bg-black">
+      <div className="border-edge-hi relative h-[calc(100dvh-8.5rem)] min-h-[26rem] shrink-0 overflow-hidden border-2 bg-black">
         <div className="absolute inset-0">
           {WEBGL ? (
             <GlobeBoundary fallback={<PolarMap className="size-full" neutral={!proMode} />}>
@@ -202,12 +203,12 @@ export default function ExplorePage() {
       </div>
 
       {/* Mission Clock below the 3D view (not over the Moon), under the free map column. */}
-      <div className="mt-2 grid shrink-0 grid-cols-1 gap-3 px-3 md:grid-cols-[minmax(200px,20%)_minmax(0,1fr)_minmax(210px,22%)]">
+      <div className="mt-2 grid shrink-0 grid-cols-1 gap-3 px-3 pb-3 md:grid-cols-[minmax(200px,20%)_minmax(0,1fr)_minmax(210px,22%)]">
         <div className="flex flex-col gap-2 md:col-start-2">
           {!proMode && <LandingDate />}
           <TimeBar />
         </div>
       </div>
-    </>
+    </div>
   );
 }
