@@ -100,7 +100,7 @@ function LeftPanel() {
 
   return (
     <aside
-      className={`${FRAME} pointer-events-auto flex max-h-[50dvh] min-h-0 w-full flex-col self-start overflow-y-auto md:max-h-full`}
+      className={`${FRAME} pointer-events-auto flex min-h-0 w-full flex-col self-start md:max-h-full md:overflow-y-auto`}
     >
       <Pages options={options} value="sites" onChange={() => undefined} />
       <div>
@@ -145,7 +145,7 @@ function RightPanel() {
 
   return (
     <aside
-      className={`${FRAME} pointer-events-auto flex max-h-full min-h-0 w-full flex-col self-start overflow-y-auto md:col-start-3`}
+      className={`${FRAME} pointer-events-auto flex min-h-0 w-full flex-col self-start max-md:order-first md:col-start-3 md:max-h-full md:overflow-y-auto`}
     >
       <Pages options={options} value={shown} onChange={setTab} />
       <div>
@@ -182,7 +182,7 @@ export default function ExplorePage() {
       {/* Wide screens: panels float over a tall map. Narrow screens: the map comes first and the panels
           follow in the normal flow, so nothing covers the globe or its controls. */}
       <div
-        className={`border-edge-hi relative shrink-0 border-2 bg-black md:h-[calc(100dvh-8.5rem)] md:min-h-[26rem] md:overflow-hidden ${
+        className={`border-edge-hi relative shrink-0 bg-black md:h-[calc(100dvh-8.5rem)] md:border-2 md:min-h-[26rem] md:overflow-hidden ${
           full ? 'max-md:fixed max-md:inset-0 max-md:z-50 max-md:overflow-hidden' : ''
         }`}
       >
@@ -201,7 +201,7 @@ export default function ExplorePage() {
           )}
         </button>
         <div
-          className={`md:absolute md:inset-0 md:h-auto md:min-h-0 ${full ? 'max-md:h-full' : 'h-[55dvh] min-h-[20rem]'}`}
+          className={`md:absolute md:inset-0 md:h-auto md:min-h-0 ${full ? 'max-md:h-full' : 'h-[55dvh] min-h-[20rem] max-md:border-edge-hi max-md:border-2'}`}
         >
           {WEBGL ? (
             <GlobeBoundary fallback={<PolarMap className="size-full" neutral={!proMode} />}>
@@ -213,7 +213,7 @@ export default function ExplorePage() {
         </div>
 
         <div
-          className={`pointer-events-none grid grid-cols-1 gap-3 p-3 md:absolute md:inset-0 md:grid-cols-[minmax(200px,20%)_minmax(0,1fr)_minmax(210px,22%)] md:grid-rows-[minmax(0,1fr)] ${
+          className={`pointer-events-none grid grid-cols-1 gap-3 p-3 max-md:p-0 max-md:pt-3 md:absolute md:inset-0 md:grid-cols-[minmax(200px,20%)_minmax(0,1fr)_minmax(210px,22%)] md:grid-rows-[minmax(0,1fr)] ${
             full ? 'max-md:[&>aside]:hidden' : ''
           }`}
         >
