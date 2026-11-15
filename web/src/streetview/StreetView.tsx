@@ -187,15 +187,17 @@ function ObserverView({ siteId, showcase }: { siteId: string; showcase: boolean 
             ))}
           </select>
         </label>
-        <button className="btn" onClick={returnToMap}>
-          Back to 3D map
-        </button>
+        {(!token || configure || !initialObserver) && (
+          <button className="btn" onClick={returnToMap}>
+            Back to 3D map
+          </button>
+        )}
         {activeObserver && (
           <span className="font-mono">
             {activeObserver.lat.toFixed(5)}° · {activeObserver.lon.toFixed(5)}° E
           </span>
         )}
-        {shareUrl && <ShareView url={shareUrl} />}
+        {(!token || configure || !initialObserver) && shareUrl && <ShareView url={shareUrl} />}
         {import.meta.env.DEV && (
           <button className="btn" onClick={() => setConfigure(!configure)}>
             Access settings
@@ -257,9 +259,13 @@ function ObserverView({ siteId, showcase }: { siteId: string; showcase: boolean 
                 token={token}
                 sample={sample}
                 initialView={startView}
+                shareUrl={shareUrl}
                 onReturn={returnToMap}
                 onObserver={onObserver}
                 onView={onView}
+                nearbyHref={(point) =>
+                  makeViewLink(new URL(window.location.href), 'free', point, time, view)
+                }
                 onGround={setMeshGround}
               />
             </Suspense>

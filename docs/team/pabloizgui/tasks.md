@@ -237,3 +237,18 @@ HistoricControls.tsx. No atribuir estos resultados al dev posterior 54b9cbb.
   al despliegue observado, con sus URLs autorizadas y su configuración actual.
 - Los inputs de Marta y Javi mantienen su ubicación en web/public/data/terrain
   y web/public/data/horizon. El plan de interfaz no regenera esos datos.
+
+## Integración autorizada del 15 de noviembre
+
+Pablo autorizó resolver los conflictos y fusionar los PR en GitHub. #142,
+#143, #144, #145 y #148 quedaron integrados en dev mediante squash, con
+checks correctos. El cierre documental se integra mediante #147.
+Se conservaron startView/SHOWCASE, el selector de fecha y los pins del store.
+Los conflictos de imports y del registro compartido se resolvieron conservando
+las funcionalidades y las atribuciones de ambos lados.
+
+La integración local con dev 54b9cbb pasó 529 pruebas en 58 archivos,
+TypeScript, lint selectivo y build. El código resultante de los cinco merges
+se cotejó con esa combinación verificada. La compilación conserva el aviso
+de tamaño de bundles. Quedan la prueba en teléfono físico/Safari y el acuerdo
+sobre datos y presupuesto para horizonte topográfico global por demanda.
