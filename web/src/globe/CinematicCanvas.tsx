@@ -2,15 +2,25 @@
  * Cinematic globe — owner: Marta (src/globe); added for the Mission game (#100).
  *
  * Rendered by `GlobeView` only when its optional `cinematic` prop is set (Explore never mounts
- * it). Same Moon, Sun lighting by the Mission Clock date and polar terrain patch as Explore, but:
- * no cards, labels, overlays or controls, no clicks or hover, and the camera follows the shot
- * (cinematic.ts). Markers show only the label they are given (the game passes card numbers).
+ * it). Same Moon and polar terrain patch as Explore, but: no cards, labels, overlays or controls,
+ * no clicks or hover, and the camera follows the shot (cinematic.ts). Lighting is its own (see
+ * `LIGHTS`): a camera-relative key light while spinning, the real Sun for the Mission Clock date
+ * plus a soft fill in the other shots. Markers show only the label they are given (the game passes card numbers).
  * With prefers-reduced-motion the camera jumps straight to each pose and the spin stays still.
  */
 import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Stars } from '@react-three/drei';
-import { CanvasTexture, Matrix4, Quaternion, SRGBColorSpace, Sprite, Vector3 } from 'three';
+import {
+  CanvasTexture,
+  DirectionalLight,
+  Matrix4,
+  Object3D,
+  Quaternion,
+  SRGBColorSpace,
+  Sprite,
+  Vector3,
+} from 'three';
 import { useAppStore } from '@/core';
 import { Moon, PlaceholderMoon } from './GlobeCanvas';
 import { PatchTrigger, PolarPatch, SunLight } from './PolarPatch';
@@ -19,6 +29,8 @@ import { useTerrainLift } from './terrainStore';
 import { latLonToVec3, type Vec3Tuple } from './geo';
 import {
   DIVE_ALTITUDE,
+  LIGHT_BLEND_MS,
+  LIGHTS,
   POLE_FLIGHT_MS,
   REVEAL_ALTITUDE,
   REVEAL_FLIGHT_MS,
@@ -27,8 +39,10 @@ import {
   flightPosition,
   lonOf,
   lookDownPose,
+  mixDir,
   poleFraming,
   spinPose,
+  stepToward,
   type CinematicMarker,
   type CinematicShot,
   type CinematicView,
@@ -83,8 +97,11 @@ export default function CinematicCanvas({
     <div className="pointer-events-none relative size-full overflow-hidden bg-black" aria-hidden>
       <Canvas camera={{ position: initial, fov: 45, near: 0.001, far: 200 }} dpr={[1, 2]} shadows>
         <color attach="background" args={['#000000']} />
-        <ambientLight intensity={sunDir ? 0.04 : 0.35} />
-        <SunLight direction={sunDir ?? FIXED_LIGHT_DIR} intensity={sunDir ? 2.6 : 2} />
+        <CinematicLights
+          sunDir={sunDir ?? FIXED_LIGHT_DIR}
+          spin={shot.kind === 'spin'}
+          reduced={reduced}
+        />
         <Stars radius={60} depth={30} count={3000} factor={3} saturation={0} fade />
         <Suspense fallback={<PlaceholderMoon />}>
           <Moon onReady={noop} onSurfaceClick={noop} />
@@ -99,6 +116,68 @@ export default function CinematicCanvas({
         <ShotRig shot={shot} reduced={reduced} onDone={() => doneRef.current?.()} />
       </Canvas>
     </div>
+  );
+}
+
+const SUN_STEP = 0.05;
+
+/**
+ * Ambient + the real Sun (with the patch shadows) + one camera-relative light that is the key
+ * light while spinning and a soft fill otherwise. The Sun fades out while spinning (the key
+ * light takes over) and back in for the other shots.
+ */
+function CinematicLights({
+  sunDir,
+  spin,
+  reduced,
+}: {
+  sunDir: readonly [number, number, number];
+  spin: boolean;
+  reduced: boolean;
+}) {
+  const camLight = useRef<DirectionalLight>(null);
+  const camTarget = useRef<Object3D>(null);
+  /** 1 = spin lighting, 0 = Sun + fill. */
+  const w = useRef(spin ? 1 : 0);
+  const last = useRef<number | null>(null);
+  const [sunI, setSunI] = useState(() => (spin ? 0 : LIGHTS.sun));
+  const sunIRef = useRef(sunI);
+  const local = useMemo(() => new Vector3(), []);
+
+  useFrame(({ camera }) => {
+    const now = performance.now();
+    const dt = last.current === null ? 0 : now - last.current;
+    last.current = now;
+    w.current = stepToward(w.current, spin ? 1 : 0, dt, reduced ? 0 : LIGHT_BLEND_MS);
+    const k = w.current;
+
+    const l = camLight.current;
+    const t = camTarget.current;
+    if (l && t) {
+      local.set(...mixDir(LIGHTS.fillDir, LIGHTS.keyDir, k)).applyQuaternion(camera.quaternion);
+      l.target = t;
+      l.position.copy(local).multiplyScalar(10);
+      l.intensity = LIGHTS.fill + (LIGHTS.key - LIGHTS.fill) * k;
+    }
+
+    // The Sun's light re-renders SunLight: only in coarse steps, and only while it changes.
+    const want = LIGHTS.sun * (1 - k);
+    if (
+      Math.abs(want - sunIRef.current) >= SUN_STEP ||
+      (want !== sunIRef.current && (k === 0 || k === 1))
+    ) {
+      sunIRef.current = want;
+      setSunI(want);
+    }
+  });
+
+  return (
+    <>
+      <ambientLight intensity={LIGHTS.ambient} />
+      <object3D ref={camTarget} position={[0, 0, 0]} />
+      <directionalLight ref={camLight} intensity={spin ? LIGHTS.key : LIGHTS.fill} />
+      <SunLight direction={sunDir} intensity={sunI} />
+    </>
   );
 }
 

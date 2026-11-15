@@ -7,11 +7,11 @@
  * the cards, and dives to the chosen site in the descent (ending it). From recon on it unmounts.
  */
 import { useCallback, useEffect, useRef, type ReactNode } from 'react';
-import { motion, MotionConfig } from 'motion/react';
+import { motion, MotionConfig, useReducedMotion } from 'motion/react';
 import { clsx } from 'clsx';
 import { useAppStore, useData } from '@/core';
 import { useGameAudio } from '../audio/useGameAudio';
-import { useGame, type Phase } from '../state/gameStore';
+import { DESCENT_MS, useGame, type Phase } from '../state/gameStore';
 import { AlertScreen } from './AlertScreen';
 import { MENU_BG } from './assets';
 import { ExitControl } from './ExitControl';
@@ -46,6 +46,23 @@ const EXIT_PHASES: readonly Phase[] = [
 /** Phases whose screen lets the globe show through (darkened a little for readable text). */
 const DIM_PHASES: readonly Phase[] = ['menu', 'intro'];
 
+/**
+ * Phases whose globe lighting follows the hand's landing time (the Sun as it will be on landing
+ * day). Later phases set the clock themselves (the timelapse moves it hour by hour).
+ */
+const LANDING_TIME_PHASES: readonly Phase[] = [
+  'alert',
+  'briefing',
+  'approach',
+  'dealing',
+  'choosing',
+  'descent',
+];
+
+/** The descent fades to black over its last part, so the recon screen takes over cleanly. */
+const DESCENT_FADE_FROM = 0.72;
+const DESCENT_FADE_MS = 650;
+
 /** alert, briefing, dealing and choosing are one screen (content changes in place). */
 function screenKey(phase: Phase): string {
   return phase === 'briefing' || phase === 'dealing' || phase === 'choosing' ? 'alert' : phase;
@@ -79,6 +96,18 @@ export function MissionGame() {
     const app = useAppStore.getState();
     if (app.selectedSiteId !== want) app.selectSite(want);
   }, [phase, chosenSiteId]);
+
+  // As soon as the hand exists, the shared clock shows its landing time: the globe's Sun is the
+  // mission's from the approach on (and the cards and recon agree with it).
+  const landingUtc = useGame((s) => s.hand?.landingUtc ?? null);
+  const followLanding = LANDING_TIME_PHASES.includes(phase);
+  useEffect(() => {
+    if (!followLanding || !landingUtc) return;
+    const app = useAppStore.getState();
+    if (app.currentTimeUTC !== landingUtc) app.setTime(landingUtc);
+  }, [followLanding, landingUtc]);
+
+  const reduced = useReducedMotion() ?? false;
 
   // Background globe shot for this phase (numbered, anonymous markers only).
   const cards = useGame((s) => s.hand?.cards);
@@ -146,6 +175,19 @@ export function MissionGame() {
                 DIM_PHASES.includes(phase) ? 'bg-black/35' : 'bg-transparent',
               )}
             />
+            {phase === 'descent' && !reduced && (
+              <motion.div
+                aria-hidden
+                className="pointer-events-none absolute inset-0 bg-black"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{
+                  delay: (DESCENT_MS * DESCENT_FADE_FROM) / 1000,
+                  duration: DESCENT_FADE_MS / 1000,
+                  ease: 'easeIn',
+                }}
+              />
+            )}
           </div>
         )}
         <div className="relative flex min-h-10 items-center justify-between gap-2 pb-1.5">

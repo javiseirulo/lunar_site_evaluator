@@ -8,8 +8,10 @@ import {
   flightPosition,
   lonOf,
   lookDownPose,
+  mixDir,
   poleFraming,
   spinPose,
+  stepToward,
 } from './cinematic';
 
 const len = (v: readonly number[]) => Math.hypot(v[0]!, v[1]!, v[2]!);
@@ -127,5 +129,32 @@ describe('spinPose', () => {
     expect(len(a.position)).toBeCloseTo(SPIN_DISTANCE, 9);
     expect(lonOf(a.position)).toBeCloseTo(10, 9);
     expect(lonOf(b.position)).toBeCloseTo(30, 9);
+  });
+});
+
+describe('dive altitude', () => {
+  it('stops between 60 and 100 km above the site', () => {
+    const km = DIVE_ALTITUDE * 1737.4;
+    expect(km).toBeGreaterThanOrEqual(60);
+    expect(km).toBeLessThanOrEqual(100);
+  });
+});
+
+describe('light blending', () => {
+  it('stepToward moves linearly, clamps at the target and jumps without a duration', () => {
+    expect(stepToward(0, 1, 500, 1000)).toBeCloseTo(0.5);
+    expect(stepToward(0.9, 1, 500, 1000)).toBe(1);
+    expect(stepToward(1, 0, 250, 1000)).toBeCloseTo(0.75);
+    expect(stepToward(0.2, 0, 1000, 1000)).toBe(0);
+    expect(stepToward(0.3, 1, 16, 0)).toBe(1);
+    expect(stepToward(0.3, 1, -50, 1000)).toBe(0.3);
+  });
+
+  it('mixDir returns unit vectors at both ends and in between', () => {
+    const a = [1, 0, 0] as const;
+    const b = [0, 1, 0] as const;
+    expect(mixDir([...a], [...b], 0)).toEqual([1, 0, 0]);
+    expect(mixDir([...a], [...b], 1)).toEqual([0, 1, 0]);
+    expect(len(mixDir([...a], [...b], 0.5))).toBeCloseTo(1, 12);
   });
 });

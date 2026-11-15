@@ -49,8 +49,11 @@ export const SPIN_DISTANCE = 2.9;
 export const SPIN_LAT = -25;
 /** Spin speed in degrees per second. */
 export const SPIN_DEG_PER_S = 4;
-/** Height of the camera above the site at the end of a dive: ~25 km. */
-export const DIVE_ALTITUDE = 25_000 / 1_737_400;
+/**
+ * Height of the camera above the site at the end of a dive: ~80 km. High enough that the view
+ * stays on the polar terrain patch and never shows the low-resolution global texture up close.
+ */
+export const DIVE_ALTITUDE = 80_000 / 1_737_400;
 /** Height above the site at the end of a reveal pull-back: ~500 km. */
 export const REVEAL_ALTITUDE = 500_000 / 1_737_400;
 /** Flight time to a pole or reveal pose. */
@@ -153,4 +156,43 @@ export function poleFraming(markers: readonly LatLon[], from: Vec3Tuple): Pose {
 /** Longitude (degrees) of a camera position, for starting a spin where the camera already is. */
 export function lonOf(p: Vec3Tuple): number {
   return (Math.atan2(-p[2], p[0]) * 180) / Math.PI;
+}
+
+/**
+ * Cinematic lighting (CinematicCanvas only; Explore keeps its own lights).
+ *
+ * - `spin`: a key light fixed relative to the camera (upper left, in front), so the turning Moon
+ *   always shows a lit, recognisable face with a soft terminator, whatever the date.
+ * - Other shots: the real Sun for the Mission Clock date, plus a gentle fill from the camera's
+ *   side and some ambient light, so polar terrain in grazing light still reads clearly.
+ * The two blend over `LIGHT_BLEND_MS` when the shot kind changes.
+ */
+export const LIGHTS = {
+  ambient: 0.14,
+  sun: 2.6,
+  /** Key light during the spin, and the fill during the other shots. */
+  key: 2.3,
+  fill: 0.75,
+  /** Directions in camera space (x right, y up, z towards the viewer). */
+  keyDir: [-0.6, 0.45, 0.66] as Vec3Tuple,
+  fillDir: [0.15, 0.7, 0.7] as Vec3Tuple,
+} as const;
+export const LIGHT_BLEND_MS = 1400;
+
+/** Moves `value` towards `target` by `dtMs / durationMs` (linear, clamped; jumps if duration ≤ 0). */
+export function stepToward(
+  value: number,
+  target: number,
+  dtMs: number,
+  durationMs: number,
+): number {
+  if (durationMs <= 0 || !Number.isFinite(dtMs)) return target;
+  const step = Math.max(0, dtMs) / durationMs;
+  return value < target ? Math.min(target, value + step) : Math.max(target, value - step);
+}
+
+/** Linear mix of two directions, normalised (a at w = 0, b at w = 1). */
+export function mixDir(a: Vec3Tuple, b: Vec3Tuple, w: number): Vec3Tuple {
+  const x = clamp01(w);
+  return norm(add(scale(a, 1 - x), scale(b, x)));
 }
