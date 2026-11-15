@@ -43,6 +43,7 @@ import { GlobeCard, type CardContent } from './GlobeCard';
 import { PinForm } from './PinForm';
 import { useCustomPins } from './customPins';
 import { latLonToVec3, vec3ToLatLon } from './geo';
+import { flightAt, planFlight, type Flight } from './flight';
 import { HistoricControls } from './HistoricControls';
 import { OUTCOME_COLORS, loadHistoricSites, useHistoric } from './historicSites';
 import { useRequirements } from './requirementsStore';
@@ -740,12 +741,42 @@ function CameraRig({
   controlsRef: RefObject<Controls | null>;
 }) {
   const camera = useThree((s) => s.camera);
+  const siteFlight = useRef<{ flight: Flight; elapsed: number } | null>(null);
+
+  // Any selection of a site (list, globe pin, header finder) flies the camera to it.
+  useEffect(() => {
+    const fly = (id: string | null) => {
+      if (!id) return;
+      const site = useData.getState().sites?.find((x) => x.id === id);
+      if (!site) return;
+      const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+      const flight = planFlight(
+        camera.position.toArray() as [number, number, number],
+        latLonToVec3(site.lat, site.lon),
+      );
+      flightRef.current = null;
+      if (reduced) {
+        siteFlight.current = null;
+        const end = flightAt(flight, flight.duration).position;
+        camera.position.set(...end);
+        controlsRef.current?.target.set(0, 0, 0);
+        controlsRef.current?.update();
+        return;
+      }
+      siteFlight.current = { flight, elapsed: 0 };
+    };
+    // Only changes after mount fly; a site already selected at mount is left as is.
+    return useAppStore.subscribe((s, prev) => {
+      if (s.selectedSiteId !== prev.selectedSiteId) fly(s.selectedSiteId);
+    });
+  }, [camera, controlsRef, flightRef]);
 
   useEffect(() => {
     const controls = controlsRef.current;
     if (!controls) return;
     const cancel = () => {
       flightRef.current = null;
+      siteFlight.current = null;
     };
     controls.addEventListener('start', cancel);
     return () => controls.removeEventListener('start', cancel);
@@ -753,6 +784,16 @@ function CameraRig({
 
   useFrame((_, dt) => {
     const target = flightRef.current;
+    const sf = siteFlight.current;
+    if (target) siteFlight.current = null;
+    else if (sf) {
+      sf.elapsed += Math.min(dt, 0.05);
+      const { position, done } = flightAt(sf.flight, sf.elapsed);
+      camera.position.set(...position);
+      // Hand the orbit target back to the Moon's centre so orbiting after landing does not jump.
+      controlsRef.current?.target.lerp(ORIGIN, done ? 1 : 1 - Math.exp(-dt * 8));
+      if (done) siteFlight.current = null;
+    }
     if (target) {
       if (target.lengthSq() === 0) {
         // Pole: keep the current azimuth so the globe tilts down instead of spinning.
