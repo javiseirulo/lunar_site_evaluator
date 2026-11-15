@@ -103,3 +103,8 @@
 - `SunLight` (PolarPatch.tsx) sustituye a la directionalLight: con el parche cargado proyecta sombras (castShadow + receiveShadow en la malla), cámara ortográfica ajustada a la esfera envolvente del parche (centro (0, −0.992, 0), radio 0.185), mapa 4096² (~160 m por téxel), bias −5e-5 y normalBias 3e-4 por el Sol rasante. Sin parche no hay coste de sombras.
 - Etiqueta en el panel: "Illustrative shading — official sunlight figures come from the data pipeline".
 - Sin verificar visualmente (panel oculto): el bias puede necesitar ajuste si aparece acné o "peter-panning".
+
+### Paso 4 — pins sobre el terreno (2026-11-15)
+- `terrainLift(lat, lon)` (terrain.ts): proyección estereográfica (`projectSouthPolar` de `@/core/projection`, solo lectura) + altura bilineal → elevación sobre la esfera en unidades del globo, con la exageración activa; 0 fuera del parche o sin dato. `sampleHeight` tolera el redondeo en los bordes de la rejilla.
+- `useTerrainLift()` (terrainStore.ts): función estable mientras no cambie el terreno ni la exageración. Pins de sitios, pins propios, alunizajes históricos, marcador de clic, etiqueta de hover y tarjeta se anclan a `PIN_ALTITUDE + lift`.
+- Comprobado con los datos reales: SR1 +1652 m, SR3 +1383 m, CR1 +1927 m, GR1 +1759 m (bordes de cráter, plausible). 3 tests nuevos (incluido que coincide con el vértice de la malla).

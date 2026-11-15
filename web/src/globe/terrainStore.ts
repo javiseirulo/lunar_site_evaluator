@@ -4,7 +4,8 @@
  */
 import { create } from 'zustand';
 import { dataUrl } from '@/core';
-import { float32LE, type HeightmapHeader } from './terrain';
+import { useCallback } from 'react';
+import { float32LE, terrainLift, type HeightmapHeader } from './terrain';
 
 export type TerrainStatus = 'idle' | 'loading' | 'ready' | 'error';
 
@@ -71,4 +72,20 @@ export function loadTerrain(fetchImpl: typeof fetch = fetch): Promise<void> {
       inflight = null;
     });
   return inflight;
+}
+
+/** Lift function (lat, lon) → globe units above the sphere; always 0 until the patch is loaded. */
+export type LiftFn = (lat: number, lon: number) => number;
+
+/** Stable while the terrain and its exaggeration do not change, so markers can memo on it. */
+export function useTerrainLift(): LiftFn {
+  const header = useTerrain((s) => (s.status === 'ready' ? s.header : null));
+  const heights = useTerrain((s) => s.heights);
+  const mask = useTerrain((s) => s.mask);
+  const exaggeration = useTerrain((s) => s.exaggeration);
+  return useCallback(
+    (lat: number, lon: number) =>
+      header && heights ? terrainLift(header, heights, lat, lon, exaggeration, mask) : 0,
+    [header, heights, mask, exaggeration],
+  );
 }

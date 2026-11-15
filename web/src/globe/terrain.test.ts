@@ -8,6 +8,7 @@ import {
   gridXY,
   sampleHeight,
   stereoInverse,
+  terrainLift,
   xyToGrid,
   type HeightmapHeader,
 } from './terrain';
@@ -80,6 +81,32 @@ describe('sampleHeight (bilinear)', () => {
     expect(
       sampleHeight({ ...h, mask: { file: 'm', valid: 1 } }, heights, -900, 900, mask),
     ).toBeNaN();
+  });
+});
+
+describe('terrainLift (markers on the terrain)', () => {
+  const h = header();
+  const heights = new Float32Array(9).fill(1737.4); // 1 per mille of R
+
+  it('lifts a polar point by h·exaggeration/R', () => {
+    expect(terrainLift(h, heights, -90, 0, 1)).toBeCloseTo(0.001, 6);
+    expect(terrainLift(h, heights, -90, 0, 2)).toBeCloseTo(0.002, 6);
+  });
+
+  it('matches the mesh vertex at a grid sample (pins sit on the ground)', () => {
+    const a = buildPatchArrays(h, heights, 1, 1);
+    const k = 1; // row 0, col 1 → x = 0, y = 1000 m
+    const r = Math.hypot(a.positions[k * 3]!, a.positions[k * 3 + 1]!, a.positions[k * 3 + 2]!);
+    const [lat, lon] = stereoInverse(0, 1000, R);
+    expect(1 + terrainLift(h, heights, lat, lon, 1)).toBeCloseTo(r, 6);
+  });
+
+  it('is 0 north of the patch, outside the grid or over missing data', () => {
+    expect(terrainLift(h, heights, -70, 0, 1)).toBe(0);
+    expect(terrainLift(h, heights, -89, 0, 1)).toBe(0); // ~30 km from the pole: off this 2 km grid
+    const holes = heights.slice();
+    holes[4] = NaN;
+    expect(terrainLift(h, holes, -90, 0, 1)).toBe(0);
   });
 });
 

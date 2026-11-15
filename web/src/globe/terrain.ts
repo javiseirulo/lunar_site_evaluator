@@ -6,6 +6,7 @@
  * so lunar curvature comes out by itself. Nothing is hard-coded: size, origin, steps, radius and
  * nodata come from the header.
  */
+import { projectSouthPolar } from '@/core/projection';
 import { latLonToVec3 } from './geo';
 
 const DEG = Math.PI / 180;
@@ -73,8 +74,13 @@ export function sampleHeight(
   y: number,
   mask?: Uint8Array | null,
 ): number {
-  const [r, c] = xyToGrid(h, x, y);
-  if (!(r >= 0 && c >= 0 && r <= h.height_px - 1 && c <= h.width_px - 1)) return NaN;
+  const [r1, c1] = xyToGrid(h, x, y);
+  const last = [h.height_px - 1, h.width_px - 1] as const;
+  // Allow floating-point round-off on the grid edges (a lat/lon round trip lands at −1e-12).
+  const EPS = 1e-6;
+  if (!(r1 >= -EPS && c1 >= -EPS && r1 <= last[0] + EPS && c1 <= last[1] + EPS)) return NaN;
+  const r = Math.min(Math.max(r1, 0), last[0]);
+  const c = Math.min(Math.max(c1, 0), last[1]);
   const r0 = Math.min(Math.floor(r), h.height_px - 2);
   const c0 = Math.min(Math.floor(c), h.width_px - 2);
   const fr = r - r0;
@@ -157,4 +163,24 @@ export function float32LE(buf: ArrayBuffer): Float32Array {
   const out = new Float32Array(buf.byteLength / 4);
   for (let i = 0; i < out.length; i++) out[i] = view.getFloat32(i * 4, true);
   return out;
+}
+
+/**
+ * How far the terrain surface sits above (or below) the unit sphere at lat/lon, in globe units
+ * (Moon radius = 1), with the patch's exaggeration. 0 outside the patch or where there is no data,
+ * so markers there stay on the sphere.
+ */
+export function terrainLift(
+  h: HeightmapHeader,
+  heights: Float32Array,
+  lat: number,
+  lon: number,
+  exaggeration: number,
+  mask?: Uint8Array | null,
+): number {
+  if (lat > h.lat_limit) return 0;
+  const [x, y] = projectSouthPolar(lat, lon, h.radius_m);
+  const m = sampleHeight(h, heights, x, y, mask);
+  if (!Number.isFinite(m)) return 0;
+  return (h.height_reference_radius_m + m * exaggeration - h.radius_m) / h.radius_m;
 }

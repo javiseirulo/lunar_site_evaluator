@@ -49,7 +49,7 @@ import { HistoricControls } from './HistoricControls';
 import { useSunDirection } from './sunLight';
 import { PatchTrigger, PolarPatch, SunLight } from './PolarPatch';
 import { EXAGGERATION_LABEL, PatchControls } from './PatchControls';
-import { loadTerrain, useTerrain } from './terrainStore';
+import { loadTerrain, useTerrain, useTerrainLift, type LiftFn } from './terrainStore';
 import { OUTCOME_COLORS, loadHistoricSites, useHistoric } from './historicSites';
 import { useRequirements } from './requirementsStore';
 import { useCandidates } from './useCandidates';
@@ -373,8 +373,9 @@ function facesCamera(point: Vector3, camera: Vector3): boolean {
   return point.dot(camera) > point.lengthSq();
 }
 
-function surfacePoint(lat: number, lon: number): Vector3 {
-  return new Vector3(...latLonToVec3(lat, lon, PIN_ALTITUDE));
+/** Marker anchor just above the ground: on the polar terrain where it is loaded, else the sphere. */
+function surfacePoint(lat: number, lon: number, lift: LiftFn): Vector3 {
+  return new Vector3(...latLonToVec3(lat, lon, PIN_ALTITUDE + lift(lat, lon)));
 }
 
 function Pins({
@@ -482,7 +483,8 @@ function Pin({
   const pin = useRef<Mesh>(null);
   const ring = useRef<Mesh>(null);
   const badge = useRef<Sprite>(null);
-  const position = useMemo(() => surfacePoint(lat, lon), [lat, lon]);
+  const lift = useTerrainLift();
+  const position = useMemo(() => surfacePoint(lat, lon, lift), [lat, lon, lift]);
 
   useEffect(() => {
     pin.current?.lookAt(0, 0, 0);
@@ -535,7 +537,8 @@ function Pin({
 /** Small white ring where the ground was clicked. */
 function PointMarker({ lat, lon }: { lat: number; lon: number }) {
   const ring = useRef<Mesh>(null);
-  const position = useMemo(() => surfacePoint(lat, lon), [lat, lon]);
+  const lift = useTerrainLift();
+  const position = useMemo(() => surfacePoint(lat, lon, lift), [lat, lon, lift]);
   useEffect(() => {
     ring.current?.lookAt(0, 0, 0);
   }, [position]);
@@ -553,9 +556,10 @@ function PointMarker({ lat, lon }: { lat: number; lon: number }) {
 /** Always-mounted hover label; hidden when there is none or it is behind the globe. */
 function HoverLabel({ label }: { label: { lat: number; lon: number; text: string } | null }) {
   const div = useRef<HTMLDivElement>(null);
+  const lift = useTerrainLift();
   const position = useMemo(
-    () => (label ? surfacePoint(label.lat, label.lon) : new Vector3()),
-    [label?.lat, label?.lon], // eslint-disable-line react-hooks/exhaustive-deps
+    () => (label ? surfacePoint(label.lat, label.lon, lift) : new Vector3()),
+    [label?.lat, label?.lon, lift], // eslint-disable-line react-hooks/exhaustive-deps
   );
 
   useFrame(({ camera }) => {
@@ -664,7 +668,8 @@ function HistoricMarker({
   onHover: (over: boolean) => void;
 }) {
   const group = useRef<Group>(null);
-  const position = useMemo(() => surfacePoint(lat, lon), [lat, lon]);
+  const lift = useTerrainLift();
+  const position = useMemo(() => surfacePoint(lat, lon, lift), [lat, lon, lift]);
 
   useEffect(() => {
     // Local +Y (the pyramid's axis) along the outward normal.
@@ -726,7 +731,8 @@ function CardAnchor({
     : null;
   const lat = coords?.lat ?? 0;
   const lon = coords?.lon ?? 0;
-  const position = useMemo(() => surfacePoint(lat, lon), [lat, lon]);
+  const lift = useTerrainLift();
+  const position = useMemo(() => surfacePoint(lat, lon, lift), [lat, lon, lift]);
 
   useFrame(({ camera }) => {
     if (!wrapper.current) return;
