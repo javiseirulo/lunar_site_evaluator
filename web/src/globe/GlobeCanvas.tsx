@@ -17,12 +17,14 @@
  * <Html> under React 19 throws "removeChild … not a child of this node" and breaks the tree.
  */
 import {
+  Component,
   Suspense,
   useEffect,
   useMemo,
   useRef,
   useState,
   type ComponentRef,
+  type ReactNode,
   type RefObject,
   type SyntheticEvent,
 } from 'react';
@@ -748,7 +750,7 @@ function HistoricMarker({
 
   return (
     <group ref={group} position={position}>
-      <HistoricLander color={color} />
+      <LanderOrCone color={color} />
       {/* Invisible click target: the old cone's footprint, so small markers stay easy to press. */}
       <mesh
         position={[0, 1.2, 0]}
@@ -801,6 +803,41 @@ function buildLander(source: Object3D, outcomeColor: string) {
     mesh.material = copy;
   });
   return { root, materials: [...owned.values()] };
+}
+
+/** Plain cone shown while the lander model loads, or instead of it if the file cannot be loaded. */
+function LanderCone({ color }: { color: string }) {
+  return (
+    <mesh position={[0, 1.2, 0]} raycast={() => null}>
+      <coneGeometry args={[1, 2.4, 3]} />
+      <meshBasicMaterial color={color} toneMapped={false} />
+    </mesh>
+  );
+}
+
+/** A failed model load must never take the whole globe down (it would fall back to the 2D map). */
+class LanderBoundary extends Component<
+  { fallback: ReactNode; children: ReactNode },
+  { failed: boolean }
+> {
+  state = { failed: false };
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+  render() {
+    return this.state.failed ? this.props.fallback : this.props.children;
+  }
+}
+
+function LanderOrCone({ color }: { color: string }) {
+  const cone = <LanderCone color={color} />;
+  return (
+    <LanderBoundary fallback={cone}>
+      <Suspense fallback={cone}>
+        <HistoricLander color={color} />
+      </Suspense>
+    </LanderBoundary>
+  );
 }
 
 /** The lander model for one past-landing marker, standing on the origin with +Y as its axis. */
