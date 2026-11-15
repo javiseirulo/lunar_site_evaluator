@@ -55,3 +55,13 @@
   renueve, el reconocimiento usa el panorama de respaldo. `SiteRecon` ahora deja en consola el motivo
   (`[recon] 3D Street View unavailable (<motivo>)`).
 - Pendiente aparte: el token para la web pública (Vercel) restringido a esa URL.
+
+## Cierre 2026-11-15 (tarde) — validado por el usuario
+- Retratos de Dr. Regolith sustituidos por la serie nueva (fondo transparente, sin franja); en la intro el doctor usa solo
+  `neutral` (la `talk` antigua tenía otro estilo; `dr-regolith-talk.png` ahora es la misma `neutral`).
+- Street View en el juego: **sin "relief light"** (`setReadingLight(false)` en `StreetViewEmbed`). Decisión del usuario: luz real,
+  aunque de noche casi no se vea nada, para que el jugador entienda que no verá el Sol / la Tierra. La página Street View de
+  Pablo no cambia.
+- El embed deja en consola el motivo de fallo (`[streetview embed] ...`). Con la ventana del navegador oculta Cesium no pinta
+  y salta `Surface sampling timed out` → panorama de respaldo; con la ventana visible carga el 3D.
+- Siguiente: modo **Historical** con los datos de los sitios de aterrizaje históricos.

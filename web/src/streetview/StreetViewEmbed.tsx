@@ -129,7 +129,8 @@ export default function StreetViewEmbed({
         labels: noop,
         observer: noop,
         save: noop,
-        error: () => {
+        error: (cause?: unknown) => {
+          console.warn('[streetview embed] render error', cause);
           fail('load');
           abort.abort();
         },
@@ -145,11 +146,15 @@ export default function StreetViewEmbed({
           return;
         }
         mounted = instance;
+        // Real lighting only: the reading light flattens the textures, and a site in darkness
+        // should look dark (the player must see that the Sun / Earth are not there).
+        instance.setReadingLight(false);
         scene.current = instance;
         instance.setSky(latestSample.current);
         latest.current.onReady?.();
       })
-      .catch(() => {
+      .catch((cause: unknown) => {
+        console.warn('[streetview embed] setup failed', cause);
         window.clearTimeout(timer);
         if (!abort.signal.aborted) fail('load');
       });

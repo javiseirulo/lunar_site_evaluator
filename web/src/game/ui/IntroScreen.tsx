@@ -1,17 +1,13 @@
 /**
  * The `intro` phase, inside the lander: through the cabin window the Moon turns (the background
  * globe shows through a transparent viewport; the cabin around it is opaque), and Dr. Regolith
- * explains at the console why we go to the lunar south pole. His portrait talks while a line
- * types and rests between lines. Finishing the dialogue calls `endIntro()`; "Skip" calls
+ * explains at the console why we go to the lunar south pole. Finishing the dialogue calls `endIntro()`; "Skip" calls
  * `skipIntro()`. Both lead to the alert.
  */
-import { useState } from 'react';
 import intro from '../content/intro.json';
 import { useGame } from '../state/gameStore';
 import { DialogueBox } from './DialogueBox';
-import { scientistImage } from './assets';
 import { PixelScientist } from './PixelScientist';
-import { usePreloadImages } from './usePreloadImages';
 
 /** Cabin wall colour: the viewport's giant shadow paints it around the window. */
 const CABIN_COLOR = '#0b0f1a';
@@ -23,8 +19,6 @@ function Rivet({ className }: { className: string }) {
 export function IntroScreen() {
   const endIntro = useGame((s) => s.endIntro);
   const skipIntro = useGame((s) => s.skipIntro);
-  const [typing, setTyping] = useState(false);
-  usePreloadImages([scientistImage('talk'), scientistImage('neutral')]);
 
   return (
     <div className="relative flex flex-1 flex-col overflow-hidden">
@@ -53,16 +47,12 @@ export function IntroScreen() {
       {/* The console: the doctor and his dialogue. */}
       <div className="relative flex flex-col items-center gap-3 p-3 sm:flex-row sm:items-end sm:p-4">
         <div className="mission-bezel relative shrink-0 p-1.5">
-          <PixelScientist
-            mood={typing ? 'talk' : 'neutral'}
-            className="size-24 bg-black/60 sm:size-32"
-          />
+          <PixelScientist mood="neutral" className="size-24 bg-black/60 sm:size-32" />
         </div>
         <DialogueBox
           className="max-w-2xl min-w-0 flex-1"
           speaker={intro.speaker}
           lines={intro.lines}
-          onTypingChange={setTyping}
           onDone={() => endIntro()}
           onSkip={() => skipIntro()}
         />
