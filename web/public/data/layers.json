@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "mock": true,
+  "mock": false,
   "projection": "+proj=stere +lat_0=-90 +lon_0=0 +k=1 +x_0=0 +y_0=0 +R=1737400 +units=m +no_defs",
   "radius_m": 1737400,
   "bounds_m": [
@@ -19,8 +19,8 @@
       "kind": "continuous",
       "units": "m",
       "value_range": [
-        -4400,
-        3900
+        -6659.0087890625,
+        6974.10986328125
       ],
       "palette": [
         [
@@ -36,12 +36,12 @@
           "#f1efe9"
         ]
       ],
-      "default_visible": true,
+      "default_visible": false,
       "default_opacity": 1,
-      "description": "Height relative to the 1737.4 km reference sphere.",
-      "file": "layers/elevation.png",
+      "description": "Real LOLA elevation; area-mean display layer from the 80 m product. Not a landing-safety metric.",
+      "file": "terrain/elevation.png",
       "encoding": "gray8",
-      "source": "MOCK — synthetic terrain, replace with LOLA-derived product"
+      "source": "NASA PGDA 90 / LDEM_80S_80MPP_ADJ.TIF / Barker et al. (2023)"
     },
     {
       "id": "slope",
@@ -49,8 +49,8 @@
       "kind": "continuous",
       "units": "°",
       "value_range": [
-        0,
-        30
+        0.6200125217437744,
+        33.68992233276367
       ],
       "palette": [
         [
@@ -68,40 +68,10 @@
       ],
       "default_visible": false,
       "default_opacity": 0.7,
-      "description": "Terrain steepness. Landers generally need gentle slopes.",
-      "file": "layers/slope.png",
+      "description": "Real LOLA slope; area-mean display layer from the 80 m product. Not a landing-safety metric.",
+      "file": "terrain/slope.png",
       "encoding": "gray8",
-      "source": "MOCK — synthetic terrain, replace with LOLA-derived product"
-    },
-    {
-      "id": "illumination",
-      "label": "Sunlight",
-      "kind": "continuous",
-      "units": "% of time",
-      "value_range": [
-        0,
-        1
-      ],
-      "palette": [
-        [
-          0,
-          "#09090d"
-        ],
-        [
-          0.5,
-          "#9a5b19"
-        ],
-        [
-          1,
-          "#ffe7a3"
-        ]
-      ],
-      "default_visible": false,
-      "default_opacity": 0.75,
-      "description": "Share of the time window with the Sun above the local horizon.",
-      "file": "layers/illumination.png",
-      "encoding": "gray8",
-      "source": "MOCK — synthetic terrain, replace with LOLA-derived product"
+      "source": "NASA PGDA 90 / LDSM_80S_80MPP_ADJ.TIF / Barker et al. (2023)"
     },
     {
       "id": "psr",
@@ -128,40 +98,70 @@
       },
       "default_visible": false,
       "default_opacity": 0.8,
-      "description": "Regions that never receive direct sunlight (cold traps, possible ice).",
+      "description": "Mapped permanently shadowed regions (cold traps, possible ice); a pixel is PSR if at least half of its 20 m source cells are.",
       "file": "layers/psr.png",
       "encoding": "gray8",
-      "source": "MOCK — synthetic terrain, replace with LOLA-derived product"
+      "source": "NASA PGDA LOLA 20 m PSR mask, LPSR_80S_20MPP_ADJ.TIF (https://pgda.gsfc.nasa.gov/data/LOLA_20mpp/LPSR_80S_20MPP_ADJ.TIF); Barker et al. (2023); majority (>=50 %) reduction to 512² in python/export/layers.py"
     },
     {
-      "id": "score",
-      "label": "Site score",
+      "id": "illumination",
+      "label": "Sunlight",
       "kind": "continuous",
-      "units": "0–1",
+      "units": "% of time",
       "value_range": [
-        0,
-        1
+        0.49000000953674316,
+        0.5699999928474426
       ],
       "palette": [
         [
           0,
-          "#2a1638"
+          "#09090d"
         ],
         [
           0.5,
-          "#1f7a8c"
+          "#9a5b19"
         ],
         [
           1,
-          "#b8f36b"
+          "#ffe7a3"
         ]
       ],
       "default_visible": false,
-      "default_opacity": 0.7,
-      "description": "Weighted combination of sunlight, Earth visibility and slope.",
-      "file": "layers/score.png",
+      "default_opacity": 0.75,
+      "description": "Share of 2027 with the Sun above a flat local horizon (no terrain shadowing yet).",
+      "file": "layers/illumination.png",
       "encoding": "gray8",
-      "source": "MOCK — synthetic terrain, replace with LOLA-derived product"
+      "source": "python/export/grids.py → grid/south_5km.bin (SPICE DE440, flat horizon, 2027 hourly), metric illum_pct; window 2027-01-01T00:00:00Z to 2028-01-01T00:00:00Z"
+    },
+    {
+      "id": "earth_vis",
+      "label": "Earth visibility",
+      "kind": "continuous",
+      "units": "% of time",
+      "value_range": [
+        0.0,
+        1.0
+      ],
+      "palette": [
+        [
+          0,
+          "#0b1026"
+        ],
+        [
+          0.5,
+          "#2f6fb0"
+        ],
+        [
+          1,
+          "#bfe6ff"
+        ]
+      ],
+      "default_visible": false,
+      "default_opacity": 0.75,
+      "description": "Share of 2027 with Earth above a flat horizon + 2° antenna margin.",
+      "file": "layers/earth_vis.png",
+      "encoding": "gray8",
+      "source": "python/export/grids.py → grid/south_5km.bin (SPICE DE440, flat horizon, 2027 hourly), metric earth_vis_pct; window 2027-01-01T00:00:00Z to 2028-01-01T00:00:00Z"
     }
   ]
 }

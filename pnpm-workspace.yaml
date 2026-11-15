@@ -1,3 +1,7 @@
 packages:
   - web
   - contracts
+# pnpm 11 reads overrides here; package.json retains the same pins for team pnpm 9.
+overrides:
+  '@cesium/engine': 26.3.0
+  '@cesium/widgets': 16.2.0

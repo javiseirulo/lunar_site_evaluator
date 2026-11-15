@@ -1,0 +1,3 @@
+# DEM inspection/export; rendering and ephemerides belong to separate modules.
+rasterio==1.4.4
+PyYAML==6.0.3

@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "asset": "astronaut-ai.png",
+  "width": 1254,
+  "height": 1254,
+  "sha256": "6eda84d86cbbdecd375df947ed907a283ab242a68181e3425193e6644304b8ca",
+  "ai_generated": true,
+  "provider": "OpenAI imagegen",
+  "date": "2026-11-15",
+  "purpose": "Human-requested draggable astronaut UI control",
+  "visible_ai_mark": true,
+  "agency_branding": false
+}

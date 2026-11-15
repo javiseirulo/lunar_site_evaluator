@@ -7,3 +7,27 @@
 - Hallazgo: existe `Softsasi/LunaMission` (posible equipo del mismo reto) → diferenciarse (ver `docs/05-prior-art.md`).
 - Datos más útiles: Horizons API/SPICE (Sol/Tierra), LOLA 5 m del polo sur (Barker et al.), Moon Trek WMTS.
 - Siguiente: javi escribe su idea en `docs/ideas/`; cada compañero la suya; luego `/office-hours`.
+
+## 2026-11-14 — Sesión 2: plan de efemérides y scoring
+- Plan detallado añadido a `docs/10-plan-tecnico.md` §5 Javi (J1–J11), sin tocar los bloques de los demás.
+- Hallazgo: Moon Trek WMTS sirve imágenes renderizadas (no valores) → para mostrar/validar; el DEM numérico y los perfiles de horizonte los produce Pablo (PGDA/PDS).
+- Pendiente: PR de contrato v1.1 (aditivo) y empezar #39 (efemérides SPICE + validación Horizons) en rama desde `dev`.
+
+## 2026-11-14 — Sesión 2b: selector de modo de tiempo (#65)
+- `web/src/scoring/`: `DEFAULT_MISSION_CONFIG`, `computeArrival` (Hohmann con distancia Tierra–Luna de Meeus, LLO polar, espera por traza, descenso), `MissionTimingPanel` montado en Explore encima del Mission Clock.
+- `missionConfig` en el store (quinto campo) y tipo `MissionConfig` en `contracts/types.ts`.
+- Verificado: lint, typecheck, 24 tests, build y navegador (escritorio y 375 px; sin errores de consola).
+- Matiz físico: con plano orbital fijo (`start_in_orbit`), solo los sitios a ≲1° del polo se alcanzan en cada órbita; a 85°S la espera también puede ser de días.
+
+## 2026-11-14 (tarde): alcance toda la Luna + plan de implementación (#67)
+- Decisión: **toda la Luna, con énfasis en el polo sur** (ya estaba en J1, pero el código solo cubría ≤ −80°). Escrita en `docs/10-plan-tecnico.md` §10, con qué cambia para Javi2, Marta, Pablo y Cristóbal.
+- Terreno: esperar a Pablo. Horizonte plano "no terrain"; `slope_deg`/`psr_dist_km` como `pending_metrics`.
+- Catálogo #48: 20 ids actuales re-fuenteados + candidatos del polo sur + aterrizajes reales del resto de la Luna, todos con fuente.
+- Plan de implementación (4 PRs: contrato v1.1 → `python/` efemérides → `@/ephem` + `@/scoring` → datos reales) en `docs/team/javiseirulo/plan-implementacion.md`. Se trabaja en paralelo con subagentes en worktrees.
+- 2026-11-14 noche: mergeados #70, #77, #78 en dev (CI verde). Catálogo #48 con plain_81s reubicado (OK de Javi). Documento de diseño para el equipo.
+- 2026-11-14: `uv run python -m export.all` sustituye los mocks por datos reales (59 sitios × 8760 h 2027, horizonte plano, ~29 MB). Validez/score sobre la ventana del manifest (año entero): 0/59 válidos por umbrales de 7 días; slope/PSR pendientes de terreno.
+- 2026-11-15: SiteCheckPanel colocado en Explore (columna derecha, bajo la ficha); estilo con etiquetas legibles. Cambio de 1 línea en pages/ExplorePage.tsx (página de Marta), avisada en el PR.
+- 2026-11-15: `export.grids` publica `grid/global_1deg.bin` (1.3 MB) y `grid/south_5km.bin` (0.3 MB) + `grid/index.json`; `loadGrid`/`sampleGrid` en `@/ephem`; nota "cómo pintarlo" para Marta en diseno-efemerides-scoring §5.
+- 2026-11-15 (sesión desatendida ~03:10): restyle global al look de Mission en rama local `javiseirulo/restyle-mission-look` (sin push). Detalle y dudas en `docs/team/javiseirulo/restyle-mission-look.md`.
+- 2026-11-15: export con terreno real (41 horizontes LOLA, slope/elev/PSR de `terrain/catalog.json`); ventana por defecto → 2027-10-12 (42/59 válidos); paridad TS/Python con horizonte en 2 sitios.
+- 2026-11-15: `export.layers` → `layers.json` real (elevation, slope, psr, illumination, earth_vis; sin score) y capas en 3D: parche polar (UV estereográficas) + mapa de calor global; leyenda sobre el globo en Expert. Badge "Mock layers" desaparece.

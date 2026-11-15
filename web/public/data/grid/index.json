@@ -1,0 +1,53 @@
+{
+  "version": 1,
+  "mock": false,
+  "generated_utc": "2026-11-14T23:04:38Z",
+  "window": {
+    "start_utc": "2027-01-01T00:00:00Z",
+    "end_utc": "2028-01-01T00:00:00Z",
+    "step_s": 3600
+  },
+  "dtype": "float32-le",
+  "grids": [
+    {
+      "id": "global_1deg",
+      "file": "grid/global_1deg.bin",
+      "projection": "equirectangular",
+      "width": 360,
+      "height": 180,
+      "metrics": [
+        "illum_pct",
+        "max_dark_hours",
+        "earth_vis_pct",
+        "max_blackout_hours",
+        "sun_el_mean_deg"
+      ],
+      "horizon_source": "flat (no terrain)",
+      "antenna_margin_deg": 2.0
+    },
+    {
+      "id": "south_5km",
+      "file": "grid/south_5km.bin",
+      "projection": "south_polar_stereographic",
+      "width": 122,
+      "height": 122,
+      "bounds_m": [
+        -304006.0,
+        -304006.0,
+        304006.0,
+        304006.0
+      ],
+      "radius_m": 1737400.0,
+      "lat_limit": -80.0,
+      "metrics": [
+        "illum_pct",
+        "max_dark_hours",
+        "earth_vis_pct",
+        "max_blackout_hours",
+        "sun_el_mean_deg"
+      ],
+      "horizon_source": "flat (no terrain)",
+      "antenna_margin_deg": 2.0
+    }
+  ]
+}

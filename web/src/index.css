@@ -1,46 +1,105 @@
 @import 'tailwindcss';
 
 /*
- * Design tokens (owner: Javi2). Use the Tailwind classes they generate, e.g.
- * bg-space-900, text-ink-muted, border-line, text-sun, bg-earth/20, font-mono.
+ * Design system — "Mission": the look Cristóbal built for the game, now the whole site.
+ * See DESIGN.md. Deep navy page, navy panels with a hard 2px edge and a 4px offset shadow
+ * (pixel/arcade), monospace uppercase headings, ONE amber accent for "now" and the single main
+ * action per screen. Pablo's pixel art carries the personality; the UI around it stays quiet.
+ * Apple-style minimalism: Normal mode shows the few things a first-time visitor needs; Expert
+ * mode (the old "Pro mode") adds every control. No agency colours, insignia, or logotype
+ * (CLAUDE.md §3).
+ *
+ * Type: system mono for titles and labels, Avenir Next / system sans for reading text.
+ * Scale 12 / 14 / 18 / 24 / 40.
+ *
+ * Component classes: .portal .box .box-head .box-body .tab .btn .btn-go .btn-quiet .field .lnk
+ * .chip .label .eyebrow .num .rows .hint .switch .range .space .meter .seg. Token names
+ * violet/pink are kept so older modules keep working: violet = selection (amber), pink = action
+ * (amber).
+ *
+ * Game screens keep `.mission-root` (MissionFx.tsx) which now repeats these same values; it can
+ * be deleted once the game stops needing an isolated palette.
  */
 @theme {
-  --font-sans: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
-  --font-mono: 'JetBrains Mono Variable', ui-monospace, SFMono-Regular, monospace;
+  --font-sans: 'Avenir Next', 'Segoe UI', system-ui, sans-serif;
+  --font-head: 'SF Mono', ui-monospace, Menlo, Consolas, monospace;
+  --font-display: 'SF Mono', ui-monospace, Menlo, Consolas, monospace;
+  --font-mono: 'SF Mono', ui-monospace, Menlo, Consolas, monospace;
 
-  --color-space-950: #05060a;
-  --color-space-900: #0a0c12;
-  --color-space-850: #0e1118;
-  --color-space-800: #131722;
-  --color-space-700: #1b2030;
-  --color-space-600: #262c3f;
-  --color-line: #232838;
-  --color-line-strong: #343b52;
+  /* Page and panels (same values as the game's navy scale). */
+  --color-void: #02050c;
+  --color-night: #02050c;
+  --color-panel: #061022;
+  --color-panel-2: #0e2040;
+  --color-panel-3: #15305c;
+  --color-pale: #0e2040;
+  --color-edge: #24406e;
+  --color-edge-hi: #4c74b4;
+  --color-edge-lo: #8cc4ff;
 
-  --color-ink: #ecebe6;
-  --color-ink-muted: #a3a6b4;
-  --color-ink-faint: #6b7084;
+  --color-heading: #ffffff;
+  --color-ink: #e6edf7;
+  --color-ink-muted: #9fb2d0;
+  --color-ink-faint: #7f93b5;
 
-  /* Semantic colours used across modules: keep Sun/Earth/PSR consistent everywhere. */
-  --color-sun: #f5b74a;
-  --color-earth: #5aaeff;
-  --color-psr: #8b7cff;
+  /* violet = selection, pink = the one main action. Both amber. */
+  --color-violet: #ffcc4d;
+  --color-violet-dark: #f08a1d;
+  --color-violet-light: #ffe08a;
+  --color-pink: #ffcc4d;
+  --color-pink-dark: #f08a1d;
+  --color-glow: #ffcc4d;
+
+  --color-link: #8cc4ff;
+  --color-link-hover: #ffcc4d;
+
+  /* Data colours, tuned for navy. */
+  --color-sun: #ffb43c;
+  --color-earth: #5ab4ff;
+  --color-psr: #8da0d0;
   --color-good: #8fe39a;
-  --color-warn: #f2c55c;
+  --color-warn: #ffcc4d;
   --color-bad: #ff7a6b;
-  --color-accent: #c9f36b;
+  --color-accent: #ffcc4d;
 
-  --radius-panel: 14px;
-  --shadow-panel: 0 1px 0 0 rgb(255 255 255 / 0.04) inset, 0 12px 40px -12px rgb(0 0 0 / 0.6);
+  /* Legacy aliases used by older panels. */
+  --color-navy-950: #02050c;
+  --color-navy-900: #061022;
+  --color-navy-850: #0a1830;
+  --color-navy-800: #0e2040;
+  --color-navy-700: #15305c;
+  --color-navy-600: #1e4380;
+  --color-navy-500: #4c74b4;
+  --color-space-950: #02050c;
+  --color-space-900: #061022;
+  --color-space-850: #0a1830;
+  --color-space-800: #0e2040;
+  --color-space-700: #15305c;
+  --color-space-600: #24406e;
+  --color-line: var(--color-edge);
+  --color-line-strong: var(--color-edge-hi);
+  --radius-panel: 0px;
 
-  --animate-twinkle: twinkle 6s ease-in-out infinite;
-  @keyframes twinkle {
-    0%,
-    100% {
-      opacity: 0.55;
+  --shadow-card: 4px 4px 0 #000;
+  --shadow-lift: 4px 4px 0 #000;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+
+  --animate-enter: enter 220ms var(--ease-out) both;
+  @keyframes enter {
+    from {
+      opacity: 0;
     }
-    50% {
+    to {
       opacity: 1;
+    }
+  }
+  --animate-pop: pop 260ms var(--ease-out) both;
+  @keyframes pop {
+    0% {
+      transform: scale(0.6);
+    }
+    100% {
+      transform: scale(1);
     }
   }
 }
@@ -52,59 +111,251 @@
     height: 100%;
   }
   body {
-    @apply bg-space-950 text-ink font-sans antialiased;
-    font-feature-settings: 'cv11', 'ss01';
+    @apply bg-void text-ink font-sans text-[14px] leading-[1.55];
+    -webkit-font-smoothing: antialiased;
   }
   ::selection {
-    background: rgb(201 243 107 / 0.3);
+    background: #ffcc4d;
+    color: #000;
   }
   :focus-visible {
-    outline: 2px solid var(--color-accent);
+    outline: 2px solid #ffcc4d;
     outline-offset: 2px;
+  }
+  h1,
+  h2,
+  h3 {
+    color: var(--color-heading);
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: -0.01em;
   }
 }
 
 @layer components {
-  .panel {
-    @apply bg-space-900/85 border-line rounded-[var(--radius-panel)] border shadow-[var(--shadow-panel)] backdrop-blur-md;
-  }
-  .eyebrow {
-    @apply text-ink-faint font-mono text-[11px] tracking-[0.14em] uppercase;
-  }
-  .num {
-    @apply font-mono tabular-nums;
+  .portal {
+    @apply mx-auto w-full max-w-[1180px];
   }
 
-  /* Range input styled once for the whole app. */
+  /* A navy panel: hard 2px edge and a 4px offset shadow, square corners. */
+  .box {
+    @apply bg-panel border-edge rounded-none border-2;
+    box-shadow: 4px 4px 0 #000;
+  }
+  .box-head,
+  .box-head-dark {
+    @apply text-heading flex min-h-[40px] items-center gap-2 px-5 pt-4 font-mono text-[13px] font-bold tracking-[0.12em] uppercase;
+  }
+  .box-head :is(h1, h2, h3),
+  .box-head-dark :is(h1, h2, h3) {
+    color: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+  }
+  .box-body {
+    @apply p-5;
+  }
+  .lift {
+    transition: border-color 150ms var(--ease-out);
+  }
+
+  /* Small amber line above a title ("Lunar landing site navigator"). */
+  .eyebrow {
+    @apply text-warn font-mono text-[11px] font-bold tracking-[0.3em] uppercase;
+  }
+
+  /* Header links on the night. The current page is an amber block with black text. */
+  .tab {
+    @apply flex h-8 items-center rounded-none border-2 border-transparent px-3 font-mono text-[12px] font-bold tracking-[0.1em] whitespace-nowrap text-[#9fb2d0] uppercase;
+    transition:
+      background-color 120ms var(--ease-out),
+      color 120ms var(--ease-out),
+      border-color 120ms var(--ease-out);
+  }
+  .tab:hover {
+    @apply border-edge text-white;
+  }
+  .tab[aria-current='page'],
+  .tab.active {
+    @apply border-black bg-warn text-black;
+  }
+
+  /* Footer and other night-page links that should read as buttons. */
+  .nav-btn {
+    @apply border-edge inline-flex h-8 items-center rounded-none border-2 px-3 font-mono text-[11px] font-bold tracking-[0.1em] text-[#9fb2d0] uppercase;
+    transition:
+      background-color 120ms var(--ease-out),
+      color 120ms var(--ease-out);
+  }
+  .nav-btn:hover {
+    @apply bg-warn border-black text-black;
+  }
+
+  /* Buttons: quiet navy by default; .btn-go (amber, black text) for the one main action. */
+  .btn {
+    @apply border-edge-hi text-ink bg-pale inline-flex h-[34px] cursor-pointer items-center justify-center gap-1.5 rounded-none border-2 px-3.5 text-[14px] font-medium;
+    transition:
+      background-color 120ms var(--ease-out),
+      border-color 120ms var(--ease-out);
+  }
+  .btn:hover {
+    @apply bg-panel-3 border-edge-lo;
+  }
+  .btn:active {
+    @apply bg-panel-2;
+  }
+  .btn:disabled {
+    @apply cursor-default opacity-40;
+  }
+  .btn-go {
+    @apply bg-pink border-black font-mono font-bold tracking-[0.06em] text-black uppercase;
+    box-shadow: 3px 3px 0 #000;
+  }
+  .btn-go:hover {
+    @apply bg-pink-dark border-black;
+  }
+  .btn-go:active {
+    @apply bg-pink-dark;
+    box-shadow: none;
+    transform: translate(3px, 3px);
+  }
+  .btn-quiet {
+    @apply text-ink;
+  }
+
+  .field {
+    @apply border-edge-hi text-ink bg-pale h-[34px] rounded-none border-2 px-2 text-[14px];
+  }
+  .field:hover {
+    @apply border-edge-lo;
+  }
+  .field::placeholder {
+    color: var(--color-ink-faint);
+  }
+
+  /* Segmented switch (Normal | Expert, 2D | 3D). */
+  .seg {
+    @apply inline-flex overflow-hidden rounded-none border-2 border-black bg-black;
+  }
+  .seg > button {
+    @apply cursor-pointer px-3 py-1 font-mono text-[11px] font-bold tracking-[0.1em] text-[#9fb2d0] uppercase;
+  }
+  .seg > button:hover {
+    @apply text-white;
+  }
+  .seg > button[aria-pressed='true'] {
+    @apply bg-warn text-black;
+  }
+
+  .lnk {
+    @apply text-link cursor-pointer underline decoration-1 underline-offset-[3px];
+  }
+  .lnk:hover {
+    @apply text-link-hover;
+  }
+  .more {
+  }
+
+  .chip {
+    @apply inline-flex items-center gap-1 rounded-none border-2 px-2 py-0.5 text-[12px] font-medium;
+  }
+  .num {
+    @apply tabular-nums;
+  }
+  .label {
+    @apply text-ink-muted text-[13px];
+  }
+  .display {
+    font-family: var(--font-display);
+    font-weight: 700;
+  }
+  .rows > * + * {
+    border-top: 1px solid var(--color-edge);
+  }
+
+  /* "?" help bubble: hover, tap or keyboard focus shows a short explanation. */
+  .hint {
+    @apply bg-panel-3 text-ink-muted relative inline-flex size-[18px] shrink-0 cursor-help items-center justify-center rounded-full align-middle text-[12px] font-medium;
+  }
+  .hint > span {
+    @apply border-edge-hi pointer-events-none absolute bottom-[calc(100%+8px)] left-1/2 z-30 w-60 max-w-[80vw] -translate-x-1/2 rounded-none border-2 bg-black px-3 py-2 text-left text-[13px] leading-snug font-normal text-white opacity-0;
+    transition: opacity 120ms var(--ease-out);
+  }
+  .hint[data-align='left'] > span {
+    left: -4px;
+    transform: none;
+  }
+  .hint[data-align='right'] > span {
+    left: auto;
+    right: -4px;
+    transform: none;
+  }
+  .hint:hover > span,
+  .hint:focus > span,
+  .hint:focus-visible > span {
+    @apply opacity-100;
+  }
+
+  /* On/off switch. */
+  .switch {
+    @apply bg-edge-hi relative inline-flex h-[18px] w-[32px] shrink-0 cursor-pointer rounded-full;
+    transition: background-color 150ms var(--ease-out);
+  }
+  .switch::after {
+    content: '';
+    @apply absolute top-[2px] left-[2px] size-[14px] rounded-full bg-white;
+    transition: transform 160ms var(--ease-out);
+  }
+  .switch[aria-checked='true'],
+  .switch[data-on='true'] {
+    background: #ffcc4d;
+  }
+  .switch[aria-checked='true']::after,
+  .switch[data-on='true']::after {
+    background: #000;
+    transform: translateX(14px);
+  }
+
+  /* Range input. */
   .range {
     @apply h-5 w-full cursor-pointer appearance-none bg-transparent;
   }
   .range::-webkit-slider-runnable-track {
-    @apply bg-space-600 h-1 rounded-full;
+    @apply bg-edge h-[4px] rounded-full;
   }
   .range::-moz-range-track {
-    @apply bg-space-600 h-1 rounded-full;
+    @apply bg-edge h-[4px] rounded-full;
   }
   .range::-webkit-slider-thumb {
-    @apply bg-ink border-space-950 -mt-1.5 size-4 appearance-none rounded-full border-2;
+    @apply bg-warn -mt-[6px] size-[16px] appearance-none rounded-none border-2 border-black;
   }
   .range::-moz-range-thumb {
-    @apply bg-ink border-space-950 size-4 rounded-full border-2;
+    @apply bg-warn size-[14px] rounded-none border-2 border-black;
   }
-}
 
-/* Faint starfield used behind the shell. Pure CSS, no images. */
-.starfield {
-  background-image:
-    radial-gradient(1px 1px at 12% 18%, #fff9 50%, transparent 51%),
-    radial-gradient(1px 1px at 72% 12%, #fff7 50%, transparent 51%),
-    radial-gradient(1.5px 1.5px at 38% 64%, #fff8 50%, transparent 51%),
-    radial-gradient(1px 1px at 88% 52%, #fff6 50%, transparent 51%),
-    radial-gradient(1px 1px at 22% 86%, #fff5 50%, transparent 51%),
-    radial-gradient(1.5px 1.5px at 58% 32%, #fff6 50%, transparent 51%),
-    radial-gradient(1px 1px at 92% 88%, #fff5 50%, transparent 51%),
-    radial-gradient(1px 1px at 5% 48%, #fff6 50%, transparent 51%);
-  background-size: 420px 420px;
+  /* The window into space: black with a sparse starfield. */
+  .space {
+    @apply relative isolate overflow-hidden;
+    color: var(--color-ink);
+    background-color: #000;
+    background-image:
+      radial-gradient(1px 1px at 12% 18%, #ffffffb0 50%, transparent 52%),
+      radial-gradient(1px 1px at 72% 9%, #ffffff90 50%, transparent 52%),
+      radial-gradient(1px 1px at 38% 34%, #ffffff90 50%, transparent 52%),
+      radial-gradient(1px 1px at 88% 42%, #ffffff70 50%, transparent 52%),
+      radial-gradient(1px 1px at 22% 66%, #ffffff60 50%, transparent 52%),
+      radial-gradient(1px 1px at 58% 82%, #ffffff70 50%, transparent 52%);
+    background-size: 260px 260px;
+  }
+
+  /* Thin data bar. */
+  .meter {
+    @apply bg-panel-3 h-[4px] overflow-hidden rounded-full;
+  }
+  .meter > span {
+    @apply block h-full rounded-full;
+    transition: width 300ms var(--ease-out);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -112,6 +363,52 @@
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* Mission Clock: running indicator + scan stripe (reduced-motion handled by the global rule). */
+@keyframes clock-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.25;
+  }
+}
+@keyframes clock-scan {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(350%);
+  }
+}
+.clock-dot {
+  animation: clock-pulse 1.2s ease-in-out infinite;
+}
+.clock-scan {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 2px;
+  width: 30%;
+  background: linear-gradient(90deg, transparent, #ffcc4d, transparent);
+  animation: clock-scan 2.4s linear infinite;
+  pointer-events: none;
+}
+
+/* Range whose track fills amber up to the current value (Mission Clock). Set --pct inline. */
+.range-progress::-webkit-slider-runnable-track {
+  height: 6px;
+  background: linear-gradient(to right, #ffcc4d var(--pct, 0%), var(--color-edge) var(--pct, 0%));
+}
+.range-progress::-moz-range-track {
+  height: 6px;
+  background: linear-gradient(to right, #ffcc4d var(--pct, 0%), var(--color-edge) var(--pct, 0%));
+}
+.range-progress::-webkit-slider-thumb {
+  margin-top: -5px;
 }

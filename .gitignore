@@ -4,6 +4,7 @@ node_modules/
 __pycache__/
 .env
 .env.*
+!web/.env.example
 # datasets pesados: no subir al repo (enlazar en docs/04-resources-data.md)
 data/
 *.tif
@@ -16,3 +17,4 @@ web/dist/
 data_raw/
 # generated small mocks/exports DO go in the repo (overrides "data/" above)
 !web/public/data/
+.gstack/

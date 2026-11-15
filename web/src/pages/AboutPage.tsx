@@ -1,8 +1,8 @@
 import { useData } from '@/core';
 
 /**
- * About / data / credits. Keep this in sync with docs/04-resources-data.md and the
- * submission's References + AI disclosure. No agency logos or mission insignia.
+ * Data, method and credits. Keep in sync with docs/04-resources-data.md and the submission's
+ * References + AI disclosure. No agency logos or mission insignia.
  */
 const DATA_SOURCES = [
   {
@@ -27,72 +27,101 @@ const DATA_SOURCES = [
   },
 ];
 
+const TOC = [
+  { id: 'how', label: 'How it works' },
+  { id: 'sources', label: 'Data sources' },
+  { id: 'ai', label: 'Use of AI' },
+  { id: 'credits', label: 'Credits' },
+];
+
 export default function AboutPage() {
   const manifest = useData((s) => s.manifest);
   const isMock = useData((s) => s.isMock);
 
   return (
-    <div className="flex-1 overflow-y-auto">
-      <article className="mx-auto max-w-3xl space-y-10 px-5 py-12">
-        <header>
-          <p className="eyebrow mb-3">About</p>
-          <h1 className="text-3xl font-semibold tracking-tight">Data, method and credits</h1>
-          <p className="text-ink-muted mt-3 leading-relaxed">
-            Built for the NASA Space Apps Challenge 2026 (Lunar Landing Site Navigator) by a team at
-            the Madrid local event. This is an independent project, not affiliated with or endorsed
-            by NASA.
-          </p>
-        </header>
+    <div className="grid gap-3 md:grid-cols-[180px_minmax(0,1fr)]">
+      <nav className="box self-start" aria-label="On this page">
+        <div className="box-head-dark">On this page</div>
+        <ul className="box-body space-y-1 text-[11px]">
+          {TOC.map((t) => (
+            <li key={t.id}>
+              <a href={`#${t.id}`} className="lnk more">
+                {t.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
 
-        {isMock && (
-          <div className="border-warn/40 bg-warn/5 text-warn rounded-xl border px-4 py-3 text-sm">
-            The app is currently showing <strong>mock data</strong> generated for development. The
-            numbers are not real measurements.
-          </div>
-        )}
+      <article className="box">
+        <div className="box-head">Data &amp; Method</div>
+        <div className="box-body max-w-[72ch] space-y-4 text-[12px]">
+          <h1 className="text-[18px] font-bold text-heading">Data, method and credits</h1>
 
-        <section>
-          <h2 className="mb-3 text-lg font-medium">How it works</h2>
-          <p className="text-ink-muted leading-relaxed">
-            For each candidate site we compute where the Sun and Earth are in the sky over time and
-            compare that with the local horizon built from lunar terrain. The Moon has no
-            atmosphere, so there is no refraction: the horizon is the terrain plus the curvature of
-            the lunar sphere. From that we derive how often a site is sunlit, how often Earth is
-            visible, and the longest stretch of darkness.
-          </p>
-        </section>
-
-        <section>
-          <h2 className="mb-3 text-lg font-medium">Data sources</h2>
-          <ul className="divide-line border-line divide-y rounded-xl border">
-            {DATA_SOURCES.map((d) => (
-              <li key={d.name} className="px-4 py-3">
-                <a
-                  href={d.href}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="hover:text-accent font-medium"
-                >
-                  {d.name}
-                </a>
-                <p className="text-ink-muted text-sm">{d.use}</p>
-              </li>
-            ))}
-          </ul>
-          {manifest && (
-            <p className="text-ink-faint mt-3 font-mono text-[11px]">
-              Loaded data: {manifest.sources.join(' · ')} (generated {manifest.generated_utc})
+          {isMock && (
+            <p className="border-warn/60 bg-warn/10 text-warn border px-2 py-1.5 text-[11px]">
+              <b>Notice:</b> the site is currently showing <b>mock data</b> generated for
+              development. The numbers are not real measurements.
             </p>
           )}
-        </section>
 
-        <section>
-          <h2 className="mb-3 text-lg font-medium">Use of AI</h2>
-          <p className="text-ink-muted leading-relaxed">
-            The project idea comes from the team. AI coding assistants were used to help write parts
-            of the code and documentation; the full log is in the repository (docs/si-usage-log.md).
-          </p>
-        </section>
+          <section id="how">
+            <h2 className="border-edge mb-1 border-b text-[13px] font-bold text-heading">
+              How it works
+            </h2>
+            <p className="text-ink-muted">
+              For each candidate site we compute where the Sun and Earth are in the sky over time
+              and compare that with the local horizon built from lunar terrain. The Moon has no
+              atmosphere, so there is no refraction: the horizon is the terrain plus the curvature
+              of the lunar sphere. From that we derive how often a site is sunlit, how often Earth
+              is visible, and the longest stretch of darkness.
+            </p>
+          </section>
+
+          <section id="sources">
+            <h2 className="border-edge mb-1 border-b text-[13px] font-bold text-heading">
+              Data sources
+            </h2>
+            <ul className="text-ink-muted list-[square] space-y-1 pl-5">
+              {DATA_SOURCES.map((d) => (
+                <li key={d.name}>
+                  <a href={d.href} target="_blank" rel="noreferrer" className="lnk">
+                    {d.name}
+                  </a>{' '}
+                  — {d.use}
+                </li>
+              ))}
+            </ul>
+            {manifest && (
+              <p className="text-ink-faint mt-1.5 text-[10px]">
+                Loaded data: {manifest.sources.join('; ')} (generated{' '}
+                <span className="num">{manifest.generated_utc}</span>)
+              </p>
+            )}
+          </section>
+
+          <section id="ai">
+            <h2 className="border-edge mb-1 border-b text-[13px] font-bold text-heading">
+              Use of AI
+            </h2>
+            <p className="text-ink-muted">
+              The project idea comes from the team. AI coding assistants were used to help write
+              parts of the code and documentation; the full log is in the repository
+              (docs/si-usage-log.md).
+            </p>
+          </section>
+
+          <section id="credits">
+            <h2 className="border-edge mb-1 border-b text-[13px] font-bold text-heading">
+              Credits
+            </h2>
+            <p className="text-ink-muted">
+              Built for the NASA Space Apps Challenge 2026 (Lunar Landing Site Navigator) by a team
+              at the Madrid local event. Independent project, not affiliated with or endorsed by
+              NASA.
+            </p>
+          </section>
+        </div>
       </article>
     </div>
   );

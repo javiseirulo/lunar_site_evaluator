@@ -22,10 +22,7 @@ export function LegendBar({ layer, className }: { layer: LayerDef; className?: s
           );
           return (
             <span key={value} className="text-ink-muted flex items-center gap-1.5 text-[11px]">
-              <span
-                className="border-line-strong size-2.5 rounded-sm border"
-                style={{ background: stop[1] }}
-              />
+              <span className="size-2.5 border border-black" style={{ background: stop[1] }} />
               {label}
             </span>
           );
@@ -36,8 +33,11 @@ export function LegendBar({ layer, className }: { layer: LayerDef; className?: s
   const [min, max] = layer.value_range;
   return (
     <div className={className}>
-      <div className="h-1.5 rounded-full" style={{ background: paletteCss(layer.palette) }} />
-      <div className="text-ink-faint mt-1 flex justify-between font-mono text-[10px]">
+      <div
+        className="h-[7px] border border-black"
+        style={{ background: paletteCss(layer.palette) }}
+      />
+      <div className="text-ink-faint num mt-0.5 flex justify-between text-[10px]">
         <span>{formatValue(min, layer.units)}</span>
         <span>{formatValue(max, layer.units)}</span>
       </div>
@@ -54,13 +54,16 @@ export function ActiveLegend({ className }: { className?: string }) {
     .reverse()
     .flatMap((id) => manifest.layers.find((l) => l.id === id) ?? []);
   return (
-    <div className={cn('panel w-52 space-y-2.5 px-3 py-2.5', className)}>
-      {layers.map((l) => (
-        <div key={l.id}>
-          <p className="text-ink-muted mb-1 text-[11px]">{l.label}</p>
-          <LegendBar layer={l} />
-        </div>
-      ))}
+    <div className={cn('box w-48', className)}>
+      <div className="box-head-dark">Legend</div>
+      <div className="box-body space-y-2">
+        {layers.map((l) => (
+          <div key={l.id}>
+            <p className="text-ink-muted mb-0.5 text-[10px] font-bold">{l.label}</p>
+            <LegendBar layer={l} />
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

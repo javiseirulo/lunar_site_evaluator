@@ -1,62 +1,100 @@
-import { useState } from 'react';
-import { cn } from '@/lib/utils';
+import { Component, type ReactNode } from 'react';
+import { useAppStore } from '@/core';
 import { TimeBar } from '@/core/shell/TimeBar';
-import { ActiveLegend, LayersPanel, PolarMap } from '@/layers';
+import { LayersPanel, PolarMap } from '@/layers';
 import { GlobeView, SiteDetail, SiteList } from '@/globe';
+import { MissionTimingPanel, SiteCheckPanel } from '@/scoring';
+import { SimpleSiteList } from './explore/SimpleSiteList';
 
-type View = '2d' | '3d';
+/**
+ * Normal mode: a site list, the 3D Moon globe, the clock and one site card. Expert mode adds the mission
+ * requirements form, layers, mission timing and the site check.
+ */
+/** True when the browser can create a WebGL context (the 3D globe needs one). */
+function hasWebGL(): boolean {
+  try {
+    const c = document.createElement('canvas');
+    return !!(c.getContext('webgl2') ?? c.getContext('webgl'));
+  } catch {
+    return false;
+  }
+}
+const WEBGL = typeof document !== 'undefined' && hasWebGL();
+
+/** If the 3D globe throws (WebGL context refused), show the fallback instead of a broken page. */
+class GlobeBoundary extends Component<
+  { fallback: ReactNode; children: ReactNode },
+  { failed: boolean }
+> {
+  state = { failed: false };
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+  render() {
+    return this.state.failed ? this.props.fallback : this.props.children;
+  }
+}
 
 export default function ExplorePage() {
-  const [view, setView] = useState<View>('2d');
+  const proMode = useAppStore((s) => s.proMode);
 
   return (
-    <div className="grid min-h-0 flex-1 grid-cols-1 content-start gap-3 overflow-y-auto p-3 lg:content-stretch lg:grid-cols-[300px_minmax(0,1fr)_320px] lg:overflow-hidden">
-      {/* Left: sites + layers */}
-      <aside className="order-3 flex flex-col gap-3 lg:order-1 lg:min-h-0">
-        <SiteList className="max-h-80 lg:max-h-none lg:flex-1" />
-        <LayersPanel className="shrink-0" />
+    <div
+      className={
+        proMode
+          ? 'grid grid-cols-1 gap-4 md:grid-cols-[250px_minmax(0,1fr)] lg:grid-cols-[250px_minmax(0,1fr)_270px]'
+          : 'grid grid-cols-1 gap-4 md:grid-cols-[minmax(0,1fr)_300px] lg:grid-cols-[240px_minmax(0,1fr)_300px]'
+      }
+    >
+      {/* Left: sites (+ layer switches in Expert) */}
+      <aside
+        className={
+          proMode
+            ? 'order-3 flex flex-col gap-4 md:order-1'
+            : 'order-3 flex flex-col gap-4 md:order-3 md:col-span-2 lg:order-1 lg:col-span-1'
+        }
+      >
+        {proMode ? (
+          <>
+            <SiteList />
+            <LayersPanel />
+          </>
+        ) : (
+          <SimpleSiteList />
+        )}
       </aside>
 
-      {/* Centre: map + time */}
-      <section className="order-1 flex flex-col gap-3 lg:order-2 lg:min-h-0">
-        <div className="relative flex aspect-square w-full items-center justify-center lg:aspect-auto lg:min-h-[320px] lg:flex-1">
-          <div
-            className="bg-space-800 border-line absolute top-0 left-0 z-10 flex rounded-lg border p-0.5"
-            role="group"
-            aria-label="Map view"
-          >
-            {(['2d', '3d'] as const).map((v) => (
-              <button
-                key={v}
-                type="button"
-                onClick={() => setView(v)}
-                className={cn(
-                  'rounded-md px-2.5 py-1 font-mono text-[11px] uppercase',
-                  view === v ? 'bg-space-600 text-ink' : 'text-ink-faint hover:text-ink',
-                )}
-                aria-pressed={view === v}
-              >
-                {v}
-              </button>
-            ))}
-          </div>
-          {/* Largest square that fits the free space (container query units). */}
-          <div
-            className="absolute inset-0 flex items-center justify-center"
-            style={{ containerType: 'size' }}
-          >
-            <div style={{ width: 'min(100cqw, 100cqh)', height: 'min(100cqw, 100cqh)' }}>
-              {view === '2d' ? <PolarMap className="size-full" /> : <GlobeView />}
+      {/* Centre: map + clock */}
+      <section className="order-1 flex min-w-0 flex-col gap-4 md:order-2">
+        <div className="box overflow-hidden">
+          <div className="space relative p-4">
+            <div className="mx-auto aspect-square w-full max-w-[560px]">
+              {/* Without WebGL (old devices, locked-down browsers) fall back to the flat polar map. */}
+              {WEBGL ? (
+                <GlobeBoundary fallback={<PolarMap className="size-full" />}>
+                  <GlobeView />
+                </GlobeBoundary>
+              ) : (
+                <PolarMap className="size-full" />
+              )}
             </div>
           </div>
-          <ActiveLegend className="absolute right-0 bottom-0 hidden md:block" />
+          {proMode && (
+            <p className="space text-ink-muted border-edge border-t px-4 py-2 text-[12px]">
+              Drag to rotate, scroll to zoom. Markers are candidate sites coloured by score; dim =
+              fails a hard filter.
+            </p>
+          )}
         </div>
-        <TimeBar className="shrink-0" />
+        {proMode && <MissionTimingPanel />}
+        <TimeBar />
       </section>
 
-      {/* Right: detail */}
-      <aside className="order-2 lg:order-3 lg:min-h-0 lg:overflow-y-auto">
+      {/* Right: site card (+ validity check in Expert) */}
+      <aside className="order-2 flex flex-col gap-4 md:order-3 lg:col-span-1">
         <SiteDetail />
+        {/* Validity for the current mission window (Javi, @/scoring; docs/10 J6–J7). */}
+        {proMode && <SiteCheckPanel />}
       </aside>
     </div>
   );

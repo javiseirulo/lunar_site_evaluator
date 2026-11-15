@@ -56,7 +56,7 @@ export function PolarMap({ className }: { className?: string }) {
 
   return (
     <div className={cn('relative aspect-square select-none', className)}>
-      <div className="bg-space-850 border-line absolute inset-0 overflow-hidden rounded-full border">
+      <div className="border-edge-hi/40 absolute inset-0 overflow-hidden rounded-full border bg-[#0d1424]">
         <canvas
           ref={canvasRef}
           className="size-full [image-rendering:auto]"
@@ -72,19 +72,22 @@ export function PolarMap({ className }: { className?: string }) {
         />
       </div>
       <Graticule manifest={manifest} />
-      {sites?.map((s) => (
-        <Pin
-          key={s.id}
-          site={s}
-          manifest={manifest}
-          selected={s.id === selectedSiteId}
-          onSelect={() => selectSite(s.id === selectedSiteId ? null : s.id)}
-        />
-      ))}
-      <div className="text-ink-faint pointer-events-none absolute bottom-1 left-1 font-mono text-[10px]">
+      {/* contracts/README v1.1: whole-Moon catalog; this map only covers the south pole. */}
+      {sites
+        ?.filter((s) => s.region === 'south_pole' || s.lat <= manifest.lat_limit)
+        .map((s) => (
+          <Pin
+            key={s.id}
+            site={s}
+            manifest={manifest}
+            selected={s.id === selectedSiteId}
+            onSelect={() => selectSite(s.id === selectedSiteId ? null : s.id)}
+          />
+        ))}
+      <div className="num bg-night/80 text-white pointer-events-none absolute bottom-0 left-0 rounded-[3px] px-1.5 py-0.5 text-[11px]">
         {hover
           ? formatLatLon(hover[0], hover[1])
-          : `South pole · to ${Math.abs(manifest.lat_limit)}°S`}
+          : `South pole to ${Math.abs(manifest.lat_limit)}°S`}
       </div>
     </div>
   );
@@ -170,15 +173,17 @@ function Pin({
     >
       <span
         className={cn(
-          'block size-2.5 rounded-full ring-2 transition-transform group-hover:scale-150',
-          selected ? 'ring-ink scale-150' : 'ring-space-950/80',
+          'block size-[9px] rotate-45 border group-hover:scale-125',
+          selected
+            ? 'animate-pop scale-150 border-white outline outline-1 outline-black'
+            : 'border-black',
           !site.valid && 'opacity-50',
         )}
         style={{ background: scoreColor(site.score) }}
       />
       <span
         className={cn(
-          'bg-space-950/90 border-line pointer-events-none absolute top-1/2 left-full ml-1 -translate-y-1/2 rounded border px-1.5 py-0.5 text-[11px] whitespace-nowrap',
+          'pointer-events-none absolute top-1/2 left-full z-10 ml-1 -translate-y-1/2 rounded-[3px] bg-white px-1.5 py-0.5 text-[12px] font-medium whitespace-nowrap text-black',
           selected ? 'block' : 'hidden group-hover:block',
         )}
       >
