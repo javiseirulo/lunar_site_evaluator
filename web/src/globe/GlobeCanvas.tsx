@@ -207,6 +207,8 @@ export default function GlobeCanvas() {
   const createPin = (lat: number, lon: number, name?: string) => {
     const pin = addPin({ lat, lon, name });
     setFocus({ kind: 'custom', id: pin.id });
+    // Shared free point (store `selectedPoint`) for the "any lat/lon" checks; never touches selectedSiteId.
+    useAppStore.getState().setSelectedPoint({ lat, lon });
     return pin;
   };
 
@@ -274,16 +276,18 @@ export default function GlobeCanvas() {
         <CameraRig flightRef={flightRef} controlsRef={controlsRef} />
       </Canvas>
       <div className="absolute top-2 left-2 flex flex-col items-start gap-2">
-        {expert && (
-          <PinForm
-            onAdd={({ name, lat, lon }) => {
-              createPin(lat, lon, name);
-              // Fly above the new pin (avoid the exact pole, where the orbit is undefined).
-              const safeLat = Math.max(-89.5, Math.min(89.5, lat));
-              flightRef.current = new Vector3(...latLonToVec3(safeLat, lon, PIN_VIEW_DISTANCE));
-            }}
-          />
-        )}
+        {/* Coordinate entry is open in Normal too (kids can go anywhere); Normal only gets plainer wording. */}
+        <PinForm
+          buttonLabel={expert ? 'Pin by coordinates' : 'Go to coordinates'}
+          title={expert ? 'Pin by coordinates' : 'Go to coordinates'}
+          submitLabel={expert ? 'Add pin' : 'Go there'}
+          onAdd={({ name, lat, lon }) => {
+            createPin(lat, lon, name);
+            // Fly above the new pin (avoid the exact pole, where the orbit is undefined).
+            const safeLat = Math.max(-89.5, Math.min(89.5, lat));
+            flightRef.current = new Vector3(...latLonToVec3(safeLat, lon, PIN_VIEW_DISTANCE));
+          }}
+        />
         <HistoricControls />
         <NightControls hasSun={!!sunDir} />
         <PatchControls />
