@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { Share2 } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 interface Matrix {
   size: number;
   modules: boolean[][];
@@ -50,11 +51,32 @@ export function ShareView({ url }: { url: string }) {
       active = false;
     };
   }, [open, snapshot]);
+  const root = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!open) return;
+    const outside = (e: PointerEvent) => {
+      if (!root.current?.contains(e.target as Node)) setOpen(false);
+    };
+    const escape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setOpen(false);
+        root.current?.querySelector('button')?.focus();
+      }
+    };
+    document.addEventListener('pointerdown', outside);
+    document.addEventListener('keydown', escape);
+    return () => {
+      document.removeEventListener('pointerdown', outside);
+      document.removeEventListener('keydown', escape);
+    };
+  }, [open]);
   const local = ['localhost', '127.0.0.1', '[::1]'].includes(new URL(snapshot).hostname);
   return (
-    <div className="lunar-share">
+    <div className="lunar-share" ref={root}>
       <button
-        className="btn"
+        className="lunar-icon"
+        aria-label="Share view / QR"
+        title="Share view / QR"
         aria-expanded={open}
         onClick={() => {
           if (!open) {
@@ -65,7 +87,7 @@ export function ShareView({ url }: { url: string }) {
           setOpen(!open);
         }}
       >
-        Share view / QR
+        <Share2 aria-hidden="true" />
       </button>
       {open && (
         <div className="lunar-share-panel">
