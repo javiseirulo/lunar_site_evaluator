@@ -113,3 +113,10 @@
 - Señal local `streetViewFlight.ts` (zustand, en src/globe): `globeActive` (lo pone el CameraRig al montarse) y `request`. `standHere(site)`: en 3D pide el vuelo; en 2D (globo no montado) o con `prefers-reduced-motion` hace `setMode('streetview')` directamente.
 - Vuelo de 1,5 s (easeInOut): dirección y radio interpolados por separado (rodea el globo, no lo atraviesa) hasta 3 km sobre el terreno (`terrainLift`), y orientación por slerp de cuaterniones hasta mirar nivelado al horizonte (~100 km) con el "arriba" local (con lookAt y +Y del mundo la vista saldría invertida junto al polo sur). Mira en la dirección de viaje; si no hay, al norte. Controles desactivados durante el vuelo; al terminar, `setMode('streetview')`.
 - 6 tests (pose, nivelado, dirección, polo, easing, 2D vs 3D). Sin verificar visualmente (panel oculto).
+
+### Paso 6 — capas sobre el parche: no se hace (2026-11-15)
+- El core (`web/src/core/data.ts`, también en `origin/dev`) sigue cargando `web/public/data/layers.json` con `"mock": true`; el real de Pablo (`terrain/layers.json`) no se usa. Según el plan, sin capas reales no se pintan sobre el parche. **Pedir a Javi2** que el core cargue el `layers.json` real.
+
+### Pendiente de pedir a otros
+- Javi2: core → `terrain/layers.json` real; `candidateIds` en el store para el mapa 2D; barra lateral más alta; campo de fecha/hora en el Mission Clock.
+- (Ya no hace falta pedir `valid.u8` a Pablo: sí estaba.)
