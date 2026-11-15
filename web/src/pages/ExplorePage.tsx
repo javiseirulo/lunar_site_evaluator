@@ -72,11 +72,11 @@ export default function ExplorePage() {
             <div className="mx-auto aspect-square w-full max-w-[560px]">
               {/* Without WebGL (old devices, locked-down browsers) fall back to the flat polar map. */}
               {WEBGL ? (
-                <GlobeBoundary fallback={<PolarMap className="size-full" />}>
+                <GlobeBoundary fallback={<PolarMap className="size-full" neutral={!proMode} />}>
                   <GlobeView />
                 </GlobeBoundary>
               ) : (
-                <PolarMap className="size-full" />
+                <PolarMap className="size-full" neutral={!proMode} />
               )}
             </div>
           </div>

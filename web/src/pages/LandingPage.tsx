@@ -88,7 +88,7 @@ export function LandingPage() {
 
         <div className="space flex flex-col justify-center p-5 sm:p-7">
           <div className="mx-auto aspect-square w-full max-w-[480px]">
-            <PolarMap className="size-full" />
+            <PolarMap className="size-full" neutral={!proMode} />
           </div>
           {site && (
             <p className="mt-3 text-center text-ink-muted text-[13px]">
