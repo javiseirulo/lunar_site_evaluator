@@ -94,3 +94,4 @@ La **idea** no puede venir de la IA.
   Contrastó cobertura con la ficha de Cesium y probó la aplicación en Chrome.
   Las dependencias científicas y los límites de las pruebas quedan en tasks.md
   y global-lunar-detail-audit.md de Pablo.
+| 2026-11-16 | martaplatero2002-star | Claude (Anthropic) | Layout móvil de Explore: mapa arriba con sus controles y paneles debajo, sin solapes, a petición de Marta (#167) | `web/src/pages/ExplorePage.tsx` (declarar como código asistido por IA) |
