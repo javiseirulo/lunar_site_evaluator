@@ -118,5 +118,5 @@
 - El core (`web/src/core/data.ts`, también en `origin/dev`) sigue cargando `web/public/data/layers.json` con `"mock": true`; el real de Pablo (`terrain/layers.json`) no se usa. Según el plan, sin capas reales no se pintan sobre el parche. **Pedir a Javi2** que el core cargue el `layers.json` real.
 
 ### Pendiente de pedir a otros
-- Javi2: core → `terrain/layers.json` real; `candidateIds` en el store para el mapa 2D; barra lateral más alta; campo de fecha/hora en el Mission Clock.
+- ~~Javi2~~ → **Javi (@javiseirulo)**, que ahora lleva el core y las capas: core → `terrain/layers.json` real; barra lateral más alta; campo de fecha/hora en el Mission Clock. (`candidateIds` para el mapa 2D: descartado, el 2D se quitará.)
 - (Ya no hace falta pedir `valid.u8` a Pablo: sí estaba.)
