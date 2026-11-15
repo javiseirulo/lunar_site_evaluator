@@ -172,7 +172,7 @@ function Stats() {
       aria-label="The project in numbers"
       className="border-t border-white/10 py-16 md:py-20"
     >
-      <dl className={`${WRAP} grid gap-x-10 gap-y-10 sm:grid-cols-2 lg:grid-cols-4`}>
+      <dl className={`${WRAP} grid gap-x-10 gap-y-10 sm:grid-cols-2 lg:grid-cols-3`}>
         {STATS.map((s) => (
           <div key={s.value} className="border-t border-white/20 pt-5">
             <dd className="lp-mono text-4xl text-[#288bff] md:text-6xl">{s.value}</dd>
