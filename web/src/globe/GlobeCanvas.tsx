@@ -114,6 +114,8 @@ export default function GlobeCanvas() {
   const controlsRef = useRef<Controls>(null);
   const [textureReady, setTextureReady] = useState(false);
   const now = useAppStore((s) => s.currentTimeUTC);
+  // DESIGN.md: Normal mode keeps one main action; pinning by coordinates is an Expert tool.
+  const expert = useAppStore((s) => s.proMode);
   const sun = useSunDirection(now);
   const sunDir = sun.dir;
   const nightOn = useNightLayer((s) => s.on);
@@ -268,14 +270,16 @@ export default function GlobeCanvas() {
         <CameraRig flightRef={flightRef} controlsRef={controlsRef} />
       </Canvas>
       <div className="absolute top-2 left-2 flex flex-col items-start gap-2">
-        <PinForm
-          onAdd={({ name, lat, lon }) => {
-            createPin(lat, lon, name);
-            // Fly above the new pin (avoid the exact pole, where the orbit is undefined).
-            const safeLat = Math.max(-89.5, Math.min(89.5, lat));
-            flightRef.current = new Vector3(...latLonToVec3(safeLat, lon, PIN_VIEW_DISTANCE));
-          }}
-        />
+        {expert && (
+          <PinForm
+            onAdd={({ name, lat, lon }) => {
+              createPin(lat, lon, name);
+              // Fly above the new pin (avoid the exact pole, where the orbit is undefined).
+              const safeLat = Math.max(-89.5, Math.min(89.5, lat));
+              flightRef.current = new Vector3(...latLonToVec3(safeLat, lon, PIN_VIEW_DISTANCE));
+            }}
+          />
+        )}
         <HistoricControls />
         <NightControls hasSun={!!sunDir} />
         <PatchControls />
