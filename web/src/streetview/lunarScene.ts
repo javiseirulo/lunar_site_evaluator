@@ -549,7 +549,9 @@ export async function createLunarScene(
         callbacks.observer(target.point); // immediately invalidate the old site's sky
         callbacks.hint(`Moving ${Math.round(target.distance)} m…`);
         const started = performance.now();
-        const duration = matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 1000;
+        const duration = matchMedia('(prefers-reduced-motion: reduce)').matches
+          ? 0
+          : Math.min(2400, 700 + target.distance * 3.4);
         const advance = (now: number) => {
           if (disposed) return;
           const t = duration ? Math.min(1, (now - started) / duration) : 1;

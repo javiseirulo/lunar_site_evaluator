@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import type { ViewerSky } from './sky';
 import type { Observer, LunarScene } from './lunarScene';
 import { createLunarScene } from './lunarScene';
-import { lightingState } from './navigation';
+import { lightingState, MAX_WALK_DISTANCE_M } from './navigation';
 import type { LabelLayout } from './landmarks';
 import { DEFAULT_VIEW, type ViewState } from './viewLink';
 import { SaveLocation } from './SaveLocation';
@@ -48,7 +48,9 @@ export default function LunarViewport({
   const [height, setHeight] = useState(initialView.height);
   const [reading, setReading] = useState(false);
   const [names, setNames] = useState(true);
-  const [hint, setHint] = useState('Click or tap nearby ground to walk · up to 200 m per step.');
+  const [hint, setHint] = useState(
+    `Click or tap nearby ground to walk · up to ${MAX_WALK_DISTANCE_M} m per step.`,
+  );
   const [view, setView] = useState(initialView);
   const [labels, setLabels] = useState<LabelLayout[]>([]);
   const [coordinates, setCoordinates] = useState(observer);
