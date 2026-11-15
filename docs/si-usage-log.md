@@ -86,3 +86,9 @@ La **idea** no puede venir de la IA.
 | 2026-11-15 | martaplatero2002-star | Claude Code (Opus 5.5) | Redacción de los prompts de Higgsfield para los assets de Mission (ideas aprobadas por Manuel) y comprobación de coste en el CLI; no se generó ningún asset (#127) | Solo documentación interna (`docs/team/martaplatero2002-star/higgsfield-mission-prompts.md`); los assets que salgan se declararán como imágenes/vídeo/voz generados con IA |
 
 - 2026-11-15 · Pablo suministró la ilustración de astronauta creada con ChatGPT. Codex adaptó la interacción, conservó el canal alfa y la firma visible ChatGPT. El recurso es ilustrativo.
+
+- 2026-11-15 · Pablo · Codex implementó el plan humano para discos aparentes,
+  navegación de 500 m, controles, pantalla completa, QR y astronauta suministrado.
+  Contrastó cobertura con la ficha de Cesium y probó la aplicación en Chrome.
+  Las dependencias científicas y los límites de las pruebas quedan en tasks.md
+  y global-lunar-detail-audit.md de Pablo.
