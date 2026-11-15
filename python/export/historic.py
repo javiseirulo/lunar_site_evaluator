@@ -200,21 +200,21 @@ def main() -> int:
         text = json.dumps(
             {"version": 1, "generated_utc": generated, **m}, separators=(",", ":"), allow_nan=False
         )
-        (OUT / f"{m['id']}.json").write_text(text, encoding="utf-8")
+        (OUT / f"{m['id']}.json").write_text(text, encoding="utf-8", newline="\n")
         index.append(summary(m))
         cells = " ".join(
             f"{o['option']}:{o['landing_sun_el']:+.1f}:{o['outcome']}" for o in m["options"]
         )
         print(f"{'PLAY' if m['playable'] else '----'} {m['id']:22s} {cells}")
-    jsonfmt.write(
-        OUT / "missions.json",
-        {
-            "version": 1,
-            "generated_utc": generated,
-            "source": "SPICE (DE440, MOON_ME) at each real landing time; content in " + SOURCE,
-            "missions": index,
-        },
-    )
+    listing = {
+        "version": 1,
+        "generated_utc": generated,
+        "source": "SPICE (DE440, MOON_ME) at each real landing time; content in " + SOURCE,
+        "missions": index,
+    }
+    # newline="\n": the same bytes on Windows as elsewhere.
+    out = OUT / "missions.json"
+    out.write_text(jsonfmt.dumps(listing) + "\n", encoding="utf-8", newline="\n")
     print(f"{len(index)} missions -> {OUT}")
     return 0
 

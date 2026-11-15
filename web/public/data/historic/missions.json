@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_utc": "2026-11-15T13:11:47Z",
+  "generated_utc": "2026-11-15T13:16:21Z",
   "source": "SPICE (DE440, MOON_ME) at each real landing time; content in python/export/historic_missions.yaml (sources listed per mission)",
   "missions": [
     {
@@ -517,3 +517,4 @@
     }
   ]
 }
+
