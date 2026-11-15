@@ -5,6 +5,7 @@
  * "Sort by" and the live list of candidate sites. No score, weights or `valid` from sites.json.
  * SiteDetail: the selected site's sheet: requirement checks, "Now" (Mission Clock) and window stats.
  */
+import { standHere } from './streetViewFlight';
 import { useEffect, useRef, useState } from 'react';
 import { Plus, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -467,7 +468,6 @@ function Results() {
 
 export function SiteDetail({ className }: { className?: string }) {
   const site = useSelectedSite();
-  const setMode = useAppStore((s) => s.setMode);
   const proMode = useAppStore((s) => s.proMode);
   const req = useRequirements((s) => s.req);
   const stats = useSiteStats(site?.id ?? null);
@@ -566,7 +566,11 @@ export function SiteDetail({ className }: { className?: string }) {
         )}
       </div>
 
-      <button type="button" onClick={() => setMode('streetview')} className="btn mt-5 w-full">
+      <button
+        type="button"
+        onClick={() => standHere({ siteId: site.id, lat: site.lat, lon: site.lon })}
+        className="btn mt-5 w-full"
+      >
         Stand here in Street View
       </button>
     </section>

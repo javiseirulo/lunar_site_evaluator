@@ -7,6 +7,7 @@ import { loadTimeseries, useData, useTimeseries } from '@/core';
 import {
   activeChecks,
   evaluateSite,
+  isCandidateSite,
   missionStats,
   resolveWindow,
   sortEvaluations,
@@ -41,7 +42,9 @@ export interface Candidates {
 }
 
 export function useCandidates(): Candidates {
-  const sites = useData((s) => s.sites);
+  const allSites = useData((s) => s.sites);
+  // Explore ranks planning candidates only; historic landings live in the "Past landings" layer.
+  const sites = useMemo(() => allSites?.filter(isCandidateSite) ?? null, [allSites]);
   const timeseries = useData((s) => s.timeseries);
   const tsErrors = useData((s) => s.timeseriesErrors);
   const window = useMissionWindow();

@@ -85,3 +85,48 @@
   - #86 (contrato): `source` solo `https`; el test exige que cada `historic_landing` de `sites.json` esté en `historic_sites.json` y que los id compartidos sean `historic_landing`.
   - #89: el cargador valida todo lo que muestra la tarjeta y avisa en consola de filas descartadas; cursor y tarjeta se limpian al apagar la capa; leyenda con borde (contraste); los choques ya no dicen "Crashed · Crash site".
   - Decisiones de Marta: sin triángulo encima de un candidato visible (su tarjeta muestra "Past landing"); 7 misiones más (Luna 13, Luna 20, Surveyor 3/5/6/7, HAKUTO-R M2) → 32; contador "32 sites (5 crashes) · 2 south of 80°S"; el interruptor reintenta la carga tras un error.
+
+## 2026-11-15 — Sesión 5: v2 del globo (#92, rama `martaplatero2002-star/92-polar-patch`)
+- Datos revisados: `terrain/heightmap.json` (1025×1025, vértices, ±304006 m, LDEM_80S_80MPP_ADJ) y `ephem/index.json` cuadran con sus cabeceras. `terrain/valid.u8` sí está (corregido: al principio lo di por ausente); se usa como máscara y, si faltara, el NaN de `heights.f32`. El core carga `web/public/data/layers.json` (mock), no `terrain/layers.json` (real) — pedir a Javi2. `@/ephem` ya interpola el Sol (`sunDirectionMoonME`): se reutiliza.
+- Paso 0: `isCandidateSite` (missionStats) + `useCandidates` solo con `kind: "candidate"`: Explore pasa de 59 a 39 sitios. Con batería 20 000 Wh / 50 W (400 h) no pasa ninguno; con 50 000 Wh, 26 de 39; con 200 000 Wh, 39.
+- Paso 1: luz según la fecha. `sunLight.ts` (+6 tests): `moonMeToThree` = (X, Z, −Y), cobertura 2026–2055 desde `ephem/index.json`, estado ok / loading / no_ephemeris. `@/ephem` de Javi carga el año (caché) e interpola el Sol; no se duplica. En el globo: luz direccional en la dirección del Sol del Mission Clock, ambiente 0,04 (sin atmósfera); sin efemérides → luz fija y aviso "No ephemeris for this date · fixed lighting". Comprobado: al abrir el 3D solo se descargan `ephem/index.json` y `ephem/2027.bin`. Línea día/noche con Play: sin comprobar visualmente (panel oculto).
+
+### Paso 2 — parche polar 3D (2026-11-15)
+- `terrain.ts`: inversa estereográfica polar sur, rejilla de la cabecera, altura bilineal y `buildPatchArrays` (radio (R+h·exag)/R, solo triángulos con los 3 vértices válidos, normales hacia fuera). 10 tests.
+- `terrainStore.ts`: carga perezosa de `heightmap.json` + `heights.f32` + `valid.u8` (opcional; detecta el index.html que Vite devuelve si falta). Se dispara al acercar la cámara al polo (<1.8, mirando al sur) o con el marcador del polo.
+- `PolarPatch.tsx`: malla gris mate (#8c8c8c, sin hillshade), 513² por defecto (paso 2), "High detail" 1025². Mientras está cargado, la esfera texturizada se corta al sur de −80° (thetaLength + 0.05° de solape, UV corregidas).
+- `PatchControls.tsx`: interruptores High detail / Vertical ×2 y etiqueta "Vertical exaggeration ×2 (shadows not to scale)".
+- Medido en el navegador: descarga ~96 ms en local; construir la malla 513² = 410 k triángulos en ~160 ms, 1025² = 1,64 M triángulos en ~460 ms. FPS sin medir (el panel del navegador estaba oculto): pendiente de que Marta lo vea.
+
+
+### Paso 3 — sombras (2026-11-15)
+- `SunLight` (PolarPatch.tsx) sustituye a la directionalLight: con el parche cargado proyecta sombras (castShadow + receiveShadow en la malla), cámara ortográfica ajustada a la esfera envolvente del parche (centro (0, −0.992, 0), radio 0.185), mapa 4096² (~160 m por téxel), bias −5e-5 y normalBias 3e-4 por el Sol rasante. Sin parche no hay coste de sombras.
+- Etiqueta en el panel: "Illustrative shading — official sunlight figures come from the data pipeline".
+- Sin verificar visualmente (panel oculto): el bias puede necesitar ajuste si aparece acné o "peter-panning".
+
+### Paso 4 — pins sobre el terreno (2026-11-15)
+- `terrainLift(lat, lon)` (terrain.ts): proyección estereográfica (`projectSouthPolar` de `@/core/projection`, solo lectura) + altura bilineal → elevación sobre la esfera en unidades del globo, con la exageración activa; 0 fuera del parche o sin dato. `sampleHeight` tolera el redondeo en los bordes de la rejilla.
+- `useTerrainLift()` (terrainStore.ts): función estable mientras no cambie el terreno ni la exageración. Pins de sitios, pins propios, alunizajes históricos, marcador de clic, etiqueta de hover y tarjeta se anclan a `PIN_ALTITUDE + lift`.
+- Comprobado con los datos reales: SR1 +1652 m, SR3 +1383 m, CR1 +1927 m, GR1 +1759 m (bordes de cráter, plausible). 3 tests nuevos (incluido que coincide con el vértice de la malla).
+
+### Paso 5 — "Stand here in Street View" (2026-11-15)
+- Señal local `streetViewFlight.ts` (zustand, en src/globe): `globeActive` (lo pone el CameraRig al montarse) y `request`. `standHere(site)`: en 3D pide el vuelo; en 2D (globo no montado) o con `prefers-reduced-motion` hace `setMode('streetview')` directamente.
+- Vuelo de 1,5 s (easeInOut): dirección y radio interpolados por separado (rodea el globo, no lo atraviesa) hasta 3 km sobre el terreno (`terrainLift`), y orientación por slerp de cuaterniones hasta mirar nivelado al horizonte (~100 km) con el "arriba" local (con lookAt y +Y del mundo la vista saldría invertida junto al polo sur). Mira en la dirección de viaje; si no hay, al norte. Controles desactivados durante el vuelo; al terminar, `setMode('streetview')`.
+- 6 tests (pose, nivelado, dirección, polo, easing, 2D vs 3D). Sin verificar visualmente (panel oculto).
+
+### Paso 6 — capas sobre el parche: no se hace (2026-11-15)
+- El core (`web/src/core/data.ts`, también en `origin/dev`) sigue cargando `web/public/data/layers.json` con `"mock": true`; el real de Pablo (`terrain/layers.json`) no se usa. Según el plan, sin capas reales no se pintan sobre el parche. **Pedir a Javi2** que el core cargue el `layers.json` real.
+
+### Pendiente de pedir a otros
+- ~~Javi2~~ → **Javi (@javiseirulo)**, que ahora lleva el core y las capas: core → `terrain/layers.json` real; barra lateral más alta; campo de fecha/hora en el Mission Clock. (`candidateIds` para el mapa 2D: descartado, el 2D se quitará.)
+- (Ya no hace falta pedir `valid.u8` a Pablo: sí estaba.)
+
+### Ajustes del parche tras probarlo (2026-11-15)
+- Petición de Marta: parche más grande, visible solo a la distancia del botón "South pole" (desaparece al alejarse) y siempre en alta resolución.
+- **Tamaño: no se puede con los datos actuales.** `heights.f32`/`valid.u8` tienen datos justo hasta 80°S (ρ máx. 303978 m → −80,0009°); las esquinas son NaN. Para ampliarlo hace falta que Pablo exporte un heightmap mayor (p. ej. hasta −75° con `LDEM_60S_240MPP_ADJ`, ya citado en docs/04). No se inventa relieve.
+- Visibilidad: `nextPatchShown` (terrainStore.ts) con histéresis: aparece a ≤ 1,3 (= distancia del botón "South pole", constante compartida `PATCH_SHOW_DISTANCE`) mirando al sur (y/d ≤ −0,85) y se oculta a > 1,45 o y/d > −0,75. Se descarga antes (a 1,8) para que esté listo. Oculto: malla montada con `visible=false` (no se reconstruye), esfera completa, sin sombras y pins sobre la esfera.
+- Siempre 1025² (1,64 M triángulos); quitado el interruptor High detail. Riesgo de FPS en portátiles con sombras: si va lento, volver a 513².
+
+### Umbral único del parche y capa Día / noche (2026-11-15)
+- Petición de Marta: misma distancia para aparecer y desaparecer (la de desaparecer, para que se vea un pelín antes). `patchShownAt`: visible a ≤ 1,45 del centro y y/d ≤ −0,75; sin histéresis. El botón "South pole" sigue dejando la cámara a 1,3 (dentro).
+- Idea de Marta: ver cómo evoluciona la noche como capa, porque ahora el lado nocturno sale negro. Capa local "Day / night" (apagada por defecto, `nightLayer.ts` + `DayNight.tsx`): luz de relleno azulada (#8ea4dc, 0,6) para ver la superficie del lado nocturno y línea del terminador (círculo máximo perpendicular al Sol de las efemérides, r = 1,003) que se mueve con el Mission Clock. Sin efemérides: se ve el lado nocturno pero no hay terminador. Las sombras del parche también se ven en azul (zona sin sol directo). 2 tests nuevos.
