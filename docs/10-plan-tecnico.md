@@ -45,7 +45,7 @@
 | Mission / juego (Cristóbal) | ⏳ diseño descrito (#52), hueco listo | `web/src/game/` (placeholder) |
 | Pipeline Python (Javi, Pablo) | Entrega polar real reunida con el visor en rama #46; revisión/integración pendientes | `python/terrain/`, `web/public/data/terrain/`: heightmap 1025², máscara, elevación/pendiente y tabla de 20 sitios; horizonte/efemérides aún pendientes |
 | Efemérides SPICE + `@/ephem` + `@/scoring` (Javi) | ✅ en `dev` (#70, #77, #78) · ⏳ export real | `python/ephem/`, `web/src/ephem/`, `web/src/scoring/`; diseño y qué usar: `docs/team/javiseirulo/diseno-efemerides-scoring.md` |
-| Deploy público | ⏳ pendiente | `web/vercel.json` listo; proyecto Vercel con raíz `web/` |
+| Deploy público | ✅ https://lunar-site-evaluator.vercel.app (2026-11-15, build de `dev` 786ff1c) | Vercel, proyecto `lunar-site-evaluator` (cuenta de @javocruz); cómo redesplegar: `web/README.md` § Deploy |
 
 ### Cómo arrancar (cualquiera)
 ```bash
