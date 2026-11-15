@@ -95,3 +95,4 @@ La **idea** no puede venir de la IA.
   Las dependencias científicas y los límites de las pruebas quedan en tasks.md
   y global-lunar-detail-audit.md de Pablo.
 | 2026-11-16 | martaplatero2002-star | Claude (Anthropic) | Layout móvil de Explore: mapa arriba con sus controles y paneles debajo, sin solapes, a petición de Marta (#167) | `web/src/pages/ExplorePage.tsx` (declarar como código asistido por IA) |
+| 2026-11-15 | javiseirulo | Claude Code (Sonnet 5.5) | Borrador en inglés de los campos del formulario de entrega (nombre, resumen, descripción, uso de SI, datos NASA, referencias, checklist y huecos) a partir de los docs, datos y código del repo; sin inventar hechos, huecos marcados TODO | Solo documentación interna (`docs/team/javiseirulo/submission-form-draft.md`) |
