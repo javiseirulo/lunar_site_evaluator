@@ -1,6 +1,6 @@
 # Principios de producción (resumen de las skills usadas)
 
-Resumen **en palabras propias**; no se copian las skills. Úsalas desde su origen si las tienes instaladas.
+Resumen **en palabras propias**. Las skills originales están en [skills/](skills/README.md).
 
 | Skill | Origen | Qué se aplicó aquí |
 |---|---|---|

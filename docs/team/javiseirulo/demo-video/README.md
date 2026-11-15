@@ -15,7 +15,8 @@ jugándolo (modo Kahoot).
 | [script.md](script.md) | Voz en inglés, tiempos medidos del audio real, imagen y texto de cada beat |
 | [higgsfield-prompts.md](higgsfield-prompts.md) | Los 3 clips de aula para Higgsfield (con reglas del concurso) |
 | [capture-list.md](capture-list.md) | Qué grabar de la app real (y dependencias) |
-| [production-principles.md](production-principles.md) | Reglas de montaje/narración resumidas (las "skills", sin copiar nada con licencia dudosa) |
+| [production-principles.md](production-principles.md) | Reglas de montaje/narración resumidas |
+| [skills/](skills/README.md) | **Las skills originales** (animated-video, video-script, content-principles, social-virality + tv2) para copiar a tu `.claude/skills/` |
 | [vo/Charon_fast.wav](vo/Charon_fast.wav) | **Locución sintética** (Gemini TTS, voz Charon), 27,0 s, sin pausas, ritmo nativo |
 | [vo/vo_lines.json](vo/vo_lines.json), [vo/voices.py](vo/voices.py) | Texto y estilo por frase + script para regenerar la voz |
 
@@ -43,7 +44,6 @@ jugándolo (modo Kahoot).
 10 peticiones/día para este modelo). `python3 voices.py list` · `python3 voices.py full charon`. El ritmo depende de la
 indicación de estilo: "fast, brisk … about 2.3 words per second" dio 27,0 s; "about 2.0" dio 36 s (no es lineal).
 
-## Origen de las skills usadas
-Método: skills `animated-video`, `video-script`, `content-principles` y `social-virality-tv2` (proyecto video_editor de Javi).
-No se copian aquí: `content-principles` y los recursos de `video-edit` no tienen licencia redistribuible. Enlaces en
-[production-principles.md](production-principles.md).
+## Skills usadas
+Método: `animated-video`, `video-script`, `content-principles`, `social-virality` y `social-virality-tv2` (proyecto video_editor
+de Javi). Están copiadas sin modificar en [skills/](skills/README.md) (origen, licencias y qué no se incluyó, allí).
