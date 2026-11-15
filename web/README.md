@@ -48,6 +48,12 @@ Useful helpers in `@/core`: `loadLayerTexture(layerDef)` (colorized canvas → `
 
 Data types live in [`../contracts/types.ts`](../contracts/types.ts). Change them only via a PR to `contracts/`.
 
+## Pages and routes
+
+`/` is the intro (`src/intro/`, outside the app shell: full-bleed hero, Moon that rises with the scroll, mist, quote).
+The app lives at `/explore`, `/game`, `/learn`, `/compare`, `/sites`, `/streetview`, `/about`; its own front page is `/home`
+(the header logo links there). Intro assets are in `public/landing/`; regenerate the mist with `node scripts/gen-landing-mist.mjs`.
+
 ## Look and feel (design system)
 
 "2000s science portal": fixed ~1000 px centred column, navy starfield, glossy blue panel title bars, uppercase tabs,
