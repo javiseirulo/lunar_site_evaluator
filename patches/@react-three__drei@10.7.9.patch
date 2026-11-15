@@ -1,0 +1,46 @@
+diff --git a/web/Html.js b/web/Html.js
+index 81d68b7f4e9893a7d0b436a398bb38883d333374..a648747b65305dfbaacb61b070407e8a32d8e564 100644
+--- a/web/Html.js
++++ b/web/Html.js
+@@ -123,6 +123,7 @@ const Html = /* @__PURE__ */React.forwardRef(({
+   const target = (portal == null ? void 0 : portal.current) || events.connected || gl.domElement.parentNode;
+   const occlusionMeshRef = React.useRef(null);
+   const isMeshSizeSet = React.useRef(false);
++  const pendingUnmount = React.useRef(null);
+   const isRayCastOcclusion = React.useMemo(() => {
+     return occlude && occlude !== 'blending' || Array.isArray(occlude) && occlude.length && isRefObject(occlude[0]);
+   }, [occlude]);
+@@ -140,7 +141,12 @@ const Html = /* @__PURE__ */React.forwardRef(({
+   }, [occlude]);
+   React.useLayoutEffect(() => {
+     if (group.current) {
+-      const currentRoot = root.current = ReactDOM.createRoot(el);
++      // Patched (lunar_site_evaluator): reuse a root whose unmount is still pending (StrictMode
++      // remounts in the same commit) instead of creating a second root on the same element.
++      const pending = pendingUnmount.current;
++      pendingUnmount.current = null;
++      const currentRoot = root.current = pending ? pending.root : ReactDOM.createRoot(el);
++      if (pending) pending.cancelled = true;
+       scene.updateMatrixWorld();
+       if (transform) {
+         el.style.cssText = `position:absolute;top:0;left:0;pointer-events:none;overflow:hidden;`;
+@@ -152,8 +158,17 @@ const Html = /* @__PURE__ */React.forwardRef(({
+         if (prepend) target.prepend(el);else target.appendChild(el);
+       }
+       return () => {
+-        if (target) target.removeChild(el);
+-        currentRoot.unmount();
++        // Patched (lunar_site_evaluator): React 19 warns, and can race, when a root is unmounted
++        // synchronously inside a commit. Detach now; unmount after the commit unless remounted.
++        if (target && el.parentNode === target) target.removeChild(el);
++        const job = { root: currentRoot, cancelled: false };
++        pendingUnmount.current = job;
++        queueMicrotask(() => {
++          if (job.cancelled) return;
++          if (pendingUnmount.current === job) pendingUnmount.current = null;
++          if (root.current === currentRoot) root.current = null;
++          currentRoot.unmount();
++        });
+       };
+     }
+   }, [target, transform]);
