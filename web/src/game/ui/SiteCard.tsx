@@ -57,10 +57,11 @@ export function SiteCard(props: SiteCardProps) {
       <motion.button
         type="button"
         disabled={!clickable}
+        data-sfx={clickable ? 'hover' : undefined}
         onClick={() => onPick(card.slot)}
         aria-label={`Choose ${label}`}
         className={clsx(
-          'group relative block w-full text-left [transform-style:preserve-3d]',
+          'group relative block w-full text-left [transform-style:preserve-3d] focus-visible:outline-none',
           clickable ? 'cursor-pointer' : 'cursor-default',
         )}
         initial={{ rotateY: dealt ? 180 : 0 }}
@@ -74,14 +75,24 @@ export function SiteCard(props: SiteCardProps) {
         <div
           className={clsx(
             'mission-pixel flex flex-col gap-2 border-4 border-black bg-navy-850 p-2 [backface-visibility:hidden]',
-            clickable && 'group-hover:border-warn group-focus-visible:border-warn',
+            'transition-[translate,box-shadow,border-color] duration-150 ease-out',
+            clickable &&
+              'group-hover:border-warn group-hover:-translate-y-1 group-hover:shadow-[4px_8px_0_#000,0_0_18px_#ffcc4d55] group-focus-visible:border-warn group-focus-visible:-translate-y-1 group-focus-visible:shadow-[4px_8px_0_#000,0_0_0_3px_#ffcc4d] group-active:translate-y-0 group-active:shadow-[2px_2px_0_#000]',
             state === 'picked' && 'border-warn',
           )}
         >
-          <div className="border-b-2 border-black pb-1">
+          <div className="flex items-center justify-between gap-1 border-b-2 border-black pb-1">
             <span className="text-warn font-mono text-[13px] font-bold tracking-wider uppercase">
               {label}
             </span>
+            {clickable && (
+              <kbd
+                aria-hidden
+                className="shrink-0 border border-black bg-black px-1 font-mono text-[10px] text-ink-muted"
+              >
+                {card.slot}
+              </kbd>
+            )}
           </div>
           <GameImage
             src={image}
@@ -91,7 +102,7 @@ export function SiteCard(props: SiteCardProps) {
           />
           <div className="flex flex-col gap-1.5">
             {bars.map((b) => (
-              <QualityBar key={b.key} bar={b} />
+              <QualityBar key={b.key} bar={b} showValue={difficulty === 'expert'} />
             ))}
           </div>
           {clickable && (

@@ -84,7 +84,7 @@ export function PolarMap({ className }: { className?: string }) {
             onSelect={() => selectSite(s.id === selectedSiteId ? null : s.id)}
           />
         ))}
-      <div className="num text-pale bg-night/80 pointer-events-none absolute bottom-0 left-0 rounded-[3px] px-1.5 py-0.5 text-[11px]">
+      <div className="num bg-night/80 text-white pointer-events-none absolute bottom-0 left-0 rounded-[3px] px-1.5 py-0.5 text-[11px]">
         {hover
           ? formatLatLon(hover[0], hover[1])
           : `South pole to ${Math.abs(manifest.lat_limit)}°S`}

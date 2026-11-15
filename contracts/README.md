@@ -83,7 +83,7 @@ New optional fields:
 - **Rounding:** files publish 2 decimals; validity and score are computed on the published values, so Python and TypeScript agree.
 
 ### Validity and score (docs/10 J6–J7; one implementation in `web/src/scoring/`, mirrored by the export)
-- **Evaluation window in `sites.json`:** `Site.metrics` cover the manifest window (all of 2027), while `valid`, `score` and `checks` cover the default mission window, written in `SitesFile.evaluation` (`missionWindow(DEFAULT_MISSION_CONFIG)`: 7 days from 2027-11-08). The default thresholds are sized for a 7-day stay, and over a whole year no site passes them. Any other window is re-evaluated in the browser with `@/scoring`.
+- **Evaluation window in `sites.json`:** `Site.metrics` cover the manifest window (all of 2027), while `valid`, `score` and `checks` cover the default mission window, written in `SitesFile.evaluation` (`missionWindow(DEFAULT_MISSION_CONFIG)`: 7 days from 2027-10-12). The default thresholds are sized for a 7-day stay, and over a whole year no site passes them. Any other window is re-evaluated in the browser with `@/scoring`.
 - **Validity:** a site is valid for a mission window when every requirement in `MissionConfig.requirements` that is not in `pending_metrics` passes its threshold. A requirement whose metric is missing counts as pending (`ok: true`, `value: null`, `margin: null`, `pending: true`); never NaN. JSON is written without NaN (`null`).
   - "Less is better" metrics fail above the threshold: `slope_deg`, `max_dark_hours`, `max_blackout_hours`, `psr_dist_km`.
   - All other metrics fail below it.

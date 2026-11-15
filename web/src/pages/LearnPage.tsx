@@ -4,6 +4,7 @@
  */
 import { useEffect } from 'react';
 import { Link, useLocation } from 'react-router';
+import { useAppStore } from '@/core';
 
 const SECTIONS = [
   { id: 'pole', title: 'Why the south pole?' },
@@ -46,6 +47,7 @@ function H({ id, children }: { id: string; children: React.ReactNode }) {
 
 export default function LearnPage() {
   const { hash } = useLocation();
+  const proMode = useAppStore((s) => s.proMode);
   // Router links like /learn#earth don't scroll by themselves in a single-page app.
   useEffect(() => {
     if (hash) document.getElementById(hash.slice(1))?.scrollIntoView();
@@ -136,12 +138,14 @@ export default function LearnPage() {
                 </Link>{' '}
                 — every candidate in one sortable table.
               </li>
-              <li>
-                <Link to="/compare" className="lnk">
-                  Compare
-                </Link>{' '}
-                — up to three sites side by side, with their sunlight and Earth windows.
-              </li>
+              {proMode && (
+                <li>
+                  <Link to="/compare" className="lnk">
+                    Compare
+                  </Link>{' '}
+                  — up to three sites side by side, with their sunlight and Earth windows.
+                </li>
+              )}
               <li>
                 <Link to="/streetview" className="lnk">
                   Street View

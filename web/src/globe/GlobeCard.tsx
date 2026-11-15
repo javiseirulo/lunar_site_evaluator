@@ -97,7 +97,7 @@ export function GlobeCard({
   const badge =
     content.kind === 'site' && content.rank !== null ? (
       <span
-        className="num flex size-6 items-center justify-center rounded-full bg-[#f2c55c] text-[13px] font-medium text-[#1c1915]"
+        className="num flex size-6 items-center justify-center rounded-full bg-warn text-[13px] font-bold text-black"
         title={`Number ${content.rank} of the top five`}
       >
         {content.rank}

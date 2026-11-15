@@ -45,8 +45,64 @@ const CSS = `
 .mission-scan {
   background-image: repeating-linear-gradient(0deg, #ffffff06 0 1px, transparent 1px 3px);
 }
+/* Cockpit (timelapse): chunky bezel, rivets, cut-corner window, instrument faults. */
+.mission-bezel {
+  background: linear-gradient(180deg, #3a3f4d 0%, #262a35 60%, #1b1e27 100%);
+  border: 4px solid #000;
+  box-shadow: inset 0 0 0 2px #555c70, inset 0 -4px 0 2px #12141a;
+}
+.mission-window {
+  clip-path: polygon(14px 0, calc(100% - 14px) 0, 100% 14px, 100% calc(100% - 14px),
+    calc(100% - 14px) 100%, 14px 100%, 0 calc(100% - 14px), 0 14px);
+}
+.mission-rivet {
+  position: absolute; width: 6px; height: 6px; background: #9aa0b2;
+  box-shadow: inset -2px -2px 0 #4a4f5e, 0 0 0 1px #000;
+}
+.mission-scanlines {
+  background-image: repeating-linear-gradient(0deg, #00000038 0 1px, transparent 1px 3px);
+}
+.mission-cockpit > .mission-bezel:first-child { transition: transform 0.5s ease-out; transform-origin: 50% 80%; }
+.mission-cockpit .mission-panel { transition: filter 1.2s ease-out; }
+.mission-cockpit[data-fx='cold'] .mission-panel { filter: brightness(0.7) saturate(0.7); }
+/* Slope failure: only the window tilts (and shrinks a little), so the gauges stay in view. */
+.mission-cockpit[data-fx='slope'] > .mission-bezel:first-child {
+  transform: rotate(-3deg) scale(0.95); animation: mission-shake 0.3s linear 5;
+}
+@keyframes mission-shake {
+  0%, 100% { transform: rotate(-3deg) scale(0.95) translate(0, 0); }
+  25% { transform: rotate(-4deg) scale(0.95) translate(-3px, 2px); }
+  50% { transform: rotate(-2deg) scale(0.95) translate(2px, -2px); }
+  75% { transform: rotate(-3.5deg) scale(0.95) translate(-2px, -1px); }
+}
+@keyframes mission-fault {
+  0%, 49% { border-color: #ff3b30; box-shadow: 0 0 12px #ff3b30aa; }
+  50%, 100% { border-color: #6a1010; box-shadow: none; }
+}
+.mission-instrument[data-fault='true'] {
+  border-color: #ff3b30; animation: mission-fault 0.7s steps(1) infinite;
+}
+@keyframes mission-static {
+  0% { background-position: 0 0; }
+  100% { background-position: 0 -24px; }
+}
+.mission-static {
+  background-image: repeating-linear-gradient(0deg, #ffffff30 0 1px, transparent 1px 2px,
+    #ffffff14 2px 4px, transparent 4px 6px);
+  animation: mission-static 0.2s steps(3) infinite;
+}
+.mission-alarm-lamp { animation: mission-blink 0.5s steps(1) infinite; }
+/* Countdown: red pulse in the last 30 s. */
+@keyframes mission-pulse {
+  0%, 100% { transform: scale(1); box-shadow: 4px 4px 0 #000; }
+  50% { transform: scale(1.07); box-shadow: 4px 4px 0 #000, 0 0 18px #ff3b3088; }
+}
+.mission-timer[data-low='true'] { animation: mission-pulse 1s ease-in-out infinite; }
 @media (prefers-reduced-motion: reduce) {
-  .mission-frame[data-flash='true'], .mission-blink { animation: none; }
+  .mission-frame[data-flash='true'], .mission-blink, .mission-instrument[data-fault='true'],
+  .mission-static, .mission-alarm-lamp, .mission-cockpit[data-fx='slope'] > .mission-bezel,
+  .mission-timer[data-low='true'] { animation: none; }
+  .mission-cockpit > .mission-bezel, .mission-cockpit .mission-panel { transition: none; }
 }
 `;
 

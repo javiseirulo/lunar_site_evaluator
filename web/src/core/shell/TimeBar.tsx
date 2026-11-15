@@ -16,7 +16,12 @@ const SPEEDS = [
   { label: '1 hour / sec', pro: '1 h/s', hoursPerSec: 1 },
   { label: '6 hours / sec', pro: '6 h/s', hoursPerSec: 6 },
   { label: '1 day / sec', pro: '1 d/s', hoursPerSec: 24 },
+  { label: '2 days / sec', pro: '2 d/s', hoursPerSec: 48 },
+  { label: '5 days / sec', pro: '5 d/s', hoursPerSec: 120 },
+  { label: '10 days / sec', pro: '10 d/s', hoursPerSec: 240 },
 ];
+const DEFAULT_SPEED = 3; // 2 days / sec
+const clampSpeed = (i: number) => (Number.isInteger(i) && SPEEDS[i] ? i : DEFAULT_SPEED);
 
 export function TimeBar({ className }: { className?: string }) {
   const range = useData((s) => s.manifest?.time_range);
@@ -26,7 +31,7 @@ export function TimeBar({ className }: { className?: string }) {
   const ts = useTimeseries(siteId);
   const proMode = useAppStore((s) => s.proMode);
   const [playing, setPlaying] = useState(false);
-  const [speed, setSpeed] = useState(1);
+  const [speed, setSpeed] = useState(DEFAULT_SPEED);
 
   const t0 = range ? Date.parse(range.start_utc) : 0;
   // end_utc is exclusive (contracts/README v1.1): the last sample is one step earlier.
@@ -42,7 +47,7 @@ export function TimeBar({ className }: { className?: string }) {
       const dt = (frame - last) / 1000;
       last = frame;
       const { currentTimeUTC: cur, setTime: set } = useAppStore.getState();
-      const next = Date.parse(cur) + dt * SPEEDS[speed]!.hoursPerSec * 3_600_000;
+      const next = Date.parse(cur) + dt * SPEEDS[clampSpeed(speed)]!.hoursPerSec * 3_600_000;
       if (next >= t1) {
         set(new Date(t1).toISOString());
         setPlaying(false);
@@ -73,11 +78,24 @@ export function TimeBar({ className }: { className?: string }) {
     h === null ? 'not in this window' : proMode ? formatHours(h) : friendlyHours(h);
 
   return (
-    <section className={cn('box px-4 py-3', className)} aria-label="Mission clock">
+    <section
+      className={cn('box relative overflow-hidden px-4 py-3', className)}
+      aria-label="Mission clock"
+    >
+      {playing && <div className="clock-scan" aria-hidden />}
       <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
         <h2 className="text-heading text-[17px] font-medium">Mission Clock</h2>
-        <span className="num text-ink-muted text-[13px]">
-          {proMode ? formatUtc(currentTimeUTC) : `Day ${day.day} of ${day.total}`}
+        <span
+          className={cn(
+            'font-mono text-[11px] tracking-[0.12em] uppercase',
+            playing ? 'text-[#ffcc4d]' : 'text-ink-faint',
+          )}
+          role="status"
+        >
+          <span className={cn('mr-1.5 inline-block', playing && 'clock-dot')} aria-hidden>
+            ●
+          </span>
+          {playing ? 'Running' : 'Paused'}
         </span>
         <span className="ml-auto flex items-center gap-2">
           {proMode && (
@@ -105,8 +123,8 @@ export function TimeBar({ className }: { className?: string }) {
           </button>
           <select
             className="field"
-            value={speed}
-            onChange={(e) => setSpeed(Number(e.target.value))}
+            value={clampSpeed(speed)}
+            onChange={(e) => setSpeed(clampSpeed(Number(e.target.value)))}
             aria-label="Speed"
           >
             {SPEEDS.map((s, i) => (
@@ -115,6 +133,15 @@ export function TimeBar({ className }: { className?: string }) {
               </option>
             ))}
           </select>
+        </span>
+      </div>
+
+      <div className="mt-2 flex flex-wrap items-baseline gap-x-3">
+        <span className="num text-heading text-[22px] leading-tight font-medium">
+          {proMode ? formatUtc(currentTimeUTC, { seconds: true }) : `Day ${day.day}`}
+        </span>
+        <span className="num text-ink-muted text-[13px]">
+          {proMode ? `Day ${day.day} of ${day.total}` : `of ${day.total}`}
         </span>
       </div>
 
@@ -131,7 +158,8 @@ export function TimeBar({ className }: { className?: string }) {
         />
         <input
           type="range"
-          className="range relative -mt-1"
+          className="range range-progress relative -mt-1"
+          style={{ ['--pct' as string]: `${pct}%` }}
           min={t0}
           max={t1}
           step={3_600_000}

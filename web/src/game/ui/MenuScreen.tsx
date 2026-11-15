@@ -1,9 +1,10 @@
-/** Title screen: pick a mode (South Pole now, Historical later) and the difficulty. */
+/** Title screen: pick the difficulty, then a mode (South Pole now, Historical later). */
 import { Lock, Play } from 'lucide-react';
 import { clsx } from 'clsx';
 import { useData } from '@/core';
 import { difficultyHint, type Difficulty } from '../engine/bars';
 import { southPoleSites } from '../engine/deal';
+import { useAppStore } from '@/core';
 import { useGame } from '../state/gameStore';
 import { MENU_BG, MODE_HISTORICAL, MODE_SOUTH_POLE } from './assets';
 import { GameImage } from './GameImage';
@@ -14,8 +15,11 @@ const DIFFICULTIES: { id: Difficulty; label: string }[] = [
 ];
 
 export function MenuScreen() {
-  const difficulty = useGame((s) => s.difficulty);
-  const setDifficulty = useGame((s) => s.setDifficulty);
+  // Difficulty is the site-wide Normal/Expert switch (header), so both places stay in step.
+  const proMode = useAppStore((s) => s.proMode);
+  const setProMode = useAppStore((s) => s.setProMode);
+  const difficulty: Difficulty = proMode ? 'expert' : 'normal';
+  const setDifficulty = (d: Difficulty) => setProMode(d === 'expert');
   const start = useGame((s) => s.start);
   // The hint lists the bars a real card shows (pending metrics are omitted from the cards).
   const sample = useData((s) => (s.sites ? southPoleSites(s.sites)[0] : undefined));
@@ -42,13 +46,44 @@ export function MenuScreen() {
         <h1 className="font-mono text-4xl font-bold tracking-[0.15em] text-white uppercase [text-shadow:4px_4px_0_#000]">
           Mission
         </h1>
+        <p className="mt-2 font-mono text-[12px] text-ink">
+          Pick a landing site in 3 minutes. Survive 7 days.
+        </p>
       </header>
+
+      <div className="relative flex flex-col items-center gap-2">
+        <span className="label">Difficulty</span>
+        <div
+          role="group"
+          aria-label="Difficulty"
+          className="mission-pixel flex border-2 border-black"
+        >
+          {DIFFICULTIES.map((d) => (
+            <button
+              key={d.id}
+              type="button"
+              aria-pressed={difficulty === d.id}
+              onClick={() => setDifficulty(d.id)}
+              className={clsx(
+                'min-h-10 cursor-pointer px-5 font-mono text-[12px] font-bold tracking-wider uppercase transition-colors focus-visible:outline-2 focus-visible:-outline-offset-4 focus-visible:outline-current',
+                difficulty === d.id
+                  ? 'bg-warn text-black'
+                  : 'bg-black text-ink-muted hover:text-white',
+              )}
+            >
+              {d.label}
+            </button>
+          ))}
+        </div>
+        <p className="text-ink-muted font-mono text-[11px]">{difficultyHint(difficulty, sample)}</p>
+      </div>
 
       <div className="relative grid w-full max-w-2xl grid-cols-1 gap-4 sm:grid-cols-2">
         <button
           type="button"
           onClick={() => start()}
-          className="mission-pixel group flex cursor-pointer flex-col border-4 border-black bg-navy-800 text-left hover:border-warn focus-visible:border-warn"
+          data-sfx="hover"
+          className="mission-pixel group flex cursor-pointer flex-col border-4 border-black bg-navy-800 text-left transition-[translate,border-color] duration-150 hover:-translate-y-1 hover:border-warn focus-visible:-translate-y-1 focus-visible:border-warn focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-warn active:translate-y-0"
         >
           <GameImage
             src={MODE_SOUTH_POLE}
@@ -60,14 +95,17 @@ export function MenuScreen() {
             <span className="font-mono text-[15px] font-bold tracking-wider text-white uppercase">
               South Pole mission
             </span>
-            <Play className="text-warn size-5 group-hover:scale-125" aria-hidden />
+            <Play
+              className="text-warn size-5 transition-transform group-hover:scale-125"
+              aria-hidden
+            />
           </span>
         </button>
 
         <button
           type="button"
           disabled
-          aria-describedby="mission-historical-soon"
+          aria-label="Historical missions (coming soon)"
           className="mission-pixel relative flex cursor-not-allowed flex-col border-4 border-black bg-navy-900 text-left opacity-60 grayscale"
         >
           <GameImage
@@ -89,33 +127,6 @@ export function MenuScreen() {
             Coming soon
           </span>
         </button>
-      </div>
-
-      <div className="relative flex flex-col items-center gap-2">
-        <span className="label">Difficulty</span>
-        <div
-          role="group"
-          aria-label="Difficulty"
-          className="mission-pixel flex border-2 border-black"
-        >
-          {DIFFICULTIES.map((d) => (
-            <button
-              key={d.id}
-              type="button"
-              aria-pressed={difficulty === d.id}
-              onClick={() => setDifficulty(d.id)}
-              className={clsx(
-                'cursor-pointer px-5 py-1.5 font-mono text-[12px] font-bold tracking-wider uppercase',
-                difficulty === d.id
-                  ? 'bg-warn text-black'
-                  : 'bg-black text-ink-muted hover:text-white',
-              )}
-            >
-              {d.label}
-            </button>
-          ))}
-        </div>
-        <p className="text-ink-muted font-mono text-[11px]">{difficultyHint(difficulty, sample)}</p>
       </div>
     </div>
   );

@@ -16,14 +16,14 @@ LESS_IS_BETTER = frozenset({"slope_deg", "max_dark_hours", "max_blackout_hours",
 # Same values as web/src/scoring/defaults.ts DEFAULT_MISSION_CONFIG (keep in sync).
 DEFAULT_MISSION_CONFIG: dict[str, Any] = {
     "time_mode": "design",
-    "landing_utc": "2027-11-08T00:00:00Z",
-    "launch_utc": "2027-11-03T00:00:00Z",
+    "landing_utc": "2027-10-12T00:00:00Z",
+    "launch_utc": "2027-10-07T00:00:00Z",
     "trajectory": "hohmann",
     "llo_alt_km": 100,
     "surface_days": 7,
     "antenna_margin_deg": 2,
     "requirements": {
-        "slope_deg": {"threshold": 8, "objective": 2},
+        "slope_deg": {"threshold": 10, "objective": 2},  # Artemis HLS < 10° (decisions log)
         "illum_pct": {"threshold": 0.5, "objective": 0.85},
         "max_dark_hours": {"threshold": 100, "objective": 24},
         "earth_vis_pct": {"threshold": 0.5, "objective": 0.95},
