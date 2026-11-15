@@ -1,5 +1,5 @@
 /**
- * The single shared app store (owner: Javi2).
+ * The single shared app store (owner: Javi).
  *
  * Modules share the contract state (selection, optional free point, UTC, layers,
  * mode and mission configuration). Read selectors and change it through actions:
@@ -19,6 +19,12 @@ export interface AppState extends AppEvents {
   /** Internal intent counter: late data loading must not replace a chosen time. */
   timeRevision: number;
   selectedPoint: { lat: number; lon: number } | null;
+  /**
+   * Normal mode: true once Simulate was pressed for the current selection. Reset to false whenever
+   * the selected site or free point changes (not when the same selection is set again).
+   */
+  simulationStarted: boolean;
+  setSimulationStarted: (started: boolean) => void;
   setSelectedPoint: (point: { lat: number; lon: number } | null) => void;
   /** Per-layer opacity 0–1 (layer UI state, read by the map/globe when drawing). */
   layerOpacity: Record<string, number>;
@@ -58,6 +64,7 @@ function readPro(): boolean {
 export const useAppStore = create<AppState>()((set, get) => ({
   selectedSiteId: null,
   selectedPoint: null,
+  simulationStarted: false,
   currentTimeUTC: DEFAULT_TIME_UTC,
   timeRevision: 0,
   activeLayers: [],
@@ -67,7 +74,12 @@ export const useAppStore = create<AppState>()((set, get) => ({
   proMode: readPro(),
   missionConfig: DEFAULT_MISSION_CONFIG,
 
-  selectSite: (id) => set({ selectedSiteId: id, selectedPoint: null }),
+  selectSite: (id) =>
+    set((s) =>
+      s.selectedSiteId === id && s.selectedPoint === null
+        ? s
+        : { selectedSiteId: id, selectedPoint: null, simulationStarted: false },
+    ),
   setSelectedPoint: (point) => {
     if (
       point &&
@@ -79,9 +91,13 @@ export const useAppStore = create<AppState>()((set, get) => ({
     set((state) =>
       state.selectedPoint?.lat === point?.lat && state.selectedPoint?.lon === point?.lon
         ? state
-        : { selectedPoint: point ? { lat: point.lat, lon: point.lon } : null },
+        : {
+            selectedPoint: point ? { lat: point.lat, lon: point.lon } : null,
+            simulationStarted: false,
+          },
     );
   },
+  setSimulationStarted: (started) => set({ simulationStarted: started }),
   setTime: (isoUtc) => set((s) => ({ currentTimeUTC: isoUtc, timeRevision: s.timeRevision + 1 })),
   setMode: (mode) => set({ mode }),
 

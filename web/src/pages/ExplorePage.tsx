@@ -36,8 +36,21 @@ class GlobeBoundary extends Component<
   }
 }
 
+/** Normal mode before Simulate: the verdict box with its title and one faint line, nothing else. */
+function SimulateHint() {
+  return (
+    <section className="box" aria-label="Site check">
+      <div className="box-head">Does it work for the mission?</div>
+      <p className="box-body text-ink-faint text-[13px]">
+        Press Simulate to check if it works for the mission
+      </p>
+    </section>
+  );
+}
+
 export default function ExplorePage() {
   const proMode = useAppStore((s) => s.proMode);
+  const simulationStarted = useAppStore((s) => s.simulationStarted);
 
   return (
     <div
@@ -96,7 +109,8 @@ export default function ExplorePage() {
         <SiteDetail />
         <SimChart />
         {/* Validity for the current mission window (Javi, @/scoring; docs/10 J6–J7). */}
-        <SiteCheckPanel simple={!proMode} />
+        {/* Normal: the verdict appears only once Simulate was pressed for this selection. */}
+        {proMode || simulationStarted ? <SiteCheckPanel simple={!proMode} /> : <SimulateHint />}
       </aside>
     </div>
   );

@@ -69,3 +69,65 @@ describe('app store', () => {
     expect(useAppStore.getState().selectedSiteId).toBe('shackleton_rim_01');
   });
 });
+
+describe('simulationStarted (Normal mode Simulate)', () => {
+  beforeEach(() => useAppStore.setState(initial, true));
+
+  it('starts false and is set by setSimulationStarted', () => {
+    expect(useAppStore.getState().simulationStarted).toBe(false);
+    useAppStore.getState().setSimulationStarted(true);
+    expect(useAppStore.getState().simulationStarted).toBe(true);
+  });
+
+  it('resets when another site is selected', () => {
+    const s = useAppStore.getState();
+    s.selectSite('site_a');
+    s.setSimulationStarted(true);
+    useAppStore.getState().selectSite('site_b');
+    expect(useAppStore.getState().simulationStarted).toBe(false);
+  });
+
+  it('resets when a site is deselected', () => {
+    const s = useAppStore.getState();
+    s.selectSite('site_a');
+    s.setSimulationStarted(true);
+    useAppStore.getState().selectSite(null);
+    expect(useAppStore.getState().simulationStarted).toBe(false);
+  });
+
+  it('keeps the flag when the same site is selected again', () => {
+    const s = useAppStore.getState();
+    s.selectSite('site_a');
+    s.setSimulationStarted(true);
+    useAppStore.getState().selectSite('site_a');
+    expect(useAppStore.getState().simulationStarted).toBe(true);
+    expect(useAppStore.getState().selectedSiteId).toBe('site_a');
+  });
+
+  it('resets when a free point is set to different coordinates', () => {
+    const s = useAppStore.getState();
+    s.setSelectedPoint({ lat: -89.5, lon: 10 });
+    s.setSimulationStarted(true);
+    useAppStore.getState().setSelectedPoint({ lat: -89.5, lon: 11 });
+    expect(useAppStore.getState().simulationStarted).toBe(false);
+  });
+
+  it('keeps the flag when the same point coordinates are set again', () => {
+    const s = useAppStore.getState();
+    s.setSelectedPoint({ lat: -89.5, lon: 10 });
+    s.setSimulationStarted(true);
+    useAppStore.getState().setSelectedPoint({ lat: -89.5, lon: 10 });
+    expect(useAppStore.getState().simulationStarted).toBe(true);
+  });
+
+  it('resets when a site is swapped for a free point and back', () => {
+    const s = useAppStore.getState();
+    s.selectSite('site_a');
+    s.setSimulationStarted(true);
+    useAppStore.getState().setSelectedPoint({ lat: -80, lon: 0 });
+    expect(useAppStore.getState().simulationStarted).toBe(false);
+    useAppStore.getState().setSimulationStarted(true);
+    useAppStore.getState().selectSite('site_a');
+    expect(useAppStore.getState().simulationStarted).toBe(false);
+  });
+});

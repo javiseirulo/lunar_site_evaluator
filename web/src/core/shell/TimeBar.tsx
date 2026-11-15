@@ -39,6 +39,8 @@ export function TimeBar({ className }: { className?: string }) {
   const ts = active.ts;
   const proMode = useAppStore((s) => s.proMode);
   const [playing, setPlaying] = useState(false);
+  const simulationStarted = useAppStore((s) => s.simulationStarted);
+  const setSimulationStarted = useAppStore((s) => s.setSimulationStarted);
   const [speed, setSpeed] = useState(DEFAULT_SPEED);
 
   const t0 = range ? Date.parse(range.start_utc) : 0;
@@ -81,6 +83,8 @@ export function TimeBar({ className }: { className?: string }) {
   const pct = t1 > t0 ? ((Math.min(t1, Math.max(t0, now)) - t0) / (t1 - t0)) * 100 : 0;
   const day = dayOfWindow(currentTimeUTC, range.start_utc, range.end_utc);
   const span = ts ? seriesSpanLabel(ts) : '';
+  // Normal mode asks for Simulate first; Expert keeps Play / Pause.
+  const label = playing ? 'Pause' : proMode ? 'Play' : simulationStarted ? 'Resume' : 'Simulate';
   const when = (n: NextChange) =>
     changeWhen(n, span, (h) => (proMode ? formatHours(h) : friendlyHours(h)));
 
@@ -122,11 +126,15 @@ export function TimeBar({ className }: { className?: string }) {
           <button
             type="button"
             className="btn btn-go w-[88px]"
-            onClick={() => setPlaying((p) => !p)}
-            aria-label={playing ? 'Pause' : 'Play'}
+            onClick={() => {
+              // Normal: the first press on Simulate marks the simulation as started for this selection.
+              if (!proMode && !playing) setSimulationStarted(true);
+              setPlaying((p) => !p);
+            }}
+            aria-label={label}
           >
             {playing ? <Pause className="size-3.5" /> : <Play className="size-3.5" />}
-            {playing ? 'Pause' : 'Play'}
+            {label}
           </button>
           <select
             className="field"
