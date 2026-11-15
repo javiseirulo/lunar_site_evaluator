@@ -50,7 +50,6 @@ export const STATS = [
   { value: '59', label: 'landing sites in the catalogue, each with a cited source' },
   { value: '8,760', label: 'hourly Sun and Earth positions per site, covering all of 2027' },
   { value: '41', label: 'polar sites with horizons built from NASA LOLA terrain' },
-  { value: '0.0007°', label: 'largest gap between our angles and JPL Horizons' },
 ];
 
 export const FEATURES = {
