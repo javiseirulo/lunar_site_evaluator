@@ -4,6 +4,7 @@ import { TimeBar } from '@/core/shell/TimeBar';
 import { SimChart } from '@/core/shell/SimChart';
 import { PolarMap } from '@/layers';
 import { GlobeView, SiteDetail, SiteList } from '@/globe';
+import { useHistoric } from '@/globe/historicSites';
 import { LayersMenu } from '@/globe/LayersMenu';
 import { PatchControls } from '@/globe/PatchControls';
 import { PinForm } from '@/globe/PinForm';
@@ -71,7 +72,10 @@ function Pages<T extends string>({
   onChange: (id: T) => void;
 }) {
   return (
-    <div className="border-edge-hi flex shrink-0 border-b-2" role="tablist">
+    <div
+      className="border-edge-hi sticky top-0 z-10 flex shrink-0 border-b-2 bg-panel"
+      role="tablist"
+    >
       {options.map((option) => (
         <button
           key={option.id}
@@ -95,14 +99,14 @@ function Pages<T extends string>({
 function MapPage() {
   const proMode = useAppStore((s) => s.proMode);
   return (
-    <div className="flex h-full min-h-0 flex-col gap-2 overflow-hidden px-2 py-2">
+    <div className="flex flex-col gap-2 px-2 py-2">
       <PinForm
         embedded
         title={proMode ? 'Pin by coordinates' : 'Go to coordinates'}
         submitLabel={proMode ? 'Add pin' : 'Go there'}
         onAdd={submitExplorePin}
       />
-      <div className="border-edge-hi min-h-0 flex-1 overflow-y-auto border-t-2 pt-2">
+      <div className="border-edge-hi border-t-2 pt-2">
         <LayersMenu embedded hasSun expert={proMode} />
       </div>
       <PatchControls />
@@ -129,23 +133,17 @@ function LeftPanel() {
 
   return (
     <aside
-      className={`${FRAME} pointer-events-auto flex max-h-[62%] min-h-0 w-full flex-col self-start overflow-hidden`}
+      className={`${FRAME} pointer-events-auto flex max-h-full min-h-0 w-full flex-col self-start overflow-y-auto`}
     >
       <Pages options={options} value={shown} onChange={setTab} />
-      <div className="min-h-0 flex-1 overflow-hidden">
-        {shown === 'needs' && (
-          <SiteList part="requirements" className={`${FLAT} h-full overflow-y-auto`} />
-        )}
-        {shown === 'window' && (
-          <div className="h-full overflow-y-auto">
-            <MissionTimingPanel className={FLAT} />
-          </div>
-        )}
+      <div>
+        {shown === 'needs' && <SiteList part="requirements" className={FLAT} />}
+        {shown === 'window' && <MissionTimingPanel className={FLAT} />}
         {shown === 'sites' &&
           (proMode ? (
-            <SiteList part="sites" className={`${FLAT} h-full`} />
+            <SiteList part="sites" className={FLAT} />
           ) : (
-            <SimpleSiteList className={`${FLAT} h-full`} />
+            <SimpleSiteList className={FLAT} />
           ))}
         {shown === 'map' && <MapPage />}
       </div>
@@ -159,7 +157,17 @@ function RightPanel() {
   const selectedSiteId = useAppStore((s) => s.selectedSiteId);
   const selectedPoint = useAppStore((s) => s.selectedPoint);
   const hasSubject = Boolean(selectedSiteId || selectedPoint);
+  const landingId = useHistoric((s) => s.focusedId);
+  const selectionKey =
+    landingId ??
+    selectedSiteId ??
+    (selectedPoint ? `${selectedPoint.lat},${selectedPoint.lon}` : '');
   const [tab, setTab] = useState<RightTab>('now');
+  const [seenSelection, setSeenSelection] = useState(selectionKey);
+  if (seenSelection !== selectionKey) {
+    setSeenSelection(selectionKey);
+    if (selectionKey) setTab('now');
+  }
 
   const options: { id: RightTab; label: string }[] = [
     { id: 'now', label: 'Now' },
@@ -172,12 +180,12 @@ function RightPanel() {
 
   return (
     <aside
-      className={`${FRAME} pointer-events-auto flex max-h-[62%] min-h-0 w-full flex-col self-start overflow-hidden md:col-start-3`}
+      className={`${FRAME} pointer-events-auto flex max-h-full min-h-0 w-full flex-col self-start overflow-y-auto md:col-start-3`}
     >
       <Pages options={options} value={shown} onChange={setTab} />
-      <div className="min-h-0 flex-1 overflow-y-auto">
-        {shown === 'now' && <SiteDetail className={`${FLAT} h-full`} />}
-        {shown === 'sun' && <SimChart className={`${FLAT} h-full`} />}
+      <div>
+        {shown === 'now' && <SiteDetail className={FLAT} />}
+        {shown === 'sun' && <SimChart className={FLAT} />}
         {shown === 'check' &&
           hasSubject &&
           (proMode || simulationStarted ? (

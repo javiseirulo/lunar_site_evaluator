@@ -12,6 +12,9 @@ import { useCustomPins } from './customPins';
 import { removeCustomPin } from './pointList';
 import { PointStatsView } from './PointStatsView';
 import { usePinSelection } from './pinSelection';
+import { useHistoric } from './historicSites';
+import { HistoricDetails } from './GlobeCard';
+import type { HistoricSite } from '@lunar/contracts';
 import { useEffect, useRef, useState } from 'react';
 import { Plus, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -499,6 +502,9 @@ function Results() {
 /** Right-hand card: the selected own pin if there is one, otherwise the selected catalogue site. */
 export function SiteDetail({ className }: { className?: string }) {
   const pinId = usePinSelection((s) => s.pinId);
+  const landing = useHistoric((s) =>
+    s.focusedId ? (s.sites.find((site) => site.id === s.focusedId) ?? null) : null,
+  );
   const point = useAppStore((s) => s.selectedPoint);
   const siteId = useAppStore((s) => s.selectedSiteId);
   // Shown while the pin is the active point: deselecting it in "Your points" hides the card, and
@@ -509,7 +515,21 @@ export function SiteDetail({ className }: { className?: string }) {
         (p) => p.id === pinId && siteId === null && point?.lat === p.lat && point?.lon === p.lon,
       ) ?? null,
   );
+  if (landing) return <LandingDetail site={landing} className={className} />;
   return pin ? <PinDetail pin={pin} className={className} /> : <SiteBody className={className} />;
+}
+
+function LandingDetail({ site, className }: { site: HistoricSite; className?: string }) {
+  return (
+    <section className={cn('box p-5', className)} aria-label={`${site.name} landing`}>
+      <p className="text-heading font-mono text-[11px] tracking-[0.12em] uppercase">Past landing</p>
+      <h2 className="mt-1 text-[22px] leading-tight">{site.name}</h2>
+      <p className="text-ink-muted num mt-1 text-[12px]">{formatLatLon(site.lat, site.lon)}</p>
+      <div className="mt-4">
+        <HistoricDetails site={site} />
+      </div>
+    </section>
+  );
 }
 
 function PinDetail({

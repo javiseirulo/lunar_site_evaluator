@@ -1,9 +1,18 @@
 .globe-surface-control.is-staged {
-  left: 50%;
-  right: auto;
-  bottom: 200px;
+  left: auto;
+  right: 12px;
+  top: 12px;
+  bottom: auto;
   width: max-content;
-  transform: translateX(-50%);
+  transform: none;
+  flex-direction: column;
+  align-items: flex-end;
+}
+@media (min-width: 768px) {
+  .globe-surface-control.is-staged {
+    /* Sit on the Moon, at the top-left corner of the Explore card. */
+    right: calc(12px + max(210px, 22%) + 10px);
+  }
 }
 .globe-surface-control {
   position: absolute;

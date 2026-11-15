@@ -195,7 +195,7 @@ function CopyButton({ text }: { text: string }) {
 }
 
 /** Text-only facts about a past landing: no logos, patches or flags (CLAUDE.md §3). */
-function HistoricDetails({ site }: { site: HistoricSite }) {
+export function HistoricDetails({ site }: { site: HistoricSite }) {
   return (
     <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-[12px]">
       <dt className="text-ink-muted">Agency</dt>
