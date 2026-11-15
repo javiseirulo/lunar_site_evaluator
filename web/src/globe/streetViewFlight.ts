@@ -18,6 +18,8 @@ export const HORIZON_DISTANCE = 100_000 / 1_737_400;
 export const FLIGHT_MS = 1500;
 
 export interface StreetViewRequest {
+  /** Free-coordinate entry reuses this flight, then opens its reproducible URL. */
+  onArrive?: () => void;
   siteId: string;
   lat: number;
   lon: number;
@@ -52,7 +54,8 @@ export function standHere(site: StreetViewRequest): void {
   if (flight.globeActive && !prefersReducedMotion()) {
     useStreetViewFlight.setState({ request: site });
   } else {
-    useAppStore.getState().setMode('streetview');
+    if (site.onArrive) site.onArrive();
+    else useAppStore.getState().setMode('streetview');
   }
 }
 

@@ -2,9 +2,16 @@
 
 ## Estado vigente — 2026-11-15
 
-Rama `pabloizgui/38-streetview-ephemerides`, PR contra `dev`. El PR #72 ya fue
-integrado por el equipo. Este estado reemplaza las tablas históricas de abajo.
-Guía actual: [ephemeris-integration.md](ephemeris-integration.md).
+Rama `pabloizgui/46-globe-streetview`, desde dev `0ca606d`, con #91, #97, #98, #90 y #101 integrados.
+Guías actuales: [globe-surface-integration.md](globe-surface-integration.md) y
+[ephemeris-integration.md](ephemeris-integration.md). Sustituye estados históricos.
+
+Añadido: astronauta PNG arrastrable en el globo existente, retorno al mapa 3D,
+Sol/Tierra, guardado por click derecho/doble toque en el formato de Marta,
+nombres más tolerantes y mayor detalle de render. La clave pública de desarrollo
+queda en código por solicitud expresa de Pablo; variable de entorno opcional.
+No se duplica la transición ni el acceso desde ficha que el usuario confirmó existentes.
+
 
 | Tarea de Pablo | Entrega |
 |---|---|
@@ -20,14 +27,18 @@ Guía actual: [ephemeris-integration.md](ephemeris-integration.md).
 
 ### Qué queda del resto del equipo
 
-- **Javi:** consumir `terrain/catalog.json` y los perfiles en `python/export/all.py`,
-  regenerando series/métricas/checks/score. Su export real todavía publica horizonte
-  plano, elevación 0 y `pending_metrics` para pendiente/PSR. Las rejillas de `grid/`
-  también son planas; 41 perfiles puntuales no constituyen una rejilla global.
-- **Marta:** revisar/consumir heightmap y capas en su globo; conectar sus pins
-  libres con `selectedPoint` o el enlace. No se modifica su motor unilateralmente.
-- **Javi2:** revisar `AppEvents.selectedPoint`, coordinar consumidores y configurar
-  la variable Cesium en el build de despliegue.
+- **Javi:** el PR #101 ya incorpora los 41 horizontes y elevación/pendiente/PSR
+  al export y usa 10° de pendiente máxima. `psr_dist_km` sigue pendiente en 18
+  sitios sin cobertura. Las rejillas científicas globales/polares siguen siendo
+  geométricas; no equivalen a una oclusión de relieve calculada por celda.
+- **Marta:** su globo ya consume heights/máscara y, con #101, capas reales;
+  revisar astronauta, pins compartidos y rendimiento del parche. Entrada por
+  coordenadas/UTC y retorno al punto observado implementados en esta rama.
+- **Javi (core/capas):** #101 ya publica `layers.json` real y lo pinta en esfera
+  y parche; su actualización Normal/Expert y barra lateral se conservan.
+  Coordinar cualquier ajuste futuro del Mission Clock; Street View ya tiene UTC.
+- **Javi2 / despliegue:** configurar un token/origen permitido para el despliegue
+  público de Vercel; el desarrollo local ya usa la clave compartida del código.
 - **Pablo / despliegue:** permitir el dominio definitivo en el token de lectura y
   probar teléfono físico. Un QR localhost no abre el ordenador del profesor desde
   otro teléfono; no hace falta otra cuenta Cesium para cada compañero.
