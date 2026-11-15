@@ -9,7 +9,7 @@ import { YourPoints } from '@/globe';
 export function SimpleSiteList({ className }: { className?: string }) {
   const sites = useData((s) => s.sites);
   const selectedSiteId = useAppStore((s) => s.selectedSiteId);
-  const selectSite = useAppStore((s) => s.selectSite);
+  const requestSelection = useAppStore((s) => s.requestSelection);
   if (!sites) return null;
   const sorted = [...sites].sort((a, b) => b.score - a.score);
 
@@ -32,7 +32,9 @@ export function SimpleSiteList({ className }: { className?: string }) {
               <button
                 type="button"
                 aria-pressed={selected}
-                onClick={() => selectSite(selected ? null : s.id)}
+                onClick={() =>
+                  requestSelection(selected ? null : { kind: 'site', id: s.id, name: s.name })
+                }
                 className={cn(
                   'flex w-full items-center gap-2 px-3 py-[7px] text-left text-[14px]',
                   selected ? 'bg-warn text-black' : 'hover:bg-panel-2',

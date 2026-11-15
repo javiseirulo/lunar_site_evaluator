@@ -42,7 +42,7 @@ import {
   Sprite,
   Vector3,
 } from 'three';
-import { useAppStore, useData } from '@/core';
+import { formatLatLon, useAppStore, useData } from '@/core';
 import { GlobeCard, type CardContent } from './GlobeCard';
 import { PinForm } from './PinForm';
 import { useCustomPins } from './customPins';
@@ -168,10 +168,11 @@ export default function GlobeCanvas() {
 
   // A clicked ground point becomes the free point right away, so the simulation can run for it.
   const clickPoint = (lat: number, lon: number) => {
-    const app = useAppStore.getState();
-    app.selectSite(null);
-    app.setSelectedPoint({ lat, lon });
-    setFocus({ kind: 'point', lat, lon });
+    useAppStore
+      .getState()
+      .requestSelection({ kind: 'point', lat, lon, name: formatLatLon(lat, lon) }, () =>
+        setFocus({ kind: 'point', lat, lon }),
+      );
   };
 
   const card = useMemo<CardContent | null>(() => {
@@ -208,9 +209,11 @@ export default function GlobeCanvas() {
   }, [focus, evaluations, topRank, sites, pins, historic, historicVisible]);
 
   const onSiteClick = (id: string) => {
-    const { selectedSiteId, selectSite } = useAppStore.getState();
-    if (selectedSiteId !== id) selectSite(id);
-    else if (focus?.kind === 'site' && focus.id === id) selectSite(null);
+    const { selectedSiteId, selectSite, requestSelection } = useAppStore.getState();
+    if (selectedSiteId !== id) {
+      const name = sites?.find((x) => x.id === id)?.name ?? id;
+      requestSelection({ kind: 'site', id, name });
+    } else if (focus?.kind === 'site' && focus.id === id) selectSite(null);
     else setFocus({ kind: 'site', id }); // selected, but the card showed something else
   };
 
@@ -228,9 +231,12 @@ export default function GlobeCanvas() {
 
   const createPin = (lat: number, lon: number, name?: string) => {
     const pin = addPin({ lat, lon, name });
-    setFocus({ kind: 'custom', id: pin.id });
     // Shared free point (store `selectedPoint`) for the "any lat/lon" checks; never touches selectedSiteId.
-    useAppStore.getState().setSelectedPoint({ lat, lon });
+    useAppStore
+      .getState()
+      .requestSelection({ kind: 'point', lat, lon, name: pin.name }, () =>
+        setFocus({ kind: 'custom', id: pin.id }),
+      );
     return pin;
   };
 

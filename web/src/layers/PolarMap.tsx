@@ -31,7 +31,7 @@ export function PolarMap({
   const activeLayers = useAppStore((s) => s.activeLayers);
   const layerOpacity = useAppStore((s) => s.layerOpacity);
   const selectedSiteId = useAppStore((s) => s.selectedSiteId);
-  const selectSite = useAppStore((s) => s.selectSite);
+  const requestSelection = useAppStore((s) => s.requestSelection);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [hover, setHover] = useState<[number, number] | null>(null);
 
@@ -91,7 +91,11 @@ export function PolarMap({
             manifest={manifest}
             selected={s.id === selectedSiteId}
             neutral={neutral}
-            onSelect={() => selectSite(s.id === selectedSiteId ? null : s.id)}
+            onSelect={() =>
+              requestSelection(
+                s.id === selectedSiteId ? null : { kind: 'site', id: s.id, name: s.name },
+              )
+            }
           />
         ))}
       <div className="num bg-night/80 text-white pointer-events-none absolute bottom-0 left-0 rounded-[3px] px-1.5 py-0.5 text-[11px]">

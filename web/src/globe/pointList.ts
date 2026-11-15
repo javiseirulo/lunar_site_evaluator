@@ -45,12 +45,16 @@ export const useFlyRequest = create<FlyRequest>()((set) => ({
   fly: (pin) => set({ request: { id: pin.id, lat: pin.lat, lon: pin.lon, n: ++flyCount } }),
 }));
 
-/** Make a pin the active free point (clean switch: no catalogue site stays selected) and fly to it. */
+/**
+ * Make a pin the active free point (clean switch: no catalogue site stays selected) and fly to it.
+ * Goes through the shared guard: a running simulation asks "End simulation?" first.
+ */
 export function selectCustomPin(pin: CustomPin): void {
-  const app = useAppStore.getState();
-  app.selectSite(null);
-  app.setSelectedPoint({ lat: pin.lat, lon: pin.lon });
-  useFlyRequest.getState().fly(pin);
+  useAppStore
+    .getState()
+    .requestSelection({ kind: 'point', lat: pin.lat, lon: pin.lon, name: pin.name }, () =>
+      useFlyRequest.getState().fly(pin),
+    );
 }
 
 /** Delete a pin; if it was the active point, the simulation point is cleared too. */

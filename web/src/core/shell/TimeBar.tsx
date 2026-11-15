@@ -41,6 +41,8 @@ export function TimeBar({ className }: { className?: string }) {
   const [playing, setPlaying] = useState(false);
   const simulationStarted = useAppStore((s) => s.simulationStarted);
   const setSimulationStarted = useAppStore((s) => s.setSimulationStarted);
+  const clockResetNonce = useAppStore((s) => s.clockResetNonce);
+  const resetClock = useAppStore((s) => s.resetClock);
   const [speed, setSpeed] = useState(DEFAULT_SPEED);
 
   const t0 = range ? Date.parse(range.start_utc) : 0;
@@ -48,12 +50,21 @@ export function TimeBar({ className }: { className?: string }) {
   const t1 = range ? Date.parse(range.end_utc) - range.step_s * 1000 : 0;
   const now = Date.parse(currentTimeUTC);
 
+  // A reset from outside (end-simulation confirm) stops playback at once: adjust during render.
+  const [seenReset, setSeenReset] = useState(clockResetNonce);
+  if (seenReset !== clockResetNonce) {
+    setSeenReset(clockResetNonce);
+    setPlaying(false);
+  }
+
   // Playback loop: advance the shared clock while playing.
   const raf = useRef(0);
   useEffect(() => {
     if (!playing || !range) return;
+    const nonce = useAppStore.getState().clockResetNonce;
     let last = performance.now();
     const tick = (frame: number) => {
+      if (useAppStore.getState().clockResetNonce !== nonce) return;
       const dt = (frame - last) / 1000;
       last = frame;
       const { currentTimeUTC: cur, setTime: set } = useAppStore.getState();
@@ -113,10 +124,7 @@ export function TimeBar({ className }: { className?: string }) {
             <button
               type="button"
               className="btn btn-quiet w-[32px] px-0"
-              onClick={() => {
-                setPlaying(false);
-                setTime(range.start_utc);
-              }}
+              onClick={() => resetClock(range.start_utc)}
               aria-label="Back to day 1"
               title="Back to day 1"
             >
