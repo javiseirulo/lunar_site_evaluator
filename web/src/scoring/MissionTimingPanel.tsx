@@ -9,8 +9,11 @@
  */
 import type { MissionConfig, TimeMode, Trajectory } from '@lunar/contracts';
 import { cn } from '@/lib/utils';
-import { formatUtc, useAppStore, useData, useSelectedSite } from '@/core';
-import { computeArrival, landingTime, TRAJECTORY_LABEL } from './arrival';
+import { formatUtc, useAppStore, useSelectedSite } from '@/core';
+import { useEphemIndex } from '@/ephem';
+import { computeArrival, landingTime, missionWindow, TRAJECTORY_LABEL } from './arrival';
+import { LandingDate } from './LandingDate';
+import { windowIssue } from './landingWindow';
 
 /** `<input type="datetime-local">` value (treated as UTC) ⇄ ISO 8601 UTC. */
 const toInput = (iso: string) => new Date(iso).toISOString().slice(0, 16);
@@ -30,7 +33,7 @@ export function MissionTimingPanel({ className }: { className?: string }) {
   const config = useAppStore((s) => s.missionConfig);
   const setMissionConfig = useAppStore((s) => s.setMissionConfig);
   const setTime = useAppStore((s) => s.setTime);
-  const range = useData((s) => s.manifest?.time_range);
+  const idx = useEphemIndex();
   const site = useSelectedSite();
 
   /** Apply a change and move the clock to the resulting landing time. */
@@ -42,7 +45,8 @@ export function MissionTimingPanel({ className }: { className?: string }) {
 
   const arrival = config.time_mode === 'mission' ? computeArrival(config, site) : null;
   const landing = landingTime(config, site);
-  const outOfRange = range && (landing < range.start_utc || landing > range.end_utc) ? range : null;
+  const win = missionWindow(config, site);
+  const dataIssue = windowIssue(idx, win.start_utc, win.end_utc);
 
   return (
     <section className={cn('box', className)} aria-label="Mission timing">
@@ -77,17 +81,7 @@ export function MissionTimingPanel({ className }: { className?: string }) {
 
         <div className="flex flex-wrap items-end gap-x-3 gap-y-1.5">
           {config.time_mode === 'design' ? (
-            <label className="flex flex-col gap-0.5">
-              <span className="label">Landing (UTC)</span>
-              <input
-                type="datetime-local"
-                className="field num"
-                value={toInput(config.landing_utc)}
-                onChange={(e) =>
-                  e.target.value && update({ landing_utc: fromInput(e.target.value) })
-                }
-              />
-            </label>
+            <LandingDate precise className="border-0 bg-transparent p-0 shadow-none" />
           ) : (
             <>
               <label className="flex flex-col gap-0.5">
@@ -192,10 +186,9 @@ export function MissionTimingPanel({ className }: { className?: string }) {
           </span>
         </div>
 
-        {outOfRange && (
+        {dataIssue && (
           <p className="text-warn text-[10px]" role="status">
-            Landing is outside the data window ({outOfRange.start_utc.slice(0, 10)} to{' '}
-            {outOfRange.end_utc.slice(0, 10)}); the clock shows the nearest available sample.
+            {dataIssue}
           </p>
         )}
 

@@ -13,6 +13,7 @@ import {
   useAppStore,
   useData,
   uvToLatLon,
+  useScoresStale,
 } from '@/core';
 import { siteMarkerColor, siteMarkerLabel } from './markerStyle';
 
@@ -178,6 +179,10 @@ function Pin({
   onSelect: () => void;
 }) {
   const [u, v] = latLonToUv(site.lat, site.lon, manifest);
+  // The catalogue score/valid only describe the default window: for any other landing date the
+  // marker falls back to the neutral look instead of a stale colour.
+  const stale = useScoresStale();
+  neutral = neutral || stale;
   return (
     <button
       type="button"
@@ -193,7 +198,7 @@ function Pin({
           selected
             ? 'animate-pop scale-150 border-white outline outline-1 outline-black'
             : 'border-black',
-          !site.valid && 'opacity-50',
+          !stale && !site.valid && 'opacity-50',
         )}
         style={{ background: siteMarkerColor(site.score, neutral, selected) }}
       />

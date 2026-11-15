@@ -13,10 +13,23 @@ export function EndSimulationDialog() {
   const selectedPoint = useAppStore((s) => s.selectedPoint);
   const sites = useData((s) => s.sites);
   const startUtc = useData((s) => s.manifest?.time_range.start_utc);
+  const pendingLanding = useAppStore((s) => s.pendingLanding);
+  const confirmLanding = useAppStore((s) => s.confirmLanding);
   const pins = useCustomPins((s) => s.pins);
   const confirmPending = useAppStore((s) => s.confirmPending);
   const cancelPending = useAppStore((s) => s.cancelPending);
 
+  if (pendingLanding && !proMode) {
+    const date = (pendingLanding.patch.landing_utc ?? pendingLanding.startUtc).slice(0, 10);
+    return (
+      <EndSimulationPanel
+        current="the current landing date"
+        next={`landing on ${date}`}
+        onKeep={cancelPending}
+        onEnd={confirmLanding}
+      />
+    );
+  }
   if (!pending || proMode || !startUtc) return null;
 
   const current = selectedSiteId

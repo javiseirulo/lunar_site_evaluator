@@ -166,6 +166,20 @@ Siguiente bloque recomendado: cámara/legibilidad y benchmark de un horizonte;
 después conectar el contrato y vectores cuando entren en dev. La nueva rejilla
 y el polo norte amplían el alcance, no son entregables ya implementados.
 
+## Actualización del visor, 15 de noviembre de 2026
+
+El adaptador de Street View conserva los vectores horarios de Javi, el paralaje
+topocéntrico y el margen del enlace. Los discos esquemáticos usan radio solar
+0,2666° y radio terrestre angular asin(6371 km/distancia). La fracción de disco
+supone un horizonte recto a través del disco. Para un punto libre se indica el
+horizonte de la esfera. Girar la cámara reutiliza la muestra calculada.
+
+La prueba con los binarios publicados sitúa el centro terrestre a −28,345° en
+el enlace de Pablo (−14,24842526°, −110,35066553°, 2027-01-01 00:00 UTC).
+En Amundsen West el 12 de enero a las 12:00 UTC queda a +0,218°, detrás de
+un perfil LOLA de +3,171° a ese azimut. La comparación independiente del
+equipo con JPL está en [Horizons](../../validation/horizons-check.md).
+
 ## Entrega del plan de Street View del 15 de noviembre
 
 Esta nota sustituye los pendientes de interfaz y despliegue descritos arriba.
