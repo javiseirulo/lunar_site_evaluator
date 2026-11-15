@@ -3,9 +3,9 @@
  * Built from Pablo's heightmap (terrain.ts); neutral matte grey so the relief comes from the Sun
  * light alone (no baked hillshade). Rendered only after loadTerrain() has run.
  */
-import { useEffect, useMemo } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import { useFrame, type ThreeEvent } from '@react-three/fiber';
-import { BufferAttribute, BufferGeometry } from 'three';
+import { BufferAttribute, BufferGeometry, DirectionalLight, Object3D } from 'three';
 import { buildPatchArrays } from './terrain';
 import { loadTerrain, useTerrain } from './terrainStore';
 import { vec3ToLatLon } from './geo';
@@ -46,6 +46,8 @@ export function PolarPatch({
   return (
     <mesh
       geometry={geometry}
+      castShadow
+      receiveShadow
       onClick={(e: ThreeEvent<MouseEvent>) => {
         if (e.delta > clickTolerancePx) return;
         e.stopPropagation();
@@ -55,6 +57,64 @@ export function PolarPatch({
     >
       <meshStandardMaterial color="#8c8c8c" roughness={1} metalness={0} />
     </mesh>
+  );
+}
+
+/**
+ * Bounding sphere of the patch in globe units: the 80°S cap spans y ∈ [−1, −cos 10°] and a
+ * horizontal radius of sin 10° ≈ 0.174; a little margin covers the relief (±10 km ≈ 0.006).
+ */
+const PATCH_CENTER: [number, number, number] = [0, -0.992, 0];
+const PATCH_RADIUS = 0.185;
+/** Distance from the patch centre to the light along the Sun direction (only the direction matters). */
+const LIGHT_DISTANCE = 2;
+/** 4096² over ~0.37 globe units ≈ 160 m per shadow texel. */
+const SHADOW_MAP_SIZE = 4096;
+
+/**
+ * The scene's directional (Sun) light. While the polar patch is loaded it casts shadows, with an
+ * orthographic shadow camera fitted to the patch; otherwise it is a plain light (no shadow cost).
+ */
+export function SunLight({
+  direction,
+  intensity,
+}: {
+  /** Unit vector towards the Sun (or any light direction), Three axes. */
+  direction: readonly [number, number, number];
+  intensity: number;
+}) {
+  const patchReady = useTerrain((s) => s.status === 'ready');
+  const light = useRef<DirectionalLight>(null);
+  const target = useRef<Object3D>(null);
+
+  useLayoutEffect(() => {
+    const l = light.current;
+    if (!l || !target.current) return;
+    l.target = target.current;
+    const cam = l.shadow.camera;
+    cam.left = cam.bottom = -PATCH_RADIUS;
+    cam.right = cam.top = PATCH_RADIUS;
+    cam.near = LIGHT_DISTANCE - PATCH_RADIUS;
+    cam.far = LIGHT_DISTANCE + PATCH_RADIUS;
+    cam.updateProjectionMatrix();
+  }, []);
+
+  const [dx, dy, dz] = direction;
+  const [cx, cy, cz] = PATCH_CENTER;
+  return (
+    <>
+      <object3D ref={target} position={PATCH_CENTER} />
+      <directionalLight
+        ref={light}
+        position={[cx + dx * LIGHT_DISTANCE, cy + dy * LIGHT_DISTANCE, cz + dz * LIGHT_DISTANCE]}
+        intensity={intensity}
+        castShadow={patchReady}
+        shadow-mapSize={[SHADOW_MAP_SIZE, SHADOW_MAP_SIZE]}
+        // Grazing polar sunlight: a small offset along the normal avoids shadow acne on slopes.
+        shadow-bias={-0.00005}
+        shadow-normalBias={0.0003}
+      />
+    </>
   );
 }
 

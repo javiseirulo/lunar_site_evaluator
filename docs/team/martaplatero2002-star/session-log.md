@@ -98,3 +98,8 @@
 - `PatchControls.tsx`: interruptores High detail / Vertical ×2 y etiqueta "Vertical exaggeration ×2 (shadows not to scale)".
 - Medido en el navegador: descarga ~96 ms en local; construir la malla 513² = 410 k triángulos en ~160 ms, 1025² = 1,64 M triángulos en ~460 ms. FPS sin medir (el panel del navegador estaba oculto): pendiente de que Marta lo vea.
 
+
+### Paso 3 — sombras (2026-11-15)
+- `SunLight` (PolarPatch.tsx) sustituye a la directionalLight: con el parche cargado proyecta sombras (castShadow + receiveShadow en la malla), cámara ortográfica ajustada a la esfera envolvente del parche (centro (0, −0.992, 0), radio 0.185), mapa 4096² (~160 m por téxel), bias −5e-5 y normalBias 3e-4 por el Sol rasante. Sin parche no hay coste de sombras.
+- Etiqueta en el panel: "Illustrative shading — official sunlight figures come from the data pipeline".
+- Sin verificar visualmente (panel oculto): el bias puede necesitar ajuste si aparece acné o "peter-panning".

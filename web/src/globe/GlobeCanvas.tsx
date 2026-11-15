@@ -47,7 +47,7 @@ import { useCustomPins } from './customPins';
 import { latLonToVec3, vec3ToLatLon } from './geo';
 import { HistoricControls } from './HistoricControls';
 import { useSunDirection } from './sunLight';
-import { PatchTrigger, PolarPatch } from './PolarPatch';
+import { PatchTrigger, PolarPatch, SunLight } from './PolarPatch';
 import { EXAGGERATION_LABEL, PatchControls } from './PatchControls';
 import { loadTerrain, useTerrain } from './terrainStore';
 import { OUTCOME_COLORS, loadHistoricSites, useHistoric } from './historicSites';
@@ -72,7 +72,7 @@ const INITIAL_CAMERA = latLonToVec3(-30, 0, 3);
 /** Degrees the cut sphere keeps past the terrain edge, so no gap opens between them. */
 const CAP_OVERLAP_DEG = 0.05;
 /** Light used when there is no ephemeris for the Mission Clock date. */
-const FIXED_LIGHT: [number, number, number] = [4, 1.5, 3];
+const FIXED_LIGHT_DIR = new Vector3(4, 1.5, 3).normalize().toArray();
 /** Camera never closer than this to the Moon's centre (surface = 1). */
 const MIN_CAMERA_RADIUS = 1.01;
 /** Mouse speed multiplier (1 = three.js default). Lower = slower, finer control. */
@@ -199,14 +199,15 @@ export default function GlobeCanvas() {
       role="region"
       aria-label="3D Moon globe with candidate landing sites. Left-drag to move, right-drag to rotate, scroll to zoom, click the ground for coordinates."
     >
-      <Canvas camera={{ position: INITIAL_CAMERA, fov: 45, near: 0.001, far: 200 }} dpr={[1, 2]}>
+      <Canvas
+        camera={{ position: INITIAL_CAMERA, fov: 45, near: 0.001, far: 200 }}
+        dpr={[1, 2]}
+        shadows
+      >
         <color attach="background" args={['#000000']} />
         {/* No atmosphere: almost no fill light, so the night side is dark. */}
         <ambientLight intensity={sunDir ? 0.04 : 0.35} />
-        <directionalLight
-          position={sunDir ? [sunDir[0] * 5, sunDir[1] * 5, sunDir[2] * 5] : FIXED_LIGHT}
-          intensity={sunDir ? 2.6 : 2}
-        />
+        <SunLight direction={sunDir ?? FIXED_LIGHT_DIR} intensity={sunDir ? 2.6 : 2} />
         <Stars radius={60} depth={30} count={3000} factor={3} saturation={0} fade />
         <Suspense fallback={<PlaceholderMoon />}>
           <Moon

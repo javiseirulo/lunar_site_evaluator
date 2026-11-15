@@ -5,6 +5,9 @@
 import { loadTerrain, useTerrain } from './terrainStore';
 import { PAPER } from './paper';
 
+export const SHADING_LABEL =
+  'Illustrative shading — official sunlight figures come from the data pipeline';
+
 export const EXAGGERATION_LABEL = 'Vertical exaggeration ×2 (shadows not to scale)';
 
 export function PatchControls() {
@@ -55,6 +58,7 @@ export function PatchControls() {
             />
             Vertical ×2
           </label>
+          <p className="text-ink-muted">{SHADING_LABEL}</p>
           <p className="text-ink-muted">LOLA 80 m DEM (LDEM_80S), resampled to about 0.6 km.</p>
         </div>
       )}
