@@ -59,6 +59,7 @@ import { flightAt, planFlight, type Flight } from './flight';
 import { useSunDirection } from './sunLight';
 import { NIGHT_FILL, useNightLayer } from './nightLayer';
 import { Terminator } from './DayNight';
+import { usePinSelection } from './pinSelection';
 import { LayersMenu } from './LayersMenu';
 import { PatchTrigger, PolarPatch, SunLight } from './PolarPatch';
 import { ActiveLegend } from '@/layers';
@@ -251,8 +252,24 @@ export default function GlobeCanvas() {
   const onHistoricClick = (id: string) =>
     setFocus((f) => (f?.kind === 'historic' && f.id === id ? null : { kind: 'historic', id }));
 
-  const onCustomClick = (id: string) =>
-    setFocus((f) => (f?.kind === 'custom' && f.id === id ? null : { kind: 'custom', id }));
+  // A clicked own pin becomes the free point (same path as "Your points" and createPin, minus the
+  // flight: the camera stays where it is) and its statistics show in the right-hand card again.
+  const onCustomClick = (id: string) => {
+    const pin = pins.find((p) => p.id === id);
+    if (!pin) return;
+    useAppStore
+      .getState()
+      .requestSelection({ kind: 'point', lat: pin.lat, lon: pin.lon, name: pin.name }, () =>
+        setFocus({ kind: 'custom', id }),
+      );
+  };
+
+  // The right-hand card shows the statistics of the selected own pin.
+  const focusedPinId = focus?.kind === 'custom' ? focus.id : null;
+  useEffect(() => {
+    usePinSelection.getState().setPinId(focusedPinId);
+    return () => usePinSelection.getState().setPinId(null);
+  }, [focusedPinId]);
 
   const closeCard = () => {
     if (focus?.kind === 'site') useAppStore.getState().selectSite(null);
