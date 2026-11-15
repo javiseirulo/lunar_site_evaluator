@@ -30,6 +30,7 @@ Nothing from v1 is renamed. Every new field is optional, so the v1 mocks stay va
 | `ephem/index.json` + `ephem/<YYYY>.bin` | `EphemIndex` | `ephem-index.schema.json` | Javi (`python/ephem`) |
 | `grid/index.json` + `grid/*.bin` | `GridIndex` | `grid-index.schema.json` | Javi (export) |
 | (store `missionConfig`, Mission scenarios) | `MissionConfig` | `mission_config.schema.json` | Javi / Cristóbal |
+| `historic_sites.json` | `HistoricSitesFile` | `historic_sites.schema.json` | Marta (curated; Cristóbal reuses it in Mission) |
 
 New optional fields:
 - `Site`: `region`, `kind`, `group`, `checks` (requirement results with margins), `pending_metrics`.
@@ -44,7 +45,9 @@ New optional fields:
 - **Mission scenarios** (Cristóbal) are partial overrides. Merge them onto `DEFAULT_MISSION_CONFIG` with `mergeMissionConfig` from `@/scoring` first, then validate the result against `mission_config.schema.json`.
 - **Historic landings:**
   - in `sites.json` they are sites like any other (`kind: "historic_landing"`), so they can be evaluated and compared;
-  - Marta's planned `historic_sites.json` (display layer with agency, date and outcome) can reuse the same `id`s so both link.
+  - `historic_sites.json` (Marta) is the display layer: agency, country, date, outcome, kind, a one-line note and the URL of the coordinate source.
+    It uses the same `id` and lat/lon as `sites.json` when the mission is in the catalog, and adds missions that are not (e.g. failed landings with a known impact point).
+    `pnpm test` checks unique ids, lat/lon ranges, ISO dates, `https` sources and that shared ids keep the same coordinates.
 - **`grid/*.bin` replaces the `grid_metrics.bin` sketched in docs/10 (Marta's block).** It is Float32 instead of uint8, and the time dimension is optional (`n_times`, `time_step_s`; e.g. per day for an animated heat map).
 
 ### Binary formats
@@ -104,3 +107,22 @@ in contrast, are sampled at pixel centres within the same outer bounds.
 See [Pablo's handoff guide](../docs/team/pabloizgui/terrain-handoff.md) for decoding,
 NoData, source/frame, regeneration and the separate real elevation/slope layers.
 Marta/Javi2 must review this addition before integration in `dev`.
+
+## Street View integration handoff (#38)
+
+`AppEvents.selectedPoint` is additive and optional for existing consumers; core
+defaults it to null. `setSelectedPoint({lat, lon})` uses planetocentric degrees,
+east-positive longitude [-180,180], and rejects non-finite/out-of-range points.
+`selectSite` clears the free point. Street View inherits it only when the route
+belongs to the current selected site; an explicit shared URL takes precedence.
+Map/globe consumers must opt in rather than communicate through renderer state.
+
+`terrain/catalog.json` / `catalog-terrain.csv` carry terrain for the 59 sourced
+coordinates of `python/export/catalog.yaml`. `horizon/<id>.json` follows the
+v1.1 contract for 41 polar sites (5 m, 0.1°, 310 km). No profile is reused at a
+different location/height. Numerical validation and source hashes are in each
+profile and `terrain/catalog-delivery.json`. Unknown PSR distances are null;
+`psr_mapped_distance_km` is only an upper bound outside demonstrated coverage,
+with a stated 0.19 km spatial approximation bound. `slope_coarse` flags the
+non-polar global-DEM slope. These products do not mutate scores or hide pending
+metrics: Javi's export must consume them and regenerate evaluation outputs.

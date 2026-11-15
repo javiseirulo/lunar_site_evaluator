@@ -1,0 +1,93 @@
+{
+  "version": 1,
+  "status": "experimental_not_for_mission_scoring",
+  "production_profiles_ready": 0,
+  "profiles": {
+    "global_equator_1deg.json": {
+      "lat": 0.0,
+      "lon": 0.0,
+      "azimuths": 360,
+      "az_step_deg": 1.0,
+      "refinement": 1,
+      "elapsed_s": 0.994,
+      "complete_rays": 360,
+      "minimum_deg": -0.7404536290497968,
+      "maximum_deg": 0.40980092050188555
+    },
+    "global_north_1deg.json": {
+      "lat": 89.9,
+      "lon": 0.0,
+      "azimuths": 360,
+      "az_step_deg": 1.0,
+      "refinement": 1,
+      "elapsed_s": 1.22,
+      "complete_rays": 360,
+      "minimum_deg": -0.6930425141994536,
+      "maximum_deg": 20.705513911345584
+    },
+    "shackleton_fixture_01deg.json": {
+      "lat": -89.9,
+      "lon": 0.0,
+      "azimuths": 3600,
+      "az_step_deg": 0.1,
+      "refinement": 1,
+      "elapsed_s": 7.445,
+      "complete_rays": 3600,
+      "minimum_deg": -2.0910803969208445,
+      "maximum_deg": 22.09658630997115
+    },
+    "shackleton_fixture_01deg_refined.json": {
+      "lat": -89.9,
+      "lon": 0.0,
+      "azimuths": 3600,
+      "az_step_deg": 0.1,
+      "refinement": 2,
+      "elapsed_s": 14.173,
+      "complete_rays": 3600,
+      "minimum_deg": -2.0910803969208445,
+      "maximum_deg": 22.10130674002818
+    },
+    "shackleton_fixture_01deg_refined4.json": {
+      "lat": -89.9,
+      "lon": 0.0,
+      "azimuths": 3600,
+      "az_step_deg": 0.1,
+      "refinement": 4,
+      "elapsed_s": 73.649,
+      "complete_rays": 3600,
+      "minimum_deg": -2.0910803969208445,
+      "maximum_deg": 22.102255441519784
+    },
+    "shackleton_fixture_1deg.json": {
+      "lat": -89.9,
+      "lon": 0.0,
+      "azimuths": 360,
+      "az_step_deg": 1.0,
+      "refinement": 1,
+      "elapsed_s": 1.963,
+      "complete_rays": 360,
+      "minimum_deg": -1.994782216583639,
+      "maximum_deg": 22.09462583641894
+    }
+  },
+  "radial_1x_vs_2x": {
+    "max_difference_deg": 0.06313977679084104,
+    "rays_exceeding_005_deg": 1
+  },
+  "radial_2x_vs_4x": {
+    "max_difference_deg": 0.03768383415046728,
+    "rays_exceeding_005_deg": 0
+  },
+  "range_difference_from_310km_deg": {
+    "150000": 0.357414843012136,
+    "200000": 0.0,
+    "300000": 0.0,
+    "310000": 0.0
+  },
+  "notes": [
+    "Benchmark on one fixture coordinate, not the approved polar catalogue.",
+    "Runtime varies with disk cache and concurrent UI/build workload.",
+    "0.1 degree azimuth sampling is not yet independently converged against a finer angular step.",
+    "Coarse global DEM does not resolve local metre-scale obstructions."
+  ]
+}

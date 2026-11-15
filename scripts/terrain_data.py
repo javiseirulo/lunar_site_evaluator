@@ -44,6 +44,19 @@ def validate_tiff_header(path):
         raise ValueError("The payload is not a TIFF/BigTIFF file")
 
 
+def validate_payload(path, source):
+    if source.get("format", "tiff") == "pds3-int16-le":
+        # Raw IMG has no magic header. Shape/length and label are verified by
+        # the dedicated importer; this is only a transfer-integrity check.
+        if Path(path).stat().st_size != source["expected_bytes"]:
+            raise ValueError("Unexpected raw IMG length")
+        with Path(path).open("rb") as stream:
+            if stream.read(64).lstrip().lower().startswith((b"<!doctype", b"<html")):
+                raise ValueError("HTML received instead of IMG")
+    else:
+        validate_tiff_header(path)
+
+
 def download(source, folder):
     """Resume a single file; publish the final name only after length/header/hash checks."""
     folder.mkdir(parents=True, exist_ok=True)
@@ -70,7 +83,7 @@ def download(source, folder):
         if target.exists():
             if target.stat().st_size != expected:
                 raise ValueError("Existing final file has an unexpected length; refusing overwrite")
-            validate_tiff_header(target)
+            validate_payload(target, source)
             report("complete", expected, sha256=sha256(target))
             return
         for attempt in range(4):
@@ -115,7 +128,7 @@ def download(source, folder):
                     raise
                 time.sleep(2 ** attempt)
         report("verifying", expected)
-        validate_tiff_header(partial)
+        validate_payload(partial, source)
         digest = sha256(partial)
         # This is a local integrity fingerprint, not a publisher-supplied checksum.
         partial.replace(target)

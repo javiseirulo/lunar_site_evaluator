@@ -31,6 +31,7 @@ import {
   CanvasTexture,
   Color,
   DoubleSide,
+  Group,
   MOUSE,
   Mesh,
   SRGBColorSpace,
@@ -42,6 +43,8 @@ import { GlobeCard, type CardContent } from './GlobeCard';
 import { PinForm } from './PinForm';
 import { useCustomPins } from './customPins';
 import { latLonToVec3, vec3ToLatLon } from './geo';
+import { HistoricControls } from './HistoricControls';
+import { OUTCOME_COLORS, loadHistoricSites, useHistoric } from './historicSites';
 import { useRequirements } from './requirementsStore';
 import { useCandidates } from './useCandidates';
 import { meetsText } from './missionStats';
@@ -74,6 +77,7 @@ type FlightRef = RefObject<Vector3 | null>;
 type Focus =
   | { kind: 'site'; id: string }
   | { kind: 'custom'; id: string }
+  | { kind: 'historic'; id: string }
   | { kind: 'point'; lat: number; lon: number }
   | null;
 type Hover = { kind: 'site' | 'custom'; id: string } | null;
@@ -93,6 +97,13 @@ export default function GlobeCanvas() {
   const pins = useCustomPins((s) => s.pins);
   const addPin = useCustomPins((s) => s.addPin);
   const removePin = useCustomPins((s) => s.removePin);
+  const historic = useHistoric((s) => s.sites);
+  const historicVisible = useHistoric((s) => s.visible);
+
+  // Past landings: load once; on failure the switch shows "unavailable" and the globe carries on.
+  useEffect(() => {
+    void loadHistoricSites();
+  }, []);
 
   const [focus, setFocus] = useState<Focus>(() => {
     const id = useAppStore.getState().selectedSiteId;
@@ -112,6 +123,8 @@ export default function GlobeCanvas() {
 
   const card = useMemo<CardContent | null>(() => {
     if (!focus) return null;
+    const pastOf = (id: string) =>
+      historicVisible ? (historic.find((h) => h.id === id) ?? null) : null;
     if (focus.kind === 'point') return focus;
     if (focus.kind === 'site') {
       const e = evaluations?.find((x) => x.site.id === focus.id);
@@ -123,15 +136,23 @@ export default function GlobeCanvas() {
           rank: topRank.get(e.site.id) ?? null,
           summary: meetsText(e),
           note: miss?.text ?? null,
+          past: pastOf(e.site.id),
         };
       }
       // Selected elsewhere (list, 2D map) with no requirement active.
       const site = sites?.find((s) => s.id === focus.id);
-      return site ? { kind: 'site', site, rank: null, summary: null, note: null } : null;
+      return site
+        ? { kind: 'site', site, rank: null, summary: null, note: null, past: pastOf(site.id) }
+        : null;
+    }
+    if (focus.kind === 'historic') {
+      if (!historicVisible) return null; // layer switched off: no card for a marker that is not drawn
+      const h = historic.find((x) => x.id === focus.id);
+      return h ? { kind: 'historic', site: h } : null;
     }
     const pin = pins.find((p) => p.id === focus.id);
     return pin ? { kind: 'custom', pin } : null;
-  }, [focus, evaluations, topRank, sites, pins]);
+  }, [focus, evaluations, topRank, sites, pins, historic, historicVisible]);
 
   const onSiteClick = (id: string) => {
     const { selectedSiteId, selectSite } = useAppStore.getState();
@@ -139,6 +160,10 @@ export default function GlobeCanvas() {
     else if (focus?.kind === 'site' && focus.id === id) selectSite(null);
     else setFocus({ kind: 'site', id }); // selected, but the card showed something else
   };
+
+  // Past landings open their own card; they are not candidates, so selectSite is never called.
+  const onHistoricClick = (id: string) =>
+    setFocus((f) => (f?.kind === 'historic' && f.id === id ? null : { kind: 'historic', id }));
 
   const onCustomClick = (id: string) =>
     setFocus((f) => (f?.kind === 'custom' && f.id === id ? null : { kind: 'custom', id }));
@@ -172,6 +197,10 @@ export default function GlobeCanvas() {
           />
         </Suspense>
         <Pins focus={focus} onSiteClick={onSiteClick} onCustomClick={onCustomClick} />
+        <HistoricMarkers
+          focusId={focus?.kind === 'historic' ? focus.id : null}
+          onClick={onHistoricClick}
+        />
         {focus?.kind === 'point' && <PointMarker lat={focus.lat} lon={focus.lon} />}
         <CardAnchor
           card={card}
@@ -196,7 +225,7 @@ export default function GlobeCanvas() {
         />
         <CameraRig flightRef={flightRef} controlsRef={controlsRef} />
       </Canvas>
-      <div className="absolute top-2 left-2">
+      <div className="absolute top-2 left-2 flex flex-col items-start gap-2">
         <PinForm
           onAdd={({ name, lat, lon }) => {
             createPin(lat, lon, name);
@@ -205,6 +234,7 @@ export default function GlobeCanvas() {
             flightRef.current = new Vector3(...latLonToVec3(safeLat, lon, PIN_VIEW_DISTANCE));
           }}
         />
+        <HistoricControls />
       </div>
       {!textureReady && (
         <div
@@ -489,6 +519,134 @@ function HoverLabel({ label }: { label: { lat: number; lon: number; text: string
   );
 }
 
+/**
+ * Past landings: small triangular pyramids pointing away from the surface, coloured by outcome.
+ * Shape differs from candidate pins (spheres) and custom pins (diamonds). The hover label stays mounted.
+ */
+function HistoricMarkers({
+  focusId,
+  onClick,
+}: {
+  focusId: string | null;
+  onClick: (id: string) => void;
+}) {
+  const sites = useHistoric((s) => s.sites);
+  const visible = useHistoric((s) => s.visible);
+  const status = useHistoric((s) => s.status);
+  const [hoverId, setHoverId] = useState<string | null>(null);
+  const shown = visible && status === 'ready';
+  // Where a candidate pin is already drawn (same id), skip the triangle so the pin stays clickable;
+  // the candidate's card shows the past landing instead.
+  const { evaluations, loading } = useCandidates();
+  const showNonMatching = useRequirements((s) => s.showNonMatching);
+  const pinned = useMemo(
+    () =>
+      new Set(
+        loading
+          ? []
+          : (evaluations ?? []).filter((e) => e.candidate || showNonMatching).map((e) => e.site.id),
+      ),
+    [evaluations, loading, showNonMatching],
+  );
+
+  // Hidden markers never fire pointer-out, so the cursor also depends on the layer being shown.
+  useEffect(() => {
+    if (!hoverId || !shown) return;
+    document.body.style.cursor = 'pointer';
+    return () => {
+      document.body.style.cursor = '';
+    };
+  }, [hoverId, shown]);
+
+  const hovered =
+    shown && hoverId && hoverId !== focusId ? sites.find((s) => s.id === hoverId) : null;
+  const label = hovered
+    ? {
+        lat: hovered.lat,
+        lon: hovered.lon,
+        text: `${hovered.name} · ${hovered.date_utc.slice(0, 4)}`,
+      }
+    : null;
+
+  return (
+    <group>
+      {shown &&
+        sites
+          .filter((h) => !pinned.has(h.id))
+          .map((h) => (
+            <HistoricMarker
+              key={h.id}
+              lat={h.lat}
+              lon={h.lon}
+              color={OUTCOME_COLORS[h.outcome]}
+              selected={h.id === focusId}
+              onClick={() => onClick(h.id)}
+              onHover={(over) => setHoverId((cur) => (over ? h.id : cur === h.id ? null : cur))}
+            />
+          ))}
+      <HoverLabel label={label} />
+    </group>
+  );
+}
+
+const UP = new Vector3(0, 1, 0);
+
+function HistoricMarker({
+  lat,
+  lon,
+  color,
+  selected,
+  onClick,
+  onHover,
+}: {
+  lat: number;
+  lon: number;
+  color: string;
+  selected: boolean;
+  onClick: () => void;
+  onHover: (over: boolean) => void;
+}) {
+  const group = useRef<Group>(null);
+  const position = useMemo(() => surfacePoint(lat, lon), [lat, lon]);
+
+  useEffect(() => {
+    // Local +Y (the pyramid's axis) along the outward normal.
+    group.current?.quaternion.setFromUnitVectors(UP, position.clone().normalize());
+  }, [position]);
+
+  useFrame(({ camera }) => {
+    const distance = Math.max(camera.position.length() - 1, 0.005);
+    group.current?.scale.setScalar(PIN_SIZE * distance * (selected ? 1.6 : 1.1));
+  });
+
+  return (
+    <group ref={group} position={position}>
+      <mesh
+        position={[0, 1.2, 0]}
+        onClick={(e: ThreeEvent<MouseEvent>) => {
+          e.stopPropagation(); // never reaches the Moon underneath
+          if (e.delta > CLICK_TOLERANCE_PX) return;
+          onClick();
+        }}
+        onPointerOver={(e) => {
+          e.stopPropagation();
+          onHover(true);
+        }}
+        onPointerOut={() => onHover(false)}
+      >
+        <coneGeometry args={[1, 2.4, 3]} />
+        <meshBasicMaterial color={color} toneMapped={false} />
+      </mesh>
+      {selected && (
+        <mesh rotation={[-Math.PI / 2, 0, 0]}>
+          <ringGeometry args={[1.6, 2.1, 32]} />
+          <meshBasicMaterial color="#ffffff" toneMapped={false} side={DoubleSide} />
+        </mesh>
+      )}
+    </group>
+  );
+}
+
 /** Always-mounted anchor for the info card next to the clicked pin or point. */
 function CardAnchor({
   card,
@@ -503,7 +661,7 @@ function CardAnchor({
 }) {
   const wrapper = useRef<HTMLDivElement>(null);
   const coords = card
-    ? card.kind === 'site'
+    ? card.kind === 'site' || card.kind === 'historic'
       ? card.site
       : card.kind === 'custom'
         ? card.pin

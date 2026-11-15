@@ -20,10 +20,10 @@ pnpm mocks            # regenerate mock data in public/data (repo root)
 | `src/layers/` | Javi2 | Layer panel, legends, 2D polar map |
 | `src/pages/` | Javi2 | Route pages that compose the modules |
 | `src/globe/` | Marta | 3D globe, filters, site list/detail (`SiteList` is a starter to replace) |
-| `src/streetview/` | Pablo | Street View (placeholder) |
-| `src/game/` | Cristóbal | Missions and game (placeholder) |
-| `src/scoring/` | Javi | Mission config defaults, arrival model (`computeArrival`), Explore time-mode panel; score/validity next. Import from `@/scoring` |
-| `public/data/` | Javi / Pablo (pipeline) | Generated data. Mock until the pipeline writes it |
+| `src/streetview/` | Pablo | Cesium Moon viewer, real SPICE sky, shared UTC clock and reproducible view links/QR |
+| `src/game/` | Cristóbal | Playable Mission module |
+| `src/scoring/` | Javi | Mission config defaults, arrival model (`computeArrival`), window evaluation, validity and score. Import from `@/scoring` |
+| `public/data/` | Javi / Pablo (pipeline) | Generated ephemerides, catalogue, series and terrain products; inspect each file's `mock` flag |
 
 Only touch another person's folder through a PR they review.
 
@@ -67,3 +67,26 @@ Avoid rounded corners, blur and soft shadows. No agency logos or insignia.
 ## Deploy
 
 Static build in `web/dist`. `vercel.json` rewrites client routes to `index.html` (set the Vercel project root to `web/`).
+
+## Lunar Street View
+
+Open `/streetview/shackleton_rim_01`; choose any of the 59 sourced sites, or use
+View options → Go anywhere on the Moon. Drag with the left button/one finger,
+scroll/pinch to zoom, click/tap nearby ground to walk at most 200 m. The options
+include eye height, artificial relief light, names and an expanded mobile view.
+
+The UTC clock uses the same core time and real `@/ephem` vectors from 2026 through
+2055-12-31 23:00 UTC. A late manifest load preserves deliberate clock choices.
+Only a matching 5 m terrain profile is used; free points and changed heights
+show a labelled geometric horizon. Share view / QR freezes location, time and
+camera; Capture current view updates it. Links never include Cesium credentials.
+
+Configure `VITE_CESIUM_ION_TOKEN` in ignored `web/.env.local` or the build
+environment (public read access to Moon asset 2684829). All teammates can use
+Pablo's application token without their own ion account. Domain restrictions
+still apply: a localhost QR is not reachable from another phone. Use an allowed
+deployment/LAN origin for classroom sharing. Do not commit tokens.
+
+Data paths, numerical limits and outstanding consumer integrations:
+[Pablo's handoff](../docs/team/pabloizgui/team-handoff.md) and
+[current tasks](../docs/team/pabloizgui/tasks.md).
