@@ -23,7 +23,11 @@ const SPEEDS = [
 const DEFAULT_SPEED = 3; // 2 days / sec
 const clampSpeed = (i: number) => (Number.isInteger(i) && SPEEDS[i] ? i : DEFAULT_SPEED);
 
-export function TimeBar({ className }: { className?: string }) {
+/**
+ * `bands={false}` hides the sunlit / Earth-in-view strips and their legend, for pages that show
+ * them in a bigger chart next to the clock (Explore's SimChart).
+ */
+export function TimeBar({ className, bands = true }: { className?: string; bands?: boolean }) {
   const range = useData((s) => s.manifest?.time_range);
   const currentTimeUTC = useAppStore((s) => s.currentTimeUTC);
   const setTime = useAppStore((s) => s.setTime);
@@ -147,10 +151,15 @@ export function TimeBar({ className }: { className?: string }) {
 
       {/* Timeline: sunlit (orange) / Earth in view (blue) bands under the slider. */}
       <div className="relative mt-3">
-        <div className="pointer-events-none mx-[8px] overflow-hidden rounded-full" aria-hidden>
-          <div className="h-[5px] bg-white/5" style={{ background: sun ?? undefined }} />
-          <div className="mt-[2px] h-[5px] bg-white/5" style={{ background: earth ?? undefined }} />
-        </div>
+        {bands && (
+          <div className="pointer-events-none mx-[8px] overflow-hidden rounded-full" aria-hidden>
+            <div className="h-[5px] bg-white/5" style={{ background: sun ?? undefined }} />
+            <div
+              className="mt-[2px] h-[5px] bg-white/5"
+              style={{ background: earth ?? undefined }}
+            />
+          </div>
+        )}
         <div
           className="bg-heading pointer-events-none absolute -top-1 -bottom-1 w-[2px]"
           style={{ left: `calc(8px + ${pct / 100} * (100% - 16px))` }}
@@ -173,7 +182,9 @@ export function TimeBar({ className }: { className?: string }) {
         />
       </div>
       <div className="text-ink-faint mt-1 flex flex-wrap items-center justify-between gap-x-3 text-[12px]">
-        {ts ? (
+        {!bands ? (
+          <span />
+        ) : ts ? (
           <span className="flex items-center gap-3">
             <span>
               <span className="text-sun">●</span> sunny

@@ -88,7 +88,7 @@ export default function ExplorePage() {
           )}
         </div>
         {proMode && <MissionTimingPanel />}
-        <TimeBar />
+        <TimeBar bands={false} />
         <SimChart />
       </section>
 

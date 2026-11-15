@@ -123,12 +123,6 @@ export function SimChart({ className }: { className?: string }) {
           stroke={SUN}
           strokeWidth={0.8}
         />,
-        <text key="l-sun" x={PAD_L + 4} y={plotTop + 11} fontSize={10} fill={SUN}>
-          Sun elevation
-        </text>,
-        <text key="l-earth" x={PAD_L + 84} y={plotTop + 11} fontSize={10} fill={EARTH}>
-          Earth elevation
-        </text>,
       );
     }
 
@@ -285,6 +279,17 @@ export function SimChart({ className }: { className?: string }) {
           strokeWidth={2}
         />
         <circle cx={cx} cy={plotTop - 4} r={3} fill={NOW} />
+        {/* Legend drawn last, top-right, so the future dimming and the cursor never cover it. */}
+        {proMode && (
+          <g fontSize={10} textAnchor="end" pointerEvents="none">
+            <text x={W - PAD_R - 4} y={plotTop + 11} fill={EARTH}>
+              Earth elevation
+            </text>
+            <text x={W - PAD_R - 94} y={plotTop + 11} fill={SUN}>
+              Sun elevation
+            </text>
+          </g>
+        )}
       </svg>
 
       {proMode && (
@@ -314,10 +319,8 @@ export function SimChart({ className }: { className?: string }) {
             {proMode && <span className="text-ink-muted"> {ts.earth_el[idx]!.toFixed(1)}°</span>}
           </Readout>
         )}
-        <Readout label={proMode ? 'Lit so far' : 'Sunny so far'}>
-          {Math.round(st.litFraction * 100)}%
-        </Readout>
-        <Readout label={proMode ? 'Longest dark' : 'Longest night'}>
+        <Readout label="Sunny so far">{Math.round(st.litFraction * 100)}%</Readout>
+        <Readout label="Longest night so far">
           {st.longestDarkHours > 0 ? hoursText(st.longestDarkHours, proMode) : 'none yet'}
         </Readout>
       </div>
