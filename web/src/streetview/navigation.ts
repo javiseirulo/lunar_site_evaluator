@@ -75,7 +75,7 @@ export class NavigationGestures {
   }
 }
 
-export const MAX_WALK_DISTANCE_M = 200;
+export const MAX_WALK_DISTANCE_M = 500;
 export const MIN_WALK_DISTANCE_M = 1;
 export const MOON_RADIUS_M = 1_737_400;
 
