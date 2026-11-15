@@ -790,6 +790,8 @@ function buildLander(source: Object3D, outcomeColor: string) {
   root.traverse((obj) => {
     const mesh = obj as Mesh;
     if (!mesh.isMesh || Array.isArray(mesh.material)) return;
+    // Clicks and hover go to the invisible cone, so the 34 model meshes are never ray-tested.
+    mesh.raycast = () => null;
     const original = mesh.material as MeshStandardMaterial;
     let copy = owned.get(original);
     if (!copy) {
