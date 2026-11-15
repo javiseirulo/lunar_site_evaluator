@@ -26,13 +26,13 @@ export type CardContent =
  * it are paper sheets, so they reset the tokens to the page's light theme.
  */
 const PAPER: CSSProperties = {
-  ['--color-heading' as string]: '#1c1915',
-  ['--color-ink' as string]: '#2c2822',
-  ['--color-ink-muted' as string]: '#6a6256',
-  ['--color-ink-faint' as string]: '#8a8174',
-  ['--color-edge' as string]: '#d9d0c0',
-  ['--color-line' as string]: '#d9d0c0',
-  color: '#2c2822',
+  ['--color-heading' as string]: '#ffffff',
+  ['--color-ink' as string]: '#e6edf7',
+  ['--color-ink-muted' as string]: '#9fb2d0',
+  ['--color-ink-faint' as string]: '#7f93b5',
+  ['--color-edge' as string]: '#24406e',
+  ['--color-line' as string]: '#24406e',
+  color: '#e6edf7',
 };
 
 /** Small paper sheet with a title row and a close button (card and pin form). */
@@ -101,7 +101,7 @@ export function GlobeCard({
   const badge =
     content.kind === 'site' && content.rank !== null ? (
       <span
-        className="num flex size-6 items-center justify-center rounded-full bg-[#f2c55c] text-[13px] font-medium text-[#1c1915]"
+        className="num flex size-6 items-center justify-center rounded-full bg-warn text-[13px] font-bold text-black"
         title={`Number ${content.rank} of the top five`}
       >
         {content.rank}

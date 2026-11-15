@@ -4,6 +4,7 @@ import { clsx } from 'clsx';
 import { useData } from '@/core';
 import { difficultyHint, type Difficulty } from '../engine/bars';
 import { southPoleSites } from '../engine/deal';
+import { useAppStore } from '@/core';
 import { useGame } from '../state/gameStore';
 import { MENU_BG, MODE_HISTORICAL, MODE_SOUTH_POLE } from './assets';
 import { GameImage } from './GameImage';
@@ -14,8 +15,11 @@ const DIFFICULTIES: { id: Difficulty; label: string }[] = [
 ];
 
 export function MenuScreen() {
-  const difficulty = useGame((s) => s.difficulty);
-  const setDifficulty = useGame((s) => s.setDifficulty);
+  // Difficulty is the site-wide Normal/Expert switch (header), so both places stay in step.
+  const proMode = useAppStore((s) => s.proMode);
+  const setProMode = useAppStore((s) => s.setProMode);
+  const difficulty: Difficulty = proMode ? 'expert' : 'normal';
+  const setDifficulty = (d: Difficulty) => setProMode(d === 'expert');
   const start = useGame((s) => s.start);
   // The hint lists the bars a real card shows (pending metrics are omitted from the cards).
   const sample = useData((s) => (s.sites ? southPoleSites(s.sites)[0] : undefined));

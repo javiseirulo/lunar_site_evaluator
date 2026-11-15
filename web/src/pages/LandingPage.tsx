@@ -52,6 +52,7 @@ export function LandingPage() {
     : null;
   const site = selected ?? best;
   const navigate = useNavigate();
+  const proMode = useAppStore((s) => s.proMode);
   const selectSite = useAppStore((s) => s.selectSite);
 
   const openMap = () => {
@@ -63,24 +64,24 @@ export function LandingPage() {
     <div className="flex flex-col gap-8">
       <section className="box grid overflow-hidden md:grid-cols-[minmax(280px,0.85fr)_minmax(0,1.15fr)]">
         <div className="flex flex-col justify-center p-6 sm:p-10">
-          <p className="label">A tool for the lunar south pole</p>
-          <h1 className="font-display mt-3 text-[40px] leading-[1.05] tracking-[-0.02em] sm:text-[46px]">
+          <p className="eyebrow">Lunar landing site navigator</p>
+          <h1 className="mt-3 text-[32px] leading-[1.1] sm:text-[40px]">
             Where should the next lander touch down?
           </h1>
           <p className="text-ink mt-4 max-w-[38ch] text-[16px] leading-relaxed">
-            Near the south pole the Sun stays low, so a short move can decide whether a lander has
-            power and can see Earth. Compare sites and dates before the mission slips.
+            Near the Moon&apos;s south pole the Sun stays low. A short move can decide whether a
+            lander has power and can see Earth.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <button
               type="button"
-              className="btn btn-go h-[42px] px-5 text-[15px]"
+              className="btn btn-go h-[44px] px-6 text-[13px]"
               onClick={openMap}
             >
               Explore the map
             </button>
-            <Link to="/compare" className="btn h-[42px] px-5 text-[15px]">
-              Compare sites
+            <Link to="/game" className="btn h-[44px] px-6 text-[13px]">
+              Play Mission
             </Link>
           </div>
         </div>
@@ -90,37 +91,41 @@ export function LandingPage() {
             <PolarMap className="size-full" />
           </div>
           {site && (
-            <p className="mt-3 text-center text-[13px] text-[#c8c2b4]">
+            <p className="mt-3 text-center text-ink-muted text-[13px]">
               {selected ? 'Selected' : 'Best in this data'}: {site.name}
               <span
                 className="mx-2 inline-block size-2.5 align-middle"
                 style={{ background: scoreColor(site.score) }}
                 aria-hidden
               />
-              <span className="num text-[#f4f0e6]">{Math.round(site.score * 100)}</span>
-              <span className="text-[#8d877c]"> / 100</span>
+              <span className="num text-white">{Math.round(site.score * 100)}</span>
+              <span className="text-ink-faint"> / 100</span>
             </p>
           )}
         </div>
       </section>
 
-      <section aria-labelledby="places-heading">
-        <h2 id="places-heading" className="font-display text-[28px] text-[#f4f0e6]">
-          Start anywhere
-        </h2>
-        <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {PLACES.map((place) => (
-            <Link
-              key={place.to}
-              to={place.to}
-              className="box hover:border-edge-lo flex flex-col px-5 py-4 transition-colors duration-150"
-            >
-              <span className="font-display text-heading text-[22px]">{place.title}</span>
-              <span className="text-ink-muted mt-1 text-[14px] leading-snug">{place.line}</span>
-            </Link>
-          ))}
-        </div>
-      </section>
+      {proMode && (
+        <section aria-labelledby="places-heading">
+          <h2 id="places-heading" className="text-[18px] tracking-[0.12em] uppercase">
+            All pages
+          </h2>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {PLACES.map((place) => (
+              <Link
+                key={place.to}
+                to={place.to}
+                className="box hover:border-edge-lo flex flex-col px-5 py-4 transition-colors duration-150"
+              >
+                <span className="text-heading font-mono text-[15px] font-bold tracking-[0.08em] uppercase">
+                  {place.title}
+                </span>
+                <span className="text-ink-muted mt-1 text-[14px] leading-snug">{place.line}</span>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   );
 }

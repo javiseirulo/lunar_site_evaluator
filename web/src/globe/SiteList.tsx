@@ -359,17 +359,17 @@ function Results() {
           aria-pressed={selected}
           className={cn(
             'grid w-full grid-cols-[22px_1fr_auto] items-baseline gap-x-1 rounded-[4px] px-3 py-[7px] text-left text-[14px] transition-colors duration-100',
-            selected ? 'bg-violet text-white' : 'hover:bg-panel-2',
+            selected ? 'bg-violet text-black' : 'hover:bg-panel-2',
             !e.candidate && !selected && 'text-ink-muted',
           )}
         >
-          <span className={cn('num text-[12px]', selected ? 'text-white/70' : 'text-ink-muted')}>
+          <span className={cn('num text-[12px]', selected ? 'text-black/70' : 'text-ink-muted')}>
             {rank ?? '·'}
           </span>
           <span className="truncate">{e.site.name}</span>
           <span className="flex gap-0.5 text-[12px]" aria-label={meetsText(e)}>
             {e.checks.map((c) => (
-              <span key={c.id} className={selected ? 'text-white' : markTone(c)} title={c.text}>
+              <span key={c.id} className={selected ? 'text-black' : markTone(c)} title={c.text}>
                 {mark(c)}
               </span>
             ))}
@@ -378,7 +378,7 @@ function Results() {
             <span
               className={cn(
                 'col-start-2 col-end-4 truncate text-[12px]',
-                selected ? 'text-white/80' : 'text-ink-muted',
+                selected ? 'text-black/80' : 'text-ink-muted',
               )}
             >
               {meetsText(e)}
@@ -388,7 +388,7 @@ function Results() {
             <span
               className={cn(
                 'col-start-2 col-end-4 truncate text-[12px]',
-                selected ? 'text-white/80' : 'text-bad',
+                selected ? 'text-black/80' : 'text-bad',
               )}
             >
               {firstMiss.text}
@@ -478,11 +478,17 @@ export function SiteDetail({ className }: { className?: string }) {
     return (
       <section className={cn('box p-5', className)}>
         <h2 className="text-[18px]">No site selected</h2>
-        <ol className="text-ink mt-3 list-decimal space-y-2 pl-5 text-[14px]">
-          <li>Add a mission requirement on the left to find candidate sites.</li>
-          <li>Click a site in the list or on the map.</li>
-          <li>Press Play and watch when the site gets sunlight and sees Earth.</li>
-        </ol>
+        {proMode ? (
+          <ol className="text-ink mt-3 list-decimal space-y-2 pl-5 text-[14px]">
+            <li>Add a mission requirement on the left to find candidate sites.</li>
+            <li>Click a site in the list or on the map.</li>
+            <li>Press Play and watch when the site gets sunlight and sees Earth.</li>
+          </ol>
+        ) : (
+          <p className="text-ink mt-3 text-[14px]">
+            Tap a site on the map or in the list. Then press Play to watch the days go by.
+          </p>
+        )}
       </section>
     );
   }
@@ -512,7 +518,7 @@ export function SiteDetail({ className }: { className?: string }) {
         </div>
       )}
 
-      <NowSection siteId={site.id} />
+      <NowSection siteId={site.id} expert={proMode} />
 
       <div className="mt-4">
         <p className="text-heading text-[15px] font-medium">
@@ -531,13 +537,15 @@ export function SiteDetail({ className }: { className?: string }) {
               value={stats.sunlitFraction !== null ? pct(stats.sunlitFraction) : '—'}
             />
             <Row label="Longest night (whole window)" value={formatHours(stats.longestNightH)} />
-            <Row
-              label="Longest comm gap (whole window)"
-              value={
-                stats.longestCommGapH === null ? 'unknown' : formatHours(stats.longestCommGapH)
-              }
-            />
-            {req.panelW !== undefined && stats.sunlitFraction !== null && (
+            {proMode && (
+              <Row
+                label="Longest comm gap (whole window)"
+                value={
+                  stats.longestCommGapH === null ? 'unknown' : formatHours(stats.longestCommGapH)
+                }
+              />
+            )}
+            {proMode && req.panelW !== undefined && stats.sunlitFraction !== null && (
               <Row
                 label="Mean solar power"
                 value={`${Math.round(meanPowerW(req.panelW, stats.sunlitFraction))} W${
@@ -545,10 +553,12 @@ export function SiteDetail({ className }: { className?: string }) {
                 }`}
               />
             )}
-            <Row
-              label="Slope"
-              value={slope === null ? 'pending terrain' : `${slope.toFixed(1)}°`}
-            />
+            {proMode && (
+              <Row
+                label="Slope"
+                value={slope === null ? 'pending terrain' : `${slope.toFixed(1)}°`}
+              />
+            )}
           </dl>
         )}
         {req.panelW !== undefined && (
@@ -563,7 +573,7 @@ export function SiteDetail({ className }: { className?: string }) {
   );
 }
 
-function NowSection({ siteId }: { siteId: string }) {
+function NowSection({ siteId, expert }: { siteId: string; expert: boolean }) {
   const ts = useTimeseries(siteId);
   const loadError = useData((s) => s.timeseriesErrors[siteId]);
   const now = useAppStore((s) => s.currentTimeUTC);
@@ -572,9 +582,11 @@ function NowSection({ siteId }: { siteId: string }) {
   return (
     <div className="mt-4">
       <p className="text-heading text-[15px] font-medium">Now (Mission Clock)</p>
-      <p className="text-ink-muted text-[12px]">
-        {formatUtc(now)}. Countdowns start at this time, not at the start of the window.
-      </p>
+      {expert && (
+        <p className="text-ink-muted text-[12px]">
+          {formatUtc(now)}. Countdowns start at this time, not at the start of the window.
+        </p>
+      )}
       {loadError ? (
         <p className="text-bad mt-1 text-[13px]">Could not load this site's data.</p>
       ) : !ts || !sky ? (
